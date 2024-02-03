@@ -1,0 +1,300 @@
+import { Head, Link, router } from '@inertiajs/react';
+import React, { useEffect, useState } from 'react';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import Header from '@/Components/Header';
+import { IoArrowBackOutline, IoCalendarOutline, IoFilter, IoPlayBack, IoPlayForward, IoSearchSharp } from 'react-icons/io5';
+import { useDebounce } from 'use-debounce';
+import { usePrevious } from 'react-use';    
+import formatNumber from '@/Utils/formatNumber';
+import Modal from '@/Components/Modal';
+import InputLabel from '@/Components/InputLabel';
+import SecondaryButton from '@/Components/SecondaryButton';
+import PrimaryButton from '@/Components/PrimaryButton';
+import Datepicker from 'react-tailwindcss-datepicker';
+import TitleMobile from '@/Components/Mobiles/TitleMobile';
+import ContentMobile from '@/Components/Mobiles/ContentMobile';
+import ContainerDesktop from '@/Components/Desktop/ContainerDesktop';
+import TitleDesktop from '@/Components/Desktop/TitleDesktop';
+import ContentDesktop from '@/Components/Desktop/ContentDesktop';
+
+function Index({users, userCollections, searchFilter}) {
+    const [showSearch, setShowSearch] = useState(false);
+    const [showFilter, setShowFilter] = useState(false);
+    const [search, setSearch] = useState(searchFilter || '');
+    const [dateValue, setDateValue] = useState({
+        startDate: '', 
+        endDate: ''
+    });
+    const [showDateFilter, setShowDateFilter] = useState(false);
+
+    const [debounceValue] = useDebounce(search, 500);
+    const [debounceDateValue] = useDebounce(dateValue, 500);
+
+    const prevSearch = usePrevious(search);
+
+    useEffect(() => {
+        if(prevSearch!==undefined) {
+            handleReloadPage();
+        }
+    }, [debounceValue, debounceDateValue]);
+    
+
+    const handleShowSearch = () => {
+        setShowSearch(!showSearch);
+    }
+
+    const handleReloadPage = () => {
+        router.reload({ 
+            only: ['users','userCollections'],
+            data: {
+                search, 
+                'start_date' : dateValue.startDate, 
+                'end_date' : dateValue.endDate 
+            }
+         });
+    }   ;
+
+    const handleDateValueChange = (newValue) => {
+        setDateValue(newValue); 
+    } 
+
+    return (
+        <>
+            <Head title='Pengguna' />
+
+            {/* Mobile */}
+                {/* Title */}
+                <TitleMobile>
+                    {/* search */}
+                    {
+                        !showDateFilter && 
+                        <div className={`flex p-1 space-x-1 ${showSearch && 'w-full border-2'}`}>
+                            <button className={`p-2 rounded-md border-2 ${showSearch ? 'border-none' : 'border-gray'}`} onClick={handleShowSearch}>
+                                {
+                                    showSearch ? <IoArrowBackOutline /> : <IoSearchSharp />
+                                }                                
+                            </button>
+                            {
+                                !showSearch && 
+                                <button className={`p-2 rounded-md border-2 border-gray`} onClick={() => setShowDateFilter(true)}>
+                                    <IoCalendarOutline />               
+                                </button>
+                            }
+                            
+
+                            {/* Filter */}
+                            {/* {
+                                !showSearch && <div className='my-auto border-2 p-2'><IoFilter /></div>
+                            }   */}
+                            
+
+                            {/* Search Input */}
+                            {
+                                showSearch && <input type="search" className='border-none max-h-full h-full my-auto focus:border-none w-full focus:ring-0' placeholder='Masukkan Pencarian' value={search || ''}
+                                onChange={e => setSearch(e.target.value)}
+                                />
+                            }                        
+                        </div>
+                    }                    
+                    
+                    {
+                        showDateFilter && 
+                        <div className='flex p-1 space-x-1 w-full'>
+                            <div className='my-auto'>
+                                <button className='p-2' onClick={() => setShowDateFilter(false)}><IoArrowBackOutline /></button>
+                            </div>
+                            
+                            <div className='w-full'>
+                                <Datepicker
+                                    value={dateValue} 
+                                    onChange={handleDateValueChange} 
+                                    classNames={'border-2 w-full'}
+                                    separator={" sampai "} 
+
+                                />
+                            </div>                            
+                        </div>
+                    }
+
+                    {
+                        (!showSearch && !showDateFilter) && <div className='my-auto flex space-x-2'>                            
+                            <div className='my-auto'>
+                                {
+                                    users.links[0].url 
+                                    ? <Link href={`/admin/users?page=${users.current_page - 1}&search=${search}`}preserveState><IoPlayBack /></Link>
+                                    : <div className='text-gray-300'><IoPlayBack /></div>
+                                }                                
+                            </div>
+                            <div className='my-auto'>{users.current_page}/{users.last_page}</div>
+                            <div className='my-auto'>
+                                {
+                                    users.links[users.links.length-1].url 
+                                    ? <Link href={`/admin/users?page=${users.current_page + 1}&search=${search}`}
+                                        only={['users','userCollections']} preserveState>
+                                        <IoPlayForward />
+                                    </Link>
+                                    : <div className='text-gray-300'><IoPlayForward /></div>
+                                }   
+                            </div>
+                        </div>
+                    }
+
+                    {
+                        (!showSearch && !showDateFilter) && <div className='my-auto italic text-xs'>    
+                            {formatNumber(users.current_page*users.per_page-(users.per_page-1))}-{formatNumber(users.to)} dari {formatNumber(users.total)}
+                        </div>
+                    }
+                </TitleMobile>
+
+                {/* Content */}
+                <ContentMobile>
+                    {
+                        userCollections.map(user => 
+                            <div key={user.id} className=' text-gray-900 py-2 px-1 border flex justify-between'>
+                                <div className=''>
+                                    <div>
+                                        {user.email}
+                                    </div>
+                                    <div className='text-sm'>
+                                        {user.name}
+                                    </div>
+                                    <div className='text-sm'>
+                                        Dibuat Tanggal: {user.date}
+                                    </div>
+                                    <div className='text-sm'>
+                                        {
+                                            user.email_verified_at 
+                                            ? <div className='italic text-green-600'>Telah Terverifikasi</div>
+                                            : <div className='italic text-red-600'>Belum Terverifikasi</div>
+                                        }
+                                    </div>
+                                </div>
+                                <div>
+                                    {user.role.toUpperCase()}
+                                </div>                                   
+                            </div>) 
+                    }
+                </ContentMobile>
+            {/* Mobile */}
+
+            {/* Desktop */}
+                <ContainerDesktop>
+                    {/* Title, Pagination, Search */}
+                    <TitleDesktop>
+                        <div className='w-1/4 my-auto '>
+                            <Datepicker
+                                value={dateValue} 
+                                onChange={handleDateValueChange} 
+                                showShortcuts={true} 
+                                classNames={'border-2'}
+                                separator={" sampai "} 
+                            />
+                        </div>
+                        
+                        <div className='w-1/4 border flex rounded-lg'>
+                            <label htmlFor='search-input' className='my-auto ml-2'><IoSearchSharp /></label>
+                            <input id='search-input' name='search-input' type="search" placeholder='Cari Pengguna' className='w-full border-none focus:outline-none focus:ring-0' value={search || ''}
+                            onChange={e => setSearch(e.target.value)}/>
+                        </div>
+
+                        <div className='italic text-xs my-auto w-1/12 text-center'>
+                            {formatNumber(users.current_page*users.per_page-(users.per_page-1))}-{formatNumber(users.to)} dari {formatNumber(users.total)}
+                        </div>
+
+                        <div className='my-auto flex space-x-2 w-1/12'>
+                            <div className='my-auto'>
+                                {
+                                    users.links[0].url 
+                                    ? <Link href={`/admin/users?page=${users.current_page - 1}&search=${search}`}preserveState><IoPlayBack /></Link>
+                                    : <div className='text-gray-300'><IoPlayBack /></div>
+                                }                                
+                            </div>
+                            <div className='my-auto'>{users.current_page}/{users.last_page}</div>
+                            <div className='my-auto'>
+                                {
+                                    users.links[users.links.length-1].url 
+                                    ? <Link href={`/admin/users?page=${users.current_page + 1}&search=${search}`}
+                                        only={['users','userCollections']} preserveState>
+                                        <IoPlayForward />
+                                    </Link>
+                                    : <div className='text-gray-300'><IoPlayForward /></div>
+                                }   
+                            </div>
+                        </div>
+                    </TitleDesktop>
+
+                    {/* Data */}
+                    <ContentDesktop>
+                        <table className='table table-pin-rows table-pin-cols text-base'>
+                            <thead className='text-base text-gray-900'>
+                                <tr className=''>
+                                    <th className='bg-gray-200'>Nama</th>
+                                    <th className='bg-gray-200'>Email</th>
+                                    <th className='bg-gray-200'>Dibuat Tanggal</th>
+                                    <th className='bg-gray-200'>Verifikasi</th>
+                                </tr>
+                            </thead>
+                            <tbody className=''>
+                                {
+                                    userCollections.map((user, index) =>
+                                        <tr className={`${index % 2 == 0 && 'bg-gray-100'}`} key={index}>
+                                            <td className=''>{user.name}</td>
+                                            <td className=''>{user.email}</td>
+                                            <td className=''>{user.date}</td>
+                                            <td className=''>
+                                            {
+                                                user.email_verified_at 
+                                                ? <div className='italic text-green-600'>Telah Terverifikasi</div>
+                                                : <div className='italic text-red-600'>Belum Terverifikasi</div>
+                                            }
+                                            </td>
+                                        </tr>
+                                    )
+                                }
+                            </tbody>
+                        </table>                                
+                    </ContentDesktop>
+                </ContainerDesktop>
+
+                {/* Modal */}
+                <Modal show={showFilter} onClose={() => setShowFilter(false)}>
+                    <div className='p-5'>
+                    
+                        <h2 className="text-lg font-medium text-gray-900">
+                            Filter Data
+                        </h2>
+                        <div className="mt-6 flex justify-between space-x-5">
+                            <InputLabel htmlFor="date-input" className='my-auto'>Tanggal</InputLabel>
+                            <Datepicker
+                                value={dateValue} 
+                                onChange={handleDateValueChange} 
+                                classNames={'z-100'}
+                            />
+                            {/* <input type="date" /> */}
+                        </div>
+
+                        <div className="mt-6 flex justify-end">
+                            <SecondaryButton onClick={() => setShowFilter(false)}>Batal</SecondaryButton>
+
+                            <PrimaryButton className="ms-3" 
+                                // disabled={processing}
+                            >
+                                Filter
+                            </PrimaryButton>
+                        </div>
+                    </div>
+                </Modal>
+            {/* Desktop */}
+
+        </>
+    );
+}
+
+Index.layout = page => <AuthenticatedLayout
+    header={<Header>Data User</Header>}
+    children={page}
+    user={page.props.auth.user}
+    title="Data User"
+/>
+
+export default Index;

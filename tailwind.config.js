@@ -8,6 +8,8 @@ export default {
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
         './resources/js/**/*.jsx',
+        "./src/**/*.{js,jsx,ts,tsx}",
+        "./node_modules/react-tailwindcss-datepicker/dist/index.esm.js",
     ],
 
     theme: {
@@ -18,5 +20,5 @@ export default {
         },
     },
 
-    plugins: [forms],
+    plugins: [forms, require("daisyui")],
 };

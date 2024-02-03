@@ -2,6 +2,9 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\IsAdmin;
+use App\Http\Middleware\IsNotViewer;
+use App\Http\Middleware\IsNotExpired;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -66,5 +69,9 @@ class Kernel extends HttpKernel
         'signed' => \App\Http\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+        'user.has.organization' => \App\Http\Middleware\UserHasOrganization::class,
+        'is.not.expired' => IsNotExpired::class,
+        'is.admin' => IsAdmin::class,
+        'is.not.viewer' => IsNotViewer::class,
     ];
 }

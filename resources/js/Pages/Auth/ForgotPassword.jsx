@@ -20,8 +20,7 @@ export default function ForgotPassword({ status }) {
             <Head title='Forgot Password' />
 
             <div className='mb-4 text-sm text-gray-600'>
-                Forgot your password? No problem. Just let us know your email address and we will email you a password
-                reset link that will allow you to choose a new one.
+                Lupa password anda? Tidak Masalah. Silakan masukkan email anda, lalu kami akan mengirimkan Link untuk mengatur kembali password anda.
             </div>
 
             {status && <div className='mb-4 font-medium text-sm text-green-600'>{status}</div>}
@@ -41,7 +40,7 @@ export default function ForgotPassword({ status }) {
 
                 <div className='flex items-center justify-end mt-4'>
                     <PrimaryButton className='ms-4' disabled={processing}>
-                        Email Password Reset Link
+                        Link Reset Password Email
                     </PrimaryButton>
                 </div>
             </form>

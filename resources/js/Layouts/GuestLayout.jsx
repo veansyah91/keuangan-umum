@@ -6,7 +6,7 @@ export default function Guest({ children }) {
         <div className='min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100'>
             <div>
                 <Link href='/'>
-                    <ApplicationLogo className='w-20 h-20 fill-current text-gray-500' />
+                    <h2 className='font-bold text-[#32a96c] text-4xl'>Keuangan Umum</h2>
                 </Link>
             </div>
 
