@@ -1,7 +1,7 @@
 import React from 'react'
 import { IoCreateOutline, IoEllipsisVertical, IoTrash } from 'react-icons/io5'
 
-export default function ContactComponentDesktop({contactCategory, className, handleDelete, handleEdit, role}) {
+export default function ContactCategoryDesktop({contactCategory, className, handleDelete, handleEdit, role}) {
     return (
         <>
           <tr className={className}>

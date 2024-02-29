@@ -4,7 +4,6 @@ import Header from '@/Components/Header';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { IoArrowBackOutline, IoPlayBack, IoPlayForward, IoSearchSharp } from 'react-icons/io5';
 import TitleMobile from '@/Components/Mobiles/TitleMobile';
-import formatNumber from '@/Utils/formatNumber';
 import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
 import PrimaryButton from '@/Components/PrimaryButton';
@@ -85,52 +84,30 @@ export default function Index({provinces, searchFilter}) {
                     <NavgroupRegionalMobile onClick={() => setShowModalImport(true)}/>
                 </div> 
 
-                <TitleMobile className={'z-50'}>
-                    {/* search */}                        
-                    <div className={`flex p-1 space-x-1 ${showSearch && 'w-full border-2'}`}>
-                        <button className={`p-2 rounded-md border-2 ${showSearch ? 'border-none' : 'border-gray'}`} onClick={handleShowSearch}>
-                            {
-                                showSearch ? <IoArrowBackOutline /> : <IoSearchSharp />
-                            }                                
-                        </button>
-
-                        {/* Search Input */}
-                        {
-                            showSearch && <input type="search" className='border-none max-h-full h-full my-auto focus:border-none w-full focus:ring-0' placeholder='Masukkan Pencarian' value={search || ''}
-                            onChange={e => setSearch(e.target.value)}
-                            />
-                        }  
-                    </div>     
-
-                    {
-                        !showSearch && <div className='my-auto flex space-x-2'>                            
-                            <div className='my-auto'>
-                                {
-                                    provinces.links[0].url 
-                                    ? <Link href={`/admin/data-master/provinces?page=${provinces.current_page - 1}&search=${search}`}preserveState><IoPlayBack /></Link>
-                                    : <div className='text-gray-300'><IoPlayBack /></div>
-                                }                                
-                            </div>
-                            <div className='my-auto'>{provinces.current_page}/{provinces.last_page}</div>
-                            <div className='my-auto'>
-                                {
-                                    provinces.links[provinces.links.length-1].url 
-                                    ? <Link href={`/admin/data-master/provinces?page=${provinces.current_page + 1}&search=${search}`}
-                                        only={['provinces']} preserveState>
-                                        <IoPlayForward />
-                                    </Link>
-                                    : <div className='text-gray-300'><IoPlayForward /></div>
-                                }   
-                            </div>
-                        </div>
+                <TitleMobile 
+                    zIndex={'z-50'}
+                    search={search}
+                    setSearch= {e => setSearch(e.target.value)}
+                    pageBefore={
+                        provinces.links[0].url 
+                        ? <Link href={`/admin/data-master/provinces?page=${provinces.current_page - 1}&search=${search}`}preserveState><IoPlayBack /></Link>
+                        : <div className='text-gray-300'><IoPlayBack /></div>
                     }
-
-                    {
-                        !showSearch && <div className='my-auto italic text-xs'>    
-                            <PageNumber data={provinces} />
-                        </div>
+                    pageAfter={
+                        provinces.links[provinces.links.length-1].url 
+                        ? <Link href={`/admin/data-master/provinces?page=${provinces.current_page + 1}&search=${search}`}
+                            only={['provinces']} preserveState>
+                            <IoPlayForward />
+                        </Link>
+                        : <div className='text-gray-300'><IoPlayForward /></div>
                     }
-                </TitleMobile>
+                    page={
+                        <>
+                            {provinces.current_page}/{provinces.last_page}
+                        </>
+                    }
+                    data={provinces}
+                />
                 <ContentMobile>
                     {
                         provinces.data.map(province => 

@@ -4,15 +4,24 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\LogController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\JournalController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProgramController;
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\CashflowController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DataLedgerController;
 use App\Http\Controllers\DataMasterController;
+use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\Admin\RegencyController;
 use App\Http\Controllers\Admin\VillageController;
 use App\Http\Controllers\Admin\DistrictController;
 use App\Http\Controllers\Admin\ProvinceController;
+use App\Http\Controllers\AccountCategoryController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\ContactCategoryController;
 use App\Http\Controllers\Admin\AdminMasterController;
@@ -101,7 +110,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     Route::middleware([
             // 'user.has.organization:{parameter}', 
-            // 'is.not.expired:{parameter}'
+            // 'is.not.expired:{parameter}',
         ])->group(function () {
         // Log Activity
 
@@ -109,24 +118,93 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/dashboard/{organization}', [DashboardController::class, 'index'])->name('dashboard');
         //
 
-        // Data Master 
-        Route::prefix('data-master/{organization}')->group(function(){
-            // Log
-            Route::get('/logs', LogController::class)->name('logs');
+        // Log
+        Route::get('/logs/{organization}', LogController::class)->name('logs');
 
+        // Data Master 
+        Route::prefix('data-master/{organization}')->group(function(){        
             Route::get('/', DataMasterController::class)->name('data-master');
 
             // Contact
-            Route::get('/contacts', [ContactController::class, 'index'])->name('contact');
+            Route::get('/contacts', [ContactController::class, 'index'])->name('data-master.contact');
+            Route::get('/contacts/create', [ContactController::class, 'create'])->name('data-master.contact.create')->middleware('is.not.viewer');
+            Route::post('/contacts', [ContactController::class, 'store'])->name('data-master.contact.store')->middleware('is.not.viewer');
+            Route::get('/contacts/{contact}/edit', [ContactController::class, 'edit'])->name('data-master.contact.edit')->middleware('is.not.viewer');
+            Route::patch('/contacts/{contact}', [ContactController::class, 'update'])->name('data-master.contact.update')->middleware('is.not.viewer');
+            Route::delete('/contacts/{contact}', [ContactController::class, 'destroy'])->name('data-master.contact.destroy')->middleware('is.not.viewer');
 
             // Contact Category
-            Route::get('/contact-categories', [ContactCategoryController::class, 'index'])->name('contact-category');
-            Route::post('/contact-categories', [ContactCategoryController::class, 'store'])->name('contact-category.post')->middleware('is.not.viewer');
-            Route::patch('/contact-categories/{contactCategory}', [ContactCategoryController::class, 'update'])->name('contact-category.update')->middleware('is.not.viewer');
-            Route::delete('/contact-categories/{contactCategory}', [ContactCategoryController::class, 'destroy'])->name('contact-category.destroy')->middleware('is.not.viewer');            
-        });
-    });
+            Route::get('/contact-categories', [ContactCategoryController::class, 'index'])->name('data-master.contact-category');
+            Route::post('/contact-categories', [ContactCategoryController::class, 'store'])->name('data-master.contact-category.post')->middleware('is.not.viewer');
+            Route::patch('/contact-categories/{contactCategory}', [ContactCategoryController::class, 'update'])->name('data-master.contact-category.update')->middleware('is.not.viewer');
+            Route::delete('/contact-categories/{contactCategory}', [ContactCategoryController::class, 'destroy'])->name('data-master.contact-category.destroy')->middleware('is.not.viewer');   
 
+            // Projects
+            Route::get('/projects', [ProjectController::class, 'index'])->name('data-master.project');
+            Route::get('/projects/create', [ProjectController::class, 'create'])->name('data-master.project.create')->middleware('is.not.viewer');
+            Route::post('/projects', [ProjectController::class, 'store'])->name('data-master.project.post')->middleware('is.not.viewer');
+            Route::get('/projects/{project}/edit', [ProjectController::class, 'edit'])->name('data-master.project.edit')->middleware('is.not.viewer');
+            Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('data-master.project.show');
+            Route::patch('/projects/{project}', [ProjectController::class, 'update'])->name('data-master.project.update')->middleware('is.not.viewer');
+            Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->name('data-master.project.destroy')->middleware('is.not.viewer');
+
+            // Programs
+            Route::get('/programs', [ProgramController::class, 'index'])->name('data-master.program');
+            Route::post('/programs', [ProgramController::class, 'store'])->name('data-master.program.post')->middleware('is.not.viewer');
+            Route::patch('/programs/{program}', [ProgramController::class, 'update'])->name('data-master.program.update')->middleware('is.not.viewer');
+            Route::delete('/programs/{program}', [ProgramController::class, 'destroy'])->name('data-master.program.destroy')->middleware('is.not.viewer');
+            
+             // Departments
+             Route::get('/departments', [DepartmentController::class, 'index'])->name('data-master.department');
+             Route::post('/departments', [DepartmentController::class, 'store'])->name('data-master.department.post')->middleware('is.not.viewer');
+             Route::patch('/departments/{department}', [DepartmentController::class, 'update'])->name('data-master.department.update')->middleware('is.not.viewer');
+             Route::delete('/departments/{department}', [DepartmentController::class, 'destroy'])->name('data-master.department.destroy')->middleware('is.not.viewer');
+             
+        });
+
+        // Accountancy
+        Route::prefix('data-ledger/{organization}')->group(function(){
+            Route::get('/', DataLedgerController::class)->name('data-ledger');
+
+            // Account Category
+            Route::get('/account-categories', [AccountCategoryController::class, 'index'])->name('data-ledger.account-category');
+            Route::post('/account-categories', [AccountCategoryController::class, 'store'])->name('data-ledger.account-category.post')->middleware('is.not.viewer');
+            Route::patch('/account-categories/{accountCategory}', [AccountCategoryController::class, 'update'])->name('data-ledger.account-category.patch')->middleware('is.not.viewer');
+            Route::delete('/account-categories/{accountCategory}', [AccountCategoryController::class, 'destroy'])->name('data-ledger.account-category.delete')->middleware('is.not.viewer');
+
+            // Account
+            Route::get('/accounts', [AccountController::class, 'index'])->name('data-ledger.account');
+            Route::post('/accounts', [AccountController::class, 'store'])->name('data-ledger.account.post')->middleware('is.not.viewer');
+            Route::patch('/accounts/{account}', [AccountController::class, 'update'])->name('data-ledger.account.update')->middleware('is.not.viewer');
+            Route::delete('/accounts/{account}', [AccountController::class, 'destroy'])->name('data-ledger.account.delete')->middleware('is.not.viewer');
+            
+            // Journal
+            Route::get('/journals', [JournalController::class, 'index'])->name('data-ledger.journal');
+            Route::post('/journals', [JournalController::class, 'store'])->name('data-ledger.journal.store')->middleware('is.not.viewer');
+            Route::get('/journals/create', [JournalController::class, 'create'])->name('data-ledger.journal.create')->middleware('is.not.viewer');
+            Route::get('/journals/{journal}', [JournalController::class, 'show'])->name('data-ledger.journal.show');
+            Route::get('/journals/{journal}/edit', [JournalController::class, 'edit'])->name('data-ledger.journal.edit')->middleware('is.not.viewer');
+            Route::patch('/journals/{journal}', [JournalController::class, 'update'])->name('data-ledger.journal.update')->middleware('is.not.viewer');
+            Route::delete('/journals/{journal}', [JournalController::class, 'destroy'])->name('data-ledger.journal.delete')->middleware('is.not.viewer');
+        });
+
+        // Reports
+        Route::prefix('reports/{organization}')->group(function(){
+            Route::get('/', [ReportController::class, 'index'])->name('report');
+            Route::get('/cashflow', [ReportController::class, 'cashflow'])->name('report.cashflow');
+            Route::get('/balance', [ReportController::class, 'balance'])->name('report.balance');
+            Route::get('/lost-profit', [ReportController::class, 'lostProfit'])->name('report.lost-profit');
+            Route::get('/journal', [ReportController::class, 'journal'])->name('report.journal');
+
+        });
+
+        // Cashflow
+        Route::prefix('cashflows/{organization}')->group(function(){
+            Route::get('/', CashflowController::class)->name('cashflow');
+
+        });
+
+    });
 });
 
 Route::middleware('auth')->group(function () {

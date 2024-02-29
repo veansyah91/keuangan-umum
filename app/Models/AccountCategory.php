@@ -10,10 +10,23 @@ class AccountCategory extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['code', 'name'];
+    protected $fillable = ['code', 'name', 'organization_id'];
 
-    public function account(): HasMany
+    public function accounts(): HasMany
     {
         return $this->hasMany(Account::class);
+    }
+
+    public function scopeFilter($query, $filters)
+    {
+        $query->when($filters['search'] ?? false, function ($query, $search) {
+            return $query->where('name', 'like', '%'.$search.'%')
+                            ->orWhere('code', 'like', '%'.$search.'%');
+        });
+
+        $query->when($filters['accountCategoryFilter'] ?? false, function ($query, $accountCategoryFilter) {
+            return $query->where('name', 'like', '%'.$accountCategoryFilter.'%')
+                            ->orWhere('code', 'like', '%'.$accountCategoryFilter.'%');
+        });
     }
 }

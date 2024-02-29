@@ -6,14 +6,16 @@ use Carbon\Carbon;
 use App\Models\User;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Str;
 use App\Models\Organization;
 use Illuminate\Http\Request;
+use App\Models\ContactCategory;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use App\Repositories\Village\VillageRepository;
 use App\Repositories\Account\AccountRepositoryInterface;
 use App\Repositories\AccountCategory\AccountCategoryRepositoryInterface;
-use Illuminate\Validation\Rule;
 
 
 class OrganizationController extends Controller
@@ -22,264 +24,277 @@ class OrganizationController extends Controller
         // Neraca
         // Aset Lancar
         [
-            'code' => '110000',
-            'name' => 'Kas dan Setara Kas',
+            'code' => '110000000',
+            'name' => 'KAS',
         ],
         [
-            'code' => '120000',
-            'name' => 'Piutang',
+            'code' => '112000000',
+            'name' => 'BANK',
         ],
         [
-            'code' => '130000',
-            'name' => 'Biaya Dibayar Dimuka',
+            'code' => '120000000',
+            'name' => 'PIUTANG',
         ],
         [
-            'code' => '131000',
-            'name' => 'Pajak Dibayar Dimuka',
+            'code' => '130000000',
+            'name' => 'BIAYA DIBAYAR DI MUKA',
         ],
         [
-            'code' => '150000',
-            'name' => 'Persediaan',
+            'code' => '131000000',
+            'name' => 'PAJAK DIBAYAR DI MUKA',
+        ],
+        [
+            'code' => '150000000',
+            'name' => 'PERSEDIAAN',
         ],
         //
         // Aset Tetap
         // Kode 16xxxx Digunakan jika Yayasan memiliki Lembaga di bawahnya
         [
-            'code' => '160000',
-            'name' => 'Investasi',
+            'code' => '160000000',
+            'name' => 'INVESTASI',
         ],
         [
-            'code' => '170000',
-            'name' => 'Harta Tetap Berwujud',
+            'code' => '170000000',
+            'name' => 'HARTA TETAP BERWUJUD',
         ],
         [
-            'code' => '171000',
-            'name' => 'Akumulasi Penyusutan Harta Tetap Berwujud',
+            'code' => '171000000',
+            'name' => 'AKUMULASI PENYUSUTAN HARTA TETAP BERWUJUD',
         ],
         //
         // Utang
         [
-            'code' => '210000',
-            'name' => 'Kewajiban',
+            'code' => '210000000',
+            'name' => 'KEWAJIBAN',
         ],
         [
-            'code' => '220000',
-            'name' => 'Pendapatan Diterima Dimuka',
+            'code' => '220000000',
+            'name' => 'PENDAPATAN DITERIMA DI MUKA',
         ],
         [
-            'code' => '230000',
-            'name' => 'Tabungan',
+            'code' => '230000000',
+            'name' => 'TABUNGAN',
         ],
         [
-            'code' => '240000',
-            'name' => 'Utang Pajak',
+            'code' => '240000000',
+            'name' => 'UTANG PAJAL',
+        ],
+        [
+            'code' => '260000000',
+            'name' => 'UTANG JANGKA PANJANG',
         ],
         //
         // Modal
         [
-            'code' => '310000',
-            'name' => 'Modal',
+            'code' => '310000000',
+            'name' => 'MODAL',
         ],
         [
-            'code' => '320000',
-            'name' => 'Laba',
+            'code' => '320000000',
+            'name' => 'LABA',
         ],
         //
         // Pendapatan
         [
-            'code' => '410000',
-            'name' => 'Pendapatan Dari Donatur Tetap',
+            'code' => '410000000',
+            'name' => 'PENDAPATAN DARI DONATUR TETAP',
         ],
         [
-            'code' => '420000',
-            'name' => 'Pendapatan Dari Sumbangan',
+            'code' => '420000000',
+            'name' => 'PENDAPATAN DARI SUMBANGAN',
         ],
         //
         // Pengeluaran Variabel
         [
-            'code' => '510000',
-            'name' => 'Akomodasi Ustad',
+            'code' => '510000000',
+            'name' => 'AKOMODASI USTAD',
         ],
         [
-            'code' => '520000',
-            'name' => 'Pengeluaran Rapat',
+            'code' => '520000000',
+            'name' => 'PENGELUARAN RAPAT',
         ],
         //
         // Pengeluaran Tetap
         [
-            'code' => '610000',
-            'name' => 'Beban Operasional',
+            'code' => '610000000',
+            'name' => 'BEBAN OPERASIONAL',
         ],
         [
-            'code' => '620000',
-            'name' => 'Beban Administrasi Dan Umum',
+            'code' => '620000000',
+            'name' => 'BEBAN ADMINISTRASI DAN UMUM',
         ],
         //
         // Beban Penyusutan
         [
-            'code' => '710000',
-            'name' => 'Beban Penyusutan',
+            'code' => '710000000',
+            'name' => 'BEBAN PENYUSUTAN',
         ],
         //
     ];
 
     protected $accountsDefault = [
         [
-            'category_name' => 'Kas dan Setara Kas',
-            'code' => '111000',
-            'name' => 'Kas',
+            'category_name' => 'KAS',
+            'code' => '111000000',
+            'name' => 'KAS',
             'is_cash' => true,
         ],
         [
-            'category_name' => 'Kas dan Setara Kas',
-            'code' => '112000',
-            'name' => 'Bank',
+            'category_name' => 'BANK',
+            'code' => '112000000',
+            'name' => 'BANK',
             'is_cash' => true,
         ],
         [
-            'category_name' => 'Piutang',
-            'code' => '120000',
-            'name' => 'Piutang',
+            'category_name' => 'PIUTANG',
+            'code' => '120000000',
+            'name' => 'PIUTAN',
         ],
         [
-            'category_name' => 'Biaya Dibayar Dimuka',
-            'code' => '130000',
-            'name' => 'Biaya Dibayar Dimuka',
+            'category_name' => 'BIAYA DIBAYAR DI MUKA',
+            'code' => '130000000',
+            'name' => 'BIAYA DIBAYAR DI MUKA',
         ],
         [
-            'category_name' => 'Pajak Dibayar Dimuka',
-            'code' => '131000',
-            'name' => 'Pajak Dibayar Dimuka',
+            'category_name' => 'PAJAK DIBAYAR DI MUKA',
+            'code' => '131000000',
+            'name' => 'PAJAK DIBAYAR DI MUKA',
         ],
         [
-            'category_name' => 'Persediaan',
-            'code' => '150000',
-            'name' => 'Persediaan',
+            'category_name' => 'PERSEDIAAN',
+            'code' => '150000000',
+            'name' => 'PERSEDIAAN',
         ],
         [
-            'category_name' => 'Investasi',
-            'code' => '160000',
-            'name' => 'Investasi',
+            'category_name' => 'INVESTASI',
+            'code' => '160000000',
+            'name' => 'INVESTASI',
         ],
         [
-            'category_name' => 'Harta Tetap Berwujud',
-            'code' => '170000',
-            'name' => 'Tanah',
+            'category_name' => 'HARTA TETAP BERWUJUD',
+            'code' => '170000000',
+            'name' => 'TANAH',
         ],
         [
-            'category_name' => 'Harta Tetap Berwujud',
-            'code' => '170100',
-            'name' => 'Bangunan',
+            'category_name' => 'HARTA TETAP BERWUJUD',
+            'code' => '170100000',
+            'name' => 'BANGUNAN',
         ],
         [
-            'category_name' => 'Harta Tetap Berwujud',
-            'code' => '171100',
-            'name' => 'Akumulasi Penyusutan Bangunan',
+            'category_name' => 'AKUMULASI PENYUSUTAN HARTA TETAP BERWUJUD',
+            'code' => '171100000',
+            'name' => 'AKUMULASI PENYUSUTAN BANGUNAN',
         ],
         [
-            'category_name' => 'Harta Tetap Berwujud',
-            'code' => '170200',
-            'name' => 'Kendaraan',
+            'category_name' => 'HARTA TETAP BERWUJUD',
+            'code' => '170200000',
+            'name' => 'KENDARAAN',
         ],
         [
-            'category_name' => 'Harta Tetap Berwujud',
-            'code' => '171200',
-            'name' => 'Akumulasi Penyusutan Kendaraan',
+            'category_name' => 'AKUMULASI PENYUSUTAN HARTA TETAP BERWUJUD',
+            'code' => '171200000',
+            'name' => 'AKUMULASI PENYUSUTAN KENDARAAN',
         ],
         [
-            'category_name' => 'Harta Tetap Berwujud',
-            'code' => '170300',
-            'name' => 'Peralatan',
+            'category_name' => 'HARTA TETAP BERWUJUD',
+            'code' => '170300000',
+            'name' => 'PERALATAN',
         ],
         [
-            'category_name' => 'Harta Tetap Berwujud',
-            'code' => '171300',
-            'name' => 'Akumulasi Penyusutan Peralatan',
+            'category_name' => 'HARTA TETAP BERWUJUD',
+            'code' => '171300000',
+            'name' => 'AKUMULASI PENYUSUTAN PERALATAN',
         ],
         [
-            'category_name' => 'Kewajiban',
-            'code' => '210000',
-            'name' => 'Kewajiban',
+            'category_name' => 'KEWAJIBAN',
+            'code' => '210000000',
+            'name' => 'KEWAJIBAN',
         ],
         [
-            'category_name' => 'Pendapatan Diterima Dimuka',
-            'code' => '220000',
-            'name' => 'Pendapatan Diterima Dimuka',
+            'category_name' => 'PENDAPATAN DITERIMA DI MUKA',
+            'code' => '220000000',
+            'name' => 'PENDAPATAN DITERIMA DI MUKA',
         ],
         [
-            'category_name' => 'Utang Pajak',
-            'code' => '230000',
-            'name' => 'Utang Pajak',
+            'category_name' => 'UTANG PAJAK',
+            'code' => '230000000',
+            'name' => 'UTANG PAJAK',
         ],
         [
-            'category_name' => 'Tabungan',
-            'code' => '230000',
-            'name' => 'Tabungan',
+            'category_name' => 'TABUNGAN',
+            'code' => '240000000',
+            'name' => 'TABUNGAN',
         ],
         [
-            'category_name' => 'Modal',
-            'code' => '310000',
-            'name' => 'Modal',
+            'category_name' => 'MODAL',
+            'code' => '310000000',
+            'name' => 'MODAL',
         ],
         [
-            'category_name' => 'Laba',
-            'code' => '320000',
-            'name' => 'Modal',
+            'category_name' => 'LABA',
+            'code' => '320000000',
+            'name' => 'LABA TAHUN BERJALAN',
         ],
         [
-            'category_name' => 'Pendapatan Dari Donatur Tetap',
-            'code' => '410000',
-            'name' => 'Pendapatan Dari Donatur Tetap',
+            'category_name' => 'LABA',
+            'code' => '320000001',
+            'name' => 'LABA DITAHAN',
         ],
         [
-            'category_name' => 'Pendapatan Dari Donatur Tetap',
-            'code' => '420000',
-            'name' => 'Pendapatan Dari Sumbangan',
+            'category_name' => 'PENDAPATAN DARI DONATUR TETAP',
+            'code' => '410000000',
+            'name' => 'PENDAPATAN DARI DONATUR TETAP',
         ],
         [
-            'category_name' => 'Akomodasi Ustad',
-            'code' => '510000',
-            'name' => 'Akomodasi Ustad',
+            'category_name' => 'PENDAPATAN DARI SUMBANGAN',
+            'code' => '420000000',
+            'name' => 'PENDAPATAN DARI SUMBANGAN',
         ],
         [
-            'category_name' => 'Pengeluaran Rapat',
-            'code' => '520000',
-            'name' => 'Pengeluaran Rapat',
+            'category_name' => 'AKOMODASI USTAD',
+            'code' => '510000000',
+            'name' => 'AKOMODASI USTAD',
         ],
         [
-            'category_name' => 'Beban Operasional',
-            'code' => '610000',
-            'name' => 'Beban Operasional',
+            'category_name' => 'PENGELUARAN RAPAT',
+            'code' => '520000000',
+            'name' => 'PENGELUARAN RAPAT',
         ],
         [
-            'category_name' => 'Beban Operasional',
-            'code' => '610001',
-            'name' => 'Beban Listrik',
+            'category_name' => 'BEBAN OPERASIONAL',
+            'code' => '610000000',
+            'name' => 'BEBAN OPERASIONAL',
         ],
         [
-            'category_name' => 'Beban Operasional',
-            'code' => '610001',
-            'name' => 'Beban Air',
+            'category_name' => 'BEBAN OPERASIONAL',
+            'code' => '610000001',
+            'name' => 'BEBAN LISTRIK',
         ],
         [
-            'category_name' => 'Beban Administrasi Dan Umum',
-            'code' => '620000',
-            'name' => 'Beban Gaji',
+            'category_name' => 'BEBAN OPERASIONAL',
+            'code' => '610000002',
+            'name' => 'BEBAN AIR',
         ],
         [
-            'category_name' => 'Beban Penyusutan',
-            'code' => '711000',
-            'name' => 'Beban Penyusutan Bangunan',
+            'category_name' => 'BEBAN OPERASIONAL',
+            'code' => '620000000',
+            'name' => 'BEBAN GAJI',
         ],
         [
-            'category_name' => 'Beban Penyusutan',
-            'code' => '712000',
-            'name' => 'Beban Penyusutan Kendaraan',
+            'category_name' => 'BEBAN PENYUSUTAN',
+            'code' => '711000000',
+            'name' => 'BEBAN PENYUSUTAN BANGUNAN',
         ],
         [
-            'category_name' => 'Beban Penyusutan',
-            'code' => '713000',
-            'name' => 'Beban Penyusutan Peralatan',
+            'category_name' => 'BEBAN PENYUSUTAN',
+            'code' => '712000000',
+            'name' => 'BEBAN PENYUSUTAN KENDARAAN',
+        ],
+        [
+            'category_name' => 'BEBAN PENYUSUTAN',
+            'code' => '713000000',
+            'name' => 'BEBAN PENYUSUTAN PERALATAN',
         ],
     ];
 
@@ -334,7 +349,12 @@ class OrganizationController extends Controller
     {
         // validation
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => [
+                    'required',
+                    'string',
+                    'max:255',
+                    Rule::unique('organizations')
+                ],
             'address' => 'required|string|max:255',
             'legality' => 'string|nullable',
             'addressDetail.province' => 'string|nullable',
@@ -347,6 +367,8 @@ class OrganizationController extends Controller
             'addressDetail.village_id' => 'string|nullable',
         ]);
 
+        $validated['slug'] = Str::slug($validated['name']);
+
         // Trial 1 Month
         $now = Carbon::now();
         $validated['expired'] = $now->add(1, 'month');
@@ -358,7 +380,6 @@ class OrganizationController extends Controller
         $validated['district_id'] = $validated['addressDetail']['district_id'];
         $validated['village'] = $validated['addressDetail']['village'];
         $validated['village_id'] = $validated['addressDetail']['village_id'];
-
         $organization = Organization::create($validated);
         $organization['role'] = 'admin';
 
@@ -379,11 +400,18 @@ class OrganizationController extends Controller
 
             $filteredAccount->map(function ($account) use ($accountCategory) {
                 $account['organization_id'] = $accountCategory['organization_id'];
+                $account['can_be_deleted'] = $account['code'] == '320000000' ? false : true;
 
-                return $accountCategory->account()->create($account);
+                return $accountCategory->accounts()->create($account);
             });
         });
         //
+
+        // Category
+        ContactCategory::create([
+            'name' => 'UMUM',
+            'organization_id' => $organization['id']
+        ]);
 
         return redirect(route('organization'))->with('success', 'Organisasi Berhasil Disimpan!');
 
@@ -423,7 +451,12 @@ class OrganizationController extends Controller
     {
         // validation
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('organizations')->ignore($organization['id'])
+            ],
             'address' => 'required|string|max:255',
             'legality' => 'string|nullable',
             'addressDetail.province' => 'string|nullable',

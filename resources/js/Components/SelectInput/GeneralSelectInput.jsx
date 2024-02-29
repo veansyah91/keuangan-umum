@@ -1,4 +1,4 @@
-import { Fragment } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { Combobox, Transition } from '@headlessui/react'
 import { IoCheckmarkCircleOutline, IoChevronDownOutline } from 'react-icons/io5'
 
@@ -6,7 +6,7 @@ export default function GeneralSelectInput({
   data, selected, setSelected, query, setQuery, maxHeight = 'max-h-60', placeholder
 }) 
   {
-
+    let selectedData = selected;
   return (
       <Combobox value={selected} onChange={setSelected}>
         <div className="relative mt-1">
@@ -14,9 +14,10 @@ export default function GeneralSelectInput({
             <Combobox.Input
               className="w-full border-none py-3 pl-3 pr-10 leading-5 text-gray-800 focus:ring-0"
               displayValue={(selected) => selected.name}
-              onChange={(event) => setQuery(event.target.value)}
+              onChange={(event) => setQuery(event.target.value.toUpperCase())}
               placeholder={placeholder}
               type='search'
+              autoComplete="off"
             />
             <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-600 text-lg">
               <IoChevronDownOutline />
@@ -51,14 +52,14 @@ export default function GeneralSelectInput({
                             selected ? 'font-medium' : 'font-normal'
                           }`}
                         >
-                          {d.name}
+                          {d.name.toUpperCase()}
                         </span>
-                        {selected ? (
+                        {((selectedData.id == d.id)) ? (                          
                           <span
                             className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
                               active ? 'text-white' : 'text-teal-600'
                             }`}
-                          >
+                          >                            
                             <IoCheckmarkCircleOutline className="h-5 w-5" aria-hidden="true" />
                           </span>
                         ) : null}

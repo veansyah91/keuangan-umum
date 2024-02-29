@@ -59,81 +59,33 @@ export default function Index({logs, organization, searchFilter, startDate, endD
     }
 
     return <>
-        <Head title='Data Kecamatan' />
+        <Head title='Data Log Aktifitas' />
 
         {/* Mobile */}
-            <TitleMobile className={'z-50'}>                    
-                {
-                    !showDateFilter && 
-                    <div className={`flex p-1 space-x-1 ${showSearch && 'w-full border-2'}`}>
-                        <button className={`p-2 rounded-md border-2 ${showSearch ? 'border-none' : 'border-gray'}`} onClick={handleShowSearch}>
-                            {
-                                showSearch ? <IoArrowBackOutline /> : <IoSearchSharp />
-                            }                                
-                        </button>
-                        {
-                            !showSearch && 
-                            <button className={`p-2 rounded-md border-2 border-gray`} onClick={() => setShowDateFilter(true)}>
-                                <IoCalendarOutline />               
-                            </button>
-                        }
-                        
-
-                        {/* Search Input */}
-                        {
-                            showSearch && <input type="search" id='search' name='search' className='border-none max-h-full h-full my-auto focus:border-none w-full focus:ring-0' placeholder='Masukkan Pencarian' value={search || ''}
-                            onChange={e => setSearch(e.target.value)}
-                            />
-                        }                        
-                    </div>
-                }                    
-                
-                {
-                    showDateFilter && 
-                    <div className='flex p-1 space-x-1 w-full'>
-                        <div className='my-auto'>
-                            <button className='p-2' onClick={() => setShowDateFilter(false)}><IoArrowBackOutline /></button>
-                        </div>
-                        
-                        <div className='w-full'>
-                            <Datepicker
-                                value={dateValue} 
-                                onChange={handleDateValueChange} 
-                                classNames={'border-2 w-full'}
-                                separator={" sampai "} 
-                                id="date-picker-mobile"
-                            />
-                        </div>                            
-                    </div>
+            <TitleMobile 
+                zIndex={'z-50'}
+                search={search}
+                setSearch= {e => setSearch(e.target.value)}
+                pageBefore={
+                            logs.links[0].url 
+                ? <Link href={`/logs/${organization.id}?page=${logs.current_page - 1}&search=${search}`} preserveState only={['logs']}><IoPlayBack /></Link>
+                : <div className='text-gray-300'><IoPlayBack /></div>
                 }
-
-                {
-                    (!showSearch && !showDateFilter) && <div className='my-auto flex space-x-2'>                            
-                        <div className='my-auto'>
-                            {
-                                logs.links[0].url 
-                                ? <Link href={`/data-master/${organization.id}/logs?page=${logs.current_page - 1}&search=${search}&start_date=${dateValue.startDate}&end_date=${dateValue.endDate}`} preserveState><IoPlayBack /></Link>
-                                : <div className='text-gray-300'><IoPlayBack /></div>
-                            }                                
-                        </div>
-                        <div className='my-auto'>{logs.current_page}/{logs.last_page}</div>
-                        <div className='my-auto'>
-                            {
-                                logs.links[logs.links.length-1].url 
-                                ? <Link href={`/data-master/${organization.id}/logs?page=${logs.current_page + 1}&search=${search}&start_date=${dateValue.startDate}&end_date=${dateValue.endDate}`}
-                                    only={['logs']} preserveState>
-                                    <IoPlayForward />
-                                </Link>
-                                : <div className='text-gray-300'><IoPlayForward /></div>
-                            }   
-                        </div>
-                    </div>
+                pageAfter={
+                            logs.links[logs.links.length-1].url 
+                            ? <Link href={`/logs/${organization.id}?page=${logs.current_page + 1}&search=${search}`}
+                                only={['logs']} preserveState>
+                                <IoPlayForward />
+                            </Link>
+                            : <div className='text-gray-300'><IoPlayForward /></div>
                 }
-
-                {
-                    (!showSearch && !showDateFilter) && <PageNumber data={logs} />
+                page={
+                    <>
+                        {logs.current_page}/{logs.last_page}
+                    </>
                 }
-            </TitleMobile>
+                data={logs}
+            />
 
             <ContentMobile>
                 {
@@ -176,7 +128,7 @@ export default function Index({logs, organization, searchFilter, startDate, endD
                     <div className='my-auto'>
                         {
                             logs.links[0].url 
-                            ? <Link href={`/data-master/${organization.id}/logs?page=${logs.current_page - 1}&search=${search}&start_date=${dateValue.startDate}&end_date=${dateValue.endDate}`} preserveState><IoPlayBack /></Link>
+                            ? <Link href={`/logs/${organization.id}?page=${logs.current_page - 1}&search=${search}&start_date=${dateValue.startDate}&end_date=${dateValue.endDate}`} preserveState><IoPlayBack /></Link>
                             : <div className='text-gray-300'><IoPlayBack /></div>
                         }                                
                     </div>
@@ -184,7 +136,7 @@ export default function Index({logs, organization, searchFilter, startDate, endD
                     <div className='my-auto'>
                         {
                             logs.links[logs.links.length-1].url 
-                            ? <Link href={`/data-master/${organization.id}/logs?page=${logs.current_page + 1}&search=${search}&start_date=${dateValue.startDate}&end_date=${dateValue.endDate}`}
+                            ? <Link href={`/logs/${organization.id}?page=${logs.current_page + 1}&search=${search}&start_date=${dateValue.startDate}&end_date=${dateValue.endDate}`}
                             only={['logs']} preserveState>
                                 <IoPlayForward />
                             </Link>

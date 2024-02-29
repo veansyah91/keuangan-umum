@@ -3,14 +3,15 @@ import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import { Link } from '@inertiajs/react';
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Authenticated({ user, header, children, organization = '', backLink, title='', breadcrumbs, role}) {
     return (
-        <div className='min-h-screen bg-gray-100'>
+        <div className='min-h-screen bg-gray-100 '>
             <div className="drawer">
                 <input id="my-drawer" type="checkbox" className="drawer-toggle" />
                 <div className="drawer-content">
-                    <nav className='bg-[#4f8315] border-b border-gray-100 w-full fixed sm:relative z-10'>
+                    <nav className='bg-[#4f8315] border-b border-gray-100 w-full fixed z-10 print:hidden'>
                         <div className='max-w-7xl mx-auto px-2 sm:px-6'>
                             <div className='flex justify-between sm:h-16 h-12'>
                                 <div className='sm:flex hidden'>
@@ -42,6 +43,15 @@ export default function Authenticated({ user, header, children, organization = '
                                             </NavLink>
                                             <NavLink href={route('data-master', organization?.id)} active={route().current('data-master*')}>
                                                 DATA MASTER
+                                            </NavLink>
+                                            <NavLink href={route('data-ledger', organization?.id)} active={route().current('data-ledger*')}>
+                                                BUKU BESAR
+                                            </NavLink>
+                                            <NavLink href={route('cashflow', organization?.id)} active={route().current('cashflow*')}>
+                                                ARUS KAS
+                                            </NavLink>
+                                            <NavLink href={route('report', organization?.id)} active={route().current('report*')}>
+                                                LAPORAN
                                             </NavLink>
                                         </div>
                                     }
@@ -83,7 +93,7 @@ export default function Authenticated({ user, header, children, organization = '
                                     </div>
                                 </div>
 
-                                <div className='my-auto flex sm:hidden space-x-3 text-white px-2'> 
+                                <div className='my-auto flex sm:hidden space-x-3 text-white px-2 print:hidden'> 
                                     <div className='my-auto'>
                                         {backLink}
                                     </div>                                    
@@ -110,7 +120,7 @@ export default function Authenticated({ user, header, children, organization = '
                     </nav>
 
                     {header && (
-                        <header className='bg-white shadow hidden sm:flex sm:justify-between'>
+                        <header className='bg-white shadow hidden sm:flex sm:justify-between pt-16 print:hidden'>
                             <div className='max-w-7xl py-3 px-4 sm:px-6 lg:px-8 my-auto'>{header}</div>
                             <div className='max-w-7xl py-3 px-4 sm:px-6 lg:px-8'>{breadcrumbs}</div>
                         </header>
@@ -130,14 +140,17 @@ export default function Authenticated({ user, header, children, organization = '
                             <li className={`${route().current('admin.users*') ? 'border-l-2 border-[#4f8315] font-bold' : ''}`}><Link href={route('admin.users')}>Data Pengguna</Link></li>     
                             <li className={`${route().current('admin.organization*') ? 'border-l-2 border-[#4f8315] font-bold' : ''}`}><Link href={route('admin.organization.menu')}>Organisasi</Link></li>     
                             <hr />
-                            <li className={`${route().current('organizatopns*') ? 'border-l-2 border-[#4f8315] font-bold' : ''}`}><Link href={route('logout')} method='post' as='button'>Keluar</Link></li>
+                            <li className={`${route().current('organizations*') ? 'border-l-2 border-[#4f8315] font-bold' : ''}`}><Link href={route('logout')} method='post' as='button'>Keluar</Link></li>
                         </ul> :
                         // User Menu
                         <ul className="menu p-4 w-64 min-h-full text-[#4f8315] bg-white font-lg bg-opacity-95">
                         {/* Sidebar content here */}                            
                             <li className={`${route().current('dashboard*') ? 'border-l-2 border-[#4f8315] font-bold' :''}`}><Link href={route('dashboard', organization.id)}>Dasbor</Link></li>
                             <li className={`${route().current('data-master*') ? 'border-l-2 border-[#4f8315] font-bold' : ''}`}><Link href={route('data-master', organization.id)}>Data Master</Link></li>     
-                            <hr />
+                            <li className={`${route().current('data-ledger*') ? 'border-l-2 border-[#4f8315] font-bold' : ''}`}><Link href={route('data-ledger', organization.id)}>Buku Besar</Link></li>     
+                            <li className={`${route().current('cashflow*') ? 'border-l-2 border-[#4f8315] font-bold' : ''}`}><Link href={route('cashflow', organization.id)}>Arus Kas</Link></li>     
+                            <li className={`${route().current('report*') ? 'border-l-2 border-[#4f8315] font-bold' : ''}`}><Link href={route('report', organization.id)}>Laporan</Link></li>     
+                            <hr className='border border-[#4f8315] my-3'/>
                             <li className={`${route().current('organizations*') ? 'border-l-2 border-[#4f8315] font-bold' : ''}`}><Link href={route('organization')}>Daftar Organisasi</Link></li>
                             {
                                 role === 'admin' && 

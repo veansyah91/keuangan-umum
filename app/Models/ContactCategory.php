@@ -13,7 +13,7 @@ class ContactCategory extends Model
 
     protected $fillable = ['name', 'organization_id'];
 
-    public function Contacts(): BelongsToMany
+    public function contacts(): BelongsToMany
     {
         return $this->belongsToMany(Contact::class, 'contact_contact_category', 'contact_id', 'contact_category_id');
     }

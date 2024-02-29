@@ -150,56 +150,32 @@ export default function Index({districts, provinces, regencies, searchFilter, pr
                     <NavgroupRegionalMobile onClick={() => setShowModalImport(true)}/>
                 </div> 
 
-                <TitleMobile className={'z-50'}>
-                    {/* search */}                        
-                    <div className={`flex p-1 space-x-1 ${showSearch && 'w-full border-2'}`}>
-                        <button className={`p-2 rounded-md border-2 ${showSearch ? 'border-none' : 'border-gray'}`} onClick={handleShowSearch}>
-                            {
-                                showSearch ? <IoArrowBackOutline /> : <IoSearchSharp />
-                            }                                
-                        </button>
-
-                        {/* Search Input */}
-                        {
-                            showSearch && <input type="search" className='border-none max-h-full h-full my-auto focus:border-none w-full focus:ring-0' placeholder='Masukkan Pencarian' value={search || ''}
-                            onChange={e => setSearch(e.target.value)}
-                            />
-                        }  
-
-                        {/* Filter */}
-                        {
-                            !showSearch && 
-                            <button onClick={() => setShowModalFilter(true)} className='my-auto border-2 p-2 rounded-md'><IoFilter /></button> 
-                        } 
-                    </div>    
-
-                    {
-                        !showSearch && <div className='my-auto flex space-x-2'>                            
-                            <div className='my-auto'>
-                                {
-                                    districts.links[0].url 
-                                    ? <Link href={`/admin/data-master/districts?page=${districts.current_page - 1}&search=${search}${selectedProvince && `&province=${selectedProvince.id}`}`} preserveState only={['districts']}><IoPlayBack /></Link>
-                                    : <div className='text-gray-300'><IoPlayBack /></div>
-                                }                                
-                            </div>
-                            <div className='my-auto'>{districts.current_page}/{districts.last_page}</div>
-                            <div className='my-auto'>
-                                {
-                                    districts.links[districts.links.length-1].url 
-                                    ? <Link href={`/admin/data-master/districts?page=${districts.current_page + 1}&search=${search}${selectedProvince && `&province=${selectedProvince.id}`}`}
-                                        only={['districts']} preserveState>
-                                        <IoPlayForward />
-                                    </Link>
-                                    : <div className='text-gray-300'><IoPlayForward /></div>
-                                }   
-                            </div>
-                        </div>
+                <TitleMobile 
+                    zIndex={'z-50'}
+                    search={search}
+                    setSearch= {e => setSearch(e.target.value)}
+                    pageBefore={
+                        districts.links[0].url 
+                        ? <Link href={`/admin/data-master/districts?page=${districts.current_page - 1}&search=${search}`}preserveState><IoPlayBack /></Link>
+                        : <div className='text-gray-300'><IoPlayBack /></div>
                     }
-
-                    {
-                        !showSearch && <PageNumber data={districts} />
+                    pageAfter={
+                        districts.links[districts.links.length-1].url 
+                        ? <Link href={`/admin/data-master/districts?page=${districts.current_page + 1}&search=${search}`}
+                            only={['districts']} preserveState>
+                            <IoPlayForward />
+                        </Link>
+                        : <div className='text-gray-300'><IoPlayForward /></div>
                     }
-                </TitleMobile>
+                    page={
+                        <>
+                            {districts.current_page}/{districts.last_page}
+                        </>
+                    }
+                    data={districts}
+                    hasFilter={true}
+                    showFilter={() => setShowModalFilter(true)}
+                />
                 <ContentMobile>
                     {
                         districts.data.map(district => 

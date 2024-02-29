@@ -17,7 +17,6 @@ import SecondaryButton from "@/Components/SecondaryButton";
 import DangerButton from "@/Components/DangerButton";
 
 export default function Index({auth, organizations, searchFilter}) {
-    
     const { flash } = usePage().props;
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const [organizationDelete, setOrganizationDelete] = useState({});
@@ -25,7 +24,7 @@ export default function Index({auth, organizations, searchFilter}) {
     const [search, setSearch] = useState(searchFilter || '');
     const [debounceValue] = useDebounce(search, 500);
 
-    const {data, setData, processing, delete: destroy, errors, setError, reset} = useForm({
+    const {data, setData, processing, delete: destroy, reset} = useForm({
         'user_id' : '',
         'user_name' : '',
         'organization_id' : '',

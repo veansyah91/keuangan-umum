@@ -113,7 +113,7 @@ export default function Create({villages, villageFilter}) {
                     value={data.name}
                     className={`mt-1 w-full ${errors && errors.name && 'border-red-500'}`}
                     isFocused={true}
-                    onChange={(e) => setData('name', e.target.value)}
+                    onChange={(e) => setData('name', e.target.value.toUpperCase())}
                     placeholder="Nama Organisasi"
                   />
                   {errors && errors.name && <div className='-mb-3'>
@@ -129,7 +129,7 @@ export default function Create({villages, villageFilter}) {
                           name='address'
                           value={data.address}
                           className={`mt-1 w-full ${errors && errors.address && 'border-red-500'}`}
-                          onChange={(e) => setData('address', e.target.value)}
+                          onChange={(e) => setData('address', e.target.value.toUpperCase())}
                           placeholder="Alamat Lengkap"
                       />
                   {errors && errors.address && <div className='-mb-3'>
@@ -176,7 +176,7 @@ export default function Create({villages, villageFilter}) {
                           name='legality'
                           value={data.legality}
                           className={`mt-1 w-full ${errors && errors.legality && 'border-red-500'}`}
-                          onChange={(e) => setData('legality', e.target.value)}
+                          onChange={(e) => setData('legality', e.target.value.toUpperCase())}
                           placeholder="No Legalitas"
                   />
                   {errors && errors.legality && <div className='-mb-3'>

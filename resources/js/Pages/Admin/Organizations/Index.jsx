@@ -118,87 +118,35 @@ export default function Index({organizations, searchFilter, statusFilter, startD
             <ToastContainer />       
 
             {/* Mobile */}
-            <TitleMobile className={'z-50'}>
-                {/* search */}
-                {
-                    !showDateFilter && 
-                    <div className={`flex p-1 space-x-1 ${showSearch && 'w-full border-2'}`}>
-                        <button className={`p-2 rounded-md border-2 ${showSearch ? 'border-none' : 'border-gray'}`} onClick={handleShowSearch}>
-                            {
-                                showSearch ? <IoArrowBackOutline /> : <IoSearchSharp />
-                            }                                
-                        </button>
-                        {
-                            !showSearch && 
-                            <button className={`p-2 rounded-md border-2 border-gray`} onClick={() => setShowDateFilter(true)}>
-                                <IoCalendarOutline />               
-                            </button>
-                        }
-                        
-
-                        {/* Filter */}
-                        {
-                            (!showSearch && !showDateFilter) && 
-                            <button onClick={() => setShowModalFilter(true)} className='my-auto border-2 p-2 rounded-md'><IoFilter /></button> 
-                        }  
-                        
-
-                        {/* Search Input */}
-                        {
-                            showSearch && <input type="search" className='border-none max-h-full h-full my-auto focus:border-none w-full focus:ring-0' placeholder='Masukkan Pencarian' value={search || ''}
-                            onChange={e => setSearch(e.target.value)}
-                            />
-                        }                        
-                    </div>
-                }                    
-                
-                {
-                    showDateFilter && 
-                    <div className='flex p-1 space-x-1 w-full'>
-                        <div className='my-auto'>
-                            <button className='p-2' onClick={() => setShowDateFilter(false)}><IoArrowBackOutline /></button>
-                        </div>
-                        
-                        <div className='w-full'>
-                            <Datepicker
-                                value={dateValue} 
-                                onChange={handleDateValueChange} 
-                                classNames={'border-2 w-full'}
-                                separator={" sampai "} 
-
-                            />
-                        </div>                            
-                    </div>
+            <TitleMobile 
+                zIndex={'z-50'}
+                search={search}
+                setSearch= {e => setSearch(e.target.value)}
+                pageBefore={
+                    organizations.links[0].url 
+                    ? <Link href={`/admin/data-master/organizations?page=${organizations.current_page - 1}&search=${search}`}preserveState><IoPlayBack /></Link>
+                    : <div className='text-gray-300'><IoPlayBack /></div>
                 }
-
-                {
-                    (!showSearch && !showDateFilter) && <div className='my-auto flex space-x-2'>                            
-                        <div className='my-auto'>
-                            {
-                                organizations.links[0].url 
-                                ? <Link href={`/admin/organizations?page=${organizations.current_page - 1}&start_date=${dateValue.startDate}&end_date=${dateValue.endDate}&status=${dataFilter.status}`}preserveState><IoPlayBack /></Link>
-                                : <div className='text-gray-300'><IoPlayBack /></div>
-                            }                                
-                        </div>
-                        <div className='my-auto'>{organizations.current_page}/{organizations.last_page}</div>
-                        <div className='my-auto'>
-                            {
-                                organizations.links[organizations.links.length-1].url 
-                                ? <Link href={`/admin/organizations?page=${organizations.current_page + 1}&start_date=${dateValue.startDate}&end_date=${dateValue.endDate}&status=${dataFilter.status}`}
-                                    only={['organizations']} preserveState>
-                                    <IoPlayForward />
-                                </Link>
-                                : <div className='text-gray-300'><IoPlayForward /></div>
-                            }   
-                        </div>
-                    </div>
+                pageAfter={
+                    organizations.links[organizations.links.length-1].url 
+                    ? <Link href={`/admin/data-master/organizations?page=${organizations.current_page + 1}&search=${search}`}
+                        only={['organizations']} preserveState>
+                        <IoPlayForward />
+                    </Link>
+                    : <div className='text-gray-300'><IoPlayForward /></div>
                 }
-
-                {
-                    (!showSearch && !showDateFilter) && <PageNumber data={organizations} />
-
+                page={
+                    <>
+                        {organizations.current_page}/{organizations.last_page}
+                    </>
                 }
-            </TitleMobile>
+                data={organizations}
+                hasFilter={true}
+                showFilter={() => setShowModalFilter(true)} 
+                hasDate={true}
+                dateValue={dateValue}
+                onChangeDate={handleDateValueChange}
+            />
 
             <ContentMobile>
                 {
@@ -222,8 +170,18 @@ export default function Index({organizations, searchFilter, statusFilter, startD
                                 value={dateValue} 
                                 onChange={handleDateValueChange} 
                                 showShortcuts={true} 
+                                configs={{
+                                    shortcuts: {
+                                        today: "Hari Ini", 
+                                        yesterday: "Kemarin", 
+                                        past: period => `${period} Hari Terakhir`, 
+                                        currentMonth: "Bulan Ini", 
+                                        pastMonth: "Bulan Lalu", 
+                                        currentYear: "Tahun Ini"
+                                    },
+                                }} 
                                 classNames={'border-2'}
-                                separator={" sampai "} 
+                                separator={" s.d "}                                 
                             />
                         </div>
                         

@@ -3,6 +3,7 @@
 namespace App\Http;
 
 use App\Http\Middleware\IsAdmin;
+use App\Http\Middleware\InPeriod;
 use App\Http\Middleware\IsNotViewer;
 use App\Http\Middleware\IsNotExpired;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;

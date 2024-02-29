@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Journal;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -47,6 +48,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function organizations(): BelongsToMany
     {
         return $this->belongsToMany(Organization::class)->withPivot('role', 'is_waiting');
+    }
+
+    public function journals(): HasMany
+    {
+        return $this->hasMany(Journal::class);
     }
 
     public function scopeFilter($query, $filters)

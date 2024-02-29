@@ -4,14 +4,16 @@ namespace App\Http\Controllers;
 
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Models\Contact;
 use App\Models\Organization;
 use Illuminate\Http\Request;
 use App\Models\ContactCategory;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use App\Repositories\Log\LogRepository;
 use App\Repositories\User\UserRepository;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
 
 class ContactCategoryController extends Controller
 {
@@ -29,6 +31,7 @@ class ContactCategoryController extends Controller
     public function index(Organization $organization): Response
     {
         $contactCategories = ContactCategory::filter(request(['search']))
+                                            ->whereOrganizationId($organization['id'])
                                             ->paginate(50);
         $user = Auth::user();
 
@@ -44,9 +47,25 @@ class ContactCategoryController extends Controller
      */
     public function store(Organization $organization, Request $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => ['required','string', Rule::unique('contact_categories')]
+
+        $validator = Validator::make($request->all(), [
+            'name' => [
+                'required',
+                'string', 
+                Rule::unique('contact_categories')->where(function ($query) use ($request, $organization){
+                    return $query->where('organization_id', $organization['id']);
+                })                
+            ]
         ]);
+
+        if ($validator->fails()) {
+            // Handle validation failure
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        $validated = $validator->validated();
+
+        $log = $validated;
 
         $validated['organization_id'] = $organization['id'];
 
@@ -54,9 +73,9 @@ class ContactCategoryController extends Controller
 
         $user = Auth::user();
 
-        $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah menambahkan DATA pada KATEGORI KONTAK dengan NAMA : ' . $validated['name']);
+        $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah menambahkan DATA pada KATEGORI KONTAK dengan DATA : ' . json_encode($log));
 
-        return redirect(route('contact-category', $organization['id']));
+        return redirect(route('data-master.contact-category', $organization['id']));
     }
 
     /**
@@ -64,19 +83,25 @@ class ContactCategoryController extends Controller
      */
     public function update(Organization $organization, Request $request, ContactCategory $contactCategory): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => ['required','string', Rule::unique('contact_categories')->ignore($contactCategory)]
+        $validator = Validator::make($request->all(), [
+            'name' => [
+                'required',
+                'string', 
+                Rule::unique('contact_categories')->where(function ($query) use ($request, $organization){
+                    return $query->where('organization_id', $organization['id']);
+                })->ignore($contactCategory['id'])                
+            ]
         ]);
 
-        $oldData = $contactCategory['name'];
+        $validated = $validator->validated();
 
         $contactCategory->update($validated);
 
         $user = Auth::user();
 
-        $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah mengubah DATA pada KATEGORI KONTAK dengan NAMA : ' . $validated['name'] . ' (sebelumnya : ' . $oldData . ')');
+        $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah mengubah DATA pada KATEGORI KONTAK menjadi : ' . json_encode($validated));
 
-        return redirect(route('contact-category', $organization['id']));
+        return redirect(route('data-master.contact-category', $organization['id']));
     }
 
     /**
@@ -85,14 +110,25 @@ class ContactCategoryController extends Controller
     public function destroy(Organization $organization, ContactCategory $contactCategory): RedirectResponse
     {
         // Cek Apakah Telah Digunakan Oleh Contact
-            
+            $contacts = Contact::whereHas('contactCategories', function ($query) use ($contactCategory){
+                                    $query->whereContactCategoryId($contactCategory['id']);
+                                })
+                                ->get();
+
+            if (count($contacts) > 0) {
+                return redirect(route('data-master.contact-category', $organization['id']))->withErrors(['delete_confirmation' => 'Kategori Kontak Tidak Bisa Dihapus, Karena Telah Digunakan']);
+            }
         // 
+
+        $log = [
+            'name' => $contactCategory['name']
+        ];
 
         $contactCategory->delete();
 
         $user = Auth::user();
 
-        $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah menghapus DATA pada KATEGORI KONTAK dengan NAMA : ' . $contactCategory['name']);
-        return redirect(route('contact-category', $organization['id']));
+        $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah menghapus DATA pada KATEGORI KONTAK, Data : ' . json_encode($log));
+        return redirect(route('data-master.contact-category', $organization['id']))->with('success', 'Kategori Kontak Berhasil Dihapus');
     }
 }

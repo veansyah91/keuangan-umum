@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Account;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Account extends Model
 {
@@ -17,6 +19,7 @@ class Account extends Model
         'code',
         'is_active',
         'is_cash',
+        'can_be_deleted'
     ];
 
     public function organization(): BelongsTo
@@ -27,5 +30,18 @@ class Account extends Model
     public function accountCategory(): BelongsTo
     {
         return $this->belongsTo(AccountCategory::class);
+    }
+    
+    public function cashflows(): HasMany
+    {
+        return $this->hasMany(Account::class);
+    }
+
+    public function scopeFilter($query, $filters)
+    {
+        $query->when($filters['search'] ?? false, function ($query, $search) {
+            return $query->where('name', 'like', '%'.$search.'%')
+                            ->orWhere('code', 'like', '%'.$search.'%');
+        });
     }
 }

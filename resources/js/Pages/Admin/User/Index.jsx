@@ -64,87 +64,33 @@ function Index({users, userCollections, searchFilter}) {
 
             {/* Mobile */}
                 {/* Title */}
-                <TitleMobile>
-                    {/* search */}
-                    {
-                        !showDateFilter && 
-                        <div className={`flex p-1 space-x-1 ${showSearch && 'w-full border-2'}`}>
-                            <button className={`p-2 rounded-md border-2 ${showSearch ? 'border-none' : 'border-gray'}`} onClick={handleShowSearch}>
-                                {
-                                    showSearch ? <IoArrowBackOutline /> : <IoSearchSharp />
-                                }                                
-                            </button>
-                            {
-                                !showSearch && 
-                                <button className={`p-2 rounded-md border-2 border-gray`} onClick={() => setShowDateFilter(true)}>
-                                    <IoCalendarOutline />               
-                                </button>
-                            }
-                            
-
-                            {/* Filter */}
-                            {/* {
-                                !showSearch && <div className='my-auto border-2 p-2'><IoFilter /></div>
-                            }   */}
-                            
-
-                            {/* Search Input */}
-                            {
-                                showSearch && <input type="search" className='border-none max-h-full h-full my-auto focus:border-none w-full focus:ring-0' placeholder='Masukkan Pencarian' value={search || ''}
-                                onChange={e => setSearch(e.target.value)}
-                                />
-                            }                        
-                        </div>
-                    }                    
-                    
-                    {
-                        showDateFilter && 
-                        <div className='flex p-1 space-x-1 w-full'>
-                            <div className='my-auto'>
-                                <button className='p-2' onClick={() => setShowDateFilter(false)}><IoArrowBackOutline /></button>
-                            </div>
-                            
-                            <div className='w-full'>
-                                <Datepicker
-                                    value={dateValue} 
-                                    onChange={handleDateValueChange} 
-                                    classNames={'border-2 w-full'}
-                                    separator={" sampai "} 
-
-                                />
-                            </div>                            
-                        </div>
+                <TitleMobile 
+                    zIndex={'z-50'}
+                    search={search}
+                    setSearch= {e => setSearch(e.target.value)}
+                    pageBefore={
+                        users.links[0].url 
+                        ? <Link href={`/admin/data-master/users?page=${users.current_page - 1}&search=${search}`}preserveState><IoPlayBack /></Link>
+                        : <div className='text-gray-300'><IoPlayBack /></div>
                     }
-
-                    {
-                        (!showSearch && !showDateFilter) && <div className='my-auto flex space-x-2'>                            
-                            <div className='my-auto'>
-                                {
-                                    users.links[0].url 
-                                    ? <Link href={`/admin/users?page=${users.current_page - 1}&search=${search}`}preserveState><IoPlayBack /></Link>
-                                    : <div className='text-gray-300'><IoPlayBack /></div>
-                                }                                
-                            </div>
-                            <div className='my-auto'>{users.current_page}/{users.last_page}</div>
-                            <div className='my-auto'>
-                                {
-                                    users.links[users.links.length-1].url 
-                                    ? <Link href={`/admin/users?page=${users.current_page + 1}&search=${search}`}
-                                        only={['users','userCollections']} preserveState>
-                                        <IoPlayForward />
-                                    </Link>
-                                    : <div className='text-gray-300'><IoPlayForward /></div>
-                                }   
-                            </div>
-                        </div>
+                    pageAfter={
+                        users.links[users.links.length-1].url 
+                        ? <Link href={`/admin/data-master/users?page=${users.current_page + 1}&search=${search}`}
+                            only={['users']} preserveState>
+                            <IoPlayForward />
+                        </Link>
+                        : <div className='text-gray-300'><IoPlayForward /></div>
                     }
-
-                    {
-                        (!showSearch && !showDateFilter) && <div className='my-auto italic text-xs'>    
-                            {formatNumber(users.current_page*users.per_page-(users.per_page-1))}-{formatNumber(users.to)} dari {formatNumber(users.total)}
-                        </div>
+                    page={
+                        <>
+                            {users.current_page}/{users.last_page}
+                        </>
                     }
-                </TitleMobile>
+                    data={users}
+                    hasDate={true}
+                    dateValue={dateValue}
+                    onChangeDate={handleDateValueChange}
+                />
 
                 {/* Content */}
                 <ContentMobile>

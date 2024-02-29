@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link, router, useForm } from '@inertiajs/react';
-import { IoAddOutline, IoArrowBackOutline, IoPlayBack, IoPlayForward, IoSearchSharp } from 'react-icons/io5';
-
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { IoArrowBackOutline, IoPlayBack, IoPlayForward, IoSearchSharp } from 'react-icons/io5';
 import { ToastContainer, toast } from 'react-toastify';
-import "react-toastify/dist/ReactToastify.css";
-
 import TitleMobile from '@/Components/Mobiles/TitleMobile';
 import { useDebounce } from 'use-debounce';
 import PageNumber from '@/Components/PageNumber';
@@ -22,7 +19,8 @@ import { usePrevious } from 'react-use';
 import ContainerDesktop from '@/Components/Desktop/ContainerDesktop';
 import TitleDesktop from '@/Components/Desktop/TitleDesktop';
 import ContentDesktop from '@/Components/Desktop/ContentDesktop';
-import ContactComponentDesktop from './Components/ContactComponentDesktop';
+import ContactCategoryDesktop from './Components/ContactCategoryDesktop';
+import InputLabel from '@/Components/InputLabel';
 
 export default function Index({role, organization, contactCategories, searchFilter}) {
     // state
@@ -40,12 +38,21 @@ export default function Index({role, organization, contactCategories, searchFilt
     const [debounceValue] = useDebounce(search, 500);
 
     const prevSearch = usePrevious(search);
+    const { flash } = usePage().props;
 
     const {data, setData, post, patch, processing, errors, reset, delete:destroy, setError} = useForm({
         name: ''
     });
 
     // useEffect 
+    useEffect(() => {
+        flash.success && 
+            toast.success(flash.success, {
+                position: toast.POSITION.TOP_CENTER
+            });
+        ;
+    }, []);
+
     useEffect(() => {
         if(prevSearch!==undefined) {
             handleReloadPage();
@@ -66,7 +73,7 @@ export default function Index({role, organization, contactCategories, searchFilt
         e.preventDefault();
 
         isUpdate 
-        ? patch(route('contact-category.update', {'organization' : organization.id, 'contactCategory' : id}), {
+        ? patch(route('data-master.contact-category.update', {'organization' : organization.id, 'contactCategory' : id}), {
             onSuccess: () => {
                 reset();          
                 toast.success(`Kategori Kontak Berhasil Diubah`, {
@@ -75,7 +82,7 @@ export default function Index({role, organization, contactCategories, searchFilt
                  handleCancelInput();
             }
         })
-        : post(route('contact-category.post', organization.id), {
+        : post(route('data-master.contact-category.post', organization.id), {
             onSuccess: () => {
                 reset();
                 toast.success(`Kategori Kontak Berhasil Ditambahkan`, {
@@ -89,17 +96,21 @@ export default function Index({role, organization, contactCategories, searchFilt
     const handleSubmitDelete = (e) => {
         e.preventDefault();
 
-        destroy(route('contact-category.destroy', {'organization' : organization.id, 'contactCategory' : id}, {
+        router.delete(route('data-master.contact-category.destroy', {'organization' : organization.id, 'contactCategory' : id}), {
             onSuccess: () => {
                 setShowDeleteConfirmation(false);
                 toast.success(`Kategori Kontak Berhasil Dihapus`, {
                     position: toast.POSITION.TOP_CENTER
                 });
                 reset();
+            },
+            onError: error => {
+                setShowDeleteConfirmation(false);
+                toast.error(error.delete_confirmation, {
+                    position: toast.POSITION.TOP_CENTER
+                });
             }
-        }));
-        setShowDeleteConfirmation(false);
-
+        });
     }
 
     const handleCancelInput = () => {
@@ -136,59 +147,38 @@ export default function Index({role, organization, contactCategories, searchFilt
 
     return (
         <>
-            <Head title='Data Kecamatan' />
+            <Head title='Data Kategori Kontak' />
             <ToastContainer />
 
             {/* Mobile */}
                 {
-                    (role !== 'viewer') && <AddButtonMobile handleShowInputModal={handleShowInputModal} />
+                    (role !== 'viewer') && <AddButtonMobile handleShowInputModal={handleShowInputModal} label={"Tambah"}/>
                 }
                 
-                <TitleMobile className={'z-50'}>
-                    {/* search */}                        
-                    <div className={`flex p-1 space-x-1 ${showSearch && 'w-full border-2'}`}>
-                        <button className={`p-2 rounded-md border-2 ${showSearch ? 'border-none' : 'border-gray'}`} onClick={() => setShowSearch(!showSearch)}>
-                            {
-                                showSearch ? <IoArrowBackOutline /> : <IoSearchSharp />
-                            }                                
-                        </button>
-
-                        {/* Search Input */}
-                        {
-                            showSearch && <input type="search" className='border-none max-h-full h-full my-auto focus:border-none w-full focus:ring-0' placeholder='Masukkan Pencarian' value={search || ''}
-                            onChange={e => setSearch(e.target.value)}
-                            />
-                        }  
-                    </div>   
-
-                    {
-                        !showSearch && <div className='my-auto flex space-x-2'>                            
-                            <div className='my-auto'>
-                                {
-                                    contactCategories.links[0].url 
-                                    ? <Link href={`/data-master/contactCategories?page=${contactCategories.current_page - 1}&search=${search}`} preserveState only={['contactCategories']}><IoPlayBack /></Link>
-                                    : <div className='text-gray-300'><IoPlayBack /></div>
-                                }                                
-                            </div>
-                            <div className='my-auto'>{contactCategories.current_page}/{contactCategories.last_page}</div>
-                            <div className='my-auto'>
-                                {
-                                    contactCategories.links[contactCategories.links.length-1].url 
-                                    ? <Link href={`/data-master/contactCategories?page=${contactCategories.current_page + 1}&search=${search}`}
-                                        only={['contactCategories']} preserveState>
-                                        <IoPlayForward />
-                                    </Link>
-                                    : <div className='text-gray-300'><IoPlayForward /></div>
-                                }   
-                            </div>
-                        </div>
+                <TitleMobile 
+                    zIndex={'z-50'}
+                    search={search}
+                    setSearch= {e => setSearch(e.target.value)}
+                    pageBefore={
+                        contactCategories.links[0].url 
+                    ? <Link href={`/data-ledger/${organization.id}/account-categories?page=${contactCategories.current_page - 1}&search=${search}`} preserveState only={['contactCategories']}><IoPlayBack /></Link>
+                    : <div className='text-gray-300'><IoPlayBack /></div>
                     }
-
-                    {
-                        !showSearch && <PageNumber data={contactCategories} />
+                    pageAfter={
+                        contactCategories.links[contactCategories.links.length-1].url 
+                        ? <Link href={`/data-ledger/${organization.id}/account-categories?page=${contactCategories.current_page + 1}&search=${search}`}
+                            only={['contactCategories']} preserveState>
+                            <IoPlayForward />
+                        </Link>
+                        : <div className='text-gray-300'><IoPlayForward /></div>
                     }
-                    
-                </TitleMobile>
+                    page={
+                        <>
+                            {contactCategories.current_page}/{contactCategories.last_page}
+                        </>
+                    }
+                    data={contactCategories}
+                />
 
                 <ContentMobile>
                     {
@@ -214,8 +204,7 @@ export default function Index({role, organization, contactCategories, searchFilt
                             (role !== 'viewer') &&
                             <PrimaryButton className='py-3' onClick={handleShowInputModal}>
                                 Tambah Data
-                            </PrimaryButton>
-                            
+                            </PrimaryButton>                            
                         }
                             
                         </div>    
@@ -235,7 +224,7 @@ export default function Index({role, organization, contactCategories, searchFilt
                                 {
                                     contactCategories.links[0].url 
                                     ? <Link 
-                                            href={`/admin/data-master/contactCategories?page=${contactCategories.current_page - 1}&search=${search}`}
+                                            href={`/data-ledger/${organization.id}/account-categories?page=${contactCategories.current_page - 1}&search=${search}`}
                                             preserveState only={['contactCategories']}
                                         >
                                             <IoPlayBack />
@@ -248,7 +237,7 @@ export default function Index({role, organization, contactCategories, searchFilt
                                 {
                                     contactCategories.links[contactCategories.links.length-1].url 
                                     ? <Link 
-                                            href={`/admin/data-master/contactCategories?page=${contactCategories.current_page + 1}&search=${search}`}
+                                            href={`/data-ledger/${organization.id}/account-categories?page=${contactCategories.current_page + 1}&search=${search}`}
                                             only={['contactCategories']} preserveState
                                         >
                                         <IoPlayForward />
@@ -272,7 +261,7 @@ export default function Index({role, organization, contactCategories, searchFilt
                                     <tbody>
                                         {
                                             contactCategories.data.map((contactCategory, index) =>
-                                                <ContactComponentDesktop 
+                                                <ContactCategoryDesktop 
                                                     key={index} 
                                                     contactCategory={contactCategory} 
                                                     className={`${index % 2 == 0 && 'bg-gray-100'}`} 
@@ -286,8 +275,7 @@ export default function Index({role, organization, contactCategories, searchFilt
                                 </table>
                             </ContentDesktop>
                         </div>
-                    </div>
-                    
+                    </div>                   
                 </ContainerDesktop>
             {/* Desktop */}
 
@@ -302,7 +290,12 @@ export default function Index({role, organization, contactCategories, searchFilt
 
                         <div className="mt-5 ">
                             <div className='flex flex-col sm:flex-row w-full gap-1'>
-                                <div className='sm:w-1/3 w-full my-auto'>Nama Kategori Kontak</div>
+                                <div className='w-full sm:w-1/3 my-auto'>
+                                    <InputLabel htmlFor='name' value='Nama Kategori Kontak' className='mx-auto my-auto'/>
+                                </div>
+                                
+
+                                {/* <div className='sm:w-1/3 w-full my-auto'>Nama Kategori Kontak</div> */}
                                 <div className='sm:w-2/3 w-full'>
                                     <TextInput
                                         id='name'
@@ -374,4 +367,5 @@ Index.layout = page => <AuthenticatedLayout
             <li>Data Kategori Kontak</li>
         </ul>
     </div>}
+    role={page.props.role}
 />
