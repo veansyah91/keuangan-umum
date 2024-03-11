@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Ledger;
 use App\Models\Account;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -34,8 +35,14 @@ class Account extends Model
     
     public function cashflows(): HasMany
     {
-        return $this->hasMany(Account::class);
+        return $this->hasMany(Cashflow::class);
     }
+
+    public function ledgers(): HasMany
+    {
+        return $this->hasMany(Ledger::class);
+    }
+
 
     public function scopeFilter($query, $filters)
     {

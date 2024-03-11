@@ -58,6 +58,7 @@ class ProjectController extends Controller
 
         $project = Project::whereOrganizationId($organization['id'])
                             ->where('code', 'like', $refHeader . '%')
+                            ->orderBy('code')
                             ->get()
                             ->last();
 

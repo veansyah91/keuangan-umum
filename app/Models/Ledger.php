@@ -16,12 +16,16 @@ class Ledger extends Model
         'debit',
         'credit',
         'date',
-        'destription',
+        'description',
         'no_ref',
         'contact_id', //jika transaksi melibatkan kontak tertentu
         'account_id',
         'organization_id',
-        'journal_id'
+        'journal_id',        
+        'is_approved',
+        'department_id',
+        'project_id',
+        'program_id'
     ];
 
     public function journal(): BelongsTo
@@ -32,5 +36,47 @@ class Ledger extends Model
     public function account(): BelongsTo
     {
         return $this->belongsTo(Account::class);
+    }
+
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    public function project(): BelongsTo
+    {
+        return $this->belongsTo(Project::class);
+    }
+
+    public function program(): BelongsTo
+    {
+        return $this->belongsTo(Program::class);
+    }
+
+    public function scopeFilter($query, $filters)
+    {
+        $query->when($filters['start_date']?? false, function ($query, $start_date) {
+            return $query->where('date', '>=', $start_date);
+        });
+
+        $query->when($filters['end_date']?? false, function ($query, $end_date) {
+            return $query->where('date', '<=', $end_date);
+        });
+
+        $query->when($filters['is_approved']?? false, function ($query, $is_approved) {
+            return $query->where('is_approved', $is_approved == "true" ? true : false);
+        });
+
+        $query->when($filters['program']?? false, function ($query, $program) {
+            return $query->where('program_id', $program);
+        });
+
+        $query->when($filters['project']?? false, function ($query, $project) {
+            return $query->where('project_id', $project);
+        });
+
+        $query->when($filters['department']?? false, function ($query, $department) {
+            return $query->where('department_id', $department);
+        });
     }
 }

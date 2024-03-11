@@ -5,12 +5,17 @@ namespace App\Http\Controllers;
 use Inertia\Inertia;
 use App\Models\Ledger;
 use App\Models\Account;
+use App\Models\Journal;
+use App\Models\Program;
+use App\Models\Project;
 use App\Models\Cashflow;
+use App\Models\Department;
 use App\Models\Organization;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Repositories\User\UserRepository;
+use Illuminate\Database\Eloquent\Builder;
 
 class ReportController extends Controller
 {
@@ -130,6 +135,137 @@ class ReportController extends Controller
 
     public function journal(Organization $organization)
     {
+        $user = Auth::user();
+
+        $journals = Journal::whereOrganizationId($organization['id'])
+                            ->filter(request(['program','project','department']))
+                            ->where(function($query){
+                                $query->where('date', '>=', request('startDate') ?? '')
+                                        ->where('date', '<=', request('endDate') ?? '');
+                            })
+                            ->with('ledgers', function ($query) {
+                                $query->with('account');
+                            })
+                            ->with('department')
+                            ->with('project')
+                            ->with('program')
+                            ->orderBy('date')
+                            ->get();
         
+        return Inertia::render('Report/Journal', [
+            'organization' => $organization,
+            'journals' => $journals,
+            'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+            'startDateFilter' => request('startDate'),
+            'endDateFilter' => request('endDate'),
+            'projects' => Project::whereOrganizationId($organization['id'])
+                                    ->get(),
+            'programs' => Program::whereOrganizationId($organization['id'])
+                            ->get(),
+            'departments' => Department::whereOrganizationId($organization['id'])
+                                        ->get(),
+            'program' => Program::find(request('program')),
+            'project' => Project::find(request('project')),
+            'department' => Department::find(request('department')),
+        ]);
+    }
+
+    public function ledger(Organization $organization)
+    {
+        $user = Auth::user();
+
+        $ledgerBefore = Ledger::whereOrganizationId($organization['id'])
+                                ->where('is_approved', true)
+                                ->filter(request(['program','project','department']))
+                                ->where('date', '<', request('startDate') ?? '')
+                                ->whereAccountId(request('account') ?? '')
+                                ->get();
+
+        $ledger = Ledger::filter(request(['program','project','department']))
+                        ->whereOrganizationId($organization['id'])
+                        ->where('date', '>=', request('startDate') ?? '')
+                        ->where('date', '<=', request('endDate') ?? '')
+                        ->whereAccountId(request('account') ?? '')
+                        ->whereIsApproved(true)
+                        ->with('journal')
+                        ->with('department', 'project', 'program')
+                        ->orderBy('date')
+                        ->get();
+
+        return Inertia::render('Report/Ledger', [
+            'organization' => $organization,
+            'ledgers' => $ledger,
+            'startedValue' => (int)$ledgerBefore->sum('debit') - (int)$ledgerBefore->sum('credit'),
+            'accounts' => Account::whereOrganizationId($organization['id'])
+                                    ->orderBy('code')
+                                    ->get(),
+            'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+            'startDateFilter' => request('startDate'),
+            'endDateFilter' => request('endDate'),
+            'projects' => Project::whereOrganizationId($organization['id'])
+                                    ->get(),
+            'programs' => Program::whereOrganizationId($organization['id'])
+                            ->get(),
+            'departments' => Department::whereOrganizationId($organization['id'])
+                                        ->get(),
+            'program' => Program::find(request('program')),
+            'project' => Project::find(request('project')),
+            'department' => Department::find(request('department')),
+            'account' => Account::find(request('account')),
+        ]);
+    }
+
+    public function ledgers(Organization $organization)
+    {
+        $user = Auth::user();
+
+        $accounts = Account::whereOrganizationId($organization['id'])
+                            ->whereHas('ledgers')
+                            ->get();
+
+        $accountHasLedgers = [];
+        $startedValues = [];
+        $index = 0;                   
+        foreach ($accounts as $account) {
+            $ledgers = Ledger::filter(request(['project', 'program', 'department']))
+                                ->where('date', '>=', request('startDate') ?? '')
+                                ->where('date', '<=', request('endDate') ?? '')
+                                ->where('is_approved', true)
+                                ->where('account_id', $account['id'])
+                                ->with('department', 'project', 'program', 'journal')
+                                ->orderBy('date')
+                                ->get();
+
+            $ledgerBefore = Ledger::filter(request(['project', 'program', 'department']))
+                                    ->where('date', '<', request('startDate') ?? '')
+                                    ->where('account_id', $account['id'])
+                                    ->where('is_approved', true)
+                                    ->get();
+
+            $accountHasLedgers[$index++] = [
+                'code' => $account['code'],
+                'id' => $account['id'],
+                'name' => $account['name'],
+                'ledgers' => $ledgers,
+                'startedValue' => $ledgerBefore->sum('debit') - $ledgerBefore->sum('credit')
+            ];
+        }
+
+        return Inertia::render('Report/Ledgers', [
+            'organization' => $organization,
+            'accounts' => $accountHasLedgers,
+            'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+            'startDateFilter' => request('startDate'),
+            'endDateFilter' => request('endDate'),
+            'projects' => Project::whereOrganizationId($organization['id'])
+                                    ->get(),
+            'programs' => Program::whereOrganizationId($organization['id'])
+                            ->get(),
+            'departments' => Department::whereOrganizationId($organization['id'])
+                                        ->get(),
+            'program' => Program::find(request('program')),
+            'project' => Project::find(request('project')),
+            'department' => Department::find(request('department')),
+        ]);
     }
 }

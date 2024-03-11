@@ -216,6 +216,7 @@ export default function Create({organization, newRef, date, accounts, projects, 
         });
       },
       onError: errors => {
+        console.log(errors);
         const arrayOfObjects = Object.entries(errors).map(([key, value]) => ({ key, value }));
 
         let tempAccountErrors = [];
@@ -232,6 +233,11 @@ export default function Create({organization, newRef, date, accounts, projects, 
           tempAccountErrors = [...tempAccountErrors, errorValue];          
         }
         setAccountError(tempAccountErrors); 
+
+        errors?.no_ref &&
+        toast.error(errors.no_ref, {
+          position: toast.POSITION.TOP_CENTER
+        });
         
         errors?.empty &&
         toast.error(`Nilai Debit Dan Kredit Tidak Boleh Kosong`, {
@@ -297,6 +303,7 @@ export default function Create({organization, newRef, date, accounts, projects, 
                   asSingle={true} 
                   placeholder='Tanggal'
                   id="date"
+                  displayFormat='MMMM DD, YYYY'
                 />
                 </div>
               </div>
@@ -307,7 +314,7 @@ export default function Create({organization, newRef, date, accounts, projects, 
                 <div>
                   <TextInput 
                     id='no_ref'
-                    className='w-full'
+                    className={`w-full ${errors.no_ref && 'border-red-500'}`}
                     value={data.no_ref}
                     onChange={(e) => setData('no_ref', e.target.value)}
                   />
@@ -586,7 +593,7 @@ export default function Create({organization, newRef, date, accounts, projects, 
               </div>
               
               {
-                Math.abs(debit-credit) === 0 && 
+                (Math.abs(debit-credit) === 0 && Math.abs(debit+credit) !== 0) && 
                 <div className='w-full sm:w-1/12 text-center'>
                   <PrimaryButton className='w-full' disabled={processing}>
                     <div className='text-center w-full'>Tambah</div>

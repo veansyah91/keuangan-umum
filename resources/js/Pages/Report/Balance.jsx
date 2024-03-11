@@ -8,13 +8,11 @@ import { FaPrint } from 'react-icons/fa';
 import PrimaryButton from '@/Components/PrimaryButton';
 import Datepicker from 'react-tailwindcss-datepicker';
 import formatNumber from '@/Utils/formatNumber';
-// import ledgerContent from './Component/ledgerContent';
 import dayjs from 'dayjs';
 import { Disclosure, Transition } from '@headlessui/react';
 import BalanceContent from './Component/BalanceContent';
 
 export default function Balance({organization, ledgers, endDateFilter, account}) {
-  // console.log(ledgers);
   const [dataLedgers, setDataLedgers] = useState([]);
   const [endDate, setEndDate] = useState(endDateFilter || '');
 
@@ -139,6 +137,7 @@ export default function Balance({organization, ledgers, endDateFilter, account})
                   asSingle={true} 
                   placeholder='Tanggal Akhir'
                   id="date"
+                  displayFormat='MMMM DD, YYYY'
                 />
               </div>
               <div className='my-auto'>

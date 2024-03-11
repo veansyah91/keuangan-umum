@@ -195,6 +195,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/balance', [ReportController::class, 'balance'])->name('report.balance');
             Route::get('/lost-profit', [ReportController::class, 'lostProfit'])->name('report.lost-profit');
             Route::get('/journal', [ReportController::class, 'journal'])->name('report.journal');
+            Route::get('/ledger', [ReportController::class, 'ledger'])->name('report.ledger');
+            Route::get('/ledgers', [ReportController::class, 'ledgers'])->name('report.ledgers');
 
         });
 

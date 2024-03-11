@@ -194,6 +194,7 @@ export default function Cashflow({organization, cashflows, startDateFilter, endD
                   asSingle={true} 
                   placeholder='Tanggal Awal'
                   id="date"
+                  displayFormat='MMMM DD, YYYY'
                 />
               </div>
               <div className='my-auto'>
@@ -204,6 +205,7 @@ export default function Cashflow({organization, cashflows, startDateFilter, endD
                   asSingle={true} 
                   placeholder='Tanggal Akhir'
                   id="date"
+                  displayFormat='MMMM DD, YYYY'
                 />
               </div>
               <div className='my-auto'>

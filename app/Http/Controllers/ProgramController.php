@@ -34,6 +34,7 @@ class ProgramController extends Controller
 
         $program = Program::whereOrganizationId($organization['id'])
                             ->where('code', 'like', $refHeader . '%')
+                            ->orderBy('code')
                             ->get()
                             ->last();
 

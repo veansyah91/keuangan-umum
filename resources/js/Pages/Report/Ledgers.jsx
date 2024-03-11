@@ -7,16 +7,17 @@ import SecondaryButton from '@/Components/SecondaryButton';
 import { FaPrint } from 'react-icons/fa';
 import PrimaryButton from '@/Components/PrimaryButton';
 import Datepicker from 'react-tailwindcss-datepicker';
-import formatNumber from '@/Utils/formatNumber';
 import dayjs from 'dayjs';
 import { Disclosure, Transition } from '@headlessui/react';
-import JournalContent from './Component/JournalContent';
 import InputLabel from '@/Components/InputLabel';
 import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
+import LedgersContent from './Component/LedgersContent';
 
-export default function Journal({journals, organization, startDateFilter, endDateFilter, departments, projects, programs, department, project, program}) {
+
+export default function Ledgers({accounts, startedValues, organization, startDateFilter, endDateFilter, departments, projects, programs, department, project, program, account}) {
+  
   // state
-  const [dataJournals, setDataJournals] = useState(journals || []);
+  const [dataAccounts, setDataAccounts] = useState([]);
   const [startDate, setStartDate] = useState(startDateFilter || '');
   const [endDate, setEndDate] = useState(endDateFilter || '');
   const [isLoading, setIsLoading] = useState(false);
@@ -31,9 +32,16 @@ export default function Journal({journals, organization, startDateFilter, endDat
     endDate: endDateFilter || ''
   });
 
+  const [selectedAccount, setSelectedAccount] = useState({
+    id: account ? account.id : null, name: account? account.name : '', code: account? account.code : ''
+  });
+
+  const [accountError, setAccountedError] = useState('');
+
   const [selectedProject, setSelectedProject] = useState({
     id: project ? project.id : null, name: project? project.name : '', code: project? project.code : ''
   });
+
   const [projectError, setProjectedError] = useState('');
 
   const [selectedProgram, setSelectedProgram] = useState({
@@ -45,6 +53,10 @@ export default function Journal({journals, organization, startDateFilter, endDat
     id: department ? department.id : null, name: department? department.name : '', code: department? department.code : ''
   });
   const [departmentError, setDepartmentedError] = useState('');
+
+  useEffect(() => {
+    setDataAccounts(accounts);
+  },[])
 
   // function
   const handleSelectedProgram = (selected) => {
@@ -83,19 +95,20 @@ export default function Journal({journals, organization, startDateFilter, endDat
 
   const handleReload = () => {
     router.reload({
-      only: ['journals'],
+      only: ['accounts'],
       data: {
         startDate, 
         endDate,
         'program' : selectedProgram.id,
         'project' : selectedProject.id,
         'department' : selectedDepartment.id,
+        'account' : selectedAccount.id,
       },
       onBefore: visit => {
         visit.completed ? setIsLoading(false) : setIsLoading(true);
       },
       onSuccess: page => {
-        setDataJournals(page.props.journals);
+        setDataAccounts(page.props.accounts);
       },
       onError: err => {
         console.log(err);
@@ -113,14 +126,14 @@ export default function Journal({journals, organization, startDateFilter, endDat
 
   return (
     <>
-      <Head title={`Laporan Jurnal Periode : ${dayjs(startDate).format('MMMM DD, YYYY')} - ${dayjs(endDate).format('MMMM DD, YYYY')}`} />
+      <Head title={`Laporan Buku Besar Periode : ${dayjs(startDate).format('MMMM DD, YYYY')} - ${dayjs(endDate).format('MMMM DD, YYYY')}`} />
 
       <div className='sm:pt-0 pb-16 pt-12'>
-        <div className='bg-white py-2 sm:pt-0 px-5'>
+        <div className='bg-white py-2 sm:pt-0 px-5 space-y-2'>
           {/* Nav Title */}
           <div className='flex sm:flex-row justify-between gap-2 print:hidden'>
-            <div className='px-3 my-auto flex gap-3'>
-              <div className='my-auto'>
+            <div className='px-3 my-auto flex flex-col sm:flex-row gap-3 w-full sm:w-1/2'>
+              <div className='my-auto w-full'>
                 <Datepicker
                   value={startDateValue} 
                   onChange={handleStartDateValueChange}  
@@ -128,10 +141,9 @@ export default function Journal({journals, organization, startDateFilter, endDat
                   asSingle={true} 
                   placeholder='Tanggal Awal'
                   id="date"
-                  displayFormat='MMMM DD, YYYY'
                 />
               </div>
-              <div className='my-auto'>
+              <div className='my-auto w-full'>
                 <Datepicker
                   value={endDateValue} 
                   onChange={handleEndDateValueChange}  
@@ -139,14 +151,13 @@ export default function Journal({journals, organization, startDateFilter, endDat
                   asSingle={true} 
                   placeholder='Tanggal Akhir'
                   id="date"
-                  displayFormat='MMMM DD, YYYY'
                 />
               </div>
-              <div className='my-auto'>
+              <div className='my-auto hidden sm:block'>
                 <PrimaryButton disabled={(!startDate || !endDate || startDate > endDate || isLoading)} onClick={handleReload}>Filter</PrimaryButton>
               </div>
             </div>
-            <div className='text-end px-3 hidden sm:block'>
+            <div className='text-end px-3 hidden sm:block print:flex print:justify-between'>              
               <SecondaryButton onClick={handlePrint}>
                 <div className='flex gap-2'>
                   <div className='my-auto'><FaPrint /></div>
@@ -301,11 +312,19 @@ export default function Journal({journals, organization, startDateFilter, endDat
               </>
             )}
           </Disclosure>
+          <div className='sm:hidden w-full'>
+            <PrimaryButton disabled={(!selectedAccount.id || !startDate || !endDate || startDate > endDate || isLoading)} onClick={handleReload} className='w-full'>
+              <div className='text-center w-full'>
+                Filter
+              </div>
+            </PrimaryButton>
+
+          </div>
 
           {/* Title Print*/}
           <div className='uppercase pt-9 pb-3 border-b hidden print:flex print:justify-between'>
             <div className='w-1/2 text-2xl my-auto'>
-              Laporan jurnal
+              Laporan Buku Besar
             </div>
             <div className='w-1/2 text-end mt-auto'>
                 <div>{organization.name}</div>
@@ -313,35 +332,29 @@ export default function Journal({journals, organization, startDateFilter, endDat
                 <div className='text-xs'>{organization.village}, {organization.district}, {organization.regency}, {organization.province}</div>
             </div>
           </div>
-          <div className='w-full text-end italic mt-3 hidden print:block'>
-            Periode : {dayjs(startDate).format('MMMM DD, YYYY')} - {dayjs(endDate).format('MMMM DD, YYYY')}
+          <div className='w-full mt-3 hidden print:flex print:justify-between'>
+            <div className='uppercase'>
+              Akun : {selectedAccount.name}
+            </div>
+            <div className='text-end italic'>
+              Periode : {dayjs(startDate).format('MMMM DD, YYYY')} - {dayjs(endDate).format('MMMM DD, YYYY')}
+            </div>
           </div>
 
           {/* Content */}
           <div className="my-2 -mx-5 space-y-3 print:font-['Open_Sans'] overflow-auto">
             <div className='sm:w-full w-[550px] print:w-full'>
-              <table className='table uppercase table-zebra table-sm'>
-                <thead>
-                  <tr className='text-slate-900 font-bold border-b-2 border-slate-900'>
-                    <th>ref/tanggal</th>
-                    <th>Dekripsi</th>
-                    <th className='text-end'>debit</th>
-                    <th className='text-end'>kredit</th>
-                    <th>Note</th>
-                  </tr>
-                </thead>
-                <tbody>
-                {
-                  dataJournals.map((journal, index) => 
-                    <JournalContent 
-                      key={index} 
-                      journal={journal}
+              {
+                dataAccounts.map((account, index) => 
+                account.ledgers.length > 0 &&
+                  <div className='mx-5 uppercase' key={index}>
+                    <LedgersContent 
+                      account={account}
+                      startedValues={startedValues}
                     />
-                  )
-                }
-                </tbody>
-              </table>
-              
+                  </div>
+                )
+              }
             </div>
           </div>
         </div>
@@ -350,17 +363,17 @@ export default function Journal({journals, organization, startDateFilter, endDat
   )
 }
 
-Journal.layout = page => <AuthenticatedLayout
-  header={<Header>Laporan Jurnal</Header>}
+Ledgers.layout = page => <AuthenticatedLayout
+  header={<Header>Laporan Buku Besar</Header>}
   children={page}
   user={page.props.auth.user}
   organization={page.props.organization}
-  title="Laporan Jurnal"
+  title="Laporan Buku Besar"
   backLink={<Link href={route('report',page.props.organization.id)}><IoArrowBackOutline/></Link>}
   breadcrumbs={<div className="text-sm breadcrumbs">
     <ul>
         <li className='font-bold'><Link href={route('report',page.props.organization.id)}>Laporan</Link></li> 
-        <li>Laporan Jurnal</li>
+        <li>Laporan Buku Besar</li>
     </ul>
   </div>}
   role={page.props.role}

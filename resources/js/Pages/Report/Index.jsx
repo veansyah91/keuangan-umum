@@ -33,9 +33,16 @@ export default function Index({organization}) {
             <div className='w-1/4'>
               <div className='text-lg font-bold'>Laporan Buku Besar</div>
               <div className='space-y-2 mt-4'>
-                <div>Laporan Jurnal</div>
-                <div>Laporan Buku Besar Per Akun</div>
-                <div>Laporan Buku Besar</div>              
+                <div>
+                  <Link href={route('report.journal', organization.id)} className='hover:bg-slate-100 p-2 rounded-lg hover:font-bold'>Laporan Jurnal</Link>                  
+                </div>
+                <div>
+                  <Link href={route('report.ledger', organization.id)} className='hover:bg-slate-100 p-2 rounded-lg hover:font-bold'>Laporan Buku Besar Per Akun</Link>                                    
+                </div>
+                <div>
+                  <Link href={route('report.ledgers', organization.id)} className='hover:bg-slate-100 p-2 rounded-lg hover:font-bold'>Laporan Buku Besar</Link>    
+                </div>
+                                                            
               </div>
             </div>
           </div>
@@ -46,7 +53,7 @@ export default function Index({organization}) {
       <div className='sm:hidden flex flex-wrap pt-14 pb-5 px-2 mx-auto bg-white gap-2 w-full justify-center'>
         <div className='w-full'>
           <div className='text-lg font-bold'>Laporan Keuangan</div>
-          <div className='mt-4'>
+          <div className='mt-2'>
             <div className='border-b py-1'>
               <Link href={route('report.cashflow', organization.id)} className='hover:bg-slate-100 p-2 rounded-lg hover:font-bold'>Laporan Arus Kas</Link>                  
             </div>
@@ -55,6 +62,20 @@ export default function Index({organization}) {
             </div>
             <div className='border-b py-1'>
               <Link href={route('report.lost-profit', organization.id)} className='hover:bg-slate-100 p-2 rounded-lg hover:font-bold'>Laporan Laba Rugi</Link>                  
+            </div>              
+          </div>
+        </div>
+        <div className='w-full mt-4'>
+          <div className='text-lg font-bold'>Laporan Buku Besar</div>
+          <div className='mt-2'>
+            <div className='border-b py-1'>
+              <Link href={route('report.journal', organization.id)} className='hover:bg-slate-100 p-2 rounded-lg hover:font-bold'>Laporan Jurnal</Link>                  
+            </div>
+            <div className='border-b py-1'>
+              <Link href={route('report.ledger', organization.id)} className='hover:bg-slate-100 p-2 rounded-lg hover:font-bold'>Laporan Buku Besar Per Akun</Link>
+            </div>
+            <div className='border-b py-1'>
+              <Link href={route('report.ledgers', organization.id)} className='hover:bg-slate-100 p-2 rounded-lg hover:font-bold'>Laporan Buku Besar</Link>                      
             </div>              
           </div>
         </div>

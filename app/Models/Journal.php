@@ -4,6 +4,9 @@ namespace App\Models;
 
 use App\Models\User;
 use App\Models\Ledger;
+use App\Models\Program;
+use App\Models\Project;
+use App\Models\Department;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -37,6 +40,21 @@ class Journal extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    public function project(): BelongsTo
+    {
+        return $this->belongsTo(Project::class);
+    }
+
+    public function program(): BelongsTo
+    {
+        return $this->belongsTo(Program::class);
+    }
+
     public function scopeFilter($query, $filters)
     {
         $query->when($filters['search'] ?? false, function ($query, $search) {
@@ -54,6 +72,18 @@ class Journal extends Model
 
         $query->when($filters['is_approved']?? false, function ($query, $is_approved) {
             return $query->where('is_approved', $is_approved == "true" ? true : false);
+        });
+
+        $query->when($filters['program']?? false, function ($query, $program) {
+            return $query->where('program_id', $program);
+        });
+
+        $query->when($filters['project']?? false, function ($query, $project) {
+            return $query->where('project_id', $project);
+        });
+
+        $query->when($filters['department']?? false, function ($query, $department) {
+            return $query->where('department_id', $department);
         });
     }
 }

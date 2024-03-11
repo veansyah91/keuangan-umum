@@ -8,7 +8,6 @@ import { FaPrint } from 'react-icons/fa';
 import PrimaryButton from '@/Components/PrimaryButton';
 import Datepicker from 'react-tailwindcss-datepicker';
 import formatNumber from '@/Utils/formatNumber';
-// import ledgerContent from './Component/ledgerContent';
 import dayjs from 'dayjs';
 import { Disclosure, Transition } from '@headlessui/react';
 import LostProfitContent from './Component/LostProfitContent';
@@ -74,6 +73,7 @@ export default function LostProfit({organization, ledgers, startDateFilter, endD
       }
 
     })
+    setDataLedgers(ledgers);
     setRevenue(tempReveneu * -1);
     setCost({
       variable: tempVariableCost,
@@ -103,7 +103,6 @@ export default function LostProfit({organization, ledgers, startDateFilter, endD
         visit.completed ? setIsLoading(false) : setIsLoading(true);
       },
       onSuccess: page => {
-        setDataLedgers(page.props.ledgers);
         functionSetData(page.props.ledgers);
       },
       onError: err => {
@@ -136,6 +135,7 @@ export default function LostProfit({organization, ledgers, startDateFilter, endD
                   asSingle={true} 
                   placeholder='Tanggal Awal'
                   id="date"
+                  displayFormat='MMMM DD, YYYY'
                 />
               </div>
               <div className='my-auto'>
@@ -146,6 +146,7 @@ export default function LostProfit({organization, ledgers, startDateFilter, endD
                   asSingle={true} 
                   placeholder='Tanggal Akhir'
                   id="date"
+                  displayFormat='MMMM DD, YYYY'
                 />
               </div>
               <div className='my-auto'>

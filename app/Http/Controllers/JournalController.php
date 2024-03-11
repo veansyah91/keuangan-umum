@@ -49,6 +49,7 @@ class JournalController extends Controller
 
         $journal = Journal::whereOrganizationId($organization['id'])
                             ->where('no_ref', 'like', $refHeader . '%')
+                            ->orderBy('no_ref')
                             ->get()
                             ->last();
 

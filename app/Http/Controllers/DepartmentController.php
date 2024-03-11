@@ -35,6 +35,7 @@ class DepartmentController extends Controller
 
         $department = Department::whereOrganizationId($organization['id'])
                             ->where('code', 'like', $refHeader . '%')
+                            ->orderBy('code')
                             ->get()
                             ->last();
 
