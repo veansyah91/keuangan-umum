@@ -62,20 +62,32 @@ class JournalController extends Controller
     
     public function index(Organization $organization)
     {
-        $journals = Journal::filter(request(['search', 'start_date', 'end_date', 'is_approved']))
+        $journals = Journal::filter(request(['search', 'start_date', 'end_date', 'is_approved', 'program', 'project', 'department']))
                             ->whereOrganizationId($organization['id'])
                             ->orderBy('date', 'desc')
                             ->orderBy('no_ref', 'desc')
                             ->paginate(50);
 
         $user = Auth::user();
+
         return Inertia::render('Journal/Index', [
             'startDate' => request('start_date'),
             'endDate' => request('end_date'),
             'organization' => $organization,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'journals' => $journals,
-            'isApproved' => request('is_approved') == "true" ? true : false
+            'isApproved' => request('is_approved') == "true" ? true : false,
+            'projects' => Project::whereOrganizationId($organization['id'])
+                                    ->select('id', 'name', 'code')
+                                    ->get(),
+            'programs' => Program::whereIsActive(true)
+                                    ->whereOrganizationId($organization['id'])
+                                    ->select('id', 'name', 'code')
+                                    ->get(), 
+            'departments' => Department::whereIsActive(true)
+                                        ->whereOrganizationId($organization['id'])
+                                        ->select('id', 'name', 'code')
+                                        ->get(),
         ]);
     }
 
@@ -259,6 +271,10 @@ class JournalController extends Controller
             return redirect(route('data-ledger.journal', $organization['id']))->with('error', 'Anda Tidak Memiliki Hak Akses');
         }
 
+        if (!$journal['is_direct']) {
+            return redirect(route('data-ledger.journal', $organization['id']))->with('error', 'Tidak Bisa Diedit Di Journal');
+        }
+
         $accounts = Account::filter(request(['search']))
                             ->whereIsActive(true)
                             ->whereOrganizationId($organization['id'])
@@ -275,7 +291,7 @@ class JournalController extends Controller
             'date' => $date,
             'accounts' => $accounts,
             'journal' => $journal,
-            'ledgers' => Ledger::whereJournalId($journal['id'])->with('account')->get(),
+            'ledgers' => Ledger::whereJournalId($journal['id'])->with('account')->orderBy('credit', 'asc')->get(),
             'program' => Program::find($journal['program_id']),
             'project' => Project::find($journal['project_id']),
             'department' => Department::find($journal['department_id']),
@@ -309,6 +325,10 @@ class JournalController extends Controller
         
         if ($user['id'] !== $journal['user_id'] && $organizationUser->organizations[0]->pivot->role !== 'admin') {
             return redirect(route('data-ledger.journal', $organization['id']))->with('error', 'Anda Tidak Memiliki Hak Akses');
+        }
+
+        if (!$journal['is_direct']) {
+            return redirect(route('data-ledger.journal', $organization['id']))->with('error', 'Tidak Bisa Diedit Di Journal');
         }
 
         $validated = $request->validate([
@@ -421,6 +441,9 @@ class JournalController extends Controller
     {
         $user = Auth::user();
 
+        if (!$journal['is_direct']) {
+            return redirect(route('data-ledger.journal', $organization['id']))->withErrors(['isNotDirect' => 'Tidak Bisa Dihapus Di Journal']);
+        }
         // cek tanggal
         // jika tanggal lebih tinggi dari hari sekarang, maka kirimkan error\
         if ($journal['date'] > $this->now->isoFormat("YYYY-MM-DD")) {
@@ -445,7 +468,7 @@ class JournalController extends Controller
         
         if ($user['id'] !== $journal['user_id'] && $organizationUser->organizations[0]->pivot->role !== 'admin') {
             return redirect(route('data-ledger.journal', $organization['id']))->with('error', 'Anda Tidak Memiliki Hak Akses');
-        }
+        }       
         
         $journal->delete();
 

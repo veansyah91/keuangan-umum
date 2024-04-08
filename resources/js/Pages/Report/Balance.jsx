@@ -120,6 +120,7 @@ export default function Balance({organization, ledgers, endDateFilter, account})
   const handlePrint = () => {
     window.print();
   }
+  
   return (
     <>
       <Head title={`Laporan Neraca Periode : ${dayjs(endDate).format('MMMM DD, YYYY')}`} />

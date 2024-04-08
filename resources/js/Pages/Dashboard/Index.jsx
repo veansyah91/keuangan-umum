@@ -13,13 +13,11 @@ import dayjs from 'dayjs';
 import Datepicker from 'react-tailwindcss-datepicker';
 import { FaHandHoldingUsd } from "react-icons/fa";
 import CostRevenueChart from './Components/CostRevenueChart';
+import CashflowChart from './Components/CashflowChart';
 
 const Index = ({ balance, startDate, endDate }) => {
   const { date, setDate } = useContext(AppContext);
   const [isLoading, setIsLoading] = useState(false);
-
-  
-  // const 
 
   useEffect(() => {
     setIsLoading(true);
@@ -231,6 +229,11 @@ const Index = ({ balance, startDate, endDate }) => {
           title={"Pengeluaran"}
           type={'cost'}
           data={balance?.costs}
+        />
+
+        {/* Arus Kas */}
+        <CashflowChart 
+          data={balance?.cashflowDay}
         />
 
       </Container>

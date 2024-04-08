@@ -15,6 +15,7 @@ import { usePrevious } from "react-use";
 import Modal from "@/Components/Modal";
 import SecondaryButton from "@/Components/SecondaryButton";
 import DangerButton from "@/Components/DangerButton";
+import { Menu } from "@headlessui/react";
 
 export default function Index({auth, organizations, searchFilter}) {
     const { flash } = usePage().props;
@@ -96,7 +97,8 @@ export default function Index({auth, organizations, searchFilter}) {
                             <div className='sm:p-6 px-6 py-3 text-gray-800 flex-none sm:flex'>
                                 <div className='sm:hidden text-gray-800 flex'>
                                     <div className="w-1/2 my-auto">
-                                        Daftar Organisasi
+                                        Daftar Organisasi 
+                                        
                                     </div>
                                     <div className="flex flex-row-reverse w-1/2 text-end">
                                         <div>
@@ -190,7 +192,7 @@ export default function Index({auth, organizations, searchFilter}) {
                                 {/* End Table Header */}
 
                                 {/* Table Body */}
-                                <div className='overflow-auto h-[24rem]'>
+                                <div className='overflow-auto h-[23rem]'>
                                     {
                                         organizations.length < 1 ? (
                                             <div className='bg-white overflow-hidden shadow-sm border-b'>

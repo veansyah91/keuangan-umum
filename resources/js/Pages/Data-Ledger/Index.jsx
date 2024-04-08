@@ -6,15 +6,15 @@ import ContainerDesktop from '@/Components/Desktop/ContainerDesktop';
 import CardMenu from '@/Components/CardMenu';
 import { PiNotebook } from "react-icons/pi";
 import { LiaClipboardListSolid } from 'react-icons/lia';
-import { RiBook2Line, RiBookletLine } from "react-icons/ri";
+import { RiBookletLine } from "react-icons/ri";
 
 export default function Index({organization}) {
     return (
         <>
-            <Head title='Data ledger' />
+            <Head title='Data Akun' />
             {/* Desktop */}
             <ContainerDesktop>
-                <div className='flex justify-start pt-5 pb-10 gap-2'>
+                <div className='flex justify-center pt-5 pb-10 gap-5'>
                     <Link href={route('data-ledger.account-category', organization.id)}>
                         <CardMenu 
                             bgColor={'bg-cyan-500'}

@@ -32,10 +32,6 @@ export default function Ledgers({accounts, startedValues, organization, startDat
     endDate: endDateFilter || ''
   });
 
-  const [selectedAccount, setSelectedAccount] = useState({
-    id: account ? account.id : null, name: account? account.name : '', code: account? account.code : ''
-  });
-
   const [accountError, setAccountedError] = useState('');
 
   const [selectedProject, setSelectedProject] = useState({
@@ -102,7 +98,6 @@ export default function Ledgers({accounts, startedValues, organization, startDat
         'program' : selectedProgram.id,
         'project' : selectedProject.id,
         'department' : selectedDepartment.id,
-        'account' : selectedAccount.id,
       },
       onBefore: visit => {
         visit.completed ? setIsLoading(false) : setIsLoading(true);
@@ -300,7 +295,7 @@ export default function Ledgers({accounts, startedValues, organization, startDat
                 </Transition>
                 <Disclosure.Button className="flex w-full justify-between rounded-lg bg-slate-100 px-4 py-2 text-left text-sm font-medium text-slate-900 hover:bg-slate-200 focus:outline-none focus-visible:ring focus-visible:ring-slate-500/75">
                   <div className='flex justify-center w-full gap-3'>
-                    <span>Tampilkan Lebih Banyak</span>
+                    <span>Tampilkan Lebih { open ? 'Sedikit' : 'Banyak' }</span>
                     <IoChevronUpCircleOutline
                       className={`${
                         open ? '' : 'rotate-180 transform'
@@ -313,7 +308,7 @@ export default function Ledgers({accounts, startedValues, organization, startDat
             )}
           </Disclosure>
           <div className='sm:hidden w-full'>
-            <PrimaryButton disabled={(!selectedAccount.id || !startDate || !endDate || startDate > endDate || isLoading)} onClick={handleReload} className='w-full'>
+            <PrimaryButton disabled={(!startDate || !endDate || startDate > endDate || isLoading)} onClick={handleReload} className='w-full'>
               <div className='text-center w-full'>
                 Filter
               </div>
@@ -334,7 +329,7 @@ export default function Ledgers({accounts, startedValues, organization, startDat
           </div>
           <div className='w-full mt-3 hidden print:flex print:justify-between'>
             <div className='uppercase'>
-              Akun : {selectedAccount.name}
+              
             </div>
             <div className='text-end italic'>
               Periode : {dayjs(startDate).format('MMMM DD, YYYY')} - {dayjs(endDate).format('MMMM DD, YYYY')}

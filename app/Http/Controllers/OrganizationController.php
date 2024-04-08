@@ -6,11 +6,13 @@ use Carbon\Carbon;
 use App\Models\User;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Models\Contact;
 use Illuminate\Support\Str;
 use App\Models\Organization;
 use Illuminate\Http\Request;
 use App\Models\ContactCategory;
 use Illuminate\Validation\Rule;
+use App\Models\FixedAssetCategory;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use App\Repositories\Village\VillageRepository;
@@ -20,6 +22,33 @@ use App\Repositories\AccountCategory\AccountCategoryRepositoryInterface;
 
 class OrganizationController extends Controller
 {
+    protected $fixedAssetCategory = [
+        [
+            'lifetime' => 0,
+            'name' => "TANAH",
+            'status' => true,
+        ],
+        [
+            'lifetime' => 48,
+            'name' => "MESIN DAN PERALATAN",
+            'status' => true,
+        ],
+        [
+            'lifetime' => 96,
+            'name' => "KENDARAAN",
+            'status' => true,
+        ],
+        [
+            'lifetime' => 48,
+            'name' => "HARTA LAINNYA",
+            'status' => true,
+        ],
+        [
+            'lifetime' => 240,
+            'name' => "GEDUNG",
+            'status' => true,
+        ],
+    ];
     protected $accountCategoriesDefault = [
         // Neraca
         // Aset Lancar
@@ -408,10 +437,26 @@ class OrganizationController extends Controller
         //
 
         // Category
-        ContactCategory::create([
+        $contactCategory = ContactCategory::create([
             'name' => 'UMUM',
             'organization_id' => $organization['id']
         ]);
+
+        Contact::create([
+            'organization_id' => $organization['id'],
+            'name' => "UMUM"
+
+        ]);
+
+        // Fixed Asset Category
+        $fixedAssetCategoriesCollection = collect($this->fixedAssetCategory);
+
+        foreach ($fixedAssetCategoriesCollection as $fixedAssetCategory) {
+            $fixedAssetCategory['organization_id'] = $organization['id'];
+
+            FixedAssetCategory::create($fixedAssetCategory);
+        }
+        // 
 
         return redirect(route('organization'))->with('success', 'Organisasi Berhasil Disimpan!');
 

@@ -4,8 +4,10 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\LogController;
+use App\Http\Controllers\CashinController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\CashoutController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\JournalController;
 use App\Http\Controllers\ProfileController;
@@ -16,6 +18,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DataLedgerController;
 use App\Http\Controllers\DataMasterController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\CashMutationController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\Admin\RegencyController;
 use App\Http\Controllers\Admin\VillageController;
@@ -25,6 +28,7 @@ use App\Http\Controllers\AccountCategoryController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\ContactCategoryController;
 use App\Http\Controllers\Admin\AdminMasterController;
+use App\Http\Controllers\FixedAssetCategoryController;
 use App\Http\Controllers\OrganizationInvoiceController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\OrganizationMenuController;
@@ -109,10 +113,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     
     Route::middleware([
-            // 'user.has.organization:{parameter}', 
-            // 'is.not.expired:{parameter}',
+            'user.has.organization:{parameter}', 
+            'is.not.expired:{parameter}',
         ])->group(function () {
-        // Log Activity
 
         //Dashboard
         Route::get('/dashboard/{organization}', [DashboardController::class, 'index'])->name('dashboard');
@@ -160,6 +163,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
              Route::patch('/departments/{department}', [DepartmentController::class, 'update'])->name('data-master.department.update')->middleware('is.not.viewer');
              Route::delete('/departments/{department}', [DepartmentController::class, 'destroy'])->name('data-master.department.destroy')->middleware('is.not.viewer');
              
+            // Fixed Asset Category
+            Route::get('/fixed-asset-categories', [FixedAssetCategoryController::class, 'index'])->name('data-master.fixed-asset-category');
+
         });
 
         // Accountancy
@@ -197,12 +203,40 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/journal', [ReportController::class, 'journal'])->name('report.journal');
             Route::get('/ledger', [ReportController::class, 'ledger'])->name('report.ledger');
             Route::get('/ledgers', [ReportController::class, 'ledgers'])->name('report.ledgers');
+            Route::get('/trial-balance', [ReportController::class, 'trialBalance'])->name('report.trial-balance');
 
         });
 
         // Cashflow
         Route::prefix('cashflows/{organization}')->group(function(){
             Route::get('/', CashflowController::class)->name('cashflow');
+
+            // cash in
+            Route::get('/cash-in', [CashinController::class, 'index'])->name('cashflow.cash-in');
+            Route::get('/cash-in/create', [CashinController::class, 'create'])->name('cashflow.cash-in.create');
+            Route::get('/cash-in/{cashIn}/edit', [CashinController::class, 'edit'])->name('cashflow.cash-in.edit');
+            Route::get('/cash-in/{cashIn}', [CashinController::class, 'show'])->name('cashflow.cash-in.show');
+            Route::patch('/cash-in/{cashIn}', [CashinController::class, 'update'])->name('cashflow.cash-in.update');
+            Route::delete('/cash-in/{cashIn}', [CashinController::class, 'destroy'])->name('cashflow.cash-in.delete');
+            Route::post('/cash-in/create', [CashinController::class, 'store'])->name('cashflow.cash-in.post');
+
+            //cash out
+            Route::get('/cash-out', [CashoutController::class, 'index'])->name('cashflow.cash-out');
+            Route::get('/cash-out/create', [CashoutController::class, 'create'])->name('cashflow.cash-out.create');
+            Route::get('/cash-out/{cashOut}/edit', [CashoutController::class, 'edit'])->name('cashflow.cash-out.edit');
+            Route::get('/cash-out/{cashOut}', [CashoutController::class, 'show'])->name('cashflow.cash-out.show');
+            Route::patch('/cash-out/{cashOut}', [CashoutController::class, 'update'])->name('cashflow.cash-out.update');
+            Route::delete('/cash-out/{cashOut}', [CashoutController::class, 'destroy'])->name('cashflow.cash-out.delete');
+            Route::post('/cash-out/create', [CashoutController::class, 'store'])->name('cashflow.cash-out.post');
+
+            //cash out
+            Route::get('/cash-mutation', [CashMutationController::class, 'index'])->name('cashflow.cash-mutation');
+            Route::get('/cash-mutation/create', [CashMutationController::class, 'create'])->name('cashflow.cash-mutation.create');
+            Route::get('/cash-mutation/{cashMutation}/edit', [CashMutationController::class, 'edit'])->name('cashflow.cash-mutation.edit');
+            Route::get('/cash-mutation/{cashMutation}', [CashMutationController::class, 'show'])->name('cashflow.cash-mutation.show');
+            Route::patch('/cash-mutation/{cashMutation}', [CashMutationController::class, 'update'])->name('cashflow.cash-mutation.update');
+            Route::delete('/cash-mutation/{cashMutation}', [CashMutationController::class, 'destroy'])->name('cashflow.cash-mutation.delete');
+            Route::post('/cash-mutation/create', [CashMutationController::class, 'store'])->name('cashflow.cash-mutation.post');
 
         });
 

@@ -8,6 +8,8 @@ import { IoIdCardOutline, IoPeopleOutline } from 'react-icons/io5';
 import { MdChecklist } from "react-icons/md";
 import { LiaClipboardListSolid } from "react-icons/lia";
 import { CgListTree } from "react-icons/cg";
+import { TbBuildingCommunity } from "react-icons/tb";
+import { BsBuildings } from "react-icons/bs";
 
 export default function Index({organization, role}) {
     return (
@@ -15,7 +17,7 @@ export default function Index({organization, role}) {
             <Head title='Data Master' />
             {/* Desktop */}
             <ContainerDesktop>
-                <div className='flex justify-start pt-5 pb-10 gap-2'>
+                <div className='flex flex-wrap justify-center pt-5 pb-10 gap-5'>
                     <Link href={route('data-master.contact-category', organization.id)}>
                         <CardMenu 
                             bgColor={'bg-cyan-500'}
@@ -49,6 +51,20 @@ export default function Index({organization, role}) {
                         bgColor={'bg-slate-500'}
                         icon={<CgListTree />}
                         title={'Data Departemen'}
+                    />
+                </Link>    
+                <Link href={route('data-master.fixed-asset-category', organization.id)}>
+                    <CardMenu 
+                        bgColor={'bg-blue-500'}
+                        icon={<TbBuildingCommunity />}
+                        title={'Kelompok Harta Tetap'}
+                    />
+                </Link> 
+                <Link href={route('data-master.department', organization.id)}>
+                    <CardMenu 
+                        bgColor={'bg-rose-500'}
+                        icon={<BsBuildings />}
+                        title={'Data Harta Tetap'}
                     />
                 </Link>         
                 </div>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { IoArrowBackOutline, IoFilter, IoPlayBack, IoPlayForward, IoSearchSharp } from 'react-icons/io5';
+import { IoArrowBackOutline, IoFilter, IoPlayBack, IoPlayForward, IoSearchSharp, IoTrashOutline } from 'react-icons/io5';
 import { ToastContainer, toast } from 'react-toastify';
 import AddButtonMobile from '@/Components/AddButtonMobile';
 import TitleMobile from '@/Components/Mobiles/TitleMobile';
@@ -20,8 +20,9 @@ import DangerButton from '@/Components/DangerButton';
 import JournalDesktop from './Components/JournalDesktop';
 import JournalMobile from './Components/JournalMobile';
 import Datepicker from 'react-tailwindcss-datepicker';
+import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 
-export default function Index({startDate, endDate, journals, role, organization, searchFilter, isApproved}) {
+export default function Index({startDate, endDate, journals, role, organization, searchFilter, isApproved, projects, programs, departments}) {
   // state
   const { flash } = usePage().props;
 
@@ -31,8 +32,23 @@ export default function Index({startDate, endDate, journals, role, organization,
    const [search, setSearch] = useState(searchFilter || '');
    const [debounceValue] = useDebounce(search, 500);
    const [dataFilter, setDataFilter] = useState({
-		'is_approved' : isApproved || undefined
+		'is_approved' : isApproved || undefined,
+		'project' : null,
+		'program' : null,
+		'department' : null,
    });
+
+   	const [selectedProgram, setSelectedProgram] = useState({
+      id: null, name: '', code: ''
+  	});
+
+    const [selectedProject, setSelectedProject] = useState({
+      id: null, name: '', code: ''
+  	});
+
+    const [selectedDepartment, setSelectedDepartment] = useState({
+      id: null, name: '', code: ''
+  	});
 
    const [modalDelete, setModalDelete] = useState({
 		title: ''
@@ -47,6 +63,7 @@ export default function Index({startDate, endDate, journals, role, organization,
 		startDate: startDate || '', 
 		endDate: endDate || ''
   	});
+
 	const [debounceDateValue] = useDebounce(dateValue, 500);
 
 	const prevSearch = usePrevious(search);
@@ -66,6 +83,36 @@ export default function Index({startDate, endDate, journals, role, organization,
 	},[debounceValue, debounceDateValue]);
 
 	//function
+	const handleSelectedProgram = (selected) => {
+		setSelectedProgram(selected);
+		setDataFilter({...dataFilter, program: selected.id});
+	}
+
+	const handleDeleteSelectedProgram = () => {
+		setSelectedProgram({id: null, name: '', code: ''});
+		setDataFilter({...dataFilter, program: null});
+	}
+
+	const handleSelectedProject = (selected) => {
+		setSelectedProject(selected);
+		setDataFilter({...dataFilter, project: selected.id});
+  }
+  
+  const handleDeleteSelectedProject = () => {
+    setSelectedProject({id: null, name: '', code: ''});
+    setDataFilter({...dataFilter, project: null});
+  }
+
+  const handleSelectedDepartment = (selected) => {
+		setSelectedDepartment(selected);
+		setDataFilter({...dataFilter, department: selected.id});
+  }
+  
+  const handleDeleteSelectedDepartment = () => {
+    setSelectedDepartment({id: null, name: '', code: ''});
+    setDataFilter({...dataFilter, department: null});
+  }
+
 	const handleDelete = (journal) => {
 		setModalDelete({
 			title: `Hapus Data Jurnal No Ref ${journal.no_ref}`
@@ -88,6 +135,13 @@ export default function Index({startDate, endDate, journals, role, organization,
 					position: toast.POSITION.TOP_CENTER
 				});
 				setShowDeleteConfirmation(false);
+			}, 
+			onError: errors => {
+				setShowDeleteConfirmation(false);
+
+				toast.error(errors.isNotDirect, {
+					position: toast.POSITION.TOP_CENTER
+				});
 			}
 		})
 	}
@@ -103,13 +157,17 @@ export default function Index({startDate, endDate, journals, role, organization,
 	}
 
 	const handleReloadPage = () => {
+    console.log();
 		router.reload({
 			only: ['journals'],
 			data: {
                 search, 
                 'start_date' : dateValue.startDate, 
                 'end_date' : dateValue.endDate,
-                'is_approved' : dataFilter.is_approved
+                'is_approved' : dataFilter.is_approved,
+				        'program' : dataFilter.program,
+				        'project' : dataFilter.project,
+				        'department' : dataFilter.department,
             },
 			preserveState: true
 		})
@@ -239,7 +297,6 @@ export default function Index({startDate, endDate, journals, role, organization,
 					</div>
 				</div>
 			</TitleDesktop>
-
 			
 			<div className='sm:flex hidden gap-5'>
 				<div className='w-full'>
@@ -287,14 +344,13 @@ export default function Index({startDate, endDate, journals, role, organization,
 			<h2 className="text-lg font-medium text-gray-900">
 				Filter Jurnal Umum
 			</h2>
-
 			
-			<div className="mt-6 ">
-				<div className='flex w-full gap-1'>
-					<div className='w-1/4 my-auto'>
+			<div className="mt-6 space-y-2">
+				<div className='flex flex-col sm:flex-row w-full gap-1'>
+					<div className='sm:w-1/4 w-full my-auto font-bold'>
 						Status
 					</div>
-					<div className='w-3/4 flex'>
+					<div className='sm:w-3/4 w-full flex'>
 						<div className="form-control">
 							<label className="label cursor-pointer space-x-2" htmlFor='all'>
 								<input 
@@ -336,6 +392,108 @@ export default function Index({startDate, endDate, journals, role, organization,
 						</div>
 					</div>
 				</div>
+				{
+					programs.length > 0 && 
+					<div className='flex flex-col sm:flex-row w-full gap-1'>
+						<div className='w-full sm:w-3/12 my-auto font-bold'>
+							Program
+						</div>
+						<div className='w-full sm:w-9/12 flex'>
+              <div className='w-10/12'>
+                <ClientSelectInput
+                  resources={programs}
+                  selected={selectedProgram}
+                  setSelected={(selected) => handleSelectedProgram(selected)}
+                  maxHeight='max-h-40'
+                  placeholder='Cari Program'
+                  isError={false}
+                  
+                  id='program'
+                />
+              </div>
+              <div className='w-2/12 my-auto'>
+                {
+                  selectedProgram.id && 
+                  <button 
+                  type='button' className='text-red-500 text-xl hover:bg-slate-200 rounded-full p-2'
+                  onClick={handleDeleteSelectedProgram}
+                  >
+                  <IoTrashOutline />
+                  </button>
+                }  
+              </div> 
+						</div>
+					</div>
+				}
+				{
+					projects.length > 0 && 
+					<div className='flex flex-col sm:flex-row w-full gap-1'>
+						<div className='w-full sm:w-3/12 my-auto font-bold'>
+							Proyek
+						</div>
+						<div className='w-full sm:w-9/12 flex'>
+              <div className='w-10/12'>
+                <ClientSelectInput
+                  resources={projects}
+                  selected={selectedProject}
+                  setSelected={(selected) => handleSelectedProject(selected)}
+                  maxHeight='max-h-40'
+                  placeholder='Cari Project'
+                  isError={false}
+                  id='project'
+                />
+              </div>
+              <div className='w-2/12 my-auto'>
+              {
+                selectedProject.id && 
+                  <button 
+                    type='button' 
+                    className='text-red-500 text-xl hover:bg-slate-200 rounded-full p-2'
+                    onClick={handleDeleteSelectedProject}
+                  >
+                  <IoTrashOutline />
+                  </button>
+              } 
+              </div> 
+						</div>
+            
+					</div>
+				}
+				{
+					departments.length > 0 && 
+					<div className='flex flex-col sm:flex-row w-full gap-1'>
+						<div className='w-full sm:w-3/12 my-auto font-bold'>
+							Departemen
+						</div>
+						<div className='w-full sm:w-9/12 flex'>
+              <div className='w-10/12'>
+                <ClientSelectInput
+                  resources={departments}
+                  selected={selectedDepartment}
+                  setSelected={(selected) => handleSelectedDepartment(selected)}
+                  maxHeight='max-h-40'
+                  placeholder='Cari Departemen'
+                  isError={false}
+                  id='department'
+                />
+              </div>
+              <div className='w-2/12 my-auto'>
+              {
+                selectedDepartment.id && 
+                  <button 
+                    type='button' 
+                    className='text-red-500 text-xl hover:bg-slate-200 rounded-full p-2'
+                    onClick={handleDeleteSelectedDepartment}
+                  >
+                  <IoTrashOutline />
+                  </button>
+              } 
+              </div> 
+						</div>
+            
+					</div>
+				}
+				
 			</div>
 
 			<div className="mt-6 flex justify-end">

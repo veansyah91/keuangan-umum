@@ -168,7 +168,7 @@ export default function Authenticated({ user, header, children, organization = '
                         </nav>
 
                         {header && (
-                            <header className='bg-white shadow hidden sm:flex sm:justify-between pt-16 print:hidden border-2'>
+                            <header className='bg-white shadow hidden sm:flex sm:justify-between pt-16 print:hidden'>
                                 <div className='max-w-7xl py-3 px-4 sm:px-6 lg:px-8 my-auto'>{header}</div>
                                 {
                                     breadcrumbs && 

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\UUID;
+use App\Models\FixedAssetCategory;
 use App\Models\OrganizationInvoice;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -50,6 +51,11 @@ class Organization extends Model
     public function organizationInvoice(): HasMany
     {
         return $this->hasMany(OrganizationInvoice::class);
+    }
+
+    public function fixedAssetCategory(): HasMany
+    {
+        return $this->hasMany(FixedAssetCategory::class);
     }
 
     public function scopeFilter($query, $filters)

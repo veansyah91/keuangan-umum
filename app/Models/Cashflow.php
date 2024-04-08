@@ -16,7 +16,6 @@ class Cashflow extends Model
         'credit',
         'date',
         'no_ref',
-        'contact_id', //jika transaksi melibatkan kontak tertentu
         'account_id',
         'organization_id',
         'journal_id',

@@ -8,7 +8,7 @@ use App\Models\Cashflow;
 
 class JournalRepository implements JournalRepositoryInterface
 {
-    public function store($validated): void
+    public function store($validated)
     {
         $journal = Journal::create($validated);
 
@@ -59,6 +59,7 @@ class JournalRepository implements JournalRepositoryInterface
                 }
             }
         }
+        return $journal;
     }
 
     public function update($validated, $journal): void 
@@ -79,6 +80,7 @@ class JournalRepository implements JournalRepositoryInterface
         }
         
         $validated['journal_id'] = $journal['id'];
+        $isCash = false;
         $cashDebit = 0;
         $cashCredit = 0;
 

@@ -9,7 +9,9 @@ export default function CardMenu({title, icon, bgColor}) {
             </div>
         </div>
         <div className='h-1/3 font-bold'>
+          <div className='px-2'>
             {title}
+          </div>
         </div>
     </div>
   )

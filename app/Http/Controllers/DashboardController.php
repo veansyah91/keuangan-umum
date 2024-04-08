@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use Inertia\Inertia;
 use App\Models\Ledger;
+use App\Models\Cashflow;
 use Carbon\CarbonImmutable;
 use App\Models\Organization;
 use Illuminate\Support\Facades\DB;
@@ -78,6 +79,14 @@ class DashboardController extends Controller
                                 ->orderBy('ledgers.date')
                                 ->get();
 
+                                
+        // cashflow
+        $cashflows = Cashflow::whereOrganizationId($organization['id'])
+                                // ->where('date', '>=', $startDate)
+                                ->where('date', '<=', $endDate)
+                                ->get();
+
+
         $currentAsset = $balance->where('code', '<', '160000000')->sum('total');
         $fixedAsset = $balance->where('code', '>=', '160000000')->where('code', '<', '200000000')->sum('total');
         $liability = $balance->where('code', '>=', '200000000')->where('code', '<', '300000000')->sum('total');
@@ -88,9 +97,9 @@ class DashboardController extends Controller
         $revenue = $balance->where('date', '>=', $tempStartDate->format('Y-m-d'))->where('code', '>=', '400000000')->where('code', '<', '500000000')->sum('total');
         $cost = $balance->where('date', '>=', $tempStartDate->format('Y-m-d'))->where('code', '>=', '500000000')->sum('total');
 
-        // revenue
         $revenueDay = [];
         $costDay = [];
+        $cashflowDay = [];
 
         for ($i=0; $i < (int)CarbonImmutable::parse($endDate)->format("d") ; $i++) { 
             $day = strval($i + 1);
@@ -108,6 +117,17 @@ class DashboardController extends Controller
                 'date' => $i + 1,
                 'value' => abs($balance->where('code', '>=', '500000000')->where('code', '<', '700000000')->where('date',$new->format('Y-m-d'))->sum('total'))
             ];
+
+            $cashflowDay[$i] = [
+                'date' => $i + 1,
+                'balance' => $cashflows->where('date', '<=', $new->format('Y-m-d'))
+                                ->sum('debit') - $cashflows->where('date', '<=', $new->format('Y-m-d'))
+                                ->sum('credit'),
+                'debit' => $cashflows->where('date', $new->format('Y-m-d'))
+                            ->sum('debit'), 
+                'credit' => $cashflows->where('date', $new->format('Y-m-d'))
+                            ->sum('credit'),
+            ];
         }
 
         $revenues = $lostProfit->where('code', '>=', '400000000')->where('code', '<', '500000000')->toArray();
@@ -115,6 +135,10 @@ class DashboardController extends Controller
 
         $revenues = $this->joinArray($revenues);
         $costs = $this->joinArray($costs); 
+
+
+
+        // dd($cashflows);
 
         return Inertia::render('Dashboard/Index', [
             'organization' => $organization,
@@ -130,6 +154,8 @@ class DashboardController extends Controller
                                         'costs' => $costs,
                                         'revenueDay' => $revenueDay,
                                         'costDay' => $costDay,
+                                        'cashflowDay' => $cashflowDay,
+
                                     ]), 
             'startDate' => $startDate,           
             'endDate' => $endDate,           

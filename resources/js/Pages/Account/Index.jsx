@@ -283,15 +283,15 @@ export default function Index({organization, accounts, role, accountCategories, 
         <ContainerDesktop>
             {/* Title, Pagination, Search */}
             <TitleDesktop>
-            <div className='my-auto w-7/12'>
-                {
-                    (role !== 'viewer') &&
-                    <PrimaryButton className='py-3' onClick={handleShowInputModal}>
-                        Tambah Data
-                    </PrimaryButton>                            
-                }
-            </div>
-            <div className='w-3/12 border flex rounded-lg'>
+                <div className='my-auto w-7/12'>
+                    {
+                        (role !== 'viewer') &&
+                        <PrimaryButton className='py-3' onClick={handleShowInputModal}>
+                            Tambah Data
+                        </PrimaryButton>                            
+                    }
+                </div>
+                <div className='w-3/12 border flex rounded-lg'>
                     <label htmlFor='search-input' className='my-auto ml-2'><IoSearchSharp /></label>
                     <input id='search-input' name='search-input' type="search" placeholder='Cari Akun' className='w-full border-none focus:outline-none focus:ring-0' value={search || ''}
                     onChange={e => setSearch(e.target.value)}/>

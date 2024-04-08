@@ -27,7 +27,10 @@ export default function Index({organization}) {
                 </div>
                 <div>
                   <Link href={route('report.lost-profit', organization.id)} className='hover:bg-slate-100 p-2 rounded-lg hover:font-bold'>Laporan Laba Rugi</Link>                  
-                </div>              
+                </div>         
+                <div>
+                  <Link href={route('report.trial-balance', organization.id)} className='hover:bg-slate-100 p-2 rounded-lg hover:font-bold'>Laporan Neraca Lajur</Link>                  
+                </div>       
               </div>
             </div>
             <div className='w-1/4'>
@@ -62,7 +65,10 @@ export default function Index({organization}) {
             </div>
             <div className='border-b py-1'>
               <Link href={route('report.lost-profit', organization.id)} className='hover:bg-slate-100 p-2 rounded-lg hover:font-bold'>Laporan Laba Rugi</Link>                  
-            </div>              
+            </div>    
+            <div className='border-b py-1'>
+              <Link href={route('report.trial-balance', organization.id)} className='hover:bg-slate-100 p-2 rounded-lg hover:font-bold'>Laporan Neraca Lajur</Link>                  
+            </div>                    
           </div>
         </div>
         <div className='w-full mt-4'>

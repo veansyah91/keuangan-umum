@@ -55,6 +55,11 @@ class Journal extends Model
         return $this->belongsTo(Program::class);
     }
 
+    public function cashin(): HasMany
+    {
+        return $this->hasMany(Cashin::class);
+    }
+
     public function scopeFilter($query, $filters)
     {
         $query->when($filters['search'] ?? false, function ($query, $search) {
