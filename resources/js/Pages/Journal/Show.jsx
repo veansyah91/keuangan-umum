@@ -105,7 +105,7 @@ export default function Show({organization, program, department, project, journa
                                     ledgers.map(ledger => 
                                         <tr key={ledger.id} className='border border-slate-800'>
                                             <td className='px-3 py-2 border border-slate-800'>{ledger.account.code}</td>
-                                            <td className='px-3 py-2 border border-slate-800'>{ledger.account.name}</td>
+                                            <td className='px-3 py-2 border border-slate-800'>{ledger.account.name.toUpperCase()}</td>
                                             <td className='text-end px-3 py-2 border border-slate-800'>IDR {formatNumber(ledger.debit)}</td>
                                             <td className='text-end px-3 py-2 border border-slate-800'>IDR {formatNumber(ledger.credit)}</td>
                                         </tr>

@@ -19,19 +19,21 @@ class JournalRepository implements JournalRepositoryInterface
 
         // create Ledger
         foreach ($validated['accounts'] as $account) {
-            $validated['account_id'] = $account['id'];
-            $validated['debit'] = $account['debit'];
-            $validated['credit'] = $account['credit'];
+            if (($account['debit'] - $account['credit']) !== 0) {
+                $validated['account_id'] = $account['id'];
+                $validated['debit'] = $account['debit'];
+                $validated['credit'] = $account['credit'];
 
-            Ledger::create($validated);
+                Ledger::create($validated);
 
-            if ($account['is_cash']) {
-                $isCash = true;
-                if ($account['debit'] > 0) {
-                    $cashDebit += $account['debit'];
-                }
-                if ($account['credit'] > 0) {
-                    $cashCredit += $account['credit'];
+                if ($account['is_cash']) {
+                    $isCash = true;
+                    if ($account['debit'] > 0) {
+                        $cashDebit += $account['debit'];
+                    }
+                    if ($account['credit'] > 0) {
+                        $cashCredit += $account['credit'];
+                    }
                 }
             }
         }

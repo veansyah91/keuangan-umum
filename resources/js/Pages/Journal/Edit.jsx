@@ -16,6 +16,7 @@ import { useDebounce } from 'use-debounce';
 import SecondaryButton from '@/Components/SecondaryButton';
 import PrimaryButton from '@/Components/PrimaryButton';
 import { Disclosure, Transition } from '@headlessui/react';
+import dayjs from 'dayjs';
 
 export default function Edit({organization, accounts, journal, ledgers, program, department, project, programs, departments, projects}) {
   // state
@@ -94,7 +95,13 @@ export default function Edit({organization, accounts, journal, ledgers, program,
 
   useEffect(() => {
     if(prevDate!==undefined) {
-      reloadNewRef();
+      let inputDateFormatted = dayjs(dateValue.startDate);
+      let tempInputDate = `${inputDateFormatted.month() + 1}-${inputDateFormatted.year()}`;
+
+      let oldDateFormatted = dayjs(journal.date);
+      let tempOldDate = `${oldDateFormatted.month() + 1}-${oldDateFormatted.year()}`;
+
+      tempInputDate !== tempOldDate ? reloadNewRef() : setData('code', journal.no_ref) ;
     }
   },[debounceDateValue]);
 
@@ -570,7 +577,7 @@ export default function Edit({organization, accounts, journal, ledgers, program,
 
               <div className='flex justify-end flex-col-reverse sm:flex-row gap-2 mt-5'>
                 <div className='w-full sm:w-1/12 my-auto text-center'>
-                  <Link href={route('data-ledger.journal', organization.id)}>
+                  <Link href={route('data-master.fixed-asset', organization.id)}>
                     <SecondaryButton className='w-full'>
                       <div className='text-center w-full'>Batal</div>
                     </SecondaryButton>

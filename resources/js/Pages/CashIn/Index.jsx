@@ -177,7 +177,7 @@ export default function Index({ cashIns, startDate, endDate, role, organization,
         }
         pageAfter={
               cashIns.links[cashIns.links.length-1].url 
-              ? <Link href={`/cashflow/${organization.id}/cash-in?page=${cashIns.current_page + 1}&search=${search}`}
+              ? <Link href={`/cashflows/${organization.id}/cash-in?page=${cashIns.current_page + 1}&search=${search}`}
                 only={['cashIns']} preserveState>
                 <IoPlayForward />
               </Link>
@@ -258,7 +258,7 @@ export default function Index({ cashIns, startDate, endDate, role, organization,
               {
                 cashIns.links[0].url 
                 ? <Link 
-                    href={`/cashflow/${organization.id}/cash-in?page=${cashIns.current_page - 1}&search=${search}`}
+                    href={`/cashflows/${organization.id}/cash-in?page=${cashIns.current_page - 1}&search=${search}`}
                     preserveState only={['cashIns']}
                   >
                     <IoPlayBack />
@@ -271,7 +271,7 @@ export default function Index({ cashIns, startDate, endDate, role, organization,
               {
                 cashIns.links[cashIns.links.length-1].url 
                 ? <Link 
-                    href={`/cashflow/${organization.id}/cash-in?page=${cashIns.current_page + 1}&search=${search}`}
+                    href={`/cashflows/${organization.id}/cash-in?page=${cashIns.current_page + 1}&search=${search}`}
                     only={['cashIns']} preserveState
                   >
                   <IoPlayForward />

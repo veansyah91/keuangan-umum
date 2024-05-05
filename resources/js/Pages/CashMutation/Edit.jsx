@@ -15,6 +15,7 @@ import { useDebounce } from 'use-debounce';
 import { NumericFormat } from 'react-number-format';
 import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 import { Disclosure, Transition } from '@headlessui/react';
+import dayjs from 'dayjs';
 
 export default function Edit({organization, newRef, date, cashAccounts, projects, programs, departments, cashMutation}) {
   // state
@@ -63,7 +64,13 @@ export default function Edit({organization, newRef, date, cashAccounts, projects
   // useEffect
   useEffect(() => {
     if(prevDate!==undefined) {
-      reloadNewRef();
+      let inputDateFormatted = dayjs(dateValue.startDate);
+      let tempInputDate = `${inputDateFormatted.month() + 1}-${inputDateFormatted.year()}`;
+
+      let oldDateFormatted = dayjs(cashMutation.date);
+      let tempOldDate = `${oldDateFormatted.month() + 1}-${oldDateFormatted.year()}`;
+
+      tempInputDate !== tempOldDate ? reloadNewRef() : setData('no_ref', cashMutation.no_ref) ;
     }
   },[debounceDateValue]);
 
@@ -467,7 +474,7 @@ export default function Edit({organization, newRef, date, cashAccounts, projects
 
             <div className='flex justify-end flex-col-reverse sm:flex-row gap-2 mt-5'>
               <div className='w-full sm:w-1/12 my-auto text-center'>
-                <Link href={route('data-ledger.journal', organization.id)}>
+                <Link href={route('cashflow.cash-mutation', organization.id)}>
                   <SecondaryButton className='w-full'>
                     <div className='text-center w-full'>Batal</div>
                   </SecondaryButton>

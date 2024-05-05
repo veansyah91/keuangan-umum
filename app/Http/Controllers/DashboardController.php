@@ -136,10 +136,6 @@ class DashboardController extends Controller
         $revenues = $this->joinArray($revenues);
         $costs = $this->joinArray($costs); 
 
-
-
-        // dd($cashflows);
-
         return Inertia::render('Dashboard/Index', [
             'organization' => $organization,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),

@@ -17,6 +17,7 @@ import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 import { Disclosure, Transition } from '@headlessui/react';
 import ContactSelectInput from '@/Components/SelectInput/ContactSelectInput';
 import formatNumber from '@/Utils/formatNumber';
+import dayjs from 'dayjs';
 
 export default function Edit({cashOut, organization, newRef, date, accounts, cashAccounts, projects, programs, departments, contacts}) {
 
@@ -79,15 +80,16 @@ export default function Edit({cashOut, organization, newRef, date, accounts, cas
   const prevDate = usePrevious(dateValue);
 
   // useEffect
-  useEffect(() => {
-    //cash account
-
-
-  },[]);
 
   useEffect(() => {
     if(prevDate!==undefined) {
-      reloadNewRef();
+      let inputDateFormatted = dayjs(dateValue.startDate);
+      let tempInputDate = `${inputDateFormatted.month() + 1}-${inputDateFormatted.year()}`;
+
+      let oldDateFormatted = dayjs(cashOut.date);
+      let tempOldDate = `${oldDateFormatted.month() + 1}-${oldDateFormatted.year()}`;
+
+      tempInputDate !== tempOldDate ? reloadNewRef() : setData('no_ref', cashOut.no_ref) ;
     }
   },[debounceDateValue]);
 
@@ -563,7 +565,7 @@ export default function Edit({cashOut, organization, newRef, date, accounts, cas
 
             <div className='flex justify-end flex-col-reverse sm:flex-row gap-2 mt-5'>
               <div className='w-full sm:w-1/12 my-auto text-center'>
-                <Link href={route('data-ledger.journal', organization.id)}>
+                <Link href={route('cashflow.cash-out', organization.id)}>
                   <SecondaryButton className='w-full'>
                     <div className='text-center w-full'>Batal</div>
                   </SecondaryButton>

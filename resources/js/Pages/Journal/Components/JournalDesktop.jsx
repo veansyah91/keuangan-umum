@@ -37,7 +37,9 @@ export default function JournalDesktop({journal, className, handleDelete, handle
                                         {
                                           'organization':journal.organization_id,
                                           'journal' : journal.id
-                                        })}>
+                                        })}
+                              preserveScroll={true}
+                        >
                           <IoCreateOutline /> Edit
                         </Link>   
                         </li>

@@ -18,6 +18,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DataLedgerController;
 use App\Http\Controllers\DataMasterController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\CashMutationController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\Admin\RegencyController;
@@ -165,7 +166,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
              
             // Fixed Asset Category
             Route::get('/fixed-asset-categories', [FixedAssetCategoryController::class, 'index'])->name('data-master.fixed-asset-category');
+            Route::post('/fixed-asset-categories', [FixedAssetCategoryController::class, 'store'])->name('data-master.fixed-asset-category.post');
+            Route::patch('/fixed-asset-categories/{fixedAssetCategory}', [FixedAssetCategoryController::class, 'update'])->name('data-master.fixed-asset-category.update');
+            Route::delete('/fixed-asset-categories/{fixedAssetCategory}', [FixedAssetCategoryController::class, 'destroy'])->name('data-master.fixed-asset-category.destroy');
 
+            // Fixed Asset
+            Route::get('fixed-assets', [FixedAssetController::class, 'index'])->name('data-master.fixed-asset');
+            Route::post('fixed-assets', [FixedAssetController::class, 'store'])->name('data-master.fixed-asset.post');
+            Route::get('fixed-assets/create', [FixedAssetController::class, 'create'])->name('data-master.fixed-asset.create');
+            Route::get('fixed-assets/{fixedAsset}/edit', [FixedAssetController::class, 'edit'])->name('data-master.fixed-asset.edit');
+            Route::get('fixed-assets/{fixedAsset}', [FixedAssetController::class, 'show'])->name('data-master.fixed-asset.show');
+            Route::patch('fixed-assets/{fixedAsset}', [FixedAssetController::class, 'update'])->name('data-master.fixed-asset.update');
+            
         });
 
         // Accountancy

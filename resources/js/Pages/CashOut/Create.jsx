@@ -562,7 +562,7 @@ export default function Create({organization, newRef, date, accounts, cashAccoun
                       
                     </div>
                     <div className='md:w-3/12 w-full text-end my-auto'>
-                    <NumericFormat 
+                      <NumericFormat 
                         value={account.value} 
                         customInput={TextInput} 
                         onValueChange={(values) => handleChangeValue(values, index)}

@@ -60,10 +60,10 @@ export default function Index({ cashMutations, startDate, endDate, role, organiz
     'no_ref' : ''
    });
 
-   const [dateValue, setDateValue] = useState({
-		startDate: startDate || '', 
-		endDate: endDate || ''
-  	});
+  const [dateValue, setDateValue] = useState({
+  startDate: startDate || '', 
+  endDate: endDate || ''
+  });
 	const [debounceDateValue] = useDebounce(dateValue, 500);
 
 	const prevSearch = usePrevious(search);
@@ -164,7 +164,7 @@ export default function Index({ cashMutations, startDate, endDate, role, organiz
       <ToastContainer />
 
       {
-      (role !== 'viewer') && <Link href={route('cashflow.cash-mutation.create', organization.id)}><AddButtonMobile label={"Tambah"}/></Link> 
+        (role !== 'viewer') && <Link href={route('cashflow.cash-mutation.create', organization.id)}><AddButtonMobile label={"Tambah"}/></Link> 
       }
       <TitleMobile 
         zIndex={'z-50'}
@@ -177,7 +177,7 @@ export default function Index({ cashMutations, startDate, endDate, role, organiz
         }
         pageAfter={
               cashMutations.links[cashMutations.links.length-1].url 
-              ? <Link href={`/cashflow/${organization.id}/cash-mutation?page=${cashMutations.current_page + 1}&search=${search}`}
+              ? <Link href={`/cashflows/${organization.id}/cash-mutation?page=${cashMutations.current_page + 1}&search=${search}`}
                 only={['cashMutations']} preserveState>
                 <IoPlayForward />
               </Link>
@@ -258,7 +258,7 @@ export default function Index({ cashMutations, startDate, endDate, role, organiz
               {
                 cashMutations.links[0].url 
                 ? <Link 
-                    href={`/cashflow/${organization.id}/cash-mutation?page=${cashMutations.current_page - 1}&search=${search}`}
+                    href={`/cashflows/${organization.id}/cash-mutation?page=${cashMutations.current_page - 1}&search=${search}`}
                     preserveState only={['cashMutations']}
                   >
                     <IoPlayBack />
@@ -271,7 +271,7 @@ export default function Index({ cashMutations, startDate, endDate, role, organiz
               {
                 cashMutations.links[cashMutations.links.length-1].url 
                 ? <Link 
-                    href={`/cashflow/${organization.id}/cash-mutation?page=${cashMutations.current_page + 1}&search=${search}`}
+                    href={`/cashflows/${organization.id}/cash-mutation?page=${cashMutations.current_page + 1}&search=${search}`}
                     only={['cashMutations']} preserveState
                   >
                   <IoPlayForward />

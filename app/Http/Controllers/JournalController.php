@@ -22,6 +22,7 @@ use App\Repositories\Log\LogRepository;
 use App\Repositories\User\UserRepository;
 use Illuminate\Support\Facades\Validator;
 use App\Repositories\Journal\JournalRepository;
+use Illuminate\Database\Query\Builder;
 
 
 class JournalController extends Controller
@@ -246,7 +247,9 @@ class JournalController extends Controller
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'journal' => $journal,
             'journalUser' => $journalUser,
-            'ledgers' => Ledger::whereJournalId($journal['id'])->with('account')->get(),
+            'ledgers' => Ledger::whereJournalId($journal['id'])
+                                ->with('account')
+                                ->get(),
             'program' => Program::find($journal['program_id']),
             'project' => Project::find($journal['project_id']),
             'department' => Department::find($journal['department_id']),

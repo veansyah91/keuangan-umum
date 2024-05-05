@@ -49,6 +49,7 @@ class OrganizationController extends Controller
             'status' => true,
         ],
     ];
+    
     protected $accountCategoriesDefault = [
         // Neraca
         // Aset Lancar
@@ -228,12 +229,22 @@ class OrganizationController extends Controller
         [
             'category_name' => 'HARTA TETAP BERWUJUD',
             'code' => '170300000',
-            'name' => 'PERALATAN',
+            'name' => 'MESIN DAN PERALATAN',
         ],
         [
             'category_name' => 'HARTA TETAP BERWUJUD',
             'code' => '171300000',
-            'name' => 'AKUMULASI PENYUSUTAN PERALATAN',
+            'name' => 'AKUMULASI PENYUSUTAN MESIN DAN PERALATAN',
+        ],
+        [
+            'category_name' => 'HARTA TETAP BERWUJUD',
+            'code' => '170900000',
+            'name' => 'HARTA LAINNYA',
+        ],
+        [
+            'category_name' => 'HARTA TETAP BERWUJUD',
+            'code' => '171900000',
+            'name' => 'AKUMULASI PENYUSUTAN HARTA LAINNYA',
         ],
         [
             'category_name' => 'KEWAJIBAN',
@@ -323,7 +334,12 @@ class OrganizationController extends Controller
         [
             'category_name' => 'BEBAN PENYUSUTAN',
             'code' => '713000000',
-            'name' => 'BEBAN PENYUSUTAN PERALATAN',
+            'name' => 'BEBAN PENYUSUTAN MESIN DAN PERALATAN',
+        ],
+        [
+            'category_name' => 'BEBAN PENYUSUTAN',
+            'code' => '719000000',
+            'name' => 'BEBAN PENYUSUTAN HARTA LAINNYA',
         ],
     ];
 

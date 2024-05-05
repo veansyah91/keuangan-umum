@@ -8,6 +8,7 @@ use App\Models\Organization;
 use Illuminate\Http\Request;
 use App\Models\AccountCategory;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Repositories\Log\LogRepository;
 use App\Repositories\User\UserRepository;
@@ -45,11 +46,18 @@ class AccountController extends Controller
             $code = $account ? (int)$account['code'] + 1 : (int)$accountCategory['code'];
         }
 
+        $search = request('search');
+        // dd($search);
+
         $accounts = Account::filter(request(['search']))
                             ->whereOrganizationId($organization['id'])
+                            // ->whereHas('accountCategory', function ($query) use ($search){
+                            //     $query->where('name', 'like', '%'.$search.'%');
+                            // })
                             ->with('accountCategory')
                             ->orderBy('code')
                             ->paginate(50);
+        
                             
         $user = Auth::user();
 

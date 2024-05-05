@@ -1,30 +1,55 @@
 import React, { useEffect, useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { IoArrowBackOutline, IoFilter, IoPlayBack, IoPlayForward, IoSearchSharp, IoTrashOutline } from 'react-icons/io5';
+import { Head, Link, router, useForm } from '@inertiajs/react';
+import { IoArrowBackOutline, IoPlayBack, IoPlayForward, IoSearchSharp } from 'react-icons/io5';
 import { ToastContainer, toast } from 'react-toastify';
 import AddButtonMobile from '@/Components/AddButtonMobile';
 import TitleMobile from '@/Components/Mobiles/TitleMobile';
 import { usePrevious } from 'react-use';
 import { useDebounce } from 'use-debounce';
+import { NumericFormat } from 'react-number-format';
 import ContainerDesktop from '@/Components/Desktop/ContainerDesktop';
 import TitleDesktop from '@/Components/Desktop/TitleDesktop';
 import PrimaryButton from '@/Components/PrimaryButton';
 import PageNumber from '@/Components/PageNumber';
 import ContentDesktop from '@/Components/Desktop/ContentDesktop';
 import FixedAssetCategoryDesktop from './Components/FixedAssetCategoryDesktop';
+import ContentMobile from '@/Components/Mobiles/ContentMobile';
+import FixedAssetCategoryMobile from './Components/FixedAssetCategoryMobile';
+import Modal from '@/Components/Modal';
+import InputLabel from '@/Components/InputLabel';
+import TextInput from '@/Components/TextInput';
+import SecondaryButton from '@/Components/SecondaryButton';
+import DangerButton from '@/Components/DangerButton';
 
-export default function Index({ role, organization, fixedAssetCategories, status, searchFilter, startDate, endDate }) {
-  console.log(fixedAssetCategories);
+export default function Index({ role, organization, fixedAssetCategories, status, searchFilter}) {  
+  const [showInputModal, setShowInputModal] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [search, setSearch] = useState(searchFilter || '');
   const [debounceValue] = useDebounce(search, 500);
   const [dataFilter, setDataFilter] = useState({
 		'status' : status || undefined,
    });
 
+   const [edit, setEdit] = useState({
+    status: false,
+    id: null
+   })
+
+   const [modalDelete, setModalDelete] = useState({
+    title: false,
+    id: null
+   })
+
 	const prevSearch = usePrevious(search);
 
+  const {data, setData, delete:destroy, post, patch, errors, setError, processing, reset} = useForm({
+    'id' : null,
+    'name' : '',
+    'lifetime' : 0,
+    'status' : true
+  })
 
   // useEffect
   useEffect(() => {
@@ -45,6 +70,88 @@ export default function Index({ role, organization, fixedAssetCategories, status
 		})
 	}
 
+  const handleEdit = (data) => {
+    setError({
+      'name' : ''
+    });
+    setShowInputModal(true);
+    setData({
+      'id' : data.id,
+      'name' : data.name,
+      'lifetime' : data.lifetime,
+      'status' : data.status
+    });
+    setEdit({
+      status: true,
+      id: data.id
+    })
+  }
+
+  const handleDelete = (data) => {
+    setModalDelete({
+      title: `Hapus Kelompok Harta Tetap ${data.name}?`
+    })
+    setShowDeleteConfirmation(true);
+    setData({
+      'id' : data.id,
+      'name' : data.name,
+      'lifetime' : data.lifetime,
+      'status' : data.status
+    });
+  }
+
+  const handleCancelInput = () => {
+    setShowInputModal(false);
+  }
+
+  const handleSubmitDelete = (e) => {
+    e.preventDefault();
+    destroy(route('data-master.fixed-asset-category.destroy', {organization: organization.id, fixedAssetCategory: data.id}), {
+      onSuccess: () => {
+        setShowDeleteConfirmation(false);
+        toast.success(`Kelompok Harta Tetap Berhasil Dihapus`, {
+          position: toast.POSITION.TOP_CENTER
+        });
+      }
+    })
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    edit.status 
+    ? patch(route('data-master.fixed-asset-category.update', {organization: organization.id, fixedAssetCategory: edit.id}), {
+      onSuccess: () => {
+        setShowInputModal(false);
+        toast.success(`Kelompok Harta Tetap Berhasil Diubah`, {
+          position: toast.POSITION.TOP_CENTER
+        });
+      },
+      preserveScroll: true
+    })
+    : post(route('data-master.fixed-asset-category.post', organization.id), {
+      onSuccess: () => {
+        setShowInputModal(false);
+        toast.success(`Kelompok Harta Tetap Berhasil Ditambahkan`, {
+          position: toast.POSITION.TOP_CENTER
+        });
+      },
+      preserveScroll: true
+    })
+  }
+
+  const handleAddButton = () => {
+    setError({
+      'name' : ''
+    });
+    reset();
+    setShowInputModal(true);
+  }
+
+  const handleChangeValue = (value) => {
+    const { floatValue } = value;
+    setData('lifetime', floatValue);
+  }
+
   return (
     <>
       <Head title='Kelompok Harta Tetap' />
@@ -52,7 +159,7 @@ export default function Index({ role, organization, fixedAssetCategories, status
 
       {/* Mobile */}
       {
-      (role !== 'viewer') && <AddButtonMobile label={"Tambah"}/>
+        (role !== 'viewer') && <AddButtonMobile label={"Tambah"} handleShowInputModal={handleAddButton}/>
       }
       <TitleMobile 
         zIndex={'z-50'}
@@ -80,6 +187,18 @@ export default function Index({ role, organization, fixedAssetCategories, status
         hasFilter={true}
         showFilter={() => setShowModalFilter(true)}
       />
+      <ContentMobile>
+        {
+          fixedAssetCategories.data.map(data => 
+            <FixedAssetCategoryMobile
+              data={data}
+              key={data.id}
+              handleDelete={() => handleDelete(data)}
+              role={role}
+            />
+          )
+        }
+      </ContentMobile>
       {/* Mobile */}
 
       {/* Desktop  */}
@@ -88,7 +207,7 @@ export default function Index({ role, organization, fixedAssetCategories, status
           <div className='my-auto w-7/12'>
             {
               (role !== 'viewer') &&
-              <PrimaryButton className='py-3'>
+              <PrimaryButton className='py-3' onClick={handleAddButton}>
                 Tambah Data
               </PrimaryButton>      
             }
@@ -146,18 +265,18 @@ export default function Index({ role, organization, fixedAssetCategories, status
                 </tr>
               </thead>
               <tbody>
-                  {
-                      fixedAssetCategories.data.map((data, index) =>
-                          <FixedAssetCategoryDesktop 
-                              key={index} 
-                              data={data} 
-                              className={`${index % 2 == 0 && 'bg-gray-100'}`} 
-                              handleEdit={() => handleEdit(data)}
-                              handleDelete={() => handleDelete(data)}
-                              role={role}
-                          />
-                      )
-                  }
+                {
+                  fixedAssetCategories.data.map((data, index) =>
+                    <FixedAssetCategoryDesktop 
+                      key={index} 
+                      data={data} 
+                      className={`${index % 2 == 0 && 'bg-gray-100'}`} 
+                      handleEdit={() => handleEdit(data)}
+                      handleDelete={() => handleDelete(data)}
+                      role={role}
+                    />
+                  )
+                }
               </tbody>
             </table>
           </ContentDesktop>
@@ -166,6 +285,124 @@ export default function Index({ role, organization, fixedAssetCategories, status
       </ContainerDesktop>
         
       {/* Desktop  */}
+
+      {/* Modal */}
+      <Modal show={showInputModal} onClose={handleCancelInput}>
+        <form 
+          onSubmit={handleSubmit} 
+          className="p-6"
+        >
+          <h2 className="text-lg font-medium text-gray-900 border-b-2 py-1">
+            {edit.status ? "Ubah" : "Tambah"} Kelompok Harta Tetap
+          </h2>
+
+          <div className="mt-5 ">             
+            <div className='flex flex-col sm:flex-row w-full gap-1 mt-5'>
+                <div className='w-full sm:w-1/3 my-auto'>
+                  <InputLabel htmlFor='name' value='Nama' className='mx-auto my-auto'/>
+                </div>                            
+
+                <div className='sm:w-2/3 w-full'>
+                    <TextInput
+                      id='name'
+                      type='text'
+                      name='name'
+                      value={data.name}
+                      className={`mt-1 w-full ${errors && errors.name && 'border-red-500'}`}
+                      onChange={(e) => setData('name', e.target.value.toUpperCase())}
+                      placeholder="Nama Kategori Akun"
+                    />
+                    {
+                      errors && errors.name && 
+                      <div className='-mb-3'>
+                        <div className='text-xs text-red-500'>{errors.name}</div>  
+                      </div>
+                    }
+                </div>
+            </div>    
+            <div className='flex flex-col sm:flex-row w-full gap-1 mt-5'>
+              <div className='w-full sm:w-1/3 my-auto'>
+                <InputLabel htmlFor='lifetime' value='Usia Pemakaian (Bulan)' className='mx-auto my-auto'/>
+              </div>                            
+
+              <div className='sm:w-2/3 w-full'>
+                <NumericFormat 
+                  value={data.lifetime} 
+                  customInput={TextInput} 
+                  onValueChange={(values) => handleChangeValue(values)}
+                  thousandSeparator={true}
+                  className='text-end w-full'
+                  // prefix={'IDR '}
+                  id='lifetime'
+                />
+                {
+                  errors && errors.lifetime && 
+                  <div className='-mb-3'>
+                      <div className='text-xs text-red-500'>{errors.lifetime}</div>  
+                  </div>
+                }
+              </div>
+            </div>           
+            <div className='flex justify-start w-full gap-1 mt-5'>  
+              <div className='w-1/12'>
+                <div className="form-control ">
+                  <label className="label cursor-pointer gap-2" htmlFor={`status`}>
+                    <input 
+                    type="checkbox" 
+                    className="checkbox" 
+                    id={`status`}
+                    value={data.status}
+                    onChange={() => setData('status', !data.status)}
+                    checked={data.status}
+                    />
+                    <span className="label-text font-bold">Aktif</span> 
+                  </label>
+                </div>
+                {
+                  errors && errors.status && 
+                  <div className='-mb-3'>
+                    <div className='text-xs text-red-500'>{errors.status}</div>  
+                  </div>
+                }
+              </div>
+            </div>     
+          </div>
+
+          <div className="mt-6 flex justify-end">
+            <SecondaryButton onClick={handleCancelInput}>Batal</SecondaryButton>
+
+            <PrimaryButton className="ms-3" 
+              disabled={processing}
+            >
+              {edit.status ? "Ubah" : "Tambah"}
+            </PrimaryButton>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal show={showDeleteConfirmation} onClose={() => setShowDeleteConfirmation(false)}>
+        <form 
+          onSubmit={handleSubmitDelete} 
+          className="p-6"
+          id='deleteForm'
+          name='deleteForm'
+        >
+          <h2 className="text-lg font-medium text-gray-900 text-center">
+            {modalDelete.title}
+          </h2>
+
+          <div className="mt-6 flex justify-end">
+            <SecondaryButton onClick={() => setShowDeleteConfirmation(false)}>Batal</SecondaryButton>
+
+            <DangerButton className="ms-3" 
+              disabled={processing}
+              >
+              Hapus
+            </DangerButton>
+          </div>
+        </form>
+      </Modal>
+      {/* Modal */}
     </>
   )
 }

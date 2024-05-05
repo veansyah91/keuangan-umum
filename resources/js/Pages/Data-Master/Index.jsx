@@ -60,7 +60,7 @@ export default function Index({organization, role}) {
                         title={'Kelompok Harta Tetap'}
                     />
                 </Link> 
-                <Link href={route('data-master.department', organization.id)}>
+                <Link href={route('data-master.fixed-asset', organization.id)}>
                     <CardMenu 
                         bgColor={'bg-rose-500'}
                         icon={<BsBuildings />}
@@ -108,6 +108,20 @@ export default function Index({organization, role}) {
                         title={'Data Departemen'}
                     />
                 </Link>               
+                <Link href={route('data-master.fixed-asset-category', organization.id)}>
+                    <CardMenu 
+                        bgColor={'bg-blue-500'}
+                        icon={<TbBuildingCommunity />}
+                        title={'Kelompok Harta Tetap'}
+                    />
+                </Link> 
+                <Link href={route('data-master.fixed-asset', organization.id)}>
+                    <CardMenu 
+                        bgColor={'bg-rose-500'}
+                        icon={<BsBuildings />}
+                        title={'Data Harta Tetap'}
+                    />
+                </Link>   
             </div>
             {/* Mobile */}
 
