@@ -2,6 +2,7 @@ import formatNumber from '@/Utils/formatNumber'
 import React, { useEffect, useState } from 'react'
 
 export default function BalanceContent({title, ledgers, showCode, type, amount}) {
+  
   const [range, setRange] = useState({
     start: '',
     end: ''

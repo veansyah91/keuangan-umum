@@ -10,7 +10,7 @@ import { MdDeveloperBoardOff } from 'react-icons/md'
 export default function FixedAssetMobile({fixedAsset, role, handleDelete}) {
   return (
     <div className=' text-gray-900 py-2 px-3 border flex gap-5 justify-between'>
-      <div className='text-start my-auto w-8/12 space-y-2'>
+      <div className='text-start my-auto w-6/12 space-y-2'>
         <div className='text-xs'>
           <div>Nama: </div>
           <div className='font-bold'>
@@ -29,20 +29,14 @@ export default function FixedAssetMobile({fixedAsset, role, handleDelete}) {
             {dayjs(fixedAsset.date).format('MMM DD, YYYY')}
           </div>
         </div>
-        <div className='text-xs'>
+        
+      </div>
+      <div className='text-start w-5/12 space-y-2'>
+        <div className='text-sm'>
           <div>Nilai Perolehan: </div>
           <div className='font-bold'>
             IDR. {formatNumber(fixedAsset.value)}
           </div>
-        </div>
-      </div>
-      <div className='text-start w-3/12 space-y-2'>
-        <div className='text-xs'>
-          {
-            fixedAsset.status 
-            ? <BadgeSuccess>Aktif</BadgeSuccess>
-            : <BadgeDanger>Tidak Aktif</BadgeDanger>
-          }
         </div>
       </div>
       <div className='text-start w-1/12 space-y-2'>

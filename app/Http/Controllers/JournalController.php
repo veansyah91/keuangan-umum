@@ -278,6 +278,15 @@ class JournalController extends Controller
             return redirect(route('data-ledger.journal', $organization['id']))->with('error', 'Tidak Bisa Diedit Di Journal');
         }
 
+        // jika tahun, tidak dalam periode
+        $year = $this->now->isoFormat('YYYY');
+        $tempDateInput = Carbon::create($journal['date']);
+        $yearInput = $tempDateInput->isoFormat('YYYY');
+
+        if ($yearInput !== $year) {
+             return redirect()->back()->withErrors(["date" => "Date Value is Unexpected!"]);        
+        }
+
         $accounts = Account::filter(request(['search']))
                             ->whereIsActive(true)
                             ->whereOrganizationId($organization['id'])
@@ -389,7 +398,6 @@ class JournalController extends Controller
         // cek tanggal
         // jika tanggal lebih tinggi dari hari sekarang, maka kirimkan error\
         if (($validated['date'] > $this->now->isoFormat("YYYY-MM-DD")) || ($journal['date'] > $this->now->isoFormat("YYYY-MM-DD"))) {
-            
             return redirect()->back()->withErrors(["date" => "Date Value is Unexpected!"]);
         }
 
@@ -453,7 +461,7 @@ class JournalController extends Controller
             return redirect()->back()->withErrors(["date" => "Date Value is Unexpected!"]);
         }
 
-        // jika tahun, tidak dalam peride
+        // jika tahun, tidak dalam periode
         $year = $this->now->isoFormat('YYYY');
         $tempDateInput = Carbon::create($journal['date']);
         $yearInput = $tempDateInput->isoFormat('YYYY');

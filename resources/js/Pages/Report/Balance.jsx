@@ -7,12 +7,12 @@ import SecondaryButton from '@/Components/SecondaryButton';
 import { FaPrint } from 'react-icons/fa';
 import PrimaryButton from '@/Components/PrimaryButton';
 import Datepicker from 'react-tailwindcss-datepicker';
-import formatNumber from '@/Utils/formatNumber';
 import dayjs from 'dayjs';
 import { Disclosure, Transition } from '@headlessui/react';
 import BalanceContent from './Component/BalanceContent';
 
 export default function Balance({organization, ledgers, endDateFilter, account}) {
+
   const [dataLedgers, setDataLedgers] = useState([]);
   const [endDate, setEndDate] = useState(endDateFilter || '');
 
@@ -46,6 +46,7 @@ export default function Balance({organization, ledgers, endDateFilter, account})
     let pasive = 0;
 
     let arrayEarningYear = null;
+
     ledgers.map((ledger, index) => {
       if (ledger.code >= '100000000' && ledger.code <= '199999999') {
         tempAsset += parseInt(ledger.total);
@@ -82,7 +83,7 @@ export default function Balance({organization, ledgers, endDateFilter, account})
 
       tempEquity += (active + pasive) * -1;
     }
-
+    
     setDataLedgers(tempLedgers);
 
     setAsset(tempAsset);

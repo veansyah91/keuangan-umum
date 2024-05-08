@@ -20,13 +20,6 @@ export default function FixedAssetDesktop({fixedAsset, role, handleDelete, class
         <td className='text-end'>IDR {formatNumber(fixedAsset.depreciation_value)}</td>
         <td className='text-end'>IDR {formatNumber(fixedAsset.depreciation_accumulated)}</td>
         <td className='text-end'>IDR {formatNumber(fixedAsset.value - fixedAsset.depreciation_accumulated)}</td>
-        <td className='text-end'>
-          {
-            fixedAsset.status 
-            ? <BadgeSuccess>Aktif</BadgeSuccess>
-            : <BadgeDanger>Tidak Aktif</BadgeDanger>
-          }
-        </td>
         <td>
         {
           (role !== 'viewer') &&

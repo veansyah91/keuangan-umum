@@ -26,8 +26,6 @@ export default function Edit({
   organization, fixedAsset, fixedAssetCategory, newRef, date, accounts, fixedAssetCategories, creditAccount
 }) 
 {
-  // console.log(fixedAsset);
-  console.log(fixedAssetCategory);
   // state
   const {data, setData, processing, patch, errors, setError, reset} = useForm({
     'lifetime' : '',
@@ -171,20 +169,9 @@ export default function Edit({
     
     patch(route('data-master.fixed-asset.update', {organization: organization.id, fixedAsset: fixedAsset.id}), {
       onSuccess: () => {
-        toast.success(`Harta Tetap Berhasil Ditambahkan`, {
+        toast.success(`Harta Tetap Berhasil Diubah`, {
           position: toast.POSITION.TOP_CENTER
         });
-        reset();
-        setSelectedFixedAssetCategory({
-          id: null, name: '', lifetime: 0
-        });
-        setSelectedAccount(
-          {id: null, name: '', code: '', is_cash:true},
-        );
-        setDateValue({
-          startDate: date, 
-          endDate: date
-        })
       },
       preserveScroll: true
     })
