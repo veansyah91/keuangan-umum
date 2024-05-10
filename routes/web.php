@@ -114,8 +114,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     
     Route::middleware([
-            'user.has.organization:{parameter}', 
-            'is.not.expired:{parameter}',
+            // 'user.has.organization:{parameter}', 
+            // 'is.not.expired:{parameter}',
         ])->group(function () {
 
         //Dashboard
@@ -177,6 +177,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('fixed-assets/{fixedAsset}/edit', [FixedAssetController::class, 'edit'])->name('data-master.fixed-asset.edit');
             Route::get('fixed-assets/{fixedAsset}', [FixedAssetController::class, 'show'])->name('data-master.fixed-asset.show');
             Route::patch('fixed-assets/{fixedAsset}', [FixedAssetController::class, 'update'])->name('data-master.fixed-asset.update');
+            Route::delete('fixed-assets/{fixedAsset}', [FixedAssetController::class, 'destroy'])->name('data-master.fixed-asset.destroy');
             
         });
 

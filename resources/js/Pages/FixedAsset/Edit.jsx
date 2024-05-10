@@ -26,8 +26,6 @@ export default function Edit({
   organization, fixedAsset, fixedAssetCategory, newRef, date, accounts, fixedAssetCategories, creditAccount
 }) 
 {
-  // console.log(fixedAsset);
-  console.log(fixedAssetCategory);
   // state
   const {data, setData, processing, patch, errors, setError, reset} = useForm({
     'lifetime' : '',
@@ -171,20 +169,9 @@ export default function Edit({
     
     patch(route('data-master.fixed-asset.update', {organization: organization.id, fixedAsset: fixedAsset.id}), {
       onSuccess: () => {
-        toast.success(`Harta Tetap Berhasil Ditambahkan`, {
+        toast.success(`Harta Tetap Berhasil Diubah`, {
           position: toast.POSITION.TOP_CENTER
         });
-        reset();
-        setSelectedFixedAssetCategory({
-          id: null, name: '', lifetime: 0
-        });
-        setSelectedAccount(
-          {id: null, name: '', code: '', is_cash:true},
-        );
-        setDateValue({
-          startDate: date, 
-          endDate: date
-        })
       },
       preserveScroll: true
     })
@@ -358,34 +345,6 @@ export default function Edit({
                   errors?.credit_account?.id && <span className='text-red-500 text-xs'>{errors.credit_account.id}</span>
                 }
               </div>
-            </div>
-
-            <div className='flex flex-col sm:flex-row justify-between gap-1'>
-            < div className="form-control ">
-                <label className="label cursor-pointer gap-2" htmlFor={`status`}>
-                  <input 
-                    type="checkbox" 
-                    className="checkbox" 
-                    id={`status`}
-                    value={data.status}
-                    onChange={() => setData('status', !data.status)}
-                    checked={data.status}
-                  />
-                  <span className="label-text font-bold">
-                    {
-                      data.status
-                      ? "Aktif"
-                      : "Tidak Aktif"
-                    }  
-                  </span> 
-                </label>
-              </div>
-              {
-                errors && errors.status && 
-                <div className='-mb-3'>
-                  <div className='text-xs text-red-500'>{errors.status}</div>  
-                </div>
-              }
             </div>
 
             <div className='flex justify-end flex-col-reverse sm:flex-row gap-2 mt-5'>

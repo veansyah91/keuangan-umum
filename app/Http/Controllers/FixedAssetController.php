@@ -257,6 +257,17 @@ class FixedAssetController extends Controller
             ],
         ];
 
+        if ($validated['lifetime'] == 0) {
+            array_push($validated['accounts'], 
+            [
+                'id' => $validated['credit_account']['id'],
+                'code' => $validated['credit_account']['code'],
+                'debit' => 0,
+                'credit' =>  $validated['value'],
+                'is_cash' => $validated['credit_account']['is_cash'],
+            ]);
+        }
+
         if ($depreciationAccumulation) {
             array_push($validated['accounts'], 
             [
@@ -295,7 +306,20 @@ class FixedAssetController extends Controller
      */
     public function show(Organization $organization, FixedAsset $fixedAsset)
     {
-        
+        $user = Auth::user();     
+
+        return Inertia::render('FixedAsset/Show', [
+            'fixedAsset' => $fixedAsset,
+            'createdBy' => User::find($fixedAsset['user_id']),
+            'journal' => Journal::whereOrganizationId($organization['id'])
+                                ->whereNoRef($fixedAsset['code'])
+                                ->first(),
+            'assetAccount' => Account::find($fixedAsset['asset']),
+            'depreciationAccumulationAccount' => Account::find($fixedAsset['accumulated_depreciation']),
+            'depreciationCostAccount' => Account::find($fixedAsset['depreciation']),
+            'organization' => $organization,
+            'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+        ]); 
     }
 
     /**
@@ -314,6 +338,24 @@ class FixedAssetController extends Controller
         
         if ($user['id'] !== $fixedAsset['user_id'] && $organizationUser->organizations[0]->pivot->role !== 'admin') {
             return redirect(route('data-master.fixed-asset', $organization['id']))->with('error', 'Anda Tidak Memiliki Hak Akses');
+        }
+
+        //cari journal
+        $ledger = Ledger::whereOrganizationId($organization['id'])
+                            ->whereAccountId($fixedAsset['asset'])
+                            ->orderBy('id')
+                            ->first();
+
+        $journal = Journal::find($ledger['journal_id']);
+
+        // jika tahun, tidak dalam periode
+        $year = $this->now->isoFormat('YYYY');
+        $tempDateInput = Carbon::create($journal['date']);
+        $yearInput = $tempDateInput->isoFormat('YYYY');
+
+        // cek apakah jurnal berbeda tahun buku
+        if ($yearInput !== $year) {
+            return redirect(route('data-master.fixed-asset', $organization['id']))->with('error', 'Date Value is Unexpected!');
         }
 
         return Inertia::render('FixedAsset/Edit', [
@@ -344,15 +386,33 @@ class FixedAssetController extends Controller
     {
         $user = Auth::user();
 
+        //cari journal
+        $ledger = Ledger::whereOrganizationId($organization['id'])
+                            ->whereAccountId($fixedAsset['asset'])
+                            ->orderBy('id')
+                            ->first();
+
+        $journal = Journal::find($ledger['journal_id']);
+
+        // jika tahun, tidak dalam periode
+        $year = $this->now->isoFormat('YYYY');
+        $tempDateInput = Carbon::create($journal['date']);
+        $yearInput = $tempDateInput->isoFormat('YYYY');
+
+        // cek apakah jurnal berbeda tahun buku
+        if ($yearInput !== $year) {
+            return redirect(route('data-master.fixed-asset', $organization['id']))->withErrors(["date" => "Date Value is Unexpected!"]);
+        }
+
         // cek apakah role user yang mengakses adalah admin atau pengguna yang membuat data, jika bukan, maka redirect ke halaman awal
         $organizationUser = User::whereId($user['id'])
                                 ->with('organizations', function ($query) use ($organization){
                                     $query->whereOrganizationId($organization['id']);
                                 })
                                 ->first();
-        
+
         if ($user['id'] !== $fixedAsset['user_id'] && $organizationUser->organizations[0]->pivot->role !== 'admin') {
-            return redirect(route('data-master.fixed-assets', $organization['id']))->with('error', 'Anda Tidak Memiliki Hak Akses');
+            return redirect(route('data-master.fixed-asset', $organization['id']))->with('error', 'Anda Tidak Memiliki Hak Akses');
         }
 
         $validated = $request->validate([
@@ -438,10 +498,9 @@ class FixedAssetController extends Controller
 
         // jika lifetime fixed asset baru == 0, maka hapus akun fixed asset yang berkaitan dengan data fixed asset
         if ($validated['lifetime'] > 0) {
+            $fixedAssetCategory = FixedAssetCategory::find($validated['fixed_asset_category']);
             // jika kategori fixed asset lama !== kategori fixed asset baru maka tidak perlu dilakukan pembaruan akun akun
             if ($validated['fixed_asset_category'] !== $fixedAsset['fixed_asset_category_id']) {
-                $fixedAssetCategory = FixedAssetCategory::find($validated['fixed_asset_category']);
-
                 $newDepreciationAccount = $this->createNewAccount($organization['id'], $fixedAssetCategory['name'], 'AKUMULASI PENYUSUTAN ' . $validated['name'],'AKUMULASI PENYUSUTAN');
 
                 if ($depreciationAccumulationAccount) {
@@ -470,28 +529,30 @@ class FixedAssetController extends Controller
 
             } else {
                 // akun akumulasi penyusutan
-                $depreciationAccumulationAccount->update([
-                    "name" => 'AKUMULASI PENYUSUTAN ' . $validated['name']
-                ]);
+                if ($depreciationAccumulationAccount) {
+                    $depreciationAccumulationAccount->update([
+                        "name" => 'AKUMULASI PENYUSUTAN ' . $validated['name']
+                    ]);
+                } else {
+                    $depreciationAccumulationAccount = Account::create($this->createNewAccount($organization['id'], $fixedAssetCategory['name'], 'AKUMULASI PENYUSUTAN ' . $validated['name'],'AKUMULASI PENYUSUTAN'));
+                }
 
                 // akun beban penyusutan
-                $depreciationCostAccount->update([
-                    "name" => 'BEBAN PENYUSUTAN ' . $validated['name']
-                ]);
+                
+                if ($depreciationCostAccount) {
+                    $depreciationCostAccount->update([
+                        "name" => 'BEBAN PENYUSUTAN ' . $validated['name']
+                    ]);
+                } else {
+                    $depreciationCostAccount = Account::create($this->createNewAccount($organization['id'], $fixedAssetCategory['name'], 'BEBAN PENYUSUTAN ' . $validated['name'],'BEBAN PENYUSUTAN'));
+                }                
             }
 
             $validated['accumulated_depreciation'] = $depreciationAccumulationAccount['id'];
             $validated['depreciation'] = $depreciationCostAccount['id'];
         } else {
-            $validated['accumulated_depreciation'] = '';
-            $validated['depreciation'] = '';
-
-            if ($depreciationAccumulation) {
-                $depreciationAccumulation->delete();
-            }
-            if ($depreciationCostAccount) {
-                $depreciationCostAccount->delete();
-            }
+            $validated['accumulated_depreciation'] = null;
+            $validated['depreciation'] = null;
         }
 
         // cari akumulasi penyusutan
@@ -500,6 +561,10 @@ class FixedAssetController extends Controller
 
         $validated['no_ref'] = $validated['code'];
         $validated['description'] = "PENGADAAN HARTA TETAP : " . $validated['name'];
+
+        if ($formatedMonths->diffInMonths($this->now) > 0) {
+            $validated['depreciation_accumulated'] = $formatedMonths->diffInMonths($this->now) < $validated['lifetime'] ? $validated['depreciation_value'] * $formatedMonths->diffInMonths($this->now) : $validated['value'];
+        }
 
         // update Fixed Asset
         $fixedAsset->update([
@@ -515,18 +580,20 @@ class FixedAssetController extends Controller
             'depreciation_value' => $validated['depreciation_value'],
             'depreciation_accumulated' => $validated['depreciation_accumulated'],
             'date' => $validated['date'],
-
+            'status' => $validated['status']
         ]);
 
-        //cari journal
-        $ledger = Ledger::whereOrganizationId($organization['id'])
-                            ->whereAccountId($fixedAsset['asset'])
-                            ->orderBy('id')
-                            ->first();
+        if ($validated['lifetime'] == 0)
+        {
+            if ($depreciationAccumulationAccount) {
+                $depreciationAccumulationAccount->delete();
+            }
+            if ($depreciationCostAccount) {
+                $depreciationCostAccount->delete();
+            }
+        }
 
-        $journal = Journal::find($ledger['journal_id']);
-        
-        $validated['date'] = $journal['date']->isoFormat('YYYY-MM-DD');
+        $validated['date'] = $journal['date'];
 
         $validated['accounts'] = [
             [
@@ -537,8 +604,38 @@ class FixedAssetController extends Controller
                 'is_cash' => 0,
             ],
         ];
-        
-        dd($journal);
+
+        if ($validated['lifetime'] > 0) {
+            array_push($validated['accounts'], 
+            [
+                'id' => $validated['credit_account']['id'],
+                'code' => $validated['credit_account']['code'],
+                'debit' => 0,
+                'credit' =>  $validated['depreciation_accumulated'] < $validated['value'] ? $validated['value'] - $validated['depreciation_accumulated'] : 0,
+                'is_cash' => $validated['credit_account']['is_cash'],
+            ],
+            [
+                'id' => $depreciationAccumulationAccount['id'],
+                'code' => $depreciationAccumulationAccount['code'],
+                'debit' => 0,
+                'credit' => $validated['depreciation_accumulated'] < $validated['value'] ? $validated['depreciation_accumulated'] : $validated['value'],
+                'is_cash' => 0,
+            ]);
+        }
+
+        $this->journalRepository->update($validated, $journal); 
+
+        $log = [
+            'name' => $validated['name'],
+            'code' => $validated['code'],
+            'value' => $validated['value'],
+            'lifetime' => $validated['lifetime'],
+            'date' => $validated['date'],
+        ];  
+
+        $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah mengubah DATA pada HARTA TETAP menjadi : ' . json_encode($log));
+
+        return redirect()->back();
     }
 
     /**
@@ -546,6 +643,67 @@ class FixedAssetController extends Controller
      */
     public function destroy(Organization $organization, FixedAsset $fixedAsset)
     {
-        //
+        $user = Auth::user();
+
+        //cari journal
+        $ledger = Ledger::whereOrganizationId($organization['id'])
+                            ->whereAccountId($fixedAsset['asset'])
+                            ->orderBy('id')
+                            ->first();
+
+        $journal = Journal::find($ledger['journal_id']);
+
+        // jika tahun, tidak dalam periode
+        $year = $this->now->isoFormat('YYYY');
+        $tempDateInput = Carbon::create($journal['date']);
+        $yearInput = $tempDateInput->isoFormat('YYYY');
+
+        // cek apakah jurnal berbeda tahun buku
+        if ($yearInput !== $year) {
+            return redirect(route('data-master.fixed-asset', $organization['id']))->withErrors(["message" => "Date Value is Unexpected!"]);
+        }
+
+        // cek apakah role user yang mengakses adalah admin atau pengguna yang membuat data, jika bukan, maka redirect ke halaman awal
+        $organizationUser = User::whereId($user['id'])
+                                ->with('organizations', function ($query) use ($organization){
+                                    $query->whereOrganizationId($organization['id']);
+                                })
+                                ->first();
+        
+        if ($user['id'] !== $fixedAsset['user_id'] && $organizationUser->organizations[0]->pivot->role !== 'admin') {
+            return redirect(route('data-ledger.journal', $organization['id']))->withErrors(["message" => "Anda Tidak Memiliki Hak Akses"]);
+        }   
+
+        $journal->delete();
+
+        // accounts
+        $assetAccount = Account::find($fixedAsset['asset']);
+        $depreciationAccumulationAccount = Account::find($fixedAsset['accumulated_depreciation']);
+        $depreciationAccount = Account::find($fixedAsset['depreciation']);
+
+        $fixedAsset->delete();
+
+        $assetAccount->delete();
+
+        if ($depreciationAccumulationAccount) {
+            $depreciationAccumulationAccount->delete();
+        }
+
+        if ($depreciationAccount) {
+            $depreciationAccount->delete();
+        }
+
+        $log = [
+            'name' => $fixedAsset['name'],
+            'code' => $fixedAsset['code'],
+            'value' => $fixedAsset['value'],
+            'lifetime' => $fixedAsset['lifetime'],
+            'date' => $fixedAsset['date'],
+        ];  
+
+        $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah menghapus DATA pada HARTA TETAP, data : ' . json_encode($log));
+
+        return redirect()->back();
+
     }
 }

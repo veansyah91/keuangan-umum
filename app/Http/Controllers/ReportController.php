@@ -96,6 +96,8 @@ class ReportController extends Controller
                             ->whereCanBeDeleted(false)
                             ->first();
 
+                            // dd($ledgers);
+
         return Inertia::render('Report/Balance', [
             'organization' => $organization,
             'ledgers' => $ledgers,

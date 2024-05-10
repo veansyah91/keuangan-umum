@@ -18,10 +18,24 @@ import ContentDesktop from '@/Components/Desktop/ContentDesktop';
 import ContentMobile from '@/Components/Mobiles/ContentMobile';
 import FixedAssetMobile from './Components/FixedAssetMobile';
 import FixedAssetDesktop from './Components/FixedAssetDesktop';
+import Modal from '@/Components/Modal';
+import SecondaryButton from '@/Components/SecondaryButton';
+import DangerButton from '@/Components/DangerButton';
 
 export default function Index({ role, organization, fixedAssets, status, searchFilter, startDate, endDate, flash }) {
 
   const [search, setSearch] = useState(searchFilter || '');
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+
+  const {data, setData, delete: destroy, errors, setError, processing, reset} = useForm({
+    'id': null,
+    'no_ref' : '',
+    'name': ''
+  });
+
+  const [modalDelete, setModalDelete] = useState({
+		title: ''
+   });
 
 	const [dateValue, setDateValue] = useState({
 		startDate: startDate || '', 
@@ -31,7 +45,7 @@ export default function Index({ role, organization, fixedAssets, status, searchF
   // useEffect
   useEffect(() => {
     flash.error && 
-    toast.error(`Anda Tidak Memiliki Hak Akses`, {
+    toast.error(flash.error, {
       position: toast.POSITION.TOP_CENTER
     });
   },[])
@@ -40,6 +54,41 @@ export default function Index({ role, organization, fixedAssets, status, searchF
 	const handleDateValueChange = (newValue) => {
     setDateValue(newValue); 
   }
+
+  const handleDelete = (fixedAsset) => {
+    setShowDeleteConfirmation(true);
+    setModalDelete({
+			title: `Hapus Data Harta Tetap ${fixedAsset.name}, No Ref ${fixedAsset.code}`
+		});
+    setData({
+      'id' : fixedAsset.id,
+      'code' : fixedAsset.code,
+      'name' : fixedAsset.name,
+    })
+  }
+
+  const handleSubmitDelete = (e) => {
+		e.preventDefault();
+
+    destroy(route('data-master.fixed-asset.destroy', {organization: organization.id, fixedAsset: data.id}), {
+      onSuccess: () => {
+        toast.success(`Harta Tetap Berhasil Dihapus`, {
+          position: toast.POSITION.TOP_CENTER
+        });
+        setShowDeleteConfirmation(false);
+
+        reset();
+      },
+      onError: errors => {
+        toast.error(errors.message, {
+          position: toast.POSITION.TOP_CENTER
+        });
+        setShowDeleteConfirmation(false);
+      }, 
+      preserveScroll: true
+    })
+  }
+
   return (
     <>
       <Head title='Harta Tetap' />
@@ -177,7 +226,6 @@ export default function Index({ role, organization, fixedAssets, status, searchF
                       <th className='bg-gray-200 text-center'>Penyusutan Perbulan</th>
                       <th className='bg-gray-200 text-center'>Akumulasi Penyusutan</th>
                       <th className='bg-gray-200 text-center'>Nilai Buku</th>
-                      <th className='bg-gray-200 text-center'>Status</th>
                       <th className='bg-gray-200'></th>
                     </tr>
                   </thead>
@@ -199,6 +247,30 @@ export default function Index({ role, organization, fixedAssets, status, searchF
             </div>
           </div>
         </ContainerDesktop>
+
+        {/* Delete */}
+        <Modal show={showDeleteConfirmation} onClose={() => setShowDeleteConfirmation(false)}>
+          <form 
+            onSubmit={handleSubmitDelete} 
+            className="p-6"
+            id='deleteForm'
+            name='deleteForm'
+          >
+            <h2 className="text-lg font-medium text-gray-900 text-center">
+              {modalDelete.title}
+            </h2>
+
+            <div className="mt-6 flex justify-end">
+              <SecondaryButton onClick={() => setShowDeleteConfirmation(false)}>Batal</SecondaryButton>
+
+              <DangerButton className="ms-3" 
+                disabled={processing}
+                >
+                Hapus
+              </DangerButton>
+            </div>
+          </form>
+        </Modal>
         
       {/* Desktop */}
     </>

@@ -102,7 +102,7 @@ export default function Show({organization, program, department, project, journa
                             </thead>
                             <tbody>
                                 {
-                                    ledgers.map(ledger => 
+                                    ledgers.sort((a,b) => a.account.code - b.account.code).map(ledger => 
                                         <tr key={ledger.id} className='border border-slate-800'>
                                             <td className='px-3 py-2 border border-slate-800'>{ledger.account.code}</td>
                                             <td className='px-3 py-2 border border-slate-800'>{ledger.account.name.toUpperCase()}</td>
