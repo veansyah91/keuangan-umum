@@ -347,34 +347,6 @@ export default function Edit({
               </div>
             </div>
 
-            <div className='flex flex-col sm:flex-row justify-between gap-1'>
-            < div className="form-control ">
-                <label className="label cursor-pointer gap-2" htmlFor={`status`}>
-                  <input 
-                    type="checkbox" 
-                    className="checkbox" 
-                    id={`status`}
-                    value={data.status}
-                    onChange={() => setData('status', !data.status)}
-                    checked={data.status}
-                  />
-                  <span className="label-text font-bold">
-                    {
-                      data.status
-                      ? "Aktif"
-                      : "Tidak Aktif"
-                    }  
-                  </span> 
-                </label>
-              </div>
-              {
-                errors && errors.status && 
-                <div className='-mb-3'>
-                  <div className='text-xs text-red-500'>{errors.status}</div>  
-                </div>
-              }
-            </div>
-
             <div className='flex justify-end flex-col-reverse sm:flex-row gap-2 mt-5'>
               <div className='w-full sm:w-1/6 my-auto text-center'>
                 <Link href={route('data-master.fixed-asset', organization.id)}>

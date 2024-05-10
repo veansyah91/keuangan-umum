@@ -306,7 +306,20 @@ class FixedAssetController extends Controller
      */
     public function show(Organization $organization, FixedAsset $fixedAsset)
     {
-        
+        $user = Auth::user();     
+
+        return Inertia::render('FixedAsset/Show', [
+            'fixedAsset' => $fixedAsset,
+            'createdBy' => User::find($fixedAsset['user_id']),
+            'journal' => Journal::whereOrganizationId($organization['id'])
+                                ->whereNoRef($fixedAsset['code'])
+                                ->first(),
+            'assetAccount' => Account::find($fixedAsset['asset']),
+            'depreciationAccumulationAccount' => Account::find($fixedAsset['accumulated_depreciation']),
+            'depreciationCostAccount' => Account::find($fixedAsset['depreciation']),
+            'organization' => $organization,
+            'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+        ]); 
     }
 
     /**
