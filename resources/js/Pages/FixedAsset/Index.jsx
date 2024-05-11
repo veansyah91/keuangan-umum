@@ -26,6 +26,7 @@ export default function Index({ role, organization, fixedAssets, status, searchF
 
   const [search, setSearch] = useState(searchFilter || '');
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [showDisposal, setShowDisposal] = useState(false);
 
   const {data, setData, delete: destroy, errors, setError, processing, reset} = useForm({
     'id': null,
@@ -65,6 +66,10 @@ export default function Index({ role, organization, fixedAssets, status, searchF
       'code' : fixedAsset.code,
       'name' : fixedAsset.name,
     })
+  }
+
+  const handleDisposal = (fixedAsset) => {
+    console.log('handle disposal');
   }
 
   const handleSubmitDelete = (e) => {
@@ -134,6 +139,7 @@ export default function Index({ role, organization, fixedAssets, status, searchF
             fixedAsset={fixedAsset}
             key={fixedAsset.id}
             handleDelete={() => handleDelete(fixedAsset)}
+            handleDisposal={() => handleDisposal(fixedAsset)}
             role={role}
           />
         )
@@ -237,6 +243,7 @@ export default function Index({ role, organization, fixedAssets, status, searchF
                         key={fixedAsset.id}
                         className={`${index % 2 == 0 && 'bg-gray-100'}`} 
                         handleDelete={() => handleDelete(fixedAsset)}
+                        handleDisposal={() => handleDisposal(fixedAsset)}
                         role={role}
                       />
                     )

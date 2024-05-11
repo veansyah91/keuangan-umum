@@ -7,7 +7,7 @@ import React from 'react'
 import { IoCreateOutline, IoEllipsisVertical, IoSearchOutline, IoTrash } from 'react-icons/io5'
 import { MdDeveloperBoardOff } from 'react-icons/md'
 
-export default function FixedAssetMobile({fixedAsset, role, handleDelete}) {
+export default function FixedAssetMobile({fixedAsset, role, handleDelete, handleDisposal}) {
   return (
     <div className=' text-gray-900 py-2 px-3 border flex gap-5 justify-between'>
       <div className='text-start my-auto w-6/12 space-y-2'>
@@ -74,7 +74,7 @@ export default function FixedAssetMobile({fixedAsset, role, handleDelete}) {
                   </li>
                   <li>                                
                       <button 
-                          onClick={handleDelete}
+                          onClick={handleDisposal}
                       ><MdDeveloperBoardOff />Disposal</button>
                   </li>
               </ul>

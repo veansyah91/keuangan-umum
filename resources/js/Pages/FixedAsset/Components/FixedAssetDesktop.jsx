@@ -9,7 +9,7 @@ import React from 'react'
 import { IoCreateOutline, IoEllipsisVertical, IoSearchOutline, IoTrash } from 'react-icons/io5'
 import { MdDeveloperBoardOff } from 'react-icons/md'
 
-export default function FixedAssetDesktop({fixedAsset, role, handleDelete, className}) {
+export default function FixedAssetDesktop({fixedAsset, role, handleDelete, handleDisposal, className}) {
   return (
     <>
       <tr className={`text-sm ${className}`}>
@@ -55,7 +55,7 @@ export default function FixedAssetDesktop({fixedAsset, role, handleDelete, class
                   </li>
                   <li>                                
                       <button 
-                          onClick={handleDelete}
+                          onClick={handleDisposal}
                       ><MdDeveloperBoardOff />Disposal</button>
                   </li>
               </ul>
