@@ -1,15 +1,4 @@
-import React, { useLayoutEffect, useState } from 'react'
-
-function maxHeight() {
-  const screenHeight = window.screen.height;
-<<<<<<< Updated upstream
-  const classHeight = `h-[${(screenHeight-384).toString()}px]`;
-=======
-  const classHeight = `max-h-[${screenHeight-384}px]`;
->>>>>>> Stashed changes
-
-  return classHeight;
-}
+import React, { useLayoutEffect, useState } from 'react';
 
 export default function ContentDesktop({children}) {  
   const [heightScreen, setHeightScreen] = useState('')
