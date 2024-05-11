@@ -4,10 +4,11 @@ namespace App\Imports;
 
 use App\Models\Village;
 use Maatwebsite\Excel\Concerns\ToModel;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 
-class VillageImport implements ToModel, WithChunkReading, WithBatchInserts
+class VillageImport implements ToModel, WithChunkReading, ShouldQueue
 {
     /**
     * @param array $row
@@ -21,11 +22,6 @@ class VillageImport implements ToModel, WithChunkReading, WithBatchInserts
             'district_id' => $row[1],
             'name' => $row[2],
         ]);
-    }
-
-    public function batchSize(): int
-    {
-        return 1000;
     }
 
     public function chunkSize(): int

@@ -3,7 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { IoArrowBackOutline, IoFilter, IoPlayBack, IoPlayForward, IoSearchSharp, IoTrash } from 'react-icons/io5';
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import NavgroupRegionalMobile from '@/Components/NavgroupRegionalMobile';
 import TitleMobile from '@/Components/Mobiles/TitleMobile';
 import { useDebounce } from 'use-debounce';
@@ -90,6 +90,7 @@ export default function Index({villages, provinces, regencies, districts, search
 
     const handleSubmitImport = (e) => {
         e.preventDefault();
+        console.log(data);
         post(route('admin.data-master.village.post'),{
             onSuccess: () => {
                 reset();
@@ -97,6 +98,9 @@ export default function Index({villages, provinces, regencies, districts, search
                 toast.success(`Desa / Kelurahan Berhasil Diimport`, {
                     position: toast.POSITION.TOP_CENTER
                 });
+            },
+            onError: errors => {
+                console.log(errors);
             }
         });
     }
@@ -221,7 +225,7 @@ export default function Index({villages, provinces, regencies, districts, search
                     <TitleDesktop>  
                         <div className='my-auto w-6/12'>
                             <PrimaryButton className='py-3' onClick={() => setShowModalImport(true)}>
-                                Import Kecamatan
+                                Import Kelurahan / Desa
                             </PrimaryButton>
                         </div>           
                         <div className='w-1/12 text-end'>

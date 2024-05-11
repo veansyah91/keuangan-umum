@@ -11,6 +11,7 @@ use App\Models\District;
 use App\Models\Province;
 use Illuminate\Http\Request;
 use App\Imports\VillageImport;
+use App\Jobs\ProcessVillageImport;
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\RedirectResponse;
@@ -69,7 +70,7 @@ class VillageController extends Controller
         $file = $request->file('village');
 
         try {
-            Excel::import(new VillageImport, $file);
+            Excel::queueImport(new VillageImport, $file);
         } catch (Throwable $th) {
             abort(503, 'Something Wrong');
         }
