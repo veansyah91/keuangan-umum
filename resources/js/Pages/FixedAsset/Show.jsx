@@ -105,7 +105,7 @@ export default function Show({organization, user, journal, fixedAsset, createdBy
               </div>
               <div className='flex flex-col sm:flex-row justify-between gap-1'>
                 <div className='sm:w-1/3 w-full font-bold'>
-                  <Link href={route('data-master.project', organization.id)}>
+                  <Link href={route('data-master.fixed-asset', organization.id)}>
                     <SecondaryButton className='w-full sm:w-1/3'>
                       <div className='w-full'>
                         Kembali
@@ -128,7 +128,7 @@ Show.layout = page => <AuthenticatedLayout
   user={page.props.auth.user}
   organization={page.props.organization}
   title="Detail Harta Tetap"
-  backLink={<Link href={route('data-master.project',page.props.organization.id)}><IoArrowBackOutline/></Link>}
+  backLink={<Link href={route('data-master.fixed-asset',page.props.organization.id)}><IoArrowBackOutline/></Link>}
   breadcrumbs={<div className="text-sm breadcrumbs">
     <ul>
     <li className='font-bold'><Link href={route('data-master',page.props.organization.id)}>Data Master</Link></li> 

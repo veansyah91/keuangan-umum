@@ -1,11 +1,11 @@
 import React, { useLayoutEffect, useState } from 'react';
 
 export default function ContentDesktop({children}) {  
-  const [heightScreen, setHeightScreen] = useState('')
+  const [heightScreen, setHeightScreen] = useState('');
 
   useLayoutEffect(() => {
     const screenHeight = window.screen.height;
-    setHeightScreen(`h-[${(screenHeight-384).toString()}px]`)
+    setHeightScreen(`h-[${(screenHeight-384).toString()}px]`);
   }, []);
   
   return (
