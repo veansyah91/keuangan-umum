@@ -3,7 +3,7 @@ import React, { useLayoutEffect, useState } from 'react';
 export default function ContentDesktop({children}) {  
   useLayoutEffect(() => {
     const screenHeight = window.screen.height;
-    document.getElementById("content").style.height = `${screenHeight-384}px`;
+    document.getElementById("content").style.height = `${screenHeight-394}px`;
   }, []);
   
   return (

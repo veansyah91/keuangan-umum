@@ -99,6 +99,11 @@ class FixedAssetController extends Controller
             'fixedAssets' => $fixedAssets,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'status' => request('status') == "true" ? true : false,
+            'accounts' => Account::filter(request(['account']))
+                                    ->whereIsActive(true)
+                                    ->whereOrganizationId($organization['id'])
+                                    ->select('id', 'name', 'code', 'is_cash')
+                                    ->get(),
         ]);
     }
 

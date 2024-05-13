@@ -5,6 +5,12 @@ export default function Guest({ children }) {
     return (
         <div className='min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100'>
             <div>
+                <img 
+                    src="/img/logo.png"
+                    alt="logo"
+                    width={150}
+                    className='mx-auto -my-2'
+                />
                 <Link href='/'>
                     <h2 className='font-bold text-[#4f8315] text-4xl'>Keuangan Umum</h2>
                 </Link>

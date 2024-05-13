@@ -59,15 +59,15 @@ export default function Authenticated({ user, header, children, organization = '
                 <div className="drawer">
                     <input id="my-drawer" type="checkbox" className="drawer-toggle" />
                     <div className="drawer-content">
-                        <nav className='bg-[#4f8315] border-b border-gray-100 w-full fixed z-10 print:hidden'>
+                        <nav className='bg-white border-[#4f8315] border-b-2 w-full fixed z-10 print:hidden'>
                             <div className='max-w-7xl mx-auto px-2 sm:px-6'>
                                 <div className='flex justify-between sm:h-16 h-12'>
                                     <div className='sm:flex hidden'>
-                                        {/* <div className='shrink-0 flex items-center'>
+                                        <div className='shrink-0 flex items-center'>
                                             <Link href='/'>
                                                 <ApplicationLogo className='block h-9 w-auto fill-current text-gray-800' />
                                             </Link>
-                                        </div> */}
+                                        </div>
 
                                         {
                                             route().current('admin*') ? 
@@ -109,10 +109,10 @@ export default function Authenticated({ user, header, children, organization = '
                                         <div className='ms-3 relative'>
                                             <Dropdown>
                                                 <Dropdown.Trigger>
-                                                    <span className='inline-flex rounded-md text-white text-lg'>
+                                                    <span className='inline-flex rounded-md text-[#4f8315] text-lg'>
                                                         <button
                                                             type='button'
-                                                            className='inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-[#4f8315] hover:text-gray-200 focus:outline-none transition ease-in-out duration-150'>
+                                                            className='inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-[#4f8315] hover:opacity-60 focus:outline-none transition ease-in-out duration-150'>
                                                             
                                                             <IoMdSettings size={"2em"} />
                                                         </button>
@@ -141,7 +141,7 @@ export default function Authenticated({ user, header, children, organization = '
                                         </div>
                                     </div>
 
-                                    <div className='my-auto flex sm:hidden space-x-3 text-white px-2 print:hidden'> 
+                                    <div className='my-auto flex sm:hidden space-x-3 text-[#4f8315] px-2 print:hidden'> 
                                         <div className='my-auto'>
                                             {backLink}
                                         </div>                                    
@@ -151,10 +151,10 @@ export default function Authenticated({ user, header, children, organization = '
                                 
                                     {/* Second Nav for Mobile */}
                                     <div className='-me-2 flex items-center sm:hidden'>
-                                        <label htmlFor="my-drawer" className="btn bg-[#4f8315] border-none">
+                                        <label htmlFor="my-drawer" className="btn bg-white border-none">
                                             <svg className='h-6 w-6' stroke='currentColor' fill='none' viewBox='0 0 24 24'>
                                                 <path
-                                                    className='inline-flex text-white'
+                                                    className='inline-flex text-[#4f8315]'
                                                     strokeLinecap='round'
                                                     strokeLinejoin='round'
                                                     strokeWidth='2'
