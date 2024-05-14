@@ -22,7 +22,9 @@ import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
 import DangerButton from '@/Components/DangerButton';
 
-export default function Index({ role, organization, fixedAssets, status, searchFilter, startDate, endDate, flash }) {
+export default function Index({ role, organization, fixedAssets, status, searchFilter, startDate, endDate, flash, accounts }) {
+
+  console.log(accounts);
 
   const [search, setSearch] = useState(searchFilter || '');
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
@@ -69,7 +71,7 @@ export default function Index({ role, organization, fixedAssets, status, searchF
   }
 
   const handleDisposal = (fixedAsset) => {
-    console.log('handle disposal');
+    setShowDisposal(true);
   }
 
   const handleSubmitDelete = (e) => {
@@ -269,6 +271,30 @@ export default function Index({ role, organization, fixedAssets, status, searchF
 
             <div className="mt-6 flex justify-end">
               <SecondaryButton onClick={() => setShowDeleteConfirmation(false)}>Batal</SecondaryButton>
+
+              <DangerButton className="ms-3" 
+                disabled={processing}
+                >
+                Hapus
+              </DangerButton>
+            </div>
+          </form>
+        </Modal>
+
+        {/* Delete */}
+        <Modal show={showDisposal} onClose={() => setShowDisposal(false)}>
+          <form 
+            onSubmit={handleSubmitDelete} 
+            className="p-6"
+            id='deleteForm'
+            name='deleteForm'
+          >
+            <h2 className="text-lg font-medium text-gray-900 text-center">
+              Apakah Anda Yakin Menghapus Harta Tetap ?
+            </h2>
+
+            <div className="mt-6 flex justify-end">
+              <SecondaryButton onClick={() => setShowDisposal(false)}>Batal</SecondaryButton>
 
               <DangerButton className="ms-3" 
                 disabled={processing}

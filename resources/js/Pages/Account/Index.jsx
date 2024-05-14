@@ -337,8 +337,8 @@ export default function Index({organization, accounts, role, accountCategories, 
                             <thead className='text-base text-gray-900'>
                                 <tr className=''>
                                     <th className='bg-gray-200'>Kategori</th>
-                                    <th className='bg-gray-200'>Nama</th>
                                     <th className='bg-gray-200'>Kode</th>
+                                    <th className='bg-gray-200'>Nama</th>
                                     <th className='bg-gray-200 text-center'>Status</th>
                                     <th className='bg-gray-200'></th>
                                 </tr>

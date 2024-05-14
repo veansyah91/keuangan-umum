@@ -232,7 +232,7 @@ class OrganizationController extends Controller
             'name' => 'MESIN DAN PERALATAN',
         ],
         [
-            'category_name' => 'HARTA TETAP BERWUJUD',
+            'category_name' => 'AKUMULASI PENYUSUTAN HARTA TETAP BERWUJUD',
             'code' => '171300000',
             'name' => 'AKUMULASI PENYUSUTAN MESIN DAN PERALATAN',
         ],
@@ -242,7 +242,7 @@ class OrganizationController extends Controller
             'name' => 'HARTA LAINNYA',
         ],
         [
-            'category_name' => 'HARTA TETAP BERWUJUD',
+            'category_name' => 'AKUMULASI PENYUSUTAN HARTA TETAP BERWUJUD',
             'code' => '171900000',
             'name' => 'AKUMULASI PENYUSUTAN HARTA LAINNYA',
         ],

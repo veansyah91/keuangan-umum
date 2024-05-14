@@ -52,7 +52,6 @@ const objectToArray = (object, type) => {
 }
 
 export default function CostRevenueChart({logo, title, dataChart, type, data}) {
-  // console.log(data);
   return (
     <div className='mt-2 bg-white p-2 mx-2 rounded-lg border '>
       {/* title */}

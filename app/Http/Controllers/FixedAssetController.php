@@ -200,6 +200,7 @@ class FixedAssetController extends Controller
             ],
         ]);
 
+
         // Buat Akun
         $fixedAssetCategory = FixedAssetCategory::find($validated['fixed_asset_category']);
 
@@ -208,6 +209,7 @@ class FixedAssetController extends Controller
 
         // akun akumulasi penyusutan
         $depreciationAccumulation = $validated['lifetime'] > 0 ? Account::create($this->createNewAccount($organization['id'], $fixedAssetCategory['name'], 'AKUMULASI PENYUSUTAN ' . $validated['name'],'AKUMULASI PENYUSUTAN')) : null;
+
 
         // akun beban penyusutan
         $depreciationCost = $validated['lifetime'] > 0  ? Account::create($this->createNewAccount($organization['id'], $fixedAssetCategory['name'], 'BEBAN PENYUSUTAN ' . $validated['name'],'BEBAN PENYUSUTAN')) : null;
@@ -680,6 +682,12 @@ class FixedAssetController extends Controller
         }   
 
         $journal->delete();
+
+        // jika ada disposal
+        if ($fixedAsset['disposal_journal_id']) {
+            $disposalJournal = Journal::find($fixedAsset['disposal_journal_id']);
+            $disposalJournal->delete();            
+        }
 
         // accounts
         $assetAccount = Account::find($fixedAsset['asset']);

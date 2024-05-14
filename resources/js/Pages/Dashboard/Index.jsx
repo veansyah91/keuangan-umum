@@ -96,56 +96,56 @@ const Index = ({ balance, startDate, endDate }) => {
             </Card.Header>
             <Card.Content className={'flex gap-5 flex-col sm:flex-row px-2'}>
               <Card className={'bg-lime-300 bg-opacity-20 shadow-md'}>
-                <Card.Header className={'flex gap-3 justify-between text-lime-600'}>
+                <Card.Header className={'flex gap-3 justify-between'}>
                   <div>
                     Aktiva
                   </div>
-                  <div>
+                  <div className='text-blue-600'>
                     IDR {isLoading ? 0 : formatNumber(balance?.currentAsset + balance?.fixedAsset)}
                   </div>
                 </Card.Header>
                 <Card.Content className={'flex gap-3'}>
-                  <Card className={'text-rose-700 shadow'}>
+                  <Card className={'shadow'}>
                     <Card.Header>
                       Harta Lancar
                     </Card.Header>
-                    <Card.Content className={'text-end text-lg sm:text-2xl'}>
+                    <Card.Content className={'text-end text-lg sm:text-2xl text-rose-700'}>
                       IDR {isLoading ? 0 : formatNumber(balance?.currentAsset)}                      
                     </Card.Content>
                   </Card>
-                  <Card className={'text-sky-500 shadow'}>
+                  <Card className={'shadow'}>
                     <Card.Header>
                       Harta Tetap
                     </Card.Header>
-                    <Card.Content className={'text-end text-lg sm:text-2xl'}>
+                    <Card.Content className={'text-end text-lg sm:text-2xl text-sky-500'}>
                       IDR {isLoading ? 0 : formatNumber(balance?.fixedAsset)}                     
                     </Card.Content>
                   </Card>
                 </Card.Content>
               </Card>
               <Card className={'bg-blue-300 bg-opacity-20 shadow-md'}>
-                <Card.Header className={'flex gap-3 justify-between text-blue-600'}>
+                <Card.Header className={'flex gap-3 justify-between'}>
                   <div>
                     Pasiva
                   </div>
-                  <div>
+                  <div className=''>
                     IDR {isLoading ? 0 : formatNumber(balance?.currentAsset + balance?.fixedAsset)}
                   </div>
                 </Card.Header>
                 <Card.Content className={'flex gap-3'}>
-                  <Card className={'text-orange-500 shadow'}>
+                  <Card className={'shadow'}>
                     <Card.Header>
                       Kewajiban
                     </Card.Header>
-                    <Card.Content className={'text-end text-lg sm:text-2xl'}>
+                    <Card.Content className={'text-end text-lg sm:text-2xl text-orange-500'}>
                       IDR {isLoading ? 0 : formatNumber(Math.abs(balance?.liability))}                      
                     </Card.Content>
                   </Card>
-                  <Card className={'text-green-500 shadow'}>
+                  <Card className={'shadow'}>
                     <Card.Header>
                       Modal
                     </Card.Header>
-                    <Card.Content className={'text-end text-lg sm:text-2xl'}>
+                    <Card.Content className={'text-green-500 text-end text-lg sm:text-2xl'}>
                       IDR {isLoading ? 0 : formatNumber(Math.abs(balance?.equity))}                     
                     </Card.Content>
                   </Card>

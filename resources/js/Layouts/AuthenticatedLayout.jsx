@@ -60,7 +60,7 @@ export default function Authenticated({ user, header, children, organization = '
                     <input id="my-drawer" type="checkbox" className="drawer-toggle" />
                     <div className="drawer-content">
                         <nav className='bg-white border-[#4f8315] border-b-2 w-full fixed z-10 print:hidden'>
-                            <div className='max-w-7xl mx-auto px-2 sm:px-6'>
+                            <div className='mx-auto px-2 sm:px-6'>
                                 <div className='flex justify-between sm:h-16 h-12'>
                                     <div className='sm:flex hidden'>
                                         <div className='shrink-0 flex items-center'>

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Journal;
 use App\Models\FixedAssetCategory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -28,11 +29,21 @@ class FixedAsset extends Model
         'depreciation_accumulated',
         'status',
         'date',
+        'is_disposed',
+        'disposal_date',
+        'disposal_ref',
+        'disposal_description',
+        'disposal_journal_id'
     ];
 
     public function fixedAssetCategory() : BelongsTo
     {
         return $this->belongsTo(FixedAssetCategory::class);
+    }
+
+    public function journal(): BelongsTo
+    {
+        return $this->belongsTo(Journal::class);
     }
 
     public function scopeFilter($query, $filters)
