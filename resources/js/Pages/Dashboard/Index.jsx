@@ -128,7 +128,7 @@ const Index = ({ balance, startDate, endDate }) => {
                   <div>
                     Pasiva
                   </div>
-                  <div className=''>
+                  <div className='text-blue-600'>
                     IDR {isLoading ? 0 : formatNumber(balance?.currentAsset + balance?.fixedAsset)}
                   </div>
                 </Card.Header>

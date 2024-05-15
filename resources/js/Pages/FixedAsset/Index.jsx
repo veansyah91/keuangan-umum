@@ -26,7 +26,7 @@ import TextInput from '@/Components/TextInput';
 import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 
 export default function Index({ role, organization, fixedAssets, status, searchFilter, startDate, endDate, flash, accounts }) {
-  console.log(fixedAssets);
+  // console.log(fixedAssets);
 
   const [search, setSearch] = useState(searchFilter || '');
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
@@ -42,6 +42,8 @@ export default function Index({ role, organization, fixedAssets, status, searchF
       'is_cash' : false,
       'code': ''
     }, 
+    'value_in_book' : 0,
+    'lifetime' : 0
   });
 
   const [modalDelete, setModalDelete] = useState({
@@ -75,7 +77,7 @@ export default function Index({ role, organization, fixedAssets, status, searchF
     setModalDelete({
 			title: `Hapus Data Harta Tetap ${fixedAsset.name}, No Ref ${fixedAsset.code}`
 		});
-    setData({
+    setData({...data, 
       'id' : fixedAsset.id,
       'code' : fixedAsset.code,
       'name' : fixedAsset.name,
@@ -83,12 +85,17 @@ export default function Index({ role, organization, fixedAssets, status, searchF
   }
 
   const handleDisposal = (fixedAsset) => {
+    // console.log(fixedAsset.lifetime);
+    let lifetime = parseInt(fixedAsset.lifetime);
     setShowDisposal(true);
     setData({...data, 
       'id' : fixedAsset.id,
       'name' : fixedAsset.name,
-      'description' : fixedAsset.disposal_description || ''
-    })
+      'description' : fixedAsset.disposal_description || '',
+      'lifetime' : lifetime,
+      'value_in_book' : fixedAsset.value - fixedAsset.depreciation_accumulated
+    });
+
   }
 
   const handleSubmitDelete = (e) => {
@@ -111,6 +118,12 @@ export default function Index({ role, organization, fixedAssets, status, searchF
       }, 
       preserveScroll: true
     })
+  }
+
+  const handleSubmitDisposal = (e) => {
+    e.preventDefault();
+
+    console.log(data);
   }
 
   const handleSelectedAccount = (selected) => {
@@ -311,13 +324,13 @@ export default function Index({ role, organization, fixedAssets, status, searchF
           </form>
         </Modal>
 
-        {/* Delete */}
+        {/* Disposal */}
         <Modal show={showDisposal} onClose={() => setShowDisposal(false)}>
           <form 
-            onSubmit={handleSubmitDelete} 
+            onSubmit={handleSubmitDisposal} 
             className="p-6"
-            id='deleteForm'
-            name='deleteForm'
+            id='disposalForm'
+            name='disposalForm'
           >
             <h2 className="text-lg font-medium text-gray-900 text-center">
               Disposal Harta Tetap
@@ -368,26 +381,30 @@ export default function Index({ role, organization, fixedAssets, status, searchF
                 </div>
               </div>
 
-              <div className='flex flex-col sm:flex-row justify-between gap-1'>
-                <div className='w-full sm:w-1/3 my-auto'>
-                  <InputLabel value={'Akun Kredit'} htmlFor='credit_account_id' className=' mx-auto my-auto'/>
+              {
+                (data.lifetime = 0 || data.value_in_book > 0) && 
+                <div className='flex flex-col sm:flex-row justify-between gap-1'>
+                  <div className='w-full sm:w-1/3 my-auto'>
+                    <InputLabel value={'Akun Kredit'} htmlFor='credit_account_id' className=' mx-auto my-auto'/>
+                  </div>
+                  
+                  <div className='w-full sm:w-2/3'>
+                    <ClientSelectInput
+                      resources={accounts}
+                      selected={selectedAccount}
+                      setSelected={(selected) => handleSelectedAccount(selected)}
+                      maxHeight='max-h-40'
+                      placeholder='Cari Akun'
+                      id='credit_account_id'
+                      isError={errors?.credit_account?.id ? true : false}
+                    />
+                    {
+                      errors?.credit_account?.id && <span className='text-red-500 text-xs'>{errors.credit_account.id}</span>
+                    }
+                  </div>
                 </div>
-                
-                <div className='w-full sm:w-2/3'>
-                  <ClientSelectInput
-                    resources={accounts}
-                    selected={selectedAccount}
-                    setSelected={(selected) => handleSelectedAccount(selected)}
-                    maxHeight='max-h-40'
-                    placeholder='Cari Akun'
-                    id='credit_account_id'
-                    isError={errors?.credit_account?.id ? true : false}
-                  />
-                  {
-                    errors?.credit_account?.id && <span className='text-red-500 text-xs'>{errors.credit_account.id}</span>
-                  }
-                </div>
-              </div>
+              }
+              
             </div>
 
             <div className="mt-6 flex justify-end">
