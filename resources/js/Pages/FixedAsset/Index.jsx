@@ -21,19 +21,27 @@ import FixedAssetDesktop from './Components/FixedAssetDesktop';
 import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
 import DangerButton from '@/Components/DangerButton';
+import InputLabel from '@/Components/InputLabel';
+import TextInput from '@/Components/TextInput';
+import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 
 export default function Index({ role, organization, fixedAssets, status, searchFilter, startDate, endDate, flash, accounts }) {
-
-  console.log(accounts);
+  console.log(fixedAssets);
 
   const [search, setSearch] = useState(searchFilter || '');
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [showDisposal, setShowDisposal] = useState(false);
 
-  const {data, setData, delete: destroy, errors, setError, processing, reset} = useForm({
+  const {data, setData, delete: destroy, patch, errors, setError, processing, reset} = useForm({
     'id': null,
     'no_ref' : '',
-    'name': ''
+    'name': '',
+    'description' : '',
+    'debit_account' : {
+      'id' : null,
+      'is_cash' : false,
+      'code': ''
+    }, 
   });
 
   const [modalDelete, setModalDelete] = useState({
@@ -44,6 +52,10 @@ export default function Index({ role, organization, fixedAssets, status, searchF
 		startDate: startDate || '', 
 		endDate: endDate || ''
 	});
+
+  const [selectedAccount, setSelectedAccount] = useState(
+    {id: null, name: '', code: '', is_cash:true},
+  ); 
 
   // useEffect
   useEffect(() => {
@@ -72,6 +84,11 @@ export default function Index({ role, organization, fixedAssets, status, searchF
 
   const handleDisposal = (fixedAsset) => {
     setShowDisposal(true);
+    setData({...data, 
+      'id' : fixedAsset.id,
+      'name' : fixedAsset.name,
+      'description' : fixedAsset.disposal_description || ''
+    })
   }
 
   const handleSubmitDelete = (e) => {
@@ -93,6 +110,19 @@ export default function Index({ role, organization, fixedAssets, status, searchF
         setShowDeleteConfirmation(false);
       }, 
       preserveScroll: true
+    })
+  }
+
+  const handleSelectedAccount = (selected) => {
+    setSelectedAccount(selected);
+    
+    setData({
+      ...data,
+      'debit_account' : {
+        'id' : selected.id,
+        'is_cash' : selected.is_cash,
+        'code' : selected.code
+      },
     })
   }
 
@@ -290,8 +320,75 @@ export default function Index({ role, organization, fixedAssets, status, searchF
             name='deleteForm'
           >
             <h2 className="text-lg font-medium text-gray-900 text-center">
-              Apakah Anda Yakin Menghapus Harta Tetap ?
+              Disposal Harta Tetap
             </h2>
+            <div className='mt-5 space-y-2'>
+
+              <div className='flex flex-col sm:flex-row justify-between gap-1'>
+                <div className='w-full sm:w-1/3 my-auto'>
+                  <InputLabel value={'Nama Harta Tetap'} htmlFor='name' className=' mx-auto my-auto'/>
+                </div>
+                
+                <div className='w-full sm:w-2/3'>
+                  <TextInput 
+                    id="name"
+                    name='name'
+                    className={`w-full ${errors?.name && 'border-red-500'}`}
+                    
+                    placeholder='Nama Harta Tetap'
+                    value={data.name}
+                    onChange={(e) => setData('name', e.target.value.toUpperCase())}
+                    disabled
+                  />
+                  {
+                    errors?.name && <span className='text-red-500 text-xs'>{errors.name}</span>
+                  }
+                </div>
+              </div>
+
+              <div className='flex flex-col sm:flex-row justify-between gap-1'>
+                <div className='w-full sm:w-1/3 my-auto'>
+                  <InputLabel value={'Keterangan'} htmlFor='description' className=' mx-auto my-auto'/>
+                </div>
+                
+                <div className='w-full sm:w-2/3'>
+                  <TextInput 
+                    id="description"
+                    name='decription'
+                    className={`w-full ${errors?.description && 'border-red-500'}`}
+                    
+                    placeholder='Keterangan'
+                    value={data.description}
+                    onChange={(e) => setData('decription', e.target.value.toUpperCase())}
+                    disabled
+                  />
+                  {
+                    errors?.decription && <span className='text-red-500 text-xs'>{errors.decription}</span>
+                  }
+                </div>
+              </div>
+
+              <div className='flex flex-col sm:flex-row justify-between gap-1'>
+                <div className='w-full sm:w-1/3 my-auto'>
+                  <InputLabel value={'Akun Kredit'} htmlFor='credit_account_id' className=' mx-auto my-auto'/>
+                </div>
+                
+                <div className='w-full sm:w-2/3'>
+                  <ClientSelectInput
+                    resources={accounts}
+                    selected={selectedAccount}
+                    setSelected={(selected) => handleSelectedAccount(selected)}
+                    maxHeight='max-h-40'
+                    placeholder='Cari Akun'
+                    id='credit_account_id'
+                    isError={errors?.credit_account?.id ? true : false}
+                  />
+                  {
+                    errors?.credit_account?.id && <span className='text-red-500 text-xs'>{errors.credit_account.id}</span>
+                  }
+                </div>
+              </div>
+            </div>
 
             <div className="mt-6 flex justify-end">
               <SecondaryButton onClick={() => setShowDisposal(false)}>Batal</SecondaryButton>
