@@ -200,6 +200,11 @@ class FixedAssetController extends Controller
             ],
         ]);
 
+        // cek tanggal
+        // jika tanggal lebih tinggi dari hari sekarang, maka kirimkan error\
+        if ($validated['date'] > $this->now->isoFormat("YYYY-MM-DD")) {
+            return redirect()->back()->withErrors(["date" => "Date Value is Unexpected!"]);
+        }
 
         // Buat Akun
         $fixedAssetCategory = FixedAssetCategory::find($validated['fixed_asset_category']);
@@ -489,6 +494,12 @@ class FixedAssetController extends Controller
         ]);
         $validated['organization_id'] = $organization['id'];
         $validated['user_id'] = $user['id'];
+        
+        // cek tanggal
+        // jika tanggal lebih tinggi dari hari sekarang, maka kirimkan error\
+        if ($validated['date'] > $this->now->isoFormat("YYYY-MM-DD")) {
+            return redirect()->back()->withErrors(["date" => "Date Value is Unexpected!"]);
+        }
 
         // akun-akun
         // akun aset

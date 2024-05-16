@@ -274,9 +274,9 @@ export default function Index({ role, organization, fixedAssets, status, searchF
                       <th className='bg-gray-200'>No. Ref</th>
                       <th className='bg-gray-200'>Nama</th>
                       <th className='bg-gray-200 text-end'>Nilai</th>
-                      <th className='bg-gray-200 text-center'>Penyusutan Perbulan</th>
-                      <th className='bg-gray-200 text-center'>Akumulasi Penyusutan</th>
-                      <th className='bg-gray-200 text-center'>Nilai Buku</th>
+                      <th className='bg-gray-200 text-end'>Penyusutan Perbulan</th>
+                      <th className='bg-gray-200 text-end'>Akumulasi Penyusutan</th>
+                      <th className='bg-gray-200 text-end'>Nilai Buku</th>
                       <th className='bg-gray-200'></th>
                     </tr>
                   </thead>

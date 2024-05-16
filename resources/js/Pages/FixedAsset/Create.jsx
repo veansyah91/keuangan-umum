@@ -156,6 +156,11 @@ export default function Create({
           endDate: date
         })
       },
+      onError: errors => {
+        toast.error(errors.date, {
+          position: toast.POSITION.TOP_CENTER
+        });
+      },
       preserveScroll: true
     })
   }
@@ -177,7 +182,7 @@ export default function Create({
                 <Datepicker
                   value={dateValue} 
                   onChange={handleDateValueChange}  
-                  inputClassName={errors?.date && 'border-red-500 rounded-lg'}
+                  // inputClassName={errors?.date && 'border-red-500 rounded-lg'}
                   useRange={false} 
                   asSingle={true} 
                   placeholder='Tanggal'
