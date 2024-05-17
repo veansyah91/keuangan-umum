@@ -32,6 +32,8 @@ const CustomToolTip = (props) => {
 export default function CashflowChart({ data }) {
   const { date } = useContext(AppContext);
 
+  console.log(data);
+
   return (
     <div className='mt-2 bg-white p-2 mx-2 rounded-lg border flex gap-2 pt-3'>
       {/* Bulanan */}
@@ -53,47 +55,52 @@ export default function CashflowChart({ data }) {
         {/* Content */}
         <div className='mt-5'>
           <ResponsiveContainer width="100%" height={250}>
-          <LineChart width={730} height={250} data={data}
-          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" 
-              style={{
-                fontSize: "10px"
-              }}
-            />
-            <YAxis 
-              tickFormatter={formatter}
-              format={formatter}
-              style={{
-                fontSize: "8px"
-              }}
-            />
-            <Tooltip content={<CustomToolTip />}/>
-            <Legend />
-            <Line type="monotone" dataKey="balance" stroke="#3770ed" 
-              tickFormatter={formatter}
-              style={{
-                fontSize: "8px"
-              }}
-              name='Saldo'
-              
-            />
-            <Line type="monotone" dataKey="debit" stroke="#82ca9d" 
-              tickFormatter={formatter}
-              style={{
-                fontSize: "8px"
-              }}
-              name='Kas Masuk'
-            />
-            <Line type="monotone" dataKey="credit" stroke="#dc2626" 
-              tickFormatter={formatter}
-              format={formatter}
-              style={{
-                fontSize: "8px"
-              }}
-              name='Kas Keluar'
-            />
-          </LineChart>
+            {
+              data && 
+              <LineChart width={730} height={250} data={data}
+              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" 
+                  style={{
+                    fontSize: "10px"
+                  }}
+                />
+                <YAxis 
+                  tickFormatter={formatter}
+                  format={formatter}
+                  style={{
+                    fontSize: "8px"
+                  }}
+                  
+                />
+                <Tooltip content={<CustomToolTip />}/>  
+                <Legend />
+                <Line type="monotone" dataKey="balance" stroke="#3770ed" 
+                  tickFormatter={formatter}
+                  style={{
+                    fontSize: "8px"
+                  }}
+                  name='Saldo'
+                  
+                />
+                <Line type="monotone" dataKey="debit" stroke="#82ca9d" 
+                  tickFormatter={formatter}
+                  style={{
+                    fontSize: "8px"
+                  }}
+                  name='Kas Masuk'
+                />
+                <Line type="monotone" dataKey="credit" stroke="#dc2626" 
+                  tickFormatter={formatter}
+                  format={formatter}
+                  style={{
+                    fontSize: "8px"
+                  }}
+                  name='Kas Keluar'
+                />
+              </LineChart>
+            }
+            
           </ResponsiveContainer>
         </div>
       </div>

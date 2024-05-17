@@ -730,4 +730,58 @@ class FixedAssetController extends Controller
         return redirect()->back();
 
     }
+
+    public function disposal(Request $request, Organization $organization, FixedAsset $fixedAsset)
+    {
+        $validated = $request->validate([ 
+            'description' => "string|nullable",
+        ]);
+
+        // akun aset lalu kreditkan
+        $debitAccount = Account::find($fixedAsset['asset']);
+
+        $validated['accounts'] = [
+            [
+                'id' => $debitAccount['id'],
+                'code' => $debitAccount['code'],
+                'debit' => 0,
+                'credit' =>  $fixedAsset['value'],
+                'is_cash' => 0,
+            ]
+        ];
+
+        if ($fixedAsset['lifetime'] == 0 || ($fixedAsset['value'] - $fixedAsset['depreciation_accumulated']) > 0) {
+            if (!$request['debit_account']['id']) {
+                return redirect()->back()->withErrors(["debit_account" => "Debit Account Required"]);
+            }
+
+            array_push($validated['accounts'], 
+            // asset
+            [
+                'id' => $request['debit_account']['id'],
+                'code' => $request['debit_account']['code'],
+                'debit' => $fixedAsset['lifetime'] == 0 ? $fixedAsset['value'] : ($fixedAsset['value'] - $fixedAsset['depreciation_accumulated']),
+                'credit' => 0,
+                'is_cash' => 0,
+            ]);
+        }
+
+        // akun penyusutan lalu debitkan
+        $depreciationAccumulationAccount = Account::find($fixedAsset['accumulated_depreciation']);
+
+        if ($fixedAsset['lifetime'] > 0) {
+            array_push($validated['accounts'],
+            [
+                'id' => $depreciationAccumulationAccount['id'],
+                'code' => $depreciationAccumulationAccount['code'],
+                'debit' => $fixedAsset['value'] - $fixedAsset['depreciation_accumulated'],
+                'credit' => 0,
+                'is_cash' => 0,
+            ], );
+    
+        }
+
+
+        dd($validated);
+    }
 }

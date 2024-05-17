@@ -178,6 +178,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('fixed-assets/{fixedAsset}', [FixedAssetController::class, 'show'])->name('data-master.fixed-asset.show');
             Route::patch('fixed-assets/{fixedAsset}', [FixedAssetController::class, 'update'])->name('data-master.fixed-asset.update');
             Route::delete('fixed-assets/{fixedAsset}', [FixedAssetController::class, 'destroy'])->name('data-master.fixed-asset.destroy');
+            Route::patch('fixed-assets/{fixedAsset}/disposal', [FixedAssetController::class, 'disposal'])->name('data-master.fixed-asset.disposal');
             
         });
 

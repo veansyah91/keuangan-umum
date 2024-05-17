@@ -85,6 +85,13 @@ export default function Index({ role, organization, fixedAssets, status, searchF
   }
 
   const handleDisposal = (fixedAsset) => {
+
+    setSelectedAccount({
+      id: null, name: '', code: '', is_cash:true,
+    });
+    errors.debit_account = '';
+    reset();
+
     let tempData = {...data, 
       'id': fixedAsset.id,
       'no_ref' : fixedAsset.code,
@@ -121,15 +128,26 @@ export default function Index({ role, organization, fixedAssets, status, searchF
     })
   }
 
-  const handleChangeDesctription = (e) => {
-    // console.log(e.target.value);
-    setData('description', e.target.value)
-  }
-
   const handleSubmitDisposal = (e) => {
     e.preventDefault();
 
-    console.log(data);
+    patch(route('data-master.fixed-asset.disposal', {organization: organization.id, fixedAsset: data.id}), {
+      onSuccess: () => {
+        toast.success(`Harta Tetap Berhasil Dihapus`, {
+          position: toast.POSITION.TOP_CENTER
+        });
+        setShowDeleteConfirmation(false);
+
+        reset();
+      },
+      onError: errors => {
+        toast.error(errors.message, {
+          position: toast.POSITION.TOP_CENTER
+        });
+        setShowDeleteConfirmation(false);
+      }, 
+      preserveScroll: true
+    })
   }
 
   const handleSelectedAccount = (selected) => {
@@ -373,16 +391,14 @@ export default function Index({ role, organization, fixedAssets, status, searchF
                 <div className='w-full sm:w-2/3'>
                   <TextInput 
                     id="description"
-                    name='decription'
+                    name='description'
                     className={`w-full ${errors?.description ? 'border-red-500' :''}`}
                     placeholder='Keterangan'
                     value={data.description}
                     onChange={(e) => setData('description' ,e.target.value.toUpperCase())}
-
-                    // onChange={(e) => handleChangeDesctription(e)}
                   />
                   {
-                    errors?.decription && <span className='text-red-500 text-xs'>{errors.decription}</span>
+                    errors?.description && <span className='text-red-500 text-xs'>{errors.description}</span>
                   }
                 </div>
               </div>
@@ -391,7 +407,7 @@ export default function Index({ role, organization, fixedAssets, status, searchF
                 (data.value_in_book > 0 || data.lifetime == 0) && 
                 <div className='flex flex-col sm:flex-row justify-between gap-1'>
                   <div className='w-full sm:w-1/3 my-auto'>
-                    <InputLabel value={'Akun Kredit'} htmlFor='credit_account_id' className=' mx-auto my-auto'/>
+                    <InputLabel value={'Akun Debit'} htmlFor='debit_account_id' className=' mx-auto my-auto'/>
                   </div>
                   
                   <div className='w-full sm:w-2/3'>
@@ -401,11 +417,11 @@ export default function Index({ role, organization, fixedAssets, status, searchF
                       setSelected={(selected) => handleSelectedAccount(selected)}
                       maxHeight='max-h-40'
                       placeholder='Cari Akun'
-                      id='credit_account_id'
-                      isError={errors?.credit_account?.id ? true : false}
+                      id='debit_account_id'
+                      isError={errors?.debit_account ? true : false}
                     />
                     {
-                      errors?.credit_account?.id && <span className='text-red-500 text-xs'>{errors.credit_account.id}</span>
+                      errors?.debit_account && <span className='text-red-500 text-xs'>{errors.debit_account}</span>
                     }
                   </div>
                 </div>
