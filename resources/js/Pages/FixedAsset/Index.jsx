@@ -85,16 +85,17 @@ export default function Index({ role, organization, fixedAssets, status, searchF
   }
 
   const handleDisposal = (fixedAsset) => {
-    // console.log(fixedAsset.lifetime);
-    let lifetime = parseInt(fixedAsset.lifetime);
+    let tempData = {...data, 
+      'id': fixedAsset.id,
+      'no_ref' : fixedAsset.code,
+      'name': fixedAsset.name,
+      'description' : '',
+      'value_in_book' : fixedAsset.value - fixedAsset.depreciation_accumulated,
+      'lifetime' : fixedAsset.lifetime
+    };
+
+    setData(tempData);
     setShowDisposal(true);
-    setData({...data, 
-      'id' : fixedAsset.id,
-      'name' : fixedAsset.name,
-      'description' : fixedAsset.disposal_description || '',
-      'lifetime' : lifetime,
-      'value_in_book' : fixedAsset.value - fixedAsset.depreciation_accumulated
-    });
 
   }
 
@@ -118,6 +119,11 @@ export default function Index({ role, organization, fixedAssets, status, searchF
       }, 
       preserveScroll: true
     })
+  }
+
+  const handleChangeDesctription = (e) => {
+    // console.log(e.target.value);
+    setData('description', e.target.value)
   }
 
   const handleSubmitDisposal = (e) => {
@@ -368,12 +374,12 @@ export default function Index({ role, organization, fixedAssets, status, searchF
                   <TextInput 
                     id="description"
                     name='decription'
-                    className={`w-full ${errors?.description && 'border-red-500'}`}
-                    
+                    className={`w-full ${errors?.description ? 'border-red-500' :''}`}
                     placeholder='Keterangan'
                     value={data.description}
-                    onChange={(e) => setData('decription', e.target.value.toUpperCase())}
-                    disabled
+                    onChange={(e) => setData('description' ,e.target.value.toUpperCase())}
+
+                    // onChange={(e) => handleChangeDesctription(e)}
                   />
                   {
                     errors?.decription && <span className='text-red-500 text-xs'>{errors.decription}</span>
@@ -382,7 +388,7 @@ export default function Index({ role, organization, fixedAssets, status, searchF
               </div>
 
               {
-                (data.lifetime = 0 || data.value_in_book > 0) && 
+                (data.value_in_book > 0 || data.lifetime == 0) && 
                 <div className='flex flex-col sm:flex-row justify-between gap-1'>
                   <div className='w-full sm:w-1/3 my-auto'>
                     <InputLabel value={'Akun Kredit'} htmlFor='credit_account_id' className=' mx-auto my-auto'/>
