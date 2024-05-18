@@ -40,6 +40,7 @@ class DepreciationCron extends Command
                 // bandingkan waktu sekarang dan bulan (tanggal) aset diadakan
                 $formatedMonths = Carbon::parse($fixedAsset['date']);
 
+                
 
             }
 
