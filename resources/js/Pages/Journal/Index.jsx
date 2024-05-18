@@ -157,7 +157,6 @@ export default function Index({startDate, endDate, journals, role, organization,
 	}
 
 	const handleReloadPage = () => {
-    console.log();
 		router.reload({
 			only: ['journals'],
 			data: {

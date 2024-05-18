@@ -62,12 +62,12 @@ class FixedAssetController extends Controller
         $this->now = CarbonImmutable::now();
     }
 
-    protected function newRef($organization, $dateRequest = '')
+    protected function newRef($organization, $dateRequest = '', $code)
     {
         $now = $this->now;
         $date = $dateRequest ?? $now->isoFormat('YYYY-MM-DD');
         $dateRef = Carbon::create($date);
-        $refHeader = "HT-" . $dateRef->isoFormat('YYYY') . $dateRef->isoFormat('MM');
+        $refHeader = $code . $dateRef->isoFormat('YYYY') . $dateRef->isoFormat('MM');
         $newRef = $refHeader . '001';
 
         $fixedAsset = FixedAsset::whereOrganizationId($organization['id'])
@@ -77,7 +77,7 @@ class FixedAssetController extends Controller
                             ->last();
 
         if ($fixedAsset) {
-            $newRef = NewRef::create("HT-", $fixedAsset['code']);
+            $newRef = NewRef::create($code, $fixedAsset['code']);
         }
 
         return $newRef;
@@ -89,8 +89,11 @@ class FixedAssetController extends Controller
     {
         $user = Auth::user();
 
-        $fixedAssets = FixedAsset::filter(request(['search', 'status']))
+        $disposal = request('disposal') == "true" ? true : false;
+
+        $fixedAssets = FixedAsset::filter(request(['search', 'start_date', 'end_date']))
                                 ->whereOrganizationId($organization['id'])
+                                ->where('is_disposed', $disposal)
                                 ->orderBy('date', 'desc')
                                 ->paginate(50);
 
@@ -98,7 +101,7 @@ class FixedAssetController extends Controller
             'organization' => $organization,
             'fixedAssets' => $fixedAssets,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
-            'status' => request('status') == "true" ? true : false,
+            'disposal' => $disposal,
             'accounts' => Account::filter(request(['account']))
                                     ->whereIsActive(true)
                                     ->whereOrganizationId($organization['id'])
@@ -117,7 +120,7 @@ class FixedAssetController extends Controller
         return Inertia::render('FixedAsset/Create', [
             'organization' => $organization,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
-            'newRef' => $this->newRef($organization, request('date')),
+            'newRef' => $this->newRef($organization, request('date'), "HT-"),
             'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
             'accounts' => Account::filter(request(['account']))
                                     ->whereIsActive(true)
@@ -376,7 +379,7 @@ class FixedAssetController extends Controller
             'creditAccount' => Account::find($fixedAsset['credit_account']),
             'fixedAssetCategory' => FixedAssetCategory::find($fixedAsset['fixed_asset_category_id']),
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
-            'newRef' => $this->newRef($organization, request('date')),
+            'newRef' => $this->newRef($organization, request('date'), "HT-"),
             'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
             'accounts' => Account::filter(request(['account']))
                                     ->whereIsActive(true)
@@ -733,6 +736,8 @@ class FixedAssetController extends Controller
 
     public function disposal(Request $request, Organization $organization, FixedAsset $fixedAsset)
     {
+        $user = Auth::user();
+
         $validated = $request->validate([ 
             'description' => "string|nullable",
         ]);
@@ -774,14 +779,39 @@ class FixedAssetController extends Controller
             [
                 'id' => $depreciationAccumulationAccount['id'],
                 'code' => $depreciationAccumulationAccount['code'],
-                'debit' => $fixedAsset['value'] - $fixedAsset['depreciation_accumulated'],
+                'debit' => $fixedAsset['depreciation_accumulated'],
                 'credit' => 0,
                 'is_cash' => 0,
             ], );
-    
         }
 
+        $validated['date'] = $this->now->isoFormat("YYYY-MM-DD");
+        $validated['description'] = 'PELEPASAN HARTA TETAP: ' . $fixedAsset['name'];
+        $validated['no_ref'] = $this->newRef($organization, $this->now->isoFormat("YYYY-MM-DD"), "DHT-");
+        $validated['value'] = $fixedAsset['value'];
+        $validated['organization_id'] = $organization['id'];
+        $validated['user_id'] = $user['id'];
 
-        dd($validated);
+        $journal = $this->journalRepository->store($validated);
+
+        $fixedAsset->update([
+            'status' => false,
+            'depreciation_accumulated' => $fixedAsset['lifetime'] ? $fixedAsset['value'] : $fixedAsset['depreciation_accumulated'],
+            'is_disposed' => true,
+            'disposal_date' => $validated['date'],
+            'disposal_ref' => $validated['no_ref'],
+            'disposal_description' => $validated['description'],
+            'disposal_journal_id' => $journal['id'],
+        ]);
+        
+        $log = [
+            'name' => $fixedAsset['name'],
+            'code' => $fixedAsset['code'],
+            'value' => $fixedAsset['value'],
+        ];  
+
+        $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah melakukan DISPOISI HARTA TETAP, data : ' . json_encode($log));
+
+        return redirect()->back();
     }
 }

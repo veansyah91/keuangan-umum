@@ -18,14 +18,6 @@ class DashboardController extends Controller
 
     public function joinArray($array)
     {   
-        // $result = array_reduce($array, function($carry, $item){ 
-        //     if(!isset($carry[$item['name']])){ 
-        //         $carry[$item['name']] = ['name'=>$item['name'],'total'=>(int)$item['total']]; 
-        //     } else { 
-        //         (int)$carry[$item['name']]['total'] += (int)$item['total']; 
-        //     } 
-        //     return $carry; 
-        // });
         $result = [];
         foreach ($array as $item) {
             $group = $item['name'];
@@ -115,7 +107,7 @@ class DashboardController extends Controller
 
             $costDay[$i] = [
                 'date' => $i + 1,
-                'value' => abs($balance->where('code', '>=', '500000000')->where('code', '<', '700000000')->where('date',$new->format('Y-m-d'))->sum('total'))
+                'value' => abs($balance->where('code', '>=', '500000000')->where('code', '<', '800000000')->where('date',$new->format('Y-m-d'))->sum('total'))
             ];
 
             $cashflowDay[$i] = [
@@ -131,7 +123,7 @@ class DashboardController extends Controller
         }
 
         $revenues = $lostProfit->where('code', '>=', '400000000')->where('code', '<', '500000000')->toArray();
-        $costs = $lostProfit->where('code', '>=', '500000000')->where('code', '<', '700000000')->toArray();
+        $costs = $lostProfit->where('code', '>=', '500000000')->where('code', '<', '800000000')->toArray();
 
         $revenues = $this->joinArray($revenues);
         $costs = $this->joinArray($costs); 

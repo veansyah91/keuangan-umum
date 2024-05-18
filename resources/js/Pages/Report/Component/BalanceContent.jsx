@@ -46,7 +46,7 @@ export default function BalanceContent({title, ledgers, showCode, type, amount})
         <div className='uppercase font-bold w-full text-lg'>{title}</div>  
         {
         ledgers.map((ledger, index) => 
-        (ledger.code >= range.start && ledger.code <= range.end) && 
+        (ledger.code >= range.start && ledger.code <= range.end && Math.abs(parseInt(ledger.total)) > 0) && 
         <div className='flex w-full justify-between my-2' key={index}>
             <div className={`w-6/12 print:w-8/12 uppercase flex gap-2 ${showCode ? 'pl-0' : 'pl-2'}`}>
             <div className={`w-1/3 text-end ${showCode ? 'block' : 'hidden'}`}>{ledger.code}</div>

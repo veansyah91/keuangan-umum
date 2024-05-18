@@ -25,12 +25,15 @@ import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
 import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 
-export default function Index({ role, organization, fixedAssets, status, searchFilter, startDate, endDate, flash, accounts }) {
-  // console.log(fixedAssets);
-
+export default function Index({ role, organization, fixedAssets, disposal, searchFilter, startDate, endDate, flash, accounts }) {
   const [search, setSearch] = useState(searchFilter || '');
+  const [debounceValue] = useDebounce(search, 500);
+
+  const [disposalStatus, setDisposalStatus] = useState(disposal || false);
+
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [showDisposal, setShowDisposal] = useState(false);
+  const [showFilter, setShowFilter] = useState(false);
 
   const {data, setData, delete: destroy, patch, errors, setError, processing, reset} = useForm({
     'id': null,
@@ -53,7 +56,11 @@ export default function Index({ role, organization, fixedAssets, status, searchF
 	const [dateValue, setDateValue] = useState({
 		startDate: startDate || '', 
 		endDate: endDate || ''
-	});
+  	});
+
+	const [debounceDateValue] = useDebounce(dateValue, 500);
+
+	const prevSearch = usePrevious(search);  
 
   const [selectedAccount, setSelectedAccount] = useState(
     {id: null, name: '', code: '', is_cash:true},
@@ -67,7 +74,26 @@ export default function Index({ role, organization, fixedAssets, status, searchF
     });
   },[])
 
+  useEffect(() => {
+		if(prevSearch!==undefined) {
+      handleReloadPage();
+    }
+	},[debounceValue, debounceDateValue]);
+
 	// function
+  const handleReloadPage = () => {
+		router.reload({
+			only: ['fixedAssets'],
+			data: {
+                search, 
+                'start_date' : dateValue.startDate, 
+                'end_date' : dateValue.endDate,
+                'disposal' : disposalStatus
+            },
+			preserveState: true
+		})
+	}
+
 	const handleDateValueChange = (newValue) => {
     setDateValue(newValue); 
   }
@@ -136,7 +162,7 @@ export default function Index({ role, organization, fixedAssets, status, searchF
         toast.success(`Harta Tetap Berhasil Dihapus`, {
           position: toast.POSITION.TOP_CENTER
         });
-        setShowDeleteConfirmation(false);
+        setShowDisposal(false);
 
         reset();
       },
@@ -148,6 +174,12 @@ export default function Index({ role, organization, fixedAssets, status, searchF
       }, 
       preserveScroll: true
     })
+  }
+  const handleSubmitFilter = (e) => {
+    e.preventDefault();
+    setShowFilter(false);
+    handleReloadPage();
+    
   }
 
   const handleSelectedAccount = (selected) => {
@@ -196,7 +228,7 @@ export default function Index({ role, organization, fixedAssets, status, searchF
         }
         data={fixedAssets}
         hasFilter={true}
-        showFilter={() => setShowModalFilter(true)}
+        showFilter={() => setShowFilter(true)}
         hasDate={true}
         dateValue={dateValue}
         onChangeDate={handleDateValueChange}
@@ -210,6 +242,7 @@ export default function Index({ role, organization, fixedAssets, status, searchF
             handleDelete={() => handleDelete(fixedAsset)}
             handleDisposal={() => handleDisposal(fixedAsset)}
             role={role}
+            disposalStatus={disposalStatus}
           />
         )
       }
@@ -230,7 +263,7 @@ export default function Index({ role, organization, fixedAssets, status, searchF
               }
             </div>
             <div className='my-auto w-4/12 flex gap-5'>
-              <button className='py-2 px-3 border rounded-lg' onClick={() => setShowModalFilter(true)}><IoFilter /></button>
+              <button className='py-2 px-3 border rounded-lg' onClick={() => setShowFilter(true)}><IoFilter /></button>
               <Datepicker
                 value={dateValue} 
                 onChange={handleDateValueChange} 
@@ -301,7 +334,10 @@ export default function Index({ role, organization, fixedAssets, status, searchF
                       <th className='bg-gray-200 text-end'>Penyusutan Perbulan</th>
                       <th className='bg-gray-200 text-end'>Akumulasi Penyusutan</th>
                       <th className='bg-gray-200 text-end'>Nilai Buku</th>
-                      <th className='bg-gray-200'></th>
+                      {
+                        !disposalStatus && 
+                        <th className='bg-gray-200'></th>
+                      }
                     </tr>
                   </thead>
                   <tbody>
@@ -314,6 +350,7 @@ export default function Index({ role, organization, fixedAssets, status, searchF
                         handleDelete={() => handleDelete(fixedAsset)}
                         handleDisposal={() => handleDisposal(fixedAsset)}
                         role={role}
+                        disposalStatus={disposalStatus}
                       />
                     )
                   }
@@ -426,17 +463,66 @@ export default function Index({ role, organization, fixedAssets, status, searchF
                   </div>
                 </div>
               }
+
+              <div className='justify-between gap-1 text-sm italic'>
+                <div className='mt-10'>
+                  Catatan:
+                </div>
+                <div>
+                  Pastikan melakukan Disposisi Harta Tetap telah dipertimbangkan, Harta Tetap yang telah dilakukan Disposisi tidak dapat dibatalkan!
+                </div>
+              </div>
               
             </div>
 
             <div className="mt-6 flex justify-end">
               <SecondaryButton onClick={() => setShowDisposal(false)}>Batal</SecondaryButton>
 
-              <DangerButton className="ms-3" 
+              <PrimaryButton className="ms-3" 
                 disabled={processing}
                 >
-                Hapus
-              </DangerButton>
+                Disposal
+              </PrimaryButton>
+            </div>
+          </form>
+        </Modal>
+
+        {/* filter */}
+        <Modal show={showFilter} onClose={() => setShowFilter(false)}>
+          <form 
+            onSubmit={handleSubmitFilter} 
+            className="p-6"
+            id='filterForm'
+            name='filterForm'
+          >
+            <h2 className="text-lg font-medium text-gray-900">
+              Filter Data
+            </h2>
+            <div className='mt-5 space-y-2'>
+              <div className='w-1/3'> 
+                <div className="form-control ">
+                  <label className="label cursor-pointer gap-2" htmlFor={`is_cash`}>
+                      <input 
+                        type="checkbox" 
+                        className="checkbox" 
+                        id={`is_cash`}
+                        value={disposalStatus}
+                        onChange={() => setDisposalStatus(!disposalStatus)}
+                        checked={disposalStatus}
+                      />
+                      <span className="label-text font-bold">Disposal Aset</span> 
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end">
+              <SecondaryButton onClick={() => setShowFilter(false)}>Batal</SecondaryButton>
+
+              <PrimaryButton className="ms-3" 
+                >
+                Filter
+              </PrimaryButton>
             </div>
           </form>
         </Modal>
