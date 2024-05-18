@@ -18,6 +18,9 @@ class UserHasOrganization
      */
     public function handle(Request $request, Closure $next): Response
     {
+        if (config('app.env') === 'local') {
+            return $next($request);
+        }
         $user = Auth::user();
         $organizationParameter = $request->route()->parameters('organization');
         $organizationParameterCollection = collect($organizationParameter);

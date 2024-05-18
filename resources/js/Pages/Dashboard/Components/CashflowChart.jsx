@@ -32,8 +32,6 @@ const CustomToolTip = (props) => {
 export default function CashflowChart({ data }) {
   const { date } = useContext(AppContext);
 
-  console.log(data);
-
   return (
     <div className='mt-2 bg-white p-2 mx-2 rounded-lg border flex gap-2 pt-3'>
       {/* Bulanan */}

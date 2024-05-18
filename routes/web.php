@@ -114,8 +114,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     
     Route::middleware([
-            // 'user.has.organization:{parameter}', 
-            // 'is.not.expired:{parameter}',
+            'user.has.organization:{parameter}', 
+            'is.not.expired:{parameter}',
         ])->group(function () {
 
         //Dashboard
