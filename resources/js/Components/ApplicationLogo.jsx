@@ -3,7 +3,7 @@ export default function ApplicationLogo(props) {
         <img 
             src="/img/logo.png"
             alt="logo"
-            width={90}
+            width={50}
         />
     );
 }
