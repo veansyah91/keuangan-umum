@@ -118,6 +118,7 @@ export default function LostProfit({organization, ledgers, startDateFilter, endD
   const handlePrint = () => {
     window.print();
   }
+  console.log(cost);
   return (
     <>
       <Head title={`Laporan Laba Rugi Periode : ${dayjs(startDate).format('MMMM DD, YYYY')} - ${dayjs(endDate).format('MMMM DD, YYYY')}`} />
@@ -305,7 +306,7 @@ export default function LostProfit({organization, ledgers, startDateFilter, endD
                     </div>
                   </div> 
                   {
-                    cost.depreciated > 0 || cost.other > 0 && 
+                    (cost.depreciated > 0 || cost.other > 0) && 
                     <div className='flex w-full justify-between py-2 font-bold'>
                       <div className='w-5/12 print:w-8/12 uppercase flex gap-2'>
                         Laba Bersih Setelah Biaya Lain
