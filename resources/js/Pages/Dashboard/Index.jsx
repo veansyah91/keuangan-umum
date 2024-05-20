@@ -104,7 +104,7 @@ const Index = ({ balance, startDate, endDate }) => {
                     IDR {isLoading ? 0 : formatNumber(balance?.currentAsset + balance?.fixedAsset)}
                   </div>
                 </Card.Header>
-                <Card.Content className={'flex gap-3'}>
+                <Card.Content className={'sm:flex sm:space-y-0 space-y-2 sm:gap-3'}>
                   <Card className={'shadow'}>
                     <Card.Header>
                       Harta Lancar
@@ -132,7 +132,7 @@ const Index = ({ balance, startDate, endDate }) => {
                     IDR {isLoading ? 0 : formatNumber(balance?.currentAsset + balance?.fixedAsset)}
                   </div>
                 </Card.Header>
-                <Card.Content className={'flex gap-3'}>
+                <Card.Content className={'sm:flex sm:space-y-0 space-y-2 sm:gap-3'}>
                   <Card className={'shadow'}>
                     <Card.Header>
                       Kewajiban

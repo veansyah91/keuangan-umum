@@ -8,8 +8,8 @@ export default function Guest({ children }) {
                 <img 
                     src="/img/logo.png"
                     alt="logo"
-                    width={150}
-                    className='mx-auto -my-2'
+                    width={125}
+                    className='mx-auto mb-2 pb-2'
                 />
                 <Link href='/'>
                     <h2 className='font-bold text-[#4f8315] text-4xl'>Keuangan Umum</h2>
