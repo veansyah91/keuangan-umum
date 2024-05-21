@@ -48,6 +48,7 @@ use App\Http\Controllers\Admin\AdminOrganizationInvoiceController;
 */
 
 Route::get('/', function () {
+    return redirect(route('organization'));
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
