@@ -90,7 +90,6 @@ export default function Index({villages, provinces, regencies, districts, search
 
     const handleSubmitImport = (e) => {
         e.preventDefault();
-        console.log(data);
         post(route('admin.data-master.village.post'),{
             onSuccess: () => {
                 reset();
