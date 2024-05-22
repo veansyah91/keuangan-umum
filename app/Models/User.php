@@ -45,11 +45,11 @@ class User extends Authenticatable implements MustVerifyEmail
 
     //Overrideen sendEmailVerificationNotification implementation
 
-    public function sendEmailVerificationNotification()
-    {
-        //dispactches the job to the queue passing it this User object
-         QueuedVerifyEmailJob::dispatch($this);
-    }
+    // public function sendEmailVerificationNotification()
+    // {
+    //     //dispactches the job to the queue passing it this User object
+    //      QueuedVerifyEmailJob::dispatch($this);
+    // }
     
     protected $casts = [
         'email_verified_at' => 'datetime',
