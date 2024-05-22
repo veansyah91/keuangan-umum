@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Journal;
 use Laravel\Sanctum\HasApiTokens;
+use App\Jobs\QueuedVerifyEmailJob;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -40,6 +41,16 @@ class User extends Authenticatable implements MustVerifyEmail
      *
      * @var array<string, string>
      */
+
+
+    //Overrideen sendEmailVerificationNotification implementation
+
+    public function sendEmailVerificationNotification()
+    {
+        //dispactches the job to the queue passing it this User object
+         QueuedVerifyEmailJob::dispatch($this);
+    }
+    
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
