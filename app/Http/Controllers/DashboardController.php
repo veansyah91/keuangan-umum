@@ -52,7 +52,7 @@ class DashboardController extends Controller
                             ->where('ledgers.organization_id',$organization['id'])
                             ->where('ledgers.is_approved', true)
                             ->select('ledgers.date', 'account_id', 'accounts.code', DB::raw('SUM(debit) - SUM(credit) as total'))
-                            ->groupBy('account_id', 'ledgers.date')
+                            ->groupBy('account_id', 'ledgers.date', 'accounts.code')
                             ->orderBy('accounts.code')
                             ->orderBy('ledgers.date')
                             ->get();
@@ -66,7 +66,7 @@ class DashboardController extends Controller
                                 ->where('ledgers.is_approved', true)
                                 ->where('accounts.code', '>=', '400000000')
                                 ->select('ledgers.account_id', 'accounts.code','accounts.name', 'ledgers.date', DB::raw('SUM(debit) - SUM(credit) as total'))
-                                ->groupBy('ledgers.account_id', 'ledgers.date')
+                                ->groupBy('ledgers.account_id', 'ledgers.date', 'accounts.code')
                                 ->orderBy('accounts.code')
                                 ->orderBy('ledgers.date')
                                 ->get();
