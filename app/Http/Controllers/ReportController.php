@@ -89,14 +89,12 @@ class ReportController extends Controller
                                 ->select('accounts.code as code','accounts.name as name', 'account_id', 'accounts.can_be_deleted', DB::raw('SUM(debit) - SUM(credit) as total'))
                                 ->orderBy('accounts.code')
                                 ->orderBy('total', 'desc')
-                                ->groupBy('account_id')
+                                ->groupBy('account_id', 'accounts.code', 'accounts.name', 'accounts.can_be_deleted')
                                 ->get();
 
         $account = Account::whereOrganizationId($organization['id'])
                             ->whereCanBeDeleted(false)
                             ->first();
-
-                            // dd($ledgers);
 
         return Inertia::render('Report/Balance', [
             'organization' => $organization,
@@ -123,7 +121,7 @@ class ReportController extends Controller
                                 ->select('accounts.code as code','accounts.name as name','account_id',DB::raw('SUM(debit) - SUM(credit) as total'))
                                 ->orderBy('accounts.code')
                                 ->orderBy('total', 'desc')
-                                ->groupBy('account_id')
+                                ->groupBy('account_id','accounts.code', 'accounts.name')
                                 ->get();
 
         return Inertia::render('Report/LostProfit', [
@@ -286,7 +284,7 @@ class ReportController extends Controller
                                 ->where('journals.is_approved', true)
                                 ->select('accounts.code as code','accounts.name as name', 'account_id', 'accounts.can_be_deleted', DB::raw('SUM(ledgers.debit) as endDebit'), DB::raw('SUM(ledgers.credit) as endCredit'))
                                 ->orderBy('accounts.code')
-                                ->groupBy('account_id')
+                                ->groupBy('account_id', 'accounts.name', 'accounts.can_be_deleted')
                                 ->get();
 
         $lostProfits = Ledger::join('accounts', 'ledgers.account_id', '=', 'accounts.id')
