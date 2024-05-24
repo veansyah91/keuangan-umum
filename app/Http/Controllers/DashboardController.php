@@ -66,7 +66,7 @@ class DashboardController extends Controller
                                 ->where('ledgers.is_approved', true)
                                 ->where('accounts.code', '>=', '400000000')
                                 ->select('ledgers.account_id', 'accounts.code','accounts.name', 'ledgers.date', DB::raw('SUM(debit) - SUM(credit) as total'))
-                                ->groupBy('ledgers.account_id', 'ledgers.date', 'accounts.code')
+                                ->groupBy('ledgers.account_id', 'ledgers.date', 'accounts.code','accounts.name')
                                 ->orderBy('accounts.code')
                                 ->orderBy('ledgers.date')
                                 ->get();
