@@ -61,7 +61,7 @@ class ReportController extends Controller
                             ->select('accounts.code as code','accounts.name as name','category','account_id',DB::raw('SUM(debit) - SUM(credit) as total'))
                             ->orderBy('accounts.code')
                             ->orderBy('total', 'desc')
-                            ->groupBy('account_id', 'category')
+                            ->groupBy('account_id', 'category', 'accounts.code', 'accounts.name')
                             ->get();
 
         return Inertia::render('Report/Cashflow', [
@@ -284,7 +284,7 @@ class ReportController extends Controller
                                 ->where('journals.is_approved', true)
                                 ->select('accounts.code as code','accounts.name as name', 'account_id', 'accounts.can_be_deleted', DB::raw('SUM(ledgers.debit) as endDebit'), DB::raw('SUM(ledgers.credit) as endCredit'))
                                 ->orderBy('accounts.code')
-                                ->groupBy('account_id', 'accounts.name', 'accounts.can_be_deleted')
+                                ->groupBy('account_id', 'accounts.name', 'accounts.can_be_deleted', 'accounts.code')
                                 ->get();
 
         $lostProfits = Ledger::join('accounts', 'ledgers.account_id', '=', 'accounts.id')
@@ -298,7 +298,7 @@ class ReportController extends Controller
                                 ->where('journals.is_approved', true)
                                 ->select('accounts.code as code','accounts.name as name', 'account_id', 'accounts.can_be_deleted', DB::raw('SUM(ledgers.debit) as tempDebit'), DB::raw('SUM(ledgers.credit) as tempCredit'), DB::raw('SUM(ledgers.debit) as endDebit'), DB::raw('SUM(ledgers.credit) as endCredit'))
                                 ->orderBy('accounts.code')
-                                ->groupBy('account_id')
+                                ->groupBy('account_id', 'accounts.code', 'accounts.name', 'accounts.can_be_deleted')
                                 ->get();
 
         
