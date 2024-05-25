@@ -95,12 +95,12 @@ export default function Index({auth, organizations, searchFilter}) {
                     <Header>
                         <div className='bg-white overflow-hidden shadow-sm sm:rounded-t-lg'>
                             <div className='sm:p-6 px-6 py-3 text-gray-800 flex-none sm:flex'>
-                                <div className='sm:hidden text-gray-800 flex'>
-                                    <div className="w-1/2 my-auto">
-                                        Daftar Organisasi 
+                                <div className='sm:hidden text-gray-800 flex flex-col-reverse gap-5'>
+                                    <div className="my-auto">
+                                        Daftar Organisasi / Bisnis
                                         
                                     </div>
-                                    <div className="flex flex-row-reverse w-1/2 text-end">
+                                    <div className="flex flex-row-reverse text-end">
                                         <div>
                                             <div className='text-gray-400 text-sm'>
                                                 {auth.user.name}
@@ -117,7 +117,7 @@ export default function Index({auth, organizations, searchFilter}) {
                                     </div>                                    
                                 </div>
                                 <div className='sm:flex-1 my-auto sm:block hidden'>
-                                    Daftar Organisasi
+                                    Daftar Organisasi / Bisnis
                                 </div>
                                 <div className='sm:flex-1 sm:block hidden text-end text-gray-800'>
                                     <div className="flex flex-row-reverse">
