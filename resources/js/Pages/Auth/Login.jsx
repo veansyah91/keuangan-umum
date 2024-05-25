@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Checkbox from '@/Components/Checkbox';
 import GuestLayout from '@/Layouts/GuestLayout';
 import InputError from '@/Components/InputError';
@@ -13,6 +13,8 @@ export default function Login({ status, canResetPassword }) {
         password: '',
         remember: false,
     });
+
+    const [showPassword, setShowPassword] = useState(false);
 
     useEffect(() => {
         return () => {
@@ -51,11 +53,11 @@ export default function Login({ status, canResetPassword }) {
                 </div>
 
                 <div className='mt-4'>
-                    <InputLabel htmlFor='password' value='Password' />
+                    <InputLabel htmlFor='password' value='Sandi' />
 
                     <TextInput
                         id='password'
-                        type='password'
+                        type={showPassword ? 'text' : 'password'}
                         name='password'
                         value={data.password}
                         className='mt-1 block w-full'
@@ -69,11 +71,11 @@ export default function Login({ status, canResetPassword }) {
                         <div className='block'>
                             <label className='flex items-center'>
                                 <Checkbox
-                                    name='remember'
-                                    checked={data.remember}
-                                    onChange={(e) => setData('remember', e.target.checked)}
+                                    name='show'
+                                    checked={showPassword}
+                                    onChange={(e) => setShowPassword(!showPassword)}
                                 />
-                                <span className='ms-2 text-sm text-gray-600'>Ingat Saya</span>
+                                <span className='ms-2 text-sm text-gray-600'>Tampilkan Sandi</span>
                             </label>
                         </div>
                         {canResetPassword && (

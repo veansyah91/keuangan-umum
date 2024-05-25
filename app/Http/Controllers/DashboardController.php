@@ -107,7 +107,7 @@ class DashboardController extends Controller
 
             $costDay[$i] = [
                 'date' => $i + 1,
-                'value' => abs($balance->where('code', '>=', '500000000')->where('code', '<', '800000000')->where('date',$new->format('Y-m-d'))->sum('total'))
+                'value' => abs($balance->where('code', '>=', '500000000')->where('code', '<', '700000000')->where('date',$new->format('Y-m-d'))->sum('total'))
             ];
 
             $cashflowDay[$i] = [
@@ -123,7 +123,9 @@ class DashboardController extends Controller
         }
 
         $revenues = $lostProfit->where('code', '>=', '400000000')->where('code', '<', '500000000')->toArray();
-        $costs = $lostProfit->where('code', '>=', '500000000')->where('code', '<', '800000000')->toArray();
+        $costs = $lostProfit->where('code', '>=', '500000000')
+                            ->where('code', '<', '700000000')                 
+                            ->toArray();
 
         $revenues = $this->joinArray($revenues);
         $costs = $this->joinArray($costs); 

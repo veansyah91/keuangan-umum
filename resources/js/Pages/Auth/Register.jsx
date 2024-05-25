@@ -1,10 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import GuestLayout from '@/Layouts/GuestLayout';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import { Head, Link, useForm } from '@inertiajs/react';
+import Checkbox from '@/Components/Checkbox';
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -13,6 +14,8 @@ export default function Register() {
         password: '',
         password_confirmation: '',
     });
+
+    const [showPassword, setShowPassword] = useState(false);
 
     useEffect(() => {
         return () => {
@@ -66,11 +69,11 @@ export default function Register() {
                 </div>
 
                 <div className='mt-4'>
-                    <InputLabel htmlFor='password' value='Password' />
+                    <InputLabel htmlFor='password' value='Sandi' />
 
                     <TextInput
                         id='password'
-                        type='password'
+                        type={showPassword ? 'text' : 'password'}
                         name='password'
                         value={data.password}
                         className='mt-1 block w-full'
@@ -83,11 +86,11 @@ export default function Register() {
                 </div>
 
                 <div className='mt-4'>
-                    <InputLabel htmlFor='password_confirmation' value='Konfirmasi Password' />
+                    <InputLabel htmlFor='password_confirmation' value='Konfirmasi Sandi' />
 
                     <TextInput
                         id='password_confirmation'
-                        type='password'
+                        type={showPassword ? 'text' : 'password'}
                         name='password_confirmation'
                         value={data.password_confirmation}
                         className='mt-1 block w-full'
@@ -97,6 +100,17 @@ export default function Register() {
                     />
 
                     <InputError message={errors.password_confirmation} className='mt-2' />
+                </div>
+
+                <div className='block mt-4'>
+                    <label className='flex items-center'>
+                        <Checkbox
+                            name='show'
+                            checked={showPassword}
+                            onChange={(e) => setShowPassword(!showPassword)}
+                        />
+                        <span className='ms-2 text-sm text-gray-600'>Tampilkan Sandi</span>
+                    </label>
                 </div>
 
                 <div className='flex items-center justify-end mt-4'>

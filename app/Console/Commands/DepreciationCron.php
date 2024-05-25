@@ -70,7 +70,7 @@ class DepreciationCron extends Command
                 $diffDepreciation = ($diff * $fixedAsset['depreciation_value']) - $fixedAsset['depreciation_accumulated'];
 
                 // bandingkan nilai akumulasi sekarang dan akumulasi seharusnya
-                if ($diffDepreciation > 0) {
+                if ($diffDepreciation > $fixedAsset['residu']) {
                     $depreciationValue = $fixedAsset['depreciation_value'];
 
                     if ($diffDepreciation < $depreciationValue) {
@@ -115,10 +115,7 @@ class DepreciationCron extends Command
                     $journalRepository->store($validated);      
                     
                     \Log::info("Penyusutan Harta Tetap " .  $fixedAsset['name']);
-                }
-
-                
-                
+                }               
 
             }
 
