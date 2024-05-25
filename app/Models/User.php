@@ -52,10 +52,10 @@ class User extends Authenticatable implements MustVerifyEmail
     //      QueuedVerifyEmailJob::dispatch($this);
     // }
 
-    public function sendEmailVerificationNotification()
-    {
-        $this->notify(new VerifyEmailQueued);
-    }
+    // public function sendEmailVerificationNotification()
+    // {
+    //     $this->notify(new VerifyEmailQueued);
+    // }
 
     protected $casts = [
         'email_verified_at' => 'datetime',
