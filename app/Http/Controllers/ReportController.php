@@ -300,7 +300,6 @@ class ReportController extends Controller
                                 ->orderBy('accounts.code')
                                 ->groupBy('account_id', 'accounts.code', 'accounts.name', 'accounts.can_be_deleted')
                                 ->get();
-
         
 
         $lostProfitBefore = Ledger::join('accounts', 'ledgers.account_id', '=', 'accounts.id')
