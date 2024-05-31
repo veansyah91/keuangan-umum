@@ -5,8 +5,10 @@ namespace App\Models;
 use App\Models\Journal;
 use Laravel\Sanctum\HasApiTokens;
 use App\Jobs\QueuedVerifyEmailJob;
+use App\Jobs\QueuedPasswordResetJob;
 use App\Notifications\VerifyEmailQueued;
 use Illuminate\Notifications\Notifiable;
+use App\Notifications\ResetPasswordQueued;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -55,6 +57,17 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendEmailVerificationNotification()
     {
         $this->notify(new VerifyEmailQueued);
+    }
+
+    // public function sendEmailResetPasswordNotification($token)
+    // {
+    //     $this->notify(new ResetPasswordQueued($token));
+    // }
+
+    public function sendPasswordResetNotification($token)
+    {
+        //dispactches the job to the queue passing it this User object
+        QueuedPasswordResetJob::dispatch($this,$token);
     }
 
     protected $casts = [

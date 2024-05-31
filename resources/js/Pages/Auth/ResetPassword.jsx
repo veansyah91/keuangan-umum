@@ -5,6 +5,7 @@ import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import { Head, useForm } from '@inertiajs/react';
+import Checkbox from '@/Components/Checkbox';
 
 export default function ResetPassword({ token, email }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -13,6 +14,8 @@ export default function ResetPassword({ token, email }) {
         password: '',
         password_confirmation: '',
     });
+
+    const [showPassword, setShowPassword] = useState(false);
 
     useEffect(() => {
         return () => {
@@ -52,7 +55,7 @@ export default function ResetPassword({ token, email }) {
 
                     <TextInput
                         id='password'
-                        type='password'
+                        type={showPassword ? 'text' : 'password'}
                         name='password'
                         value={data.password}
                         className='mt-1 block w-full'
@@ -64,11 +67,22 @@ export default function ResetPassword({ token, email }) {
                     <InputError message={errors.password} className='mt-2' />
                 </div>
 
+                <div className='block mt-4'>
+                    <label className='flex items-center'>
+                        <Checkbox
+                            name='show'
+                            checked={showPassword}
+                            onChange={(e) => setShowPassword(!showPassword)}
+                        />
+                        <span className='ms-2 text-sm text-gray-600'>Tampilkan Sandi</span>
+                    </label>
+                </div>
+
                 <div className='mt-4'>
                     <InputLabel htmlFor='password_confirmation' value='Confirm Password' />
 
                     <TextInput
-                        type='password'
+                        type={showPassword ? 'text' : 'password'}
                         name='password_confirmation'
                         value={data.password_confirmation}
                         className='mt-1 block w-full'
