@@ -30,7 +30,8 @@ class Organization extends Model
                             'district_id',                            
                             'village',
                             'village_id',
-                            'slug'
+                            'slug',
+                            'is_profit'
                         ];
 
     public function users(): BelongsToMany
