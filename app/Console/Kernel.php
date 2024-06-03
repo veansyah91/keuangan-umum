@@ -19,8 +19,8 @@ class Kernel extends ConsoleKernel
                     ->daily();
                     // ->everyMinute();
         $schedule->command('deactiveOrganization:cron')
-                    ->daily();
-                    // ->everyMinute();
+                    // ->daily();
+                    ->everyMinute();
     }
 
     /**

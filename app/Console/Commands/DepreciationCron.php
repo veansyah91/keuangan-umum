@@ -53,7 +53,7 @@ class DepreciationCron extends Command
     public function handle()
     {
         try {
-            // \Log::info("Depreciation Schedule Cron job Berhasil di jalankan " . date('Y-m-d H:i:s'));
+            \Log::info("Depreciation Schedule Cron job Berhasil di jalankan " . date('Y-m-d H:i:s'));
             $fixedAssets = FixedAsset::where('is_disposed', false)
                                     ->whereColumn('value', '<>', 'depreciation_accumulated')
                                     ->get();
@@ -113,8 +113,6 @@ class DepreciationCron extends Command
                     ];
 
                     $journalRepository->store($validated);      
-                    
-                    \Log::info("Penyusutan Harta Tetap " .  $fixedAsset['name']);
                 }               
 
             }

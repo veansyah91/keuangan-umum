@@ -2,6 +2,9 @@
 
 namespace App\Console\Commands;
 
+use Carbon\Carbon;
+use Carbon\CarbonImmutable;
+use App\Models\Organization;
 use Illuminate\Console\Command;
 
 class DeactiveOrganizationCron extends Command
@@ -27,5 +30,27 @@ class DeactiveOrganizationCron extends Command
     {
         // Sample
         \Log::info("Cron job Deactive Organization di jalankan " . date('Y-m-d H:i:s'));
+
+            $now = CarbonImmutable::now();
+            $organizations = Organization::where('status', '<>', 'deactive')->get();
+
+            foreach ($organizations as $organization) {
+                $formatedMonths = Carbon::parse($organization['expired']);
+                $diff = $formatedMonths->diffInMonths($now);
+
+                
+                if ($diff > 2) {
+                    \Log::info($diff);
+                    $organization->update([
+                        'status' => 'deactive'
+                    ]);
+                    \Log::info($organization);
+
+                }
+            
+            }
+
+        // \Log::info($organizations);
+
     }
 }
