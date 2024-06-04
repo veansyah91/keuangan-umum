@@ -10,8 +10,11 @@ import Datepicker from 'react-tailwindcss-datepicker';
 import dayjs from 'dayjs';
 import { Disclosure, Transition } from '@headlessui/react';
 import BalanceContent from './Component/BalanceContent';
+import InputLabel from '@/Components/InputLabel';
+import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
+import { IoTrashOutline } from 'react-icons/io5/index.esm';
 
-export default function Balance({organization, ledgers, endDateFilter, account}) {
+export default function Balance({organization, ledgers, endDateFilter, account, projects, programs, departments, project, program, department}) {
 
   const [dataLedgers, setDataLedgers] = useState([]);
   const [endDate, setEndDate] = useState(endDateFilter || '');
@@ -31,12 +34,53 @@ export default function Balance({organization, ledgers, endDateFilter, account})
 
   const [isLoading, setIsLoading] = useState(false);
 
+  const [selectedProject, setSelectedProject] = useState({
+    id: project ? project.id : null, name: project? project.name : '', code: project? project.code : ''
+  });
+
+  const [projectError, setProjectedError] = useState('');
+
+  const [selectedProgram, setSelectedProgram] = useState({
+    id: program ? program.id : null, name: program? program.name : '', code: program? program.code : ''
+  });
+  const [programError, setProgramedError] = useState('');
+
+  const [selectedDepartment, setSelectedDepartment] = useState({
+    id: department ? department.id : null, name: department? department.name : '', code: department? department.code : ''
+  });
+  const [departmentError, setDepartmentedError] = useState('');
+
+
   // useEffect
   useEffect(() => {
     functionSetData(ledgers, account);
   },[])
 
   // function 
+  const handleSelectedProgram = (selected) => {
+    setSelectedProgram(selected);
+  }
+
+  const handleDeleteSelectedProgram = () => {
+    setSelectedProgram({id: null, name: '', code: ''});
+  }
+
+  const handleSelectedProject = (selected) => {
+    setSelectedProject(selected);
+  }
+
+  const handleDeleteSelectedProject = () => {
+    setSelectedProject({id: null, name: '', code: ''});
+  }
+
+  const handleSelectedDepartment = (selected) => {
+    setSelectedDepartment(selected);
+  }
+
+  const handleDeleteSelectedDepartment = () => {
+    setSelectedDepartment({id: null, name: '', code: ''});
+  }
+
   const functionSetData = (ledgers, account) => {
     let tempAsset = 0;
     let tempLiability = 0;
@@ -100,7 +144,10 @@ export default function Balance({organization, ledgers, endDateFilter, account})
     router.reload({
       only: ['ledgers', 'account'],
       data: {
-        endDate
+        endDate,
+        'program' : selectedProgram.id,
+        'project' : selectedProject.id,
+        'department' : selectedDepartment.id,
       },
       onBefore: visit => {
         visit.completed ? setIsLoading(false) : setIsLoading(true);
@@ -174,6 +221,120 @@ export default function Balance({organization, ledgers, endDateFilter, account})
                   leaveTo="transform scale-95 opacity-0"
                 >
                   <Disclosure.Panel>
+                  {
+                    (programs.length > 0 || projects.length > 0 || departments.length) ?
+                    <div className='flex flex-col sm:flex-row justify-start gap-3 sm:py-5 mb-3'>                    
+                      {
+                        programs.length > 0 &&
+                        <div className='sm:w-1/3 w-full text-slate-900 space-y-2'>
+                          <div>
+                            <InputLabel value={'Program Kegiatan'} htmlFor='program'/>
+                          </div>
+                          <div className='flex w-full relative'>
+                            <div className='w-5/6'>
+                              <ClientSelectInput
+                                resources={programs}
+                                selected={selectedProgram}
+                                setSelected={(selected) => handleSelectedProgram(selected)}
+                                maxHeight='max-h-40'
+                                placeholder='Cari Program Kegiatan'
+                                isError={programError ? true : false}
+                                id='program'
+                              />
+                              {
+                                selectedProgram.id && 
+                                <span className='text-xs absolute'>Kode: {selectedProgram.code}</span>
+                              }
+                              
+                            </div>
+                            {
+                              selectedProgram.id && 
+                              <div className='w-1/6 my-auto'>
+                                <button 
+                                type='button' className='text-red-500 text-xl hover:bg-slate-200 rounded-full p-2'
+                                  onClick={handleDeleteSelectedProgram}
+                                >
+                                  <IoTrashOutline />
+                                </button>
+                              </div> 
+                            }                    
+                          </div>
+                        </div>
+                      }
+                      {
+                        projects.length > 0 &&
+                        <div className='sm:w-1/3 w-full text-slate-900 space-y-2'>
+                          <div>
+                            <InputLabel value={'Proyek'} htmlFor='project'/>
+                          </div>
+                          <div className='flex w-full relative'>
+                            <div className='w-5/6'>
+                              <ClientSelectInput
+                                resources={projects}
+                                selected={selectedProject}
+                                setSelected={(selected) => handleSelectedProject(selected)}
+                                maxHeight='max-h-40'
+                                placeholder='Cari Proyek'
+                                isError={projectError ? true : false}
+                                id='project'
+                              />
+                              {
+                                selectedProject.id && 
+                                <span className='text-xs absolute'>Kode: {selectedProject.code}</span>
+                              }
+                            </div>
+                            {
+                              selectedProject.id && 
+                              <div className='w-1/6 my-auto'>
+                                <button 
+                                type='button' className='text-red-500 text-xl hover:bg-slate-200 rounded-full p-2'
+                                  onClick={handleDeleteSelectedProject}
+                                >
+                                  <IoTrashOutline />
+                                </button>
+                              </div> 
+                            }  
+                          </div>
+                        </div>
+                      }
+                      {
+                        departments.length > 0 &&
+                        <div className='sm:w-1/3 w-full text-slate-900 space-y-2'>
+                          <div>
+                            <InputLabel value={'Departemen'} htmlFor='department'/>
+                          </div>
+                          <div className='flex w-full relative'>
+                            <div className='w-5/6'>
+                              <ClientSelectInput
+                                resources={departments}
+                                selected={selectedDepartment}
+                                setSelected={(selected) => handleSelectedDepartment(selected)}
+                                maxHeight='max-h-40'
+                                placeholder='Cari Departemen'
+                                isError={departmentError ? true : false}
+                                id='department'
+                              />
+                              {
+                                selectedDepartment.id && 
+                                <span className='text-xs absolute'>Kode: {selectedDepartment.code}</span>
+                              }
+                            </div>
+                            {
+                              selectedDepartment.id && 
+                              <div className='w-1/6 my-auto'>
+                                <button 
+                                type='button' className='text-red-500 text-xl hover:bg-slate-200 rounded-full p-2'
+                                  onClick={handleDeleteSelectedDepartment}
+                                >
+                                  <IoTrashOutline />
+                                </button>
+                              </div> 
+                            }  
+                          </div>
+                        </div>
+                      }
+                    </div> : ''
+                  }
                   <div className='flex flex-col sm:flex-row justify-start gap-3 sm:py-5 mb-3'>
                     <div className="form-control">
                       <label className="label cursor-pointer gap-2" htmlFor='checkbox'>
@@ -217,8 +378,37 @@ export default function Balance({organization, ledgers, endDateFilter, account})
                 <div className='text-xs'>{organization.village}, {organization.district}, {organization.regency}, {organization.province}</div>
             </div>
           </div>
-          <div className='w-full text-end italic mt-3 hidden print:block'>
-            Periode : {dayjs(endDate).format('MMMM DD, YYYY')}
+          <div className='w-full mt-3 hidden print:flex print:justify-between'>
+            
+            <div className='text-end italic '>
+              Periode : {dayjs(endDate).format('MMMM DD, YYYY')}
+            </div>
+            <div className='text-xs my-auto'>
+              {
+                (programs.length > 0 || projects.length > 0 || departments.length) ?
+                <div>
+                  {
+                    selectedProgram.name &&
+                    <div>
+                      Program Kegiatan: {selectedProgram.code}-{selectedProgram.name.toUpperCase()}
+                    </div>
+                  }
+                  {
+                    selectedProject &&
+                    <div>
+                      Proyek : {selectedProject.code}-{selectedProject.name.toUpperCase()}
+                    </div>
+                  }
+                  {
+                    selectedDepartment.name  &&
+                    <div>
+                      Departemen : {selectedDepartment.code}-{selectedDepartment.name.toUpperCase()}
+                    </div>
+                  }
+                </div> : ''
+              }
+            </div>
+            
           </div>
 
           {/* Content */}          

@@ -48,11 +48,17 @@ class ReportController extends Controller
 
         }
         $startCashflow = Cashflow::whereOrganizationId($organization['id'])
+                                    ->whereHas('journal', function ($query){
+                                        $query->filter(request(['project', 'program', 'department']));
+                                    })
                                     ->where('date', '<', request('startDate') ?? '')
                                     ->select(DB::raw('SUM(debit) - SUM(credit) as total'))
                                     ->first();
 
         $cashflows = Cashflow::join('accounts', 'cashflows.account_id', '=', 'accounts.id')
+                            ->whereHas('journal', function ($query){
+                                $query->filter(request(['project', 'program', 'department']));
+                            })
                             ->where(function($query){
                                 $query->where('cashflows.date', '>=', request('startDate') ?? '')
                                             ->where('cashflows.date', '<=', request('endDate') ?? '');
@@ -71,6 +77,15 @@ class ReportController extends Controller
             'startCashflow' => $startCashflow,
             'startDateFilter' => request('startDate'),
             'endDateFilter' => request('endDate'),
+            'projects' => Project::whereOrganizationId($organization['id'])
+                                    ->get(),
+            'programs' => Program::whereOrganizationId($organization['id'])
+                            ->get(),
+            'departments' => Department::whereOrganizationId($organization['id'])
+                                        ->get(),
+            'program' => Program::find(request('program')),
+            'project' => Project::find(request('project')),
+            'department' => Department::find(request('department')),
         ]);
     }
 
@@ -80,6 +95,9 @@ class ReportController extends Controller
 
         $ledgers = Ledger::join('accounts', 'ledgers.account_id', '=', 'accounts.id')
                                 ->join('journals', 'ledgers.journal_id', '=', 'journals.id')
+                                ->whereHas('journal', function ($query){
+                                    $query->filter(request(['project', 'program', 'department']));
+                                })
                                 ->where(function($query){
                                     $query->where('ledgers.date', '<=', request('endDate') ?? '');
                                 })
@@ -101,7 +119,16 @@ class ReportController extends Controller
             'ledgers' => $ledgers,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'endDateFilter' => request('endDate'),
-            'account' => $account
+            'account' => $account,
+            'projects' => Project::whereOrganizationId($organization['id'])
+                                    ->get(),
+            'programs' => Program::whereOrganizationId($organization['id'])
+                            ->get(),
+            'departments' => Department::whereOrganizationId($organization['id'])
+                                        ->get(),
+            'program' => Program::find(request('program')),
+            'project' => Project::find(request('project')),
+            'department' => Department::find(request('department')),
         ]);
     }
 
@@ -111,6 +138,9 @@ class ReportController extends Controller
 
         $ledgers = Ledger::join('accounts', 'ledgers.account_id', '=', 'accounts.id')
                                 ->join('journals', 'ledgers.journal_id', '=', 'journals.id')
+                                ->whereHas('journal', function ($query){
+                                    $query->filter(request(['project', 'program', 'department']));
+                                })
                                 ->where(function($query){
                                     $query->where('ledgers.date', '>=', request('startDate') ?? '')
                                                 ->where('ledgers.date', '<=', request('endDate') ?? '');
@@ -130,6 +160,15 @@ class ReportController extends Controller
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'startDateFilter' => request('startDate'),
             'endDateFilter' => request('endDate'),
+            'projects' => Project::whereOrganizationId($organization['id'])
+                                    ->get(),
+            'programs' => Program::whereOrganizationId($organization['id'])
+                            ->get(),
+            'departments' => Department::whereOrganizationId($organization['id'])
+                                        ->get(),
+            'program' => Program::find(request('program')),
+            'project' => Project::find(request('project')),
+            'department' => Department::find(request('department')),
         ]);
     }
 
@@ -280,6 +319,11 @@ class ReportController extends Controller
                                     $query ->where('ledgers.date', '<=', request('endDate') ?? '');
                                 })
                                 ->where('ledgers.organization_id',$organization['id'])
+                                ->where(function($query){
+                                    $query->when(request('project') ?? false, function($query){
+                                        $query->where('ledgers.project_id');
+                                    });
+                                })
                                 ->where('accounts.code', '<', '400000000')
                                 ->where('journals.is_approved', true)
                                 ->select('accounts.code as code','accounts.name as name', 'account_id', 'accounts.can_be_deleted', DB::raw('SUM(ledgers.debit) as endDebit'), DB::raw('SUM(ledgers.credit) as endCredit'))
@@ -294,6 +338,11 @@ class ReportController extends Controller
                                             ->where('ledgers.date', '<=', request('endDate') ?? '');
                                 })
                                 ->where('ledgers.organization_id',$organization['id'])
+                                ->where(function($query){
+                                    $query->when(request('project') ?? false, function($query){
+                                        $query->where('ledgers.project_id');
+                                    });
+                                })
                                 ->where('accounts.code', '>=', '400000000')
                                 ->where('journals.is_approved', true)
                                 ->select('accounts.code as code','accounts.name as name', 'account_id', 'accounts.can_be_deleted', DB::raw('SUM(ledgers.debit) as tempDebit'), DB::raw('SUM(ledgers.credit) as tempCredit'), DB::raw('SUM(ledgers.debit) as endDebit'), DB::raw('SUM(ledgers.credit) as endCredit'))
@@ -308,6 +357,11 @@ class ReportController extends Controller
                                         $query ->where('ledgers.date', '<', request('startDate') ?? '');
                                     })
                                     ->where('ledgers.organization_id',$organization['id'])
+                                    ->where(function($query){
+                                        $query->when(request('project') ?? false, function($query){
+                                            $query->where('ledgers.project_id');
+                                        });
+                                    })
                                     ->where('accounts.code', '>=', '400000000')
                                     ->where('journals.is_approved', true)
                                     ->select(DB::raw('SUM(ledgers.debit) - SUM(ledgers.credit) as value'))
@@ -328,6 +382,11 @@ class ReportController extends Controller
                                     ->where(function($query){
                                         $query ->where('ledgers.date', '>=', request('startDate') ?? '')
                                                 ->where('ledgers.date', '<=', request('endDate') ?? '');
+                                    })
+                                    ->where(function($query){
+                                        $query->when(request('project') ?? false, function($query){
+                                            $query->where('ledgers.project_id');
+                                        });
                                     })
                                     ->where('ledgers.account_id',$balance['account_id'])
                                     ->where('journals.is_approved', true)
@@ -403,7 +462,16 @@ class ReportController extends Controller
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'startDateFilter' => request('startDate'),
             'endDateFilter' => request('endDate'),
-            
+            'projects' => Project::whereOrganizationId($organization['id'])
+                                    ->get(),
+            'programs' => Program::whereOrganizationId($organization['id'])
+                            ->get(),
+            'departments' => Department::whereOrganizationId($organization['id'])
+                                        ->get(),
+            'program' => Program::find(request('program')),
+            'project' => Project::find(request('project')),
+            'department' => Department::find(request('department')),
+            'account' => Account::find(request('account')),
         ]);
     }
 }

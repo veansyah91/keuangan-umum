@@ -389,7 +389,7 @@ class CashoutController extends Controller
             'no_ref' => [
                 'required',
                 'string', 
-                Rule::unique('cashOuts')->where(function ($query) use ($request, $organization){
+                Rule::unique('cashouts')->where(function ($query) use ($request, $organization){
                     return $query->where('organization_id', $organization['id']);
                 })->ignore($cashOut['id'])              
             ],

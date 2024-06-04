@@ -3,11 +3,6 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
 import { Head, Link } from '@inertiajs/react';
 import ContainerDesktop from '@/Components/Desktop/ContainerDesktop';
-import CardMenu from '@/Components/CardMenu';
-import { IoIdCardOutline, IoPeopleOutline } from 'react-icons/io5';
-import { MdChecklist } from "react-icons/md";
-import { LiaClipboardListSolid } from "react-icons/lia";
-import { CgListTree } from "react-icons/cg";
 
 export default function Index({organization}) {
   return (

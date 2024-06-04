@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('organizations', function (Blueprint $table) {
             $table->boolean('is_profit')->default(false);
+            $table->string('type')->default('basic'); //basic, business
         });
     }
 
@@ -22,7 +23,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('organizations', function (Blueprint $table) {
-            $table->drop('is_profit');
+            $table->dropColumn('is_profit');
+            $table->dropColumn('type');
         });
     }
 };

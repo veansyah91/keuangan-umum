@@ -213,145 +213,150 @@ export default function Ledger({ledgers, accounts, startedValue, organization, s
               </button>
             </div>
           </div>
-          <Disclosure as="div" className='mt-3 print:hidden'>
-            {({ open }) => (
-              <>
-                <Transition
-                  enter="transition duration-100 ease-out"
-                  enterFrom="transform scale-95 opacity-0"
-                  enterTo="transform scale-100 opacity-100"
-                  leave="transition duration-75 ease-out"
-                  leaveFrom="transform scale-100 opacity-100"
-                  leaveTo="transform scale-95 opacity-0"
-                >
-                  <Disclosure.Panel>
-                  <div className='flex flex-col sm:flex-row justify-start gap-3 sm:py-5 mb-3'>                    
-                    {
-                      programs.length > 0 &&
-                      <div className='sm:w-1/3 w-full text-slate-900 space-y-2'>
-                        <div>
-                          <InputLabel value={'Program Kegiatan'} htmlFor='program'/>
-                        </div>
-                        <div className='flex w-full relative'>
-                          <div className='w-5/6'>
-                            <ClientSelectInput
-                              resources={programs}
-                              selected={selectedProgram}
-                              setSelected={(selected) => handleSelectedProgram(selected)}
-                              maxHeight='max-h-40'
-                              placeholder='Cari Program Kegiatan'
-                              isError={programError ? true : false}
-                              id='program'
-                            />
+
+          {
+            (programs.length > 0 || projects.length > 0 || departments.length ) ?
+            <Disclosure as="div" className='mt-3 print:hidden'>
+              {({ open }) => (
+                <>
+                  <Transition
+                    enter="transition duration-100 ease-out"
+                    enterFrom="transform scale-95 opacity-0"
+                    enterTo="transform scale-100 opacity-100"
+                    leave="transition duration-75 ease-out"
+                    leaveFrom="transform scale-100 opacity-100"
+                    leaveTo="transform scale-95 opacity-0"
+                  >
+                    <Disclosure.Panel>
+                    <div className='flex flex-col sm:flex-row justify-start gap-3 sm:py-5 mb-3'>                    
+                      {
+                        programs.length > 0 &&
+                        <div className='sm:w-1/3 w-full text-slate-900 space-y-2'>
+                          <div>
+                            <InputLabel value={'Program Kegiatan'} htmlFor='program'/>
+                          </div>
+                          <div className='flex w-full relative'>
+                            <div className='w-5/6'>
+                              <ClientSelectInput
+                                resources={programs}
+                                selected={selectedProgram}
+                                setSelected={(selected) => handleSelectedProgram(selected)}
+                                maxHeight='max-h-40'
+                                placeholder='Cari Program Kegiatan'
+                                isError={programError ? true : false}
+                                id='program'
+                              />
+                              {
+                                selectedProgram.id && 
+                                <span className='text-xs absolute'>Kode: {selectedProgram.code}</span>
+                              }
+                              
+                            </div>
                             {
                               selectedProgram.id && 
-                              <span className='text-xs absolute'>Kode: {selectedProgram.code}</span>
-                            }
-                            
+                              <div className='w-1/6 my-auto'>
+                                <button 
+                                type='button' className='text-red-500 text-xl hover:bg-slate-200 rounded-full p-2'
+                                  onClick={handleDeleteSelectedProgram}
+                                >
+                                  <IoTrashOutline />
+                                </button>
+                              </div> 
+                            }                    
                           </div>
-                          {
-                            selectedProgram.id && 
-                            <div className='w-1/6 my-auto'>
-                              <button 
-                              type='button' className='text-red-500 text-xl hover:bg-slate-200 rounded-full p-2'
-                                onClick={handleDeleteSelectedProgram}
-                              >
-                                <IoTrashOutline />
-                              </button>
-                            </div> 
-                          }                    
                         </div>
-                      </div>
-                    }
-                    {
-                      projects.length > 0 &&
-                      <div className='sm:w-1/3 w-full text-slate-900 space-y-2'>
-                        <div>
-                          <InputLabel value={'Proyek'} htmlFor='project'/>
-                        </div>
-                        <div className='flex w-full relative'>
-                          <div className='w-5/6'>
-                            <ClientSelectInput
-                              resources={projects}
-                              selected={selectedProject}
-                              setSelected={(selected) => handleSelectedProject(selected)}
-                              maxHeight='max-h-40'
-                              placeholder='Cari Proyek'
-                              isError={projectError ? true : false}
-                              id='project'
-                            />
+                      }
+                      {
+                        projects.length > 0 &&
+                        <div className='sm:w-1/3 w-full text-slate-900 space-y-2'>
+                          <div>
+                            <InputLabel value={'Proyek'} htmlFor='project'/>
+                          </div>
+                          <div className='flex w-full relative'>
+                            <div className='w-5/6'>
+                              <ClientSelectInput
+                                resources={projects}
+                                selected={selectedProject}
+                                setSelected={(selected) => handleSelectedProject(selected)}
+                                maxHeight='max-h-40'
+                                placeholder='Cari Proyek'
+                                isError={projectError ? true : false}
+                                id='project'
+                              />
+                              {
+                                selectedProject.id && 
+                                <span className='text-xs absolute'>Kode: {selectedProject.code}</span>
+                              }
+                            </div>
                             {
                               selectedProject.id && 
-                              <span className='text-xs absolute'>Kode: {selectedProject.code}</span>
-                            }
+                              <div className='w-1/6 my-auto'>
+                                <button 
+                                type='button' className='text-red-500 text-xl hover:bg-slate-200 rounded-full p-2'
+                                  onClick={handleDeleteSelectedProject}
+                                >
+                                  <IoTrashOutline />
+                                </button>
+                              </div> 
+                            }  
                           </div>
-                          {
-                            selectedProject.id && 
-                            <div className='w-1/6 my-auto'>
-                              <button 
-                              type='button' className='text-red-500 text-xl hover:bg-slate-200 rounded-full p-2'
-                                onClick={handleDeleteSelectedProject}
-                              >
-                                <IoTrashOutline />
-                              </button>
-                            </div> 
-                          }  
                         </div>
-                      </div>
-                    }
-                    {
-                      departments.length > 0 &&
-                      <div className='sm:w-1/3 w-full text-slate-900 space-y-2'>
-                        <div>
-                          <InputLabel value={'Departemen'} htmlFor='department'/>
-                        </div>
-                        <div className='flex w-full relative'>
-                          <div className='w-5/6'>
-                            <ClientSelectInput
-                              resources={departments}
-                              selected={selectedDepartment}
-                              setSelected={(selected) => handleSelectedDepartment(selected)}
-                              maxHeight='max-h-40'
-                              placeholder='Cari Departemen'
-                              isError={departmentError ? true : false}
-                              id='department'
-                            />
+                      }
+                      {
+                        departments.length > 0 &&
+                        <div className='sm:w-1/3 w-full text-slate-900 space-y-2'>
+                          <div>
+                            <InputLabel value={'Departemen'} htmlFor='department'/>
+                          </div>
+                          <div className='flex w-full relative'>
+                            <div className='w-5/6'>
+                              <ClientSelectInput
+                                resources={departments}
+                                selected={selectedDepartment}
+                                setSelected={(selected) => handleSelectedDepartment(selected)}
+                                maxHeight='max-h-40'
+                                placeholder='Cari Departemen'
+                                isError={departmentError ? true : false}
+                                id='department'
+                              />
+                              {
+                                selectedDepartment.id && 
+                                <span className='text-xs absolute'>Kode: {selectedDepartment.code}</span>
+                              }
+                            </div>
                             {
                               selectedDepartment.id && 
-                              <span className='text-xs absolute'>Kode: {selectedDepartment.code}</span>
-                            }
+                              <div className='w-1/6 my-auto'>
+                                <button 
+                                type='button' className='text-red-500 text-xl hover:bg-slate-200 rounded-full p-2'
+                                  onClick={handleDeleteSelectedDepartment}
+                                >
+                                  <IoTrashOutline />
+                                </button>
+                              </div> 
+                            }  
                           </div>
-                          {
-                            selectedDepartment.id && 
-                            <div className='w-1/6 my-auto'>
-                              <button 
-                              type='button' className='text-red-500 text-xl hover:bg-slate-200 rounded-full p-2'
-                                onClick={handleDeleteSelectedDepartment}
-                              >
-                                <IoTrashOutline />
-                              </button>
-                            </div> 
-                          }  
                         </div>
-                      </div>
-                    }
-                  </div>
-                  </Disclosure.Panel>
-                </Transition>
-                <Disclosure.Button className="flex w-full justify-between rounded-lg bg-slate-100 px-4 py-2 text-left text-sm font-medium text-slate-900 hover:bg-slate-200 focus:outline-none focus-visible:ring focus-visible:ring-slate-500/75">
-                  <div className='flex justify-center w-full gap-3'>
-                    <span>Tampilkan Lebih { open ? 'Sedikit' : 'Banyak' }</span>
-                    <IoChevronUpCircleOutline
-                      className={`${
-                        open ? '' : 'rotate-180 transform'
-                      } h-5 w-5 text-slate-500`}
-                    />
-                  </div>
-                  
-                </Disclosure.Button>
-              </>
-            )}
-          </Disclosure>
+                      }
+                    </div>
+                    </Disclosure.Panel>
+                  </Transition>
+                  <Disclosure.Button className="flex w-full justify-between rounded-lg bg-slate-100 px-4 py-2 text-left text-sm font-medium text-slate-900 hover:bg-slate-200 focus:outline-none focus-visible:ring focus-visible:ring-slate-500/75">
+                    <div className='flex justify-center w-full gap-3'>
+                      <span>Tampilkan Lebih { open ? 'Sedikit' : 'Banyak' }</span>
+                      <IoChevronUpCircleOutline
+                        className={`${
+                          open ? '' : 'rotate-180 transform'
+                        } h-5 w-5 text-slate-500`}
+                      />
+                    </div>
+                    
+                  </Disclosure.Button>
+                </>
+              )}
+            </Disclosure> : ''
+          }
+
           <div className='sm:hidden w-full'>
             <PrimaryButton disabled={(!selectedAccount.id || !startDate || !endDate || startDate > endDate || isLoading)} onClick={handleReload} className='w-full'>
               <div className='text-center w-full'>

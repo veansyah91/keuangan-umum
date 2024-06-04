@@ -9,8 +9,12 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import Datepicker from 'react-tailwindcss-datepicker';
 import dayjs from 'dayjs';
 import TrialBalanceContent from './Component/TrialBalanceContent';
+import { Disclosure, Transition } from '@headlessui/react';
+import InputLabel from '@/Components/InputLabel';
+import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
+import { IoChevronUpCircleOutline, IoTrashOutline } from 'react-icons/io5/index.esm';
 
-export default function TrialBalance({ organization, balances, lostProfits, total, startDateFilter, endDateFilter }) {
+export default function TrialBalance({ organization, balances, lostProfits, total, startDateFilter, endDateFilter, departments, projects, programs, department, project, program}) {
   const [dataBalances, setDataBalances] = useState(balances || []);
   const [dataLostProfits, setDataLostProfits] = useState(lostProfits || []);
   const [dataTotal, setDataTotal] = useState(total || []);
@@ -29,9 +33,47 @@ export default function TrialBalance({ organization, balances, lostProfits, tota
 
   const [isLoading, setIsLoading] = useState(false);
 
+  const [selectedProject, setSelectedProject] = useState({
+    id: project ? project.id : null, name: project? project.name : '', code: project? project.code : ''
+  });
+  const [projectError, setProjectedError] = useState('');
+
+  const [selectedProgram, setSelectedProgram] = useState({
+    id: program ? program.id : null, name: program? program.name : '', code: program? program.code : ''
+  });
+  const [programError, setProgramedError] = useState('');
+
+  const [selectedDepartment, setSelectedDepartment] = useState({
+    id: department ? department.id : null, name: department? department.name : '', code: department? department.code : ''
+  });
+  const [departmentError, setDepartmentedError] = useState('');
+
   // useEffect
   
   // function 
+  const handleSelectedProgram = (selected) => {
+    setSelectedProgram(selected);
+  }
+
+  const handleDeleteSelectedProgram = () => {
+    setSelectedProgram({id: null, name: '', code: ''});
+  }
+
+  const handleSelectedProject = (selected) => {
+    setSelectedProject(selected);
+  }
+
+  const handleDeleteSelectedProject = () => {
+    setSelectedProject({id: null, name: '', code: ''});
+  }
+
+  const handleSelectedDepartment = (selected) => {
+    setSelectedDepartment(selected);
+  }
+
+  const handleDeleteSelectedDepartment = () => {
+    setSelectedDepartment({id: null, name: '', code: ''});
+  }
   const handleStartDateValueChange = (newValue) => {
     setStartDateValue(newValue);
     setStartDate(newValue.startDate);
@@ -46,7 +88,10 @@ export default function TrialBalance({ organization, balances, lostProfits, tota
     router.reload({
       only: ['balances', 'lostProfits', 'total'],
       data: {
-        startDate, endDate
+        startDate, endDate,
+        'program' : selectedProgram.id,
+        'project' : selectedProject.id,
+        'department' : selectedDepartment.id,
       },
       onBefore: visit => {
         visit.completed ? setIsLoading(false) : setIsLoading(true);
