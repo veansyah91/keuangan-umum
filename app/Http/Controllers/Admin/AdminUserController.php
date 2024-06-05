@@ -31,8 +31,6 @@ class AdminUserController extends Controller
             ];
         });
 
-        // dd($this->codeRecomendation(request('name')));
-
         return Inertia::render('Admin/User/Index', [
             'users' => $users,
             'userCollections' => $userCollection,
