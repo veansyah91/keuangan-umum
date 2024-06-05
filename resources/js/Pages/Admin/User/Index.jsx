@@ -1,4 +1,4 @@
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import React, { useEffect, useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
@@ -19,10 +19,6 @@ import ContentDesktop from '@/Components/Desktop/ContentDesktop';
 import { IoEllipsisVertical, IoTrash } from 'react-icons/io5/index.esm';
 import { GiTakeMyMoney } from "react-icons/gi";
 
-const affiliateName = (name) => {
-
-}
-
 function Index({users, userCollections, searchFilter, affiliateCoderecommendation}) {
     const [showSearch, setShowSearch] = useState(false);
     const [showFilter, setShowFilter] = useState(false);
@@ -37,6 +33,12 @@ function Index({users, userCollections, searchFilter, affiliateCoderecommendatio
     const [debounceDateValue] = useDebounce(dateValue, 500);
 
     const prevSearch = usePrevious(search);
+
+    const { data, setData, patch } = useForm({
+        'id': null,
+        'name' : '',
+        'affiliatedCode' : ''
+    })
 
     useEffect(() => {
         if(prevSearch!==undefined) {
@@ -66,11 +68,16 @@ function Index({users, userCollections, searchFilter, affiliateCoderecommendatio
 
     const handleSetAffiliation = (user) => {
         console.log(user);
-
+        let newCode = user.name.replace(/\s+/g, '');
+        setData({
+            'id': user.id,
+            'name': user.name,
+            'affiliatedCode' : newCode.toUpperCase()
+        }); 
         router.reload({
             only: ['affiliateCoderecommendation'],
             data: {
-                'name' : user.name
+                'name' : newCode.toUpperCase()
             },
             onSuccess : () => {
                 console.log(affiliateCoderecommendation);

@@ -25,7 +25,7 @@ function Edit({ auth, mustVerifyEmail, status }) {
                                 <Header>Profil</Header>
                             </div>
                             <div>
-                                <Link className='text-slate-900 border border-slate-500 px-2 py-1 hover:bg-slate-100 rounded-lg' href={route('logout')} method='post' as='button'>
+                                <Link className='text-slate-900 border border-slate-500 px-2 py-1 hover:bg-red-500 hover:text-white hover:border-none rounded-lg' href={route('logout')} method='post' as='button'>
                                     Log Out
                                 </Link> 
                             </div>
