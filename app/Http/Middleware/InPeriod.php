@@ -18,6 +18,7 @@ class InPeriod
         // saat ini diasumsukan bahwa periode buku adalah dari tanggal 1 januari - 31 desember
         // jika dilakukan penulisan, pengubahan atau penhapusan data berbeda tahun, maka akan return ke halaman index
         dd('in period');
+
         return $next($request);
     }
 }

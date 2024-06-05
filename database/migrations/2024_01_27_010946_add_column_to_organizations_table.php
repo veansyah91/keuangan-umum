@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::table('organizations', function (Blueprint $table) {
             $table->string('province')->nullable();
             $table->string('regency')->nullable();
-            $table->string('district')->nullable();    
-            $table->string('village')->nullable();          
+            $table->string('district')->nullable();
+            $table->string('village')->nullable();
         });
     }
 

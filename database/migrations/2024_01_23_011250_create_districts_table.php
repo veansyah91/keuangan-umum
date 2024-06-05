@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('districts', function (Blueprint $table) {
             $table->string('id')->primary();
             $table->string('name');
-            // $table->string('regency_id');          
+            // $table->string('regency_id');
             // $table->foreign('regency_id')->references('id')->on('regencies');
             $table->foreignUuid('regency_id')->constrained()->cascadeOnDelete();
         });

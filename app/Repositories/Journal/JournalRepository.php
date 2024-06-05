@@ -2,9 +2,9 @@
 
 namespace App\Repositories\Journal;
 
-use App\Models\Ledger;
-use App\Models\Journal;
 use App\Models\Cashflow;
+use App\Models\Journal;
+use App\Models\Ledger;
 
 class JournalRepository implements JournalRepositoryInterface
 {
@@ -37,23 +37,23 @@ class JournalRepository implements JournalRepositoryInterface
                 }
             }
         }
-        
+
         // create cashflow
         if ($isCash) {
             foreach ($validated['accounts'] as $account) {
-                if (!$account['is_cash']) {
+                if (! $account['is_cash']) {
                     $validated['account_id'] = $account['id'];
                     $validated['debit'] = $account['credit'];
                     $validated['credit'] = $account['debit'];
-                    
+
                     $validated['category'] = 'operating';
 
                     $firstChar = substr($account['code'], 0, 2);
-                    if ((int)$firstChar > 26 && (int)$firstChar < 40) {
+                    if ((int) $firstChar > 26 && (int) $firstChar < 40) {
                         $validated['category'] = 'financing';
                     }
 
-                    if ((int)$firstChar > 15 && (int)$firstChar < 20) {
+                    if ((int) $firstChar > 15 && (int) $firstChar < 20) {
                         $validated['category'] = 'investing';
                     }
 
@@ -61,10 +61,11 @@ class JournalRepository implements JournalRepositoryInterface
                 }
             }
         }
+
         return $journal;
     }
 
-    public function update($validated, $journal): void 
+    public function update($validated, $journal): void
     {
         // update journal
         $journal->update($validated);
@@ -80,7 +81,7 @@ class JournalRepository implements JournalRepositoryInterface
         foreach ($cashflows as $cashflow) {
             $cashflow->delete();
         }
-        
+
         $validated['journal_id'] = $journal['id'];
         $isCash = false;
         $cashDebit = 0;
@@ -104,23 +105,23 @@ class JournalRepository implements JournalRepositoryInterface
                 }
             }
         }
-        
+
         // create cashflow
         if ($isCash) {
             foreach ($validated['accounts'] as $account) {
-                if (!$account['is_cash']) {
+                if (! $account['is_cash']) {
                     $validated['account_id'] = $account['id'];
                     $validated['debit'] = $account['credit'];
                     $validated['credit'] = $account['debit'];
-                    
+
                     $validated['category'] = 'operating';
 
                     $firstChar = substr($account['code'], 0, 2);
-                    if ((int)$firstChar > 26 && (int)$firstChar < 40) {
+                    if ((int) $firstChar > 26 && (int) $firstChar < 40) {
                         $validated['category'] = 'financing';
                     }
 
-                    if ((int)$firstChar > 15 && (int)$firstChar < 20) {
+                    if ((int) $firstChar > 15 && (int) $firstChar < 20) {
                         $validated['category'] = 'investing';
                     }
 
@@ -129,5 +130,4 @@ class JournalRepository implements JournalRepositoryInterface
             }
         }
     }
-
 }

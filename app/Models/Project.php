@@ -2,27 +2,25 @@
 
 namespace App\Models;
 
-use App\Models\User;
-use App\Models\Organization;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Project extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-                            'name',
-                            'code',
-                            'description',
-                            'start_date',
-                            'end_date',
-                            'status',
-                            'estimated_value',
-                            'organization_id',
-                            'user_id'
-                        ];
+        'name',
+        'code',
+        'description',
+        'start_date',
+        'end_date',
+        'status',
+        'estimated_value',
+        'organization_id',
+        'user_id',
+    ];
 
     public function organization(): BelongsTo
     {
@@ -38,10 +36,10 @@ class Project extends Model
     {
         $query->when($filters['search'] ?? false, function ($query, $search) {
             return $query->where('name', 'like', '%'.$search.'%')
-                            ->orWhere('code', 'like', '%'.$search.'%');
+                ->orWhere('code', 'like', '%'.$search.'%');
         });
 
-        $query->when($filters['status']?? false, function ($query, $status) {
+        $query->when($filters['status'] ?? false, function ($query, $status) {
             return $query->where('status', $status);
         });
     }

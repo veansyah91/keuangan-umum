@@ -20,6 +20,7 @@ class IsAdmin
         if (Auth::user()->role == 'admin' || Auth::user()->role == 'super-admin') {
             return $next($request);
         }
+
         return redirect('organizations')->with('error', 'Anda Tidak Memiliki Hak Akses');
     }
 }

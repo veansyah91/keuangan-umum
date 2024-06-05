@@ -2,22 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use Inertia\Inertia;
-use Inertia\Response;
 use App\Models\Contact;
-use App\Models\Organization;
-use Illuminate\Http\Request;
 use App\Models\ContactCategory;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\RedirectResponse;
+use App\Models\Organization;
 use App\Repositories\Log\LogRepository;
 use App\Repositories\User\UserRepository;
-use Illuminate\Validation\Rule;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class ContactCategoryController extends Controller
 {
     protected $userRepository;
+
     protected $logRepository;
 
     public function __construct(UserRepository $userRepository, LogRepository $logRepository)
@@ -25,20 +26,21 @@ class ContactCategoryController extends Controller
         $this->userRepository = $userRepository;
         $this->logRepository = $logRepository;
     }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Organization $organization): Response
     {
         $contactCategories = ContactCategory::filter(request(['search']))
-                                            ->whereOrganizationId($organization['id'])
-                                            ->paginate(50);
+            ->whereOrganizationId($organization['id'])
+            ->paginate(50);
         $user = Auth::user();
 
         return Inertia::render('ContactCategory/Index', [
             'organization' => $organization,
             'contactCategories' => $contactCategories,
-            'role' => $this->userRepository->getRole($user['id'], $organization['id'])
+            'role' => $this->userRepository->getRole($user['id'], $organization['id']),
         ]);
     }
 
@@ -51,11 +53,11 @@ class ContactCategoryController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => [
                 'required',
-                'string', 
-                Rule::unique('contact_categories')->where(function ($query) use ($request, $organization){
+                'string',
+                Rule::unique('contact_categories')->where(function ($query) use ($organization) {
                     return $query->where('organization_id', $organization['id']);
-                })                
-            ]
+                }),
+            ],
         ]);
 
         if ($validator->fails()) {
@@ -73,7 +75,7 @@ class ContactCategoryController extends Controller
 
         $user = Auth::user();
 
-        $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah menambahkan DATA pada KATEGORI KONTAK dengan DATA : ' . json_encode($log));
+        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menambahkan DATA pada KATEGORI KONTAK dengan DATA : '.json_encode($log));
 
         return redirect(route('data-master.contact-category', $organization['id']));
     }
@@ -86,11 +88,11 @@ class ContactCategoryController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => [
                 'required',
-                'string', 
-                Rule::unique('contact_categories')->where(function ($query) use ($request, $organization){
+                'string',
+                Rule::unique('contact_categories')->where(function ($query) use ($organization) {
                     return $query->where('organization_id', $organization['id']);
-                })->ignore($contactCategory['id'])                
-            ]
+                })->ignore($contactCategory['id']),
+            ],
         ]);
 
         $validated = $validator->validated();
@@ -99,7 +101,7 @@ class ContactCategoryController extends Controller
 
         $user = Auth::user();
 
-        $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah mengubah DATA pada KATEGORI KONTAK menjadi : ' . json_encode($validated));
+        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah mengubah DATA pada KATEGORI KONTAK menjadi : '.json_encode($validated));
 
         return redirect(route('data-master.contact-category', $organization['id']));
     }
@@ -110,25 +112,26 @@ class ContactCategoryController extends Controller
     public function destroy(Organization $organization, ContactCategory $contactCategory): RedirectResponse
     {
         // Cek Apakah Telah Digunakan Oleh Contact
-            $contacts = Contact::whereHas('contactCategories', function ($query) use ($contactCategory){
-                                    $query->whereContactCategoryId($contactCategory['id']);
-                                })
-                                ->get();
+        $contacts = Contact::whereHas('contactCategories', function ($query) use ($contactCategory) {
+            $query->whereContactCategoryId($contactCategory['id']);
+        })
+            ->get();
 
-            if (count($contacts) > 0) {
-                return redirect(route('data-master.contact-category', $organization['id']))->withErrors(['delete_confirmation' => 'Kategori Kontak Tidak Bisa Dihapus, Karena Telah Digunakan']);
-            }
-        // 
+        if (count($contacts) > 0) {
+            return redirect(route('data-master.contact-category', $organization['id']))->withErrors(['delete_confirmation' => 'Kategori Kontak Tidak Bisa Dihapus, Karena Telah Digunakan']);
+        }
+        //
 
         $log = [
-            'name' => $contactCategory['name']
+            'name' => $contactCategory['name'],
         ];
 
         $contactCategory->delete();
 
         $user = Auth::user();
 
-        $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah menghapus DATA pada KATEGORI KONTAK, Data : ' . json_encode($log));
+        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menghapus DATA pada KATEGORI KONTAK, Data : '.json_encode($log));
+
         return redirect(route('data-master.contact-category', $organization['id']))->with('success', 'Kategori Kontak Berhasil Dihapus');
     }
 }

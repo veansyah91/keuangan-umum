@@ -2,54 +2,53 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
-use App\Models\User;
-use Inertia\Inertia;
-use Inertia\Response;
 use App\Models\Contact;
-use Illuminate\Support\Str;
-use App\Models\Organization;
-use Illuminate\Http\Request;
 use App\Models\ContactCategory;
-use Illuminate\Validation\Rule;
 use App\Models\FixedAssetCategory;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\RedirectResponse;
-use App\Repositories\Village\VillageRepository;
+use App\Models\Organization;
+use App\Models\User;
 use App\Repositories\Account\AccountRepositoryInterface;
 use App\Repositories\AccountCategory\AccountCategoryRepositoryInterface;
-
+use App\Repositories\Village\VillageRepository;
+use Carbon\Carbon;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class OrganizationController extends Controller
 {
     protected $fixedAssetCategory = [
         [
             'lifetime' => 0,
-            'name' => "TANAH",
+            'name' => 'TANAH',
             'status' => true,
         ],
         [
             'lifetime' => 48,
-            'name' => "MESIN DAN PERALATAN",
+            'name' => 'MESIN DAN PERALATAN',
             'status' => true,
         ],
         [
             'lifetime' => 96,
-            'name' => "KENDARAAN",
+            'name' => 'KENDARAAN',
             'status' => true,
         ],
         [
             'lifetime' => 48,
-            'name' => "HARTA LAINNYA",
+            'name' => 'HARTA LAINNYA',
             'status' => true,
         ],
         [
             'lifetime' => 240,
-            'name' => "GEDUNG",
+            'name' => 'GEDUNG',
             'status' => true,
         ],
     ];
-    
+
     protected $accountCategoriesDefault = [
         // Neraca
         // Aset Lancar
@@ -358,13 +357,13 @@ class OrganizationController extends Controller
         $user = Auth::user();
 
         $organizations = Organization::filter(request(['search']))
-                        ->whereHas('users', function ($query) use ($user) {
-                            $query->where('user_id', $user['id']);
-                        })
-                        ->with('users', function ($query) use ($user) {
-                            $query->where('user_id', $user['id']);
-                        })
-                        ->get();
+            ->whereHas('users', function ($query) use ($user) {
+                $query->where('user_id', $user['id']);
+            })
+            ->with('users', function ($query) use ($user) {
+                $query->where('user_id', $user['id']);
+            })
+            ->get();
 
         return Inertia::render('Organization/Index',
             [
@@ -380,10 +379,10 @@ class OrganizationController extends Controller
     public function create(): Response
     {
         $villages = new VillageRepository;
-        
+
         return Inertia::render('Organization/Create', [
             'villages' => $villages->getFullAddress(request(['village'])),
-            'villageFilter' => request('village')
+            'villageFilter' => request('village'),
         ]);
     }
 
@@ -395,11 +394,11 @@ class OrganizationController extends Controller
         // validation
         $validated = $request->validate([
             'name' => [
-                    'required',
-                    'string',
-                    'max:255',
-                    Rule::unique('organizations')
-                ],
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('organizations'),
+            ],
             'address' => 'required|string|max:255',
             'legality' => 'string|nullable',
             'addressDetail.province' => 'string|nullable',
@@ -455,12 +454,12 @@ class OrganizationController extends Controller
         // Category
         $contactCategory = ContactCategory::create([
             'name' => 'UMUM',
-            'organization_id' => $organization['id']
+            'organization_id' => $organization['id'],
         ]);
 
         Contact::create([
             'organization_id' => $organization['id'],
-            'name' => "UMUM"
+            'name' => 'UMUM',
 
         ]);
 
@@ -472,7 +471,7 @@ class OrganizationController extends Controller
 
             FixedAssetCategory::create($fixedAssetCategory);
         }
-        // 
+        //
 
         return redirect(route('organization'))->with('success', 'Organisasi Berhasil Disimpan!');
 
@@ -497,11 +496,11 @@ class OrganizationController extends Controller
     public function edit(Organization $organization)
     {
         $villages = new VillageRepository;
-        
+
         return Inertia::render('Organization/Edit', [
             'organization' => $organization,
             'villages' => $villages->getFullAddress(request(['village']) ? request(['village']) : ['village' => $organization['village']]),
-            'villageFilter' => request('village') ?? $organization['village']
+            'villageFilter' => request('village') ?? $organization['village'],
         ]);
     }
 
@@ -516,7 +515,7 @@ class OrganizationController extends Controller
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('organizations')->ignore($organization['id'])
+                Rule::unique('organizations')->ignore($organization['id']),
             ],
             'address' => 'required|string|max:255',
             'legality' => 'string|nullable',
@@ -561,13 +560,13 @@ class OrganizationController extends Controller
         $organization->users;
 
         $users = User::where('email', request('user'))
-                        ->get();
+            ->get();
 
         return Inertia::render('Organization/ShareToOther', [
             'organization' => $organization,
             'users' => $users,
             'userFilter' => request('user'),
-            'userOrganization' => $userOrganization
+            'userOrganization' => $userOrganization,
         ]);
     }
 
@@ -576,27 +575,27 @@ class OrganizationController extends Controller
         $validated = $request->validate([
             'user_id' => 'required|numeric',
             'organization_id' => 'required|string',
-            'role' => ['required', Rule::in(['viewer','editor'])],
+            'role' => ['required', Rule::in(['viewer', 'editor'])],
         ]);
 
         $user = User::findOrFail($validated['user_id']);
 
         //cek apakah user sudah pernah tertaut
         $organizationUser = User::whereId($validated['user_id'])
-                                ->whereHas('organizations', function ($query) use ($validated){
-                                    $query->where('organization_id', $validated['organization_id']);
-                                })
-                                ->first();
+            ->whereHas('organizations', function ($query) use ($validated) {
+                $query->where('organization_id', $validated['organization_id']);
+            })
+            ->first();
 
-        if($organizationUser){
+        if ($organizationUser) {
             return redirect(route('organization.share-to-other', $organization['id']))->withErrors(['user_id' => 'The user is added'])->withInput();
         }
 
         $user->organizations()->attach($organization, [
             'role' => $validated['role'],
-            'is_waiting' => true
+            'is_waiting' => true,
         ]);
-        
+
         return redirect(route('organization.share-to-other', $organization['id']));
     }
 
@@ -605,14 +604,15 @@ class OrganizationController extends Controller
         $validated = $request->validate([
             'user_id' => 'required|numeric',
             'organization_id' => 'required|string',
-            'role' => ['required', Rule::in(['viewer','editor'])],
+            'role' => ['required', Rule::in(['viewer', 'editor'])],
         ]);
 
         $user = User::findOrFail($validated['user_id']);
 
         $user->organizations()->syncWithoutDetaching([
-            $organization['id'] => ['role' => $validated['role']]
+            $organization['id'] => ['role' => $validated['role']],
         ]);
+
         return redirect(route('organization.share-to-other', $organization['id']));
     }
 
@@ -624,13 +624,13 @@ class OrganizationController extends Controller
             'organization_id' => 'required|string',
             'is_waiting' => 'required|boolean',
         ]);
-        
+
         $user = User::findOrFail($validated['user_id']);
 
         if ($validated['confirm']) {
             //ubah status menunggu pada pivot menjadi false
             $user->organizations()->syncWithoutDetaching([
-                $organization['id'] => ['is_waiting' => false]
+                $organization['id'] => ['is_waiting' => false],
             ]);
 
         } else {

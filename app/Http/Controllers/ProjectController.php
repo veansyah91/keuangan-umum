@@ -2,22 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use Inertia\Inertia;
 use App\Helpers\NewRef;
 use App\Models\Journal;
-use App\Models\Project;
-use Carbon\CarbonImmutable;
 use App\Models\Organization;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Project;
 use App\Repositories\Log\LogRepository;
 use App\Repositories\User\UserRepository;
+use Carbon\CarbonImmutable;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
+use Inertia\Inertia;
 
 class ProjectController extends Controller
 {
     protected $userRepository;
+
     protected $logRepository;
+
     protected $now;
 
     public function __construct(UserRepository $userRepository, LogRepository $logRepository)
@@ -26,6 +28,7 @@ class ProjectController extends Controller
         $this->logRepository = $logRepository;
         $this->now = CarbonImmutable::now();
     }
+
     /**
      * Display a listing of the resource.
      */
@@ -33,16 +36,16 @@ class ProjectController extends Controller
     {
         $user = Auth::user();
         $projects = Project::filter(request(['search', 'status']))
-                            ->whereOrganizationId($organization['id'])
-                            ->orderBy('code', 'desc')
-                            ->paginate(50);
+            ->whereOrganizationId($organization['id'])
+            ->orderBy('code', 'desc')
+            ->paginate(50);
 
-        return Inertia::render('Project/Index', 
-        [
-            'projects' => $projects,
-            'organization' => $organization,
-            'role' => $this->userRepository->getRole($user['id'], $organization['id']),
-        ]);
+        return Inertia::render('Project/Index',
+            [
+                'projects' => $projects,
+                'organization' => $organization,
+                'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+            ]);
     }
 
     /**
@@ -50,20 +53,20 @@ class ProjectController extends Controller
      */
     public function create(Organization $organization)
     {
-        $user = Auth::user();      
+        $user = Auth::user();
 
         $now = CarbonImmutable::now();
-        $refHeader = "P-" . $now->isoFormat('YYYY');
-        $code = $refHeader . '001';
+        $refHeader = 'P-'.$now->isoFormat('YYYY');
+        $code = $refHeader.'001';
 
         $project = Project::whereOrganizationId($organization['id'])
-                            ->where('code', 'like', $refHeader . '%')
-                            ->orderBy('code')
-                            ->get()
-                            ->last();
+            ->where('code', 'like', $refHeader.'%')
+            ->orderBy('code')
+            ->get()
+            ->last();
 
         if ($project) {
-            $code = NewRef::create("P-", $project['code']);
+            $code = NewRef::create('P-', $project['code']);
         }
 
         return Inertia::render('Project/Create', [
@@ -82,26 +85,26 @@ class ProjectController extends Controller
 
         $validated = $request->validate([
             'name' => [
-                        'required',
-                        'string',
-                        Rule::unique('projects')->where(function ($query) use ($request, $organization){
-                            return $query->where('organization_id', $organization['id']);
-                        })     
-                    ],
+                'required',
+                'string',
+                Rule::unique('projects')->where(function ($query) use ($organization) {
+                    return $query->where('organization_id', $organization['id']);
+                }),
+            ],
             'code' => [
-                        'required',
-                        'string',
-                        Rule::unique('projects')->where(function ($query) use ($request, $organization){
-                            return $query->where('organization_id', $organization['id']);
-                        })     
-                    ],
+                'required',
+                'string',
+                Rule::unique('projects')->where(function ($query) use ($organization) {
+                    return $query->where('organization_id', $organization['id']);
+                }),
+            ],
             'description' => 'string|nullable',
             'start_date' => 'date|nullable',
             'end_date' => 'date|nullable',
             'status' => [
-                             Rule::in(['finished', 'in progress', 'pending', 'not started'])     
-                        ],
-            'estimated_value' => "numeric|min:0"
+                Rule::in(['finished', 'in progress', 'pending', 'not started']),
+            ],
+            'estimated_value' => 'numeric|min:0',
         ]);
 
         $log = [
@@ -109,12 +112,12 @@ class ProjectController extends Controller
             'code' => $validated['code'],
             'estimated_value' => $validated['estimated_value'],
         ];
-        
+
         $validated['organization_id'] = $organization['id'];
         $validated['user_id'] = $user['id'];
         Project::create($validated);
 
-        $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah menambahkan DATA pada PROYEK dengan DATA : ' . json_encode($log));
+        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menambahkan DATA pada PROYEK dengan DATA : '.json_encode($log));
 
         return redirect(route('data-master.project.create', $organization['id']));
     }
@@ -157,26 +160,26 @@ class ProjectController extends Controller
 
         $validated = $request->validate([
             'name' => [
-                        'required',
-                        'string',
-                        Rule::unique('projects')->where(function ($query) use ($request, $organization){
-                            return $query->where('organization_id', $organization['id']);
-                        })->ignore($project['id'])
-                    ],
+                'required',
+                'string',
+                Rule::unique('projects')->where(function ($query) use ($organization) {
+                    return $query->where('organization_id', $organization['id']);
+                })->ignore($project['id']),
+            ],
             'code' => [
-                        'required',
-                        'string',
-                        Rule::unique('projects')->where(function ($query) use ($request, $organization){
-                            return $query->where('organization_id', $organization['id']);
-                        })->ignore($project['id'])
-                    ],
+                'required',
+                'string',
+                Rule::unique('projects')->where(function ($query) use ($organization) {
+                    return $query->where('organization_id', $organization['id']);
+                })->ignore($project['id']),
+            ],
             'description' => 'string|nullable',
             'start_date' => 'date|nullable',
             'end_date' => 'date|nullable',
             'status' => [
-                             Rule::in(['finished', 'in progress', 'pending', 'not started'])     
-                        ],
-            'estimated_value' => "numeric|min:0"
+                Rule::in(['finished', 'in progress', 'pending', 'not started']),
+            ],
+            'estimated_value' => 'numeric|min:0',
         ]);
 
         $project->update($validated);
@@ -187,7 +190,7 @@ class ProjectController extends Controller
             'estimated_value' => $validated['estimated_value'],
         ];
 
-        $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah mengubah DATA pada PROYEK menjadi : ' . json_encode($log));
+        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah mengubah DATA pada PROYEK menjadi : '.json_encode($log));
 
         return redirect(route('data-master.project.edit', ['organization' => $organization['id'], 'project' => $project['id']]));
     }
@@ -201,7 +204,7 @@ class ProjectController extends Controller
         $journal = Journal::whereProjectId($project['id'])->first();
 
         if ($journal) {
-            return redirect()->back()->withErrors(["delete" => "Can't delete, The Project is using"]);
+            return redirect()->back()->withErrors(['delete' => "Can't delete, The Project is using"]);
         }
 
         $project->delete();
@@ -213,7 +216,8 @@ class ProjectController extends Controller
 
         $user = Auth::user();
 
-        $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah menghapus DATA pada PROYEK, yaitu DATA : ' . json_encode($log));
+        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menghapus DATA pada PROYEK, yaitu DATA : '.json_encode($log));
+
         return redirect(route('data-master.project', $organization['id']));
 
     }

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('description')->nullable();
             $table->string('no_ref');
 
-            $table->unsignedBigInteger('contact_id')->nullable();          
+            $table->unsignedBigInteger('contact_id')->nullable();
             $table->foreign('contact_id')->references('id')->on('contacts');
 
             $table->foreignId('account_id')->constrained()->cascadeOnDelete();

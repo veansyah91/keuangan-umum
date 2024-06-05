@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('organizations', function (Blueprint $table) {                     
+        Schema::table('organizations', function (Blueprint $table) {
             $table->string('province_id')->nullable();
             $table->string('regency_id')->nullable();
-            $table->string('district_id')->nullable();    
-            $table->string('village_id')->nullable(); 
+            $table->string('district_id')->nullable();
+            $table->string('village_id')->nullable();
         });
     }
 

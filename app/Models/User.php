@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Journal;
+use App\Models\Affiliation;
 use Laravel\Sanctum\HasApiTokens;
 use App\Jobs\QueuedVerifyEmailJob;
 use App\Jobs\QueuedPasswordResetJob;
@@ -10,6 +10,7 @@ use App\Notifications\VerifyEmailQueued;
 use Illuminate\Notifications\Notifiable;
 use App\Notifications\ResetPasswordQueued;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -45,7 +46,6 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array<string, string>
      */
 
-
     //Overrideen sendEmailVerificationNotification implementation
 
     // public function sendEmailVerificationNotification()
@@ -67,7 +67,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendPasswordResetNotification($token)
     {
         //dispactches the job to the queue passing it this User object
-        QueuedPasswordResetJob::dispatch($this,$token);
+        QueuedPasswordResetJob::dispatch($this, $token);
     }
 
     protected $casts = [
@@ -80,6 +80,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(Organization::class)->withPivot('role', 'is_waiting');
     }
 
+    public function affilation(): HasOne
+    {
+        return $this->hasOne(Affiliation::class);
+    }
+
     public function journals(): HasMany
     {
         return $this->hasMany(Journal::class);
@@ -89,20 +94,19 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $query->when($filters['search'] ?? false, function ($query, $search) {
             return $query->where('name', 'like', '%'.$search.'%')
-                        ->orWhere('email', 'like', '%'.$search.'%');
+                ->orWhere('email', 'like', '%'.$search.'%');
         });
 
         $query->when($filters['user'] ?? false, function ($query, $search) {
             return $query->where('email', $search);
         });
 
-        $query->when($filters['start_date']?? false, function ($query, $start_date) {
+        $query->when($filters['start_date'] ?? false, function ($query, $start_date) {
             return $query->where('created_at', '>=', $start_date);
         });
 
-        $query->when($filters['end_date']?? false, function ($query, $end_date) {
+        $query->when($filters['end_date'] ?? false, function ($query, $end_date) {
             return $query->where('created_at', '<=', $end_date);
         });
     }
-    
 }

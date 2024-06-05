@@ -16,8 +16,14 @@ import ContentMobile from '@/Components/Mobiles/ContentMobile';
 import ContainerDesktop from '@/Components/Desktop/ContainerDesktop';
 import TitleDesktop from '@/Components/Desktop/TitleDesktop';
 import ContentDesktop from '@/Components/Desktop/ContentDesktop';
+import { IoEllipsisVertical, IoTrash } from 'react-icons/io5/index.esm';
+import { GiTakeMyMoney } from "react-icons/gi";
 
-function Index({users, userCollections, searchFilter}) {
+const affiliateName = (name) => {
+
+}
+
+function Index({users, userCollections, searchFilter, affiliateCoderecommendation}) {
     const [showSearch, setShowSearch] = useState(false);
     const [showFilter, setShowFilter] = useState(false);
     const [search, setSearch] = useState(searchFilter || '');
@@ -57,6 +63,20 @@ function Index({users, userCollections, searchFilter}) {
     const handleDateValueChange = (newValue) => {
         setDateValue(newValue); 
     } 
+
+    const handleSetAffiliation = (user) => {
+        console.log(user);
+
+        router.reload({
+            only: ['affiliateCoderecommendation'],
+            data: {
+                'name' : user.name
+            },
+            onSuccess : () => {
+                console.log(affiliateCoderecommendation);
+            }
+        });
+    }
 
     return (
         <>
@@ -178,6 +198,8 @@ function Index({users, userCollections, searchFilter}) {
                                     <th className='bg-gray-200'>Email</th>
                                     <th className='bg-gray-200'>Dibuat Tanggal</th>
                                     <th className='bg-gray-200'>Verifikasi</th>
+                                    <th className='bg-gray-200'>Afiliasi</th>
+                                    <th className='bg-gray-200'></th>
                                 </tr>
                             </thead>
                             <tbody className=''>
@@ -193,6 +215,25 @@ function Index({users, userCollections, searchFilter}) {
                                                 ? <div className='italic text-green-600'>Telah Terverifikasi</div>
                                                 : <div className='italic text-red-600'>Belum Terverifikasi</div>
                                             }
+                                            </td>
+                                            <td className=''>
+
+                                            </td>
+                                            <td className='text-end'>
+                                                <div className="dropdown dropdown-left">
+                                                    <div                             
+                                                        tabIndex={0} 
+                                                        role="button" className={`bg-inherit border-none hover:bg-gray-100 -z-50 text-gray-300'`}>
+                                                        <IoEllipsisVertical />
+                                                    </div>
+                                                    <ul tabIndex={0} className="dropdown-content z-[50] menu p-2 shadow bg-base-100 rounded-box w-56">
+                                                        <li>                                
+                                                            <button 
+                                                                onClick={() => handleSetAffiliation(user)}
+                                                            ><GiTakeMyMoney />Afiliasi</button>
+                                                        </li>
+                                                    </ul>
+                                                </div>
                                             </td>
                                         </tr>
                                     )

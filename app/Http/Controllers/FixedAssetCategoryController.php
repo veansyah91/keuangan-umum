@@ -2,117 +2,117 @@
 
 namespace App\Http\Controllers;
 
-use Inertia\Inertia;
-use Carbon\CarbonImmutable;
-use App\Models\Organization;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use App\Models\FixedAssetCategory;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Organization;
 use App\Repositories\Log\LogRepository;
 use App\Repositories\User\UserRepository;
+use Carbon\CarbonImmutable;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
+use Inertia\Inertia;
 
 class FixedAssetCategoryController extends Controller
 {
-  protected $userRepository;
+    protected $userRepository;
 
-  public function __construct(UserRepository $userRepository, LogRepository $logRepository)
+    public function __construct(UserRepository $userRepository, LogRepository $logRepository)
     {
         $this->userRepository = $userRepository;
         $this->logRepository = $logRepository;
         $this->now = CarbonImmutable::now();
     }
 
-  public function index(Organization $organization)
-  {
-    $user = Auth::user();
+    public function index(Organization $organization)
+    {
+        $user = Auth::user();
 
-    $fixedAssetCategories = FixedAssetCategory::filter(request(['search', 'status']))
-                            ->whereOrganizationId($organization['id'])
-                            ->paginate(50);
-    
-    return Inertia::render('FixedAssetCategory/Index', [
-        'organization' => $organization,
-        'fixedAssetCategories' => $fixedAssetCategories,
-        'role' => $this->userRepository->getRole($user['id'], $organization['id']),
-        'status' => request('status') == "true" ? true : false,
-        'startDate' => request('start_date'),
-        'endDate' => request('end_date'),
-    ]);
-  }
+        $fixedAssetCategories = FixedAssetCategory::filter(request(['search', 'status']))
+            ->whereOrganizationId($organization['id'])
+            ->paginate(50);
 
-  public function store(Request $request, Organization $organization)
-  {
-    $user = Auth::user();
+        return Inertia::render('FixedAssetCategory/Index', [
+            'organization' => $organization,
+            'fixedAssetCategories' => $fixedAssetCategories,
+            'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+            'status' => request('status') == 'true' ? true : false,
+            'startDate' => request('start_date'),
+            'endDate' => request('end_date'),
+        ]);
+    }
 
-    // validation
-    $validated = $request->validate([
-      'name' => [
-              'required',
-              'string',
-              'max:255',
-              Rule::unique('fixed_asset_categories')
-          ],
-      'lifetime' => 'required|numeric',
-      'status' => 'required|boolean'
-    ]);
+    public function store(Request $request, Organization $organization)
+    {
+        $user = Auth::user();
 
-    $log = $validated;
-
-    $validated['organization_id'] = $organization['id'];
-
-    FixedAssetCategory::create($validated);
-
-    $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah menambahkan DATA pada KELOMPOK HARTA TETAP dengan DATA : ' . json_encode($log));
-
-    return redirect()->back();
-  }
-
-  public function update(Request $request, Organization $organization, FixedAssetCategory $fixedAssetCategory)
-  {
-    $user = Auth::user();
-
-    // validation
-    $validated = $request->validate([
-      'name' => [
-              'required',
-              'string',
-              'max:255',
-              Rule::unique('fixed_asset_categories')->ignore($fixedAssetCategory['id'])
+        // validation
+        $validated = $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('fixed_asset_categories'),
             ],
-      'lifetime' => 'required|numeric',
-      'status' => 'required|boolean'
-    ]);
+            'lifetime' => 'required|numeric',
+            'status' => 'required|boolean',
+        ]);
 
-    $log = $validated;
+        $log = $validated;
 
-    $validated['organization_id'] = $organization['id'];
+        $validated['organization_id'] = $organization['id'];
 
-    $fixedAssetCategory->update($validated);
+        FixedAssetCategory::create($validated);
 
-    $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah mengubah DATA pada KELOMPOK HARTA TETAP menjadi : ' . json_encode($log));
+        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menambahkan DATA pada KELOMPOK HARTA TETAP dengan DATA : '.json_encode($log));
 
-    return redirect()->back();
-  }
+        return redirect()->back();
+    }
 
-  public function destroy(Organization $organization, FixedAssetCategory $fixedAssetCategory)
-  {
-    $user = Auth::user();
+    public function update(Request $request, Organization $organization, FixedAssetCategory $fixedAssetCategory)
+    {
+        $user = Auth::user();
 
-    // cek apakah kelompok harta tetap telah digunakan
+        // validation
+        $validated = $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('fixed_asset_categories')->ignore($fixedAssetCategory['id']),
+            ],
+            'lifetime' => 'required|numeric',
+            'status' => 'required|boolean',
+        ]);
 
-    // 
-    $log = [
-      'name' => $fixedAssetCategory['name'],
-      'lifetime' => $fixedAssetCategory['lifetime'],
-      'status' => $fixedAssetCategory['status']
-    ];
+        $log = $validated;
 
-    $fixedAssetCategory->delete();
+        $validated['organization_id'] = $organization['id'];
 
-    $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah menghapus DATA pada KATEGORI AKUN : ' . json_encode($log));
+        $fixedAssetCategory->update($validated);
 
-    return redirect()->back();
-    dd($fixedAssetCategory);
-  }
+        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah mengubah DATA pada KELOMPOK HARTA TETAP menjadi : '.json_encode($log));
+
+        return redirect()->back();
+    }
+
+    public function destroy(Organization $organization, FixedAssetCategory $fixedAssetCategory)
+    {
+        $user = Auth::user();
+
+        // cek apakah kelompok harta tetap telah digunakan
+
+        //
+        $log = [
+            'name' => $fixedAssetCategory['name'],
+            'lifetime' => $fixedAssetCategory['lifetime'],
+            'status' => $fixedAssetCategory['status'],
+        ];
+
+        $fixedAssetCategory->delete();
+
+        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menghapus DATA pada KATEGORI AKUN : '.json_encode($log));
+
+        return redirect()->back();
+        dd($fixedAssetCategory);
+    }
 }

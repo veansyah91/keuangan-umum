@@ -2,13 +2,13 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use App\Repositories\Account\AccountRepository;
-use App\Repositories\Journal\JournalRepository;
 use App\Repositories\Account\AccountRepositoryInterface;
-use App\Repositories\Journal\JournalRepositoryInterface;
 use App\Repositories\AccountCategory\AccountCategoryRepository;
 use App\Repositories\AccountCategory\AccountCategoryRepositoryInterface;
+use App\Repositories\Journal\JournalRepository;
+use App\Repositories\Journal\JournalRepositoryInterface;
+use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider
 {

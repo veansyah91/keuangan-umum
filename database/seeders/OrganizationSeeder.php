@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Organization;
 use Illuminate\Database\Seeder;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class OrganizationSeeder extends Seeder
 {
@@ -13,12 +12,12 @@ class OrganizationSeeder extends Seeder
      */
     public function run(): void
     {
-        for ($i=0; $i < 100; $i++) { 
-            # code...
+        for ($i = 0; $i < 100; $i++) {
+            // code...
             Organization::create([
-                'name' => "Masjid " . fake()->name(),
+                'name' => 'Masjid '.fake()->name(),
                 'address' => fake()->city(),
-                'expired' => "2024-12-12",
+                'expired' => '2024-12-12',
             ]);
         }
     }

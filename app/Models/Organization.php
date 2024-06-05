@@ -3,12 +3,10 @@
 namespace App\Models;
 
 use App\Traits\UUID;
-use App\Models\FixedAssetCategory;
-use App\Models\OrganizationInvoice;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Organization extends Model
 {
@@ -16,23 +14,23 @@ class Organization extends Model
     use UUID;
 
     protected $fillable = [
-                            'name', 
-                            'category', 
-                            'address', 
-                            'legality', 
-                            'expired', 
-                            'status',
-                            'province',
-                            'province_id',
-                            'regency',
-                            'regency_id',
-                            'district',
-                            'district_id',                            
-                            'village',
-                            'village_id',
-                            'slug',
-                            'is_profit'
-                        ];
+        'name',
+        'category',
+        'address',
+        'legality',
+        'expired',
+        'status',
+        'province',
+        'province_id',
+        'regency',
+        'regency_id',
+        'district',
+        'district_id',
+        'village',
+        'village_id',
+        'slug',
+        'is_profit',
+    ];
 
     public function users(): BelongsToMany
     {
@@ -68,16 +66,16 @@ class Organization extends Model
         $query->when($filters['searchOrganization'] ?? false, function ($query, $search) {
             return $query->where('name', 'like', '%'.$search.'%');
         });
-        
-        $query->when($filters['start_date']?? false, function ($query, $start_date) {
+
+        $query->when($filters['start_date'] ?? false, function ($query, $start_date) {
             return $query->where('created_at', '>=', $start_date);
         });
 
-        $query->when($filters['end_date']?? false, function ($query, $end_date) {
+        $query->when($filters['end_date'] ?? false, function ($query, $end_date) {
             return $query->where('created_at', '<=', $end_date);
         });
 
-        $query->when($filters['status']?? false, function ($query, $status) {
+        $query->when($filters['status'] ?? false, function ($query, $status) {
             return $query->where('status', $status);
         });
     }

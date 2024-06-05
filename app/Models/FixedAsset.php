@@ -2,11 +2,9 @@
 
 namespace App\Models;
 
-use App\Models\Journal;
-use App\Models\FixedAssetCategory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class FixedAsset extends Model
 {
@@ -33,10 +31,10 @@ class FixedAsset extends Model
         'disposal_date',
         'disposal_ref',
         'disposal_description',
-        'disposal_journal_id'
+        'disposal_journal_id',
     ];
 
-    public function fixedAssetCategory() : BelongsTo
+    public function fixedAssetCategory(): BelongsTo
     {
         return $this->belongsTo(FixedAssetCategory::class);
     }
@@ -50,19 +48,19 @@ class FixedAsset extends Model
     {
         $query->when($filters['search'] ?? false, function ($query, $search) {
             return $query->where('name', 'like', '%'.$search.'%')
-                        ->orWhere('code', 'like', '%'.$search.'%');
+                ->orWhere('code', 'like', '%'.$search.'%');
         });
 
-        $query->when($filters['start_date']?? false, function ($query, $start_date) {
+        $query->when($filters['start_date'] ?? false, function ($query, $start_date) {
             return $query->where('date', '>=', $start_date);
         });
 
-        $query->when($filters['end_date']?? false, function ($query, $end_date) {
+        $query->when($filters['end_date'] ?? false, function ($query, $end_date) {
             return $query->where('date', '<=', $end_date);
         });
 
         $query->when($filters['status'] ?? false, function ($query, $status) {
-            return $query->where('status', $status == "true" ? true : false);
+            return $query->where('status', $status == 'true' ? true : false);
         });
     }
 }

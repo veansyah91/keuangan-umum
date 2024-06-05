@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('organization_invoices', function (Blueprint $table) {
             $table->id();
             $table->string('no_ref');
-            $table->enum('product',['Bulanan', 'Tahunan']);
+            $table->enum('product', ['Bulanan', 'Tahunan']);
             $table->string('description')->nullable();
             $table->enum('status', ['paid', 'pending', 'canceled']);
             $table->integer('price');

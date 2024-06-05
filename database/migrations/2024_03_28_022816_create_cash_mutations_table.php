@@ -20,17 +20,17 @@ return new class extends Migration
             $table->foreignId('journal_id')->constrained()->cascadeOnDelete();
 
             $table->foreignUuid('organization_id')->constrained()->cascadeOnDelete();
-            
-            $table->unsignedBigInteger('user_id');          
-            $table->foreign('user_id')->references('id')->on('users');  
 
-            $table->unsignedBigInteger('project_id')->nullable();          
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users');
+
+            $table->unsignedBigInteger('project_id')->nullable();
             $table->foreign('project_id')->references('id')->on('projects');
 
-            $table->unsignedBigInteger('program_id')->nullable();          
+            $table->unsignedBigInteger('program_id')->nullable();
             $table->foreign('program_id')->references('id')->on('programs');
 
-            $table->unsignedBigInteger('department_id')->nullable();          
+            $table->unsignedBigInteger('department_id')->nullable();
             $table->foreign('department_id')->references('id')->on('departments');
             $table->timestamps();
         });

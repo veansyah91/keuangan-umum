@@ -2,11 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Repositories\User\UserRepository;
 use Closure;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Repositories\User\UserRepository;
 use Symfony\Component\HttpFoundation\Response;
 
 class UserHasOrganization
@@ -30,6 +29,7 @@ class UserHasOrganization
         if ($userRepository->getOrganization($user['id'], $organizationParameterCollection['organization']['id'])) {
             return $next($request);
         }
+
         return redirect('organizations')->with(['error' => 'Organisasi Belum Tertaut Dengan Akun Anda']);
 
     }

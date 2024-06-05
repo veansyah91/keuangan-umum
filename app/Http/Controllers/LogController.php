@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Log;
-use Inertia\Inertia;
-use Inertia\Response;
 use App\Models\Organization;
+use App\Repositories\User\UserRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Repositories\User\UserRepository;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class LogController extends Controller
 {
@@ -18,6 +18,7 @@ class LogController extends Controller
     {
         $this->userRepository = $userRepository;
     }
+
     /**
      * Handle the incoming request.
      */
@@ -25,11 +26,11 @@ class LogController extends Controller
     {
         $user = Auth::user();
 
-        $logs = Log::filter(request(['search','start_date', 'end_date']))
-                    ->whereOrganizationId($organization['id'])
-                    ->orderBy('id', 'desc')
-                    ->paginate(50);
-        
+        $logs = Log::filter(request(['search', 'start_date', 'end_date']))
+            ->whereOrganizationId($organization['id'])
+            ->orderBy('id', 'desc')
+            ->paginate(50);
+
         return Inertia::render('Log/Index', [
             'organization' => $organization,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),

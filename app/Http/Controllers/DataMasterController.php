@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Inertia\Inertia;
 use App\Models\Organization;
+use App\Repositories\User\UserRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Repositories\User\UserRepository;
+use Inertia\Inertia;
 
 class DataMasterController extends Controller
 {
@@ -16,6 +16,7 @@ class DataMasterController extends Controller
     {
         $this->userRepository = $userRepository;
     }
+
     /**
      * Handle the incoming request.
      */
@@ -23,9 +24,9 @@ class DataMasterController extends Controller
     {
         $user = Auth::user();
 
-        return Inertia::render("Data-Master/Index", [
+        return Inertia::render('Data-Master/Index', [
             'organization' => $organization,
-            'role' => $this->userRepository->getRole($user['id'], $organization['id'])
+            'role' => $this->userRepository->getRole($user['id'], $organization['id']),
         ]);
     }
 }

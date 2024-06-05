@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('organization_invoices', function (Blueprint $table) {
-            $table->unsignedBigInteger('accepted_by_user_id')->nullable();
-            $table->foreign('accepted_by_user_id')->references('id')->on('users');
+            $table->unsignedBigInteger('affiliation_id')->nullable();
+            $table->foreign('affiliation_id')->references('id')->on('affiliations');
         });
     }
 
@@ -23,7 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('organization_invoices', function (Blueprint $table) {
-            //
+            $table->dropForeign('affiliation_id');
         });
     }
 };

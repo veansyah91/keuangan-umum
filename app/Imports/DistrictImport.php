@@ -7,18 +7,16 @@ use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 
-class DistrictImport implements ToModel, WithChunkReading, WithBatchInserts
+class DistrictImport implements ToModel, WithBatchInserts, WithChunkReading
 {
     /**
-    * @param array $row
-    *
-    * @return \Illuminate\Database\Eloquent\Model|null
-    */
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
     public function model(array $row)
     {
         return new District([
-            'id' => (int)$row[0],
-            'regency_id' => (int)$row[1],
+            'id' => (int) $row[0],
+            'regency_id' => (int) $row[1],
             'name' => $row[2],
         ]);
     }

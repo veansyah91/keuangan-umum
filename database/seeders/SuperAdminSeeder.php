@@ -2,10 +2,9 @@
 
 namespace Database\Seeders;
 
-use Carbon\Carbon;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class SuperAdminSeeder extends Seeder
 {
@@ -16,11 +15,11 @@ class SuperAdminSeeder extends Seeder
     {
         $date = Carbon::now();
         User::create([
-            'name' => "Ferdi Yansyah",
-            'email' => "superadmin@keuangan.com",
+            'name' => 'Ferdi Yansyah',
+            'email' => 'superadmin@keuangan.com',
             'password' => bcrypt('9968Siskom'),
             'email_verified_at' => $date,
-            'role' => 'super-admin'
+            'role' => 'super-admin',
         ]);
     }
 }

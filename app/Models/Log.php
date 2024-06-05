@@ -17,11 +17,11 @@ class Log extends Model
             return $query->where('message', 'like', '%'.$search.'%');
         });
 
-        $query->when($filters['start_date']?? false, function ($query, $start_date) {
+        $query->when($filters['start_date'] ?? false, function ($query, $start_date) {
             return $query->where('created_at', '>=', $start_date);
         });
 
-        $query->when($filters['end_date']?? false, function ($query, $end_date) {
+        $query->when($filters['end_date'] ?? false, function ($query, $end_date) {
             return $query->where('created_at', '<=', $end_date);
         });
     }

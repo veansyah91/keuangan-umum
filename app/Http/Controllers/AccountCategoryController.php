@@ -2,20 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use Inertia\Inertia;
 use App\Models\Account;
-use App\Models\Organization;
-use Illuminate\Http\Request;
 use App\Models\AccountCategory;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Organization;
 use App\Repositories\Log\LogRepository;
 use App\Repositories\User\UserRepository;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
+use Inertia\Inertia;
 
 class AccountCategoryController extends Controller
 {
     protected $userRepository;
+
     protected $logRepository;
 
     public function __construct(UserRepository $userRepository, LogRepository $logRepository)
@@ -23,22 +24,23 @@ class AccountCategoryController extends Controller
         $this->userRepository = $userRepository;
         $this->logRepository = $logRepository;
     }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Organization $organization)
     {
         $accountCategories = AccountCategory::filter(request(['search']))
-                                                ->whereOrganizationId($organization['id'])
-                                                ->orderBy('code')
-                                                ->paginate(50);
+            ->whereOrganizationId($organization['id'])
+            ->orderBy('code')
+            ->paginate(50);
         $user = Auth::user();
 
-        return Inertia::render('Account-Category/Index',[
+        return Inertia::render('Account-Category/Index', [
             'organization' => $organization,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'accountCategories' => $accountCategories,
-            'searchFilter' => request('search')
+            'searchFilter' => request('search'),
         ]);
     }
 
@@ -58,19 +60,19 @@ class AccountCategoryController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => [
                 'required',
-                'string', 
-                Rule::unique('account_categories')->where(function ($query) use ($request, $organization){
+                'string',
+                Rule::unique('account_categories')->where(function ($query) use ($organization) {
                     return $query->where('organization_id', $organization['id']);
-                })               
+                }),
             ],
             'code' => [
                 'required',
-                'string', 
+                'string',
                 'size:9',
-                Rule::unique('account_categories')->where(function ($query) use ($request, $organization){
+                Rule::unique('account_categories')->where(function ($query) use ($organization) {
                     return $query->where('organization_id', $organization['id']);
-                })               
-            ]
+                }),
+            ],
         ]);
 
         if ($validator->fails()) {
@@ -88,7 +90,7 @@ class AccountCategoryController extends Controller
 
         $user = Auth::user();
 
-        $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah menambahkan DATA pada KATEGORI AKUN dengan DATA : ' . json_encode($log));
+        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menambahkan DATA pada KATEGORI AKUN dengan DATA : '.json_encode($log));
 
         return redirect()->back();
     }
@@ -117,19 +119,19 @@ class AccountCategoryController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => [
                 'required',
-                'string', 
-                Rule::unique('account_categories')->where(function ($query) use ($request, $organization){
+                'string',
+                Rule::unique('account_categories')->where(function ($query) use ($organization) {
                     return $query->where('organization_id', $organization['id']);
-                })->ignore($accountCategory['id'])                
+                })->ignore($accountCategory['id']),
             ],
             'code' => [
                 'required',
-                'string', 
+                'string',
                 'size:9',
-                Rule::unique('account_categories')->where(function ($query) use ($request, $organization){
+                Rule::unique('account_categories')->where(function ($query) use ($organization) {
                     return $query->where('organization_id', $organization['id']);
-                })->ignore($accountCategory['id'])                
-            ]
+                })->ignore($accountCategory['id']),
+            ],
         ]);
 
         if ($validator->fails()) {
@@ -147,7 +149,7 @@ class AccountCategoryController extends Controller
 
         $user = Auth::user();
 
-        $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah mengubah DATA pada KATEGORI AKUN menjadi : ' . json_encode($log));
+        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah mengubah DATA pada KATEGORI AKUN menjadi : '.json_encode($log));
 
         return redirect()->back();
     }
@@ -159,7 +161,7 @@ class AccountCategoryController extends Controller
     {
         // cek apakah telah digunakan pada tabel akun
         $account = Account::whereAccountCategoryId($accountCategory['id'])
-                            ->first();
+            ->first();
 
         if ($account) {
             return redirect()->back()->withErrors(['account_used' => 'Tidak Dapat Dihapus, Kategori Akun Telah Digunakan Pada Akun'])->withInput();

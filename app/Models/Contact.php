@@ -2,9 +2,8 @@
 
 namespace App\Models;
 
-use App\Models\ContactCategory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Contact extends Model
@@ -22,10 +21,10 @@ class Contact extends Model
     {
         $query->when($filters['search'] ?? false, function ($query, $search) {
             return $query->where('name', 'like', '%'.$search.'%')
-                            ->orWhere('address', 'like', '%'.$search.'%')
-                            ->orWhereHas('contactCategories', function ($query) use ($search){
-                                $query->where('name', 'like', '%'.$search.'%');
-                            });
+                ->orWhere('address', 'like', '%'.$search.'%')
+                ->orWhereHas('contactCategories', function ($query) use ($search) {
+                    $query->where('name', 'like', '%'.$search.'%');
+                });
         });
     }
 }

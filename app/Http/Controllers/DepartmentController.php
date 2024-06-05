@@ -2,22 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use Inertia\Inertia;
 use App\Helpers\NewRef;
-use App\Models\Journal;
 use App\Models\Department;
-use Carbon\CarbonImmutable;
+use App\Models\Journal;
 use App\Models\Organization;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Auth;
 use App\Repositories\Log\LogRepository;
 use App\Repositories\User\UserRepository;
+use Carbon\CarbonImmutable;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
+use Inertia\Inertia;
 
 class DepartmentController extends Controller
 {
     protected $userRepository;
+
     protected $logRepository;
+
     protected $now;
 
     public function __construct(UserRepository $userRepository, LogRepository $logRepository)
@@ -30,21 +32,22 @@ class DepartmentController extends Controller
     protected function newRef($organization)
     {
         $now = CarbonImmutable::now();
-        $refHeader = "D-" . $now->isoFormat('YYYY');
-        $code = $refHeader . '001';
+        $refHeader = 'D-'.$now->isoFormat('YYYY');
+        $code = $refHeader.'001';
 
         $department = Department::whereOrganizationId($organization['id'])
-                            ->where('code', 'like', $refHeader . '%')
-                            ->orderBy('code')
-                            ->get()
-                            ->last();
+            ->where('code', 'like', $refHeader.'%')
+            ->orderBy('code')
+            ->get()
+            ->last();
 
         if ($department) {
-            $code = NewRef::create("D-", $department['code']);
+            $code = NewRef::create('D-', $department['code']);
         }
 
         return $code;
     }
+
     /**
      * Display a listing of the resource.
      */
@@ -53,11 +56,11 @@ class DepartmentController extends Controller
         $user = Auth::user();
 
         $departments = Department::filter(request(['search', 'is_active']))
-                            ->whereOrganizationId($organization['id'])  
-                            ->with('user')
-                            ->orderBy('code', 'desc')
-                            ->paginate(50);
-                            
+            ->whereOrganizationId($organization['id'])
+            ->with('user')
+            ->orderBy('code', 'desc')
+            ->paginate(50);
+
         return Inertia::render('Department/Index', [
             'departments' => $departments,
             'organization' => $organization,
@@ -81,25 +84,25 @@ class DepartmentController extends Controller
     {
         $validated = $request->validate([
             'name' => [
-                        'required',
-                        'string',
-                        Rule::unique('departments')->where(function ($query) use ($request, $organization){
-                            return $query->where('organization_id', $organization['id']);
-                        })     
-                    ],
+                'required',
+                'string',
+                Rule::unique('departments')->where(function ($query) use ($organization) {
+                    return $query->where('organization_id', $organization['id']);
+                }),
+            ],
             'code' => [
-                        'required',
-                        'string',
-                        Rule::unique('departments')->where(function ($query) use ($request, $organization){
-                            return $query->where('organization_id', $organization['id']);
-                        })     
-                    ],
+                'required',
+                'string',
+                Rule::unique('departments')->where(function ($query) use ($organization) {
+                    return $query->where('organization_id', $organization['id']);
+                }),
+            ],
             'description' => 'string|nullable',
         ]);
 
         $user = Auth::user();
 
-        $validated = [...$validated, 
+        $validated = [...$validated,
             'organization_id' => $organization['id'],
             'user_id' => $user['id'],
             'is_active' => true,
@@ -113,7 +116,7 @@ class DepartmentController extends Controller
             'description' => $validated['description'],
         ];
 
-        $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah menambahkan DATA pada DEPARTEMEN KEGIATAN dengan DATA : ' . json_encode($log));
+        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menambahkan DATA pada DEPARTEMEN KEGIATAN dengan DATA : '.json_encode($log));
 
         return redirect(route('data-master.department', $organization['id']));
     }
@@ -141,19 +144,19 @@ class DepartmentController extends Controller
     {
         $validated = $request->validate([
             'name' => [
-                        'required',
-                        'string',
-                        Rule::unique('departments')->where(function ($query) use ($request, $organization){
-                            return $query->where('organization_id', $organization['id']);
-                        })->ignore($department['id'])    
-                    ],
+                'required',
+                'string',
+                Rule::unique('departments')->where(function ($query) use ($organization) {
+                    return $query->where('organization_id', $organization['id']);
+                })->ignore($department['id']),
+            ],
             'code' => [
-                        'required',
-                        'string',
-                        Rule::unique('departments')->where(function ($query) use ($request, $organization){
-                            return $query->where('organization_id', $organization['id']);
-                        })->ignore($department['id'])    
-                    ],
+                'required',
+                'string',
+                Rule::unique('departments')->where(function ($query) use ($organization) {
+                    return $query->where('organization_id', $organization['id']);
+                })->ignore($department['id']),
+            ],
             'description' => 'string|nullable',
             'is_active' => 'boolean|nullable',
         ]);
@@ -168,7 +171,7 @@ class DepartmentController extends Controller
 
         $user = Auth::user();
 
-        $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah mengubah DATA pada DEPARTEMEN KEGIATAN menjadi DATA : ' . json_encode($log));
+        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah mengubah DATA pada DEPARTEMEN KEGIATAN menjadi DATA : '.json_encode($log));
 
         return redirect(route('data-master.department', $organization['id']));
     }
@@ -178,23 +181,24 @@ class DepartmentController extends Controller
      */
     public function destroy(Organization $organization, Department $department)
     {
-         // cek journal, apabila telah digunakan pada journal maka tolak permintaan hapus Department
+        // cek journal, apabila telah digunakan pada journal maka tolak permintaan hapus Department
         $journal = Journal::whereDepartmentId($department['id'])->first();
 
         if ($journal) {
-            return redirect()->back()->withErrors(["delete" => "Can't delete, The Department is using"]);
+            return redirect()->back()->withErrors(['delete' => "Can't delete, The Department is using"]);
         }
 
         $department->delete();
         $log = [
             'name' => $department['name'],
-            'code' => $department['code'],            
+            'code' => $department['code'],
             'description' => $department['description'],
         ];
 
         $user = Auth::user();
 
-        $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah menghapus DATA pada DEPARTEMEN KEGIATAN, yaitu DATA : ' . json_encode($log));
+        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menghapus DATA pada DEPARTEMEN KEGIATAN, yaitu DATA : '.json_encode($log));
+
         return redirect(route('data-master.department', $organization['id']));
     }
 }

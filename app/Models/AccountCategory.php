@@ -21,12 +21,12 @@ class AccountCategory extends Model
     {
         $query->when($filters['search'] ?? false, function ($query, $search) {
             return $query->where('name', 'like', '%'.$search.'%')
-                            ->orWhere('code', 'like', '%'.$search.'%');
+                ->orWhere('code', 'like', '%'.$search.'%');
         });
 
         $query->when($filters['accountCategoryFilter'] ?? false, function ($query, $accountCategoryFilter) {
             return $query->where('name', 'like', '%'.$accountCategoryFilter.'%')
-                            ->orWhere('code', 'like', '%'.$accountCategoryFilter.'%');
+                ->orWhere('code', 'like', '%'.$accountCategoryFilter.'%');
         });
     }
 }

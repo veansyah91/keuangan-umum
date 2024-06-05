@@ -2,10 +2,10 @@
 
 namespace App\Policies;
 
-use App\Models\User;
 use App\Models\Organization;
-use Illuminate\Auth\Access\Response;
+use App\Models\User;
 use App\Repositories\User\UserRepository;
+use Illuminate\Auth\Access\Response;
 
 class OrganizationPolicy
 {
@@ -15,7 +15,7 @@ class OrganizationPolicy
     {
         $this->userRepository = $userRepository;
     }
-    
+
     /**
      * Determine whether the user can view any models.
      */
@@ -40,7 +40,7 @@ class OrganizationPolicy
         $organization = $this->userRepository->getOrganization($user['id'], $organization['id']);
         $role = $organization->organizations[0]['pivot']['role'];
 
-        return ($role === 'admin' || $role === 'editor') 
+        return ($role === 'admin' || $role === 'editor')
                 ? Response::allow()
                 : Response::denyWithStatus(403);
     }

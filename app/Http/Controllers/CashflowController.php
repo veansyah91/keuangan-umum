@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Inertia\Inertia;
 use App\Models\Organization;
+use App\Repositories\User\UserRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Repositories\User\UserRepository;
+use Inertia\Inertia;
 
 class CashflowController extends Controller
 {
@@ -16,6 +16,7 @@ class CashflowController extends Controller
     {
         $this->userRepository = $userRepository;
     }
+
     /**
      * Handle the incoming request.
      */
@@ -25,7 +26,7 @@ class CashflowController extends Controller
 
         return Inertia::render('Cashflow/Index', [
             'organization' => $organization,
-            'role' => $this->userRepository->getRole($user['id'], $organization['id'])
+            'role' => $this->userRepository->getRole($user['id'], $organization['id']),
         ]);
     }
 }

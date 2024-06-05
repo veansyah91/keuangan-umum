@@ -2,21 +2,21 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Inertia\Inertia;
-use Inertia\Response;
+use App\Http\Controllers\Controller;
 use App\Models\Organization;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use App\Http\Controllers\Controller;
-use Illuminate\Http\RedirectResponse;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class AdminOrganizationController extends Controller
 {
     public function index(): Response
     {
-        $organizations = Organization::filter(request(['search','start_date', 'end_date', 'status']))->paginate(50)->withQueryString();
+        $organizations = Organization::filter(request(['search', 'start_date', 'end_date', 'status']))->paginate(50)->withQueryString();
 
-        return Inertia::render('Admin/Organizations/Index',[
+        return Inertia::render('Admin/Organizations/Index', [
             'organizations' => $organizations,
             'searchFilter' => request('search'),
             'statusFilter' => request('status'),
@@ -25,17 +25,18 @@ class AdminOrganizationController extends Controller
         ]);
     }
 
-    public function updateStatus(Request $request, Organization $organization):  RedirectResponse
+    public function updateStatus(Request $request, Organization $organization): RedirectResponse
     {
         // validasi
         $validated = $request->validate([
             'status' => [
                 'string',
-                Rule::in(['active', 'deactive', 'trial'])
-            ]
+                Rule::in(['active', 'deactive', 'trial']),
+            ],
         ]);
 
         $organization->update($validated);
+
         return redirect(route('admin.organization.index'));
     }
 }

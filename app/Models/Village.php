@@ -2,22 +2,22 @@
 
 namespace App\Models;
 
-use App\Models\District;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Village extends Model
 {
     use HasFactory;
 
     const UPDATED_AT = null;
+
     const CREATED_AT = null;
-    
+
     protected $fillable = [
-                            'name', 
-                            'id', 
-                            'district_id'];
+        'name',
+        'id',
+        'district_id'];
 
     public function district(): BelongsTo
     {
@@ -28,7 +28,7 @@ class Village extends Model
     {
         $query->when($filters['search'] ?? false, function ($query, $search) {
             return $query->where('id', 'like', '%'.$search.'%')
-                        ->orWhere('name', 'like', '%'.$search.'%');
+                ->orWhere('name', 'like', '%'.$search.'%');
         });
 
         $query->when($filters['village'] ?? false, function ($query, $village) {

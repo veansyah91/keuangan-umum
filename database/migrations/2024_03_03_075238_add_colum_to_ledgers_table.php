@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('ledgers', function (Blueprint $table) {
-            $table->unsignedBigInteger('project_id')->nullable();          
+            $table->unsignedBigInteger('project_id')->nullable();
             $table->foreign('project_id')->references('id')->on('projects');
 
-            $table->unsignedBigInteger('program_id')->nullable();          
+            $table->unsignedBigInteger('program_id')->nullable();
             $table->foreign('program_id')->references('id')->on('programs');
 
-            $table->unsignedBigInteger('department_id')->nullable();          
+            $table->unsignedBigInteger('department_id')->nullable();
             $table->foreign('department_id')->references('id')->on('departments');
 
             $table->boolean('is_approved')->default(true);

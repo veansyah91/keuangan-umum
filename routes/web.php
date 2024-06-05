@@ -1,40 +1,40 @@
 <?php
 
-use Inertia\Inertia;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Foundation\Application;
-use App\Http\Controllers\LogController;
-use App\Http\Controllers\CashinController;
-use App\Http\Controllers\ReportController;
+use App\Http\Controllers\AccountCategoryController;
 use App\Http\Controllers\AccountController;
-use App\Http\Controllers\CashoutController;
-use App\Http\Controllers\ContactController;
-use App\Http\Controllers\JournalController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ProgramController;
-use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminMasterController;
+use App\Http\Controllers\Admin\AdminOrganizationController;
+use App\Http\Controllers\Admin\AdminOrganizationInvoiceController;
+use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\DistrictController;
+use App\Http\Controllers\Admin\OrganizationMenuController;
+use App\Http\Controllers\Admin\ProvinceController;
+use App\Http\Controllers\Admin\RegencyController;
+use App\Http\Controllers\Admin\VillageController;
 use App\Http\Controllers\CashflowController;
+use App\Http\Controllers\CashinController;
+use App\Http\Controllers\CashMutationController;
+use App\Http\Controllers\CashoutController;
+use App\Http\Controllers\ContactCategoryController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DataLedgerController;
 use App\Http\Controllers\DataMasterController;
 use App\Http\Controllers\DepartmentController;
-use App\Http\Controllers\FixedAssetController;
-use App\Http\Controllers\CashMutationController;
-use App\Http\Controllers\OrganizationController;
-use App\Http\Controllers\Admin\RegencyController;
-use App\Http\Controllers\Admin\VillageController;
-use App\Http\Controllers\Admin\DistrictController;
-use App\Http\Controllers\Admin\ProvinceController;
-use App\Http\Controllers\AccountCategoryController;
-use App\Http\Controllers\Admin\AdminUserController;
-use App\Http\Controllers\ContactCategoryController;
-use App\Http\Controllers\Admin\AdminMasterController;
 use App\Http\Controllers\FixedAssetCategoryController;
+use App\Http\Controllers\FixedAssetController;
+use App\Http\Controllers\JournalController;
+use App\Http\Controllers\LogController;
+use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\OrganizationInvoiceController;
-use App\Http\Controllers\Admin\AdminDashboardController;
-use App\Http\Controllers\Admin\OrganizationMenuController;
-use App\Http\Controllers\Admin\AdminOrganizationController;
-use App\Http\Controllers\Admin\AdminOrganizationInvoiceController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProgramController;
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ReportController;
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,6 +49,7 @@ use App\Http\Controllers\Admin\AdminOrganizationInvoiceController;
 
 Route::get('/', function () {
     return redirect(route('organization'));
+
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
@@ -61,7 +62,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Admin
     Route::middleware('is.admin')->group(function () {
         //prefix ADMIN
-        Route::prefix('admin')->group(function(){
+        Route::prefix('admin')->group(function () {
             // Dashboard
             Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
@@ -88,7 +89,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/organization-menu', OrganizationMenuController::class)->name('admin.organization.menu');
             Route::get('/organizations', [AdminOrganizationController::class, 'index'])->name('admin.organization.index');
             Route::patch('/organizations/update-status/{organization}', [AdminOrganizationController::class, 'updateStatus'])->name('admin.organization.update.status');
-            
+
             Route::get('/organization-invoice', [AdminOrganizationInvoiceController::class, 'index'])->name('admin.organization.invoice.index');
             Route::patch('/organization-invoice/{organizationInvoice}/payment-confirmation', [AdminOrganizationInvoiceController::class, 'paymentConfirmation'])->name('admin.organization.invoice.payment.confirmation');
         });
@@ -112,12 +113,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/organizations/{organization}/invoices/create', [OrganizationInvoiceController::class, 'create'])->name('organization.invoice.create');
     Route::post('/organizations/{organization}/invoices/', [OrganizationInvoiceController::class, 'store'])->name('organization.invoice.post');
     Route::get('/organizations/{organization}/invoices/{organizationInvoice}', [OrganizationInvoiceController::class, 'show'])->name('organization.invoice.show')->middleware('user.has.organization:{parameter}');
-    
-    
+
     Route::middleware([
-            'user.has.organization:{parameter}', 
-            'is.not.expired:{parameter}',
-        ])->group(function () {
+        'user.has.organization:{parameter}',
+        'is.not.expired:{parameter}',
+    ])->group(function () {
 
         //Dashboard
         Route::get('/dashboard/{organization}', [DashboardController::class, 'index'])->name('dashboard');
@@ -126,8 +126,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Log
         Route::get('/logs/{organization}', LogController::class)->name('logs');
 
-        // Data Master 
-        Route::prefix('data-master/{organization}')->group(function(){        
+        // Data Master
+        Route::prefix('data-master/{organization}')->group(function () {
             Route::get('/', DataMasterController::class)->name('data-master');
 
             // Contact
@@ -142,7 +142,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/contact-categories', [ContactCategoryController::class, 'index'])->name('data-master.contact-category');
             Route::post('/contact-categories', [ContactCategoryController::class, 'store'])->name('data-master.contact-category.post')->middleware('is.not.viewer');
             Route::patch('/contact-categories/{contactCategory}', [ContactCategoryController::class, 'update'])->name('data-master.contact-category.update')->middleware('is.not.viewer');
-            Route::delete('/contact-categories/{contactCategory}', [ContactCategoryController::class, 'destroy'])->name('data-master.contact-category.destroy')->middleware('is.not.viewer');   
+            Route::delete('/contact-categories/{contactCategory}', [ContactCategoryController::class, 'destroy'])->name('data-master.contact-category.destroy')->middleware('is.not.viewer');
 
             // Projects
             Route::get('/projects', [ProjectController::class, 'index'])->name('data-master.project');
@@ -158,13 +158,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/programs', [ProgramController::class, 'store'])->name('data-master.program.post')->middleware('is.not.viewer');
             Route::patch('/programs/{program}', [ProgramController::class, 'update'])->name('data-master.program.update')->middleware('is.not.viewer');
             Route::delete('/programs/{program}', [ProgramController::class, 'destroy'])->name('data-master.program.destroy')->middleware('is.not.viewer');
-            
-             // Departments
-             Route::get('/departments', [DepartmentController::class, 'index'])->name('data-master.department');
-             Route::post('/departments', [DepartmentController::class, 'store'])->name('data-master.department.post')->middleware('is.not.viewer');
-             Route::patch('/departments/{department}', [DepartmentController::class, 'update'])->name('data-master.department.update')->middleware('is.not.viewer');
-             Route::delete('/departments/{department}', [DepartmentController::class, 'destroy'])->name('data-master.department.destroy')->middleware('is.not.viewer');
-             
+
+            // Departments
+            Route::get('/departments', [DepartmentController::class, 'index'])->name('data-master.department');
+            Route::post('/departments', [DepartmentController::class, 'store'])->name('data-master.department.post')->middleware('is.not.viewer');
+            Route::patch('/departments/{department}', [DepartmentController::class, 'update'])->name('data-master.department.update')->middleware('is.not.viewer');
+            Route::delete('/departments/{department}', [DepartmentController::class, 'destroy'])->name('data-master.department.destroy')->middleware('is.not.viewer');
+
             // Fixed Asset Category
             Route::get('/fixed-asset-categories', [FixedAssetCategoryController::class, 'index'])->name('data-master.fixed-asset-category');
             Route::post('/fixed-asset-categories', [FixedAssetCategoryController::class, 'store'])->name('data-master.fixed-asset-category.post');
@@ -180,11 +180,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::patch('fixed-assets/{fixedAsset}', [FixedAssetController::class, 'update'])->name('data-master.fixed-asset.update');
             Route::delete('fixed-assets/{fixedAsset}', [FixedAssetController::class, 'destroy'])->name('data-master.fixed-asset.destroy');
             Route::patch('fixed-assets/{fixedAsset}/disposal', [FixedAssetController::class, 'disposal'])->name('data-master.fixed-asset.disposal');
-            
+
         });
 
         // Accountancy
-        Route::prefix('data-ledger/{organization}')->group(function(){
+        Route::prefix('data-ledger/{organization}')->group(function () {
             Route::get('/', DataLedgerController::class)->name('data-ledger');
 
             // Account Category
@@ -198,7 +198,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/accounts', [AccountController::class, 'store'])->name('data-ledger.account.post')->middleware('is.not.viewer');
             Route::patch('/accounts/{account}', [AccountController::class, 'update'])->name('data-ledger.account.update')->middleware('is.not.viewer');
             Route::delete('/accounts/{account}', [AccountController::class, 'destroy'])->name('data-ledger.account.delete')->middleware('is.not.viewer');
-            
+
             // Journal
             Route::get('/journals', [JournalController::class, 'index'])->name('data-ledger.journal');
             Route::post('/journals', [JournalController::class, 'store'])->name('data-ledger.journal.store')->middleware('is.not.viewer');
@@ -210,7 +210,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
 
         // Reports
-        Route::prefix('reports/{organization}')->group(function(){
+        Route::prefix('reports/{organization}')->group(function () {
             Route::get('/', [ReportController::class, 'index'])->name('report');
             Route::get('/cashflow', [ReportController::class, 'cashflow'])->name('report.cashflow');
             Route::get('/balance', [ReportController::class, 'balance'])->name('report.balance');
@@ -223,7 +223,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
 
         // Cashflow
-        Route::prefix('cashflows/{organization}')->group(function(){
+        Route::prefix('cashflows/{organization}')->group(function () {
             Route::get('/', CashflowController::class)->name('cashflow');
 
             // cash in

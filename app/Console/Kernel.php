@@ -10,17 +10,18 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         Commands\DepreciationCron::class,
     ];
+
     /**
      * Define the application's command schedule.
      */
     protected function schedule(Schedule $schedule): void
     {
         $schedule->command('depreciation:cron')
-                    ->daily();
-                    // ->everyMinute();
+            ->daily();
+        // ->everyMinute();
         $schedule->command('deactiveOrganization:cron')
-                    ->daily();
-                    // ->everyMinute();
+            ->daily();
+        // ->everyMinute();
     }
 
     /**

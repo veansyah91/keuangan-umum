@@ -10,7 +10,7 @@ class LogRepository implements LogRepositoryInterface
     {
         Log::create([
             'message' => $message,
-            'organization_id' => $organization
+            'organization_id' => $organization,
         ]);
     }
 }

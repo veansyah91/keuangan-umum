@@ -2,11 +2,9 @@
 
 namespace App\Models;
 
-use App\Models\Account;
-use App\Models\Journal;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Cashflow extends Model
 {
@@ -20,7 +18,7 @@ class Cashflow extends Model
         'account_id',
         'organization_id',
         'journal_id',
-        'category'
+        'category',
     ];
 
     public function account(): BelongsTo
@@ -32,5 +30,4 @@ class Cashflow extends Model
     {
         return $this->belongsTo(Journal::class);
     }
-
 }

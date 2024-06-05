@@ -2,8 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use Closure;
 use Carbon\Carbon;
+use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,7 +27,7 @@ class IsNotExpired
         $now = Carbon::now();
 
         if ($organizationParameterCollection['organization']->expired < $now) {
-            return redirect('organizations')->with('error', $organizationParameterCollection['organization']->name . ' Sudah Kadaluarsa, Silakan melakukan perpanjangan');
+            return redirect('organizations')->with('error', $organizationParameterCollection['organization']->name.' Sudah Kadaluarsa, Silakan melakukan perpanjangan');
         }
 
         return $next($request);

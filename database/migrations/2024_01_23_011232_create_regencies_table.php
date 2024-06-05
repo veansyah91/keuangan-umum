@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('regencies', function (Blueprint $table) {
-            $table->uuid('id')->primary();            
+            $table->uuid('id')->primary();
             $table->string('name');
             $table->foreignUuid('province_id')->constrained()->cascadeOnDelete();
         });

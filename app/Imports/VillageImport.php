@@ -3,18 +3,15 @@
 namespace App\Imports;
 
 use App\Models\Village;
-use Maatwebsite\Excel\Concerns\ToModel;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Maatwebsite\Excel\Concerns\WithBatchInserts;
+use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 
-class VillageImport implements ToModel, WithChunkReading, ShouldQueue
+class VillageImport implements ShouldQueue, ToModel, WithChunkReading
 {
     /**
-    * @param array $row
-    *
-    * @return \Illuminate\Database\Eloquent\Model|null
-    */
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
     public function model(array $row)
     {
         return new Village([

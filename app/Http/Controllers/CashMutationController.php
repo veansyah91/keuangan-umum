@@ -2,31 +2,34 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
-use App\Models\User;
-use Inertia\Inertia;
-use App\Models\Ledger;
 use App\Helpers\NewRef;
 use App\Models\Account;
+use App\Models\CashMutation;
+use App\Models\Department;
 use App\Models\Journal;
+use App\Models\Ledger;
+use App\Models\Organization;
 use App\Models\Program;
 use App\Models\Project;
-use App\Models\Department;
-use Carbon\CarbonImmutable;
-use App\Models\CashMutation;
-use App\Models\Organization;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use App\Repositories\Journal\JournalRepository;
 use App\Repositories\Log\LogRepository;
 use App\Repositories\User\UserRepository;
-use App\Repositories\Journal\JournalRepository;
+use Carbon\Carbon;
+use Carbon\CarbonImmutable;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
+use Inertia\Inertia;
 
 class CashMutationController extends Controller
 {
     protected $userRepository;
+
     protected $logRepository;
+
     protected $journalRepository;
+
     protected $now;
 
     public function __construct(UserRepository $userRepository, LogRepository $logRepository, JournalRepository $journalRepository)
@@ -42,21 +45,22 @@ class CashMutationController extends Controller
         $now = $this->now;
         $date = $dateRequest ?? $now->isoFormat('YYYY-MM-DD');
         $dateRef = Carbon::create($date);
-        $refHeader = "MK-" . $dateRef->isoFormat('YYYY') . $dateRef->isoFormat('MM');
-        $newRef = $refHeader . '001';
+        $refHeader = 'MK-'.$dateRef->isoFormat('YYYY').$dateRef->isoFormat('MM');
+        $newRef = $refHeader.'001';
 
         $cashMutation = CashMutation::whereOrganizationId($organization['id'])
-                            ->where('no_ref', 'like', $refHeader . '%')
-                            ->orderBy('no_ref')
-                            ->get()
-                            ->last();
+            ->where('no_ref', 'like', $refHeader.'%')
+            ->orderBy('no_ref')
+            ->get()
+            ->last();
 
         if ($cashMutation) {
-            $newRef = NewRef::create("MK-", $cashMutation['no_ref']);
+            $newRef = NewRef::create('MK-', $cashMutation['no_ref']);
         }
 
         return $newRef;
     }
+
     /**
      * Display a listing of the resource.
      */
@@ -65,11 +69,11 @@ class CashMutationController extends Controller
         $user = Auth::user();
 
         $cashMutations = CashMutation::filter(request(['search', 'start_date', 'end_date', 'is_approved', 'program', 'project', 'department']))
-                            ->whereOrganizationId($organization['id'])
-                            ->with('journal')
-                            ->orderBy('date', 'desc')
-                            ->orderBy('no_ref', 'desc')
-                            ->paginate(50);
+            ->whereOrganizationId($organization['id'])
+            ->with('journal')
+            ->orderBy('date', 'desc')
+            ->orderBy('no_ref', 'desc')
+            ->paginate(50);
 
         return Inertia::render('CashMutation/Index', [
             'startDate' => request('start_date'),
@@ -77,18 +81,18 @@ class CashMutationController extends Controller
             'organization' => $organization,
             'cashMutations' => $cashMutations,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
-            'isApproved' => request('is_approved') == "true" ? true : false,
+            'isApproved' => request('is_approved') == 'true' ? true : false,
             'projects' => Project::whereOrganizationId($organization['id'])
-                                    ->select('id', 'name', 'code')
-                                    ->get(),
+                ->select('id', 'name', 'code')
+                ->get(),
             'programs' => Program::whereIsActive(true)
-                                    ->whereOrganizationId($organization['id'])
-                                    ->select('id', 'name', 'code')
-                                    ->get(), 
+                ->whereOrganizationId($organization['id'])
+                ->select('id', 'name', 'code')
+                ->get(),
             'departments' => Department::whereIsActive(true)
-                                        ->whereOrganizationId($organization['id'])
-                                        ->select('id', 'name', 'code')
-                                        ->get(),
+                ->whereOrganizationId($organization['id'])
+                ->select('id', 'name', 'code')
+                ->get(),
         ]);
     }
 
@@ -105,22 +109,22 @@ class CashMutationController extends Controller
             'newRef' => $this->newRef($organization, request('date')),
             'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
             'cashAccounts' => Account::filter(request(['account']))
-                                    ->whereIsActive(true)
-                                    ->whereOrganizationId($organization['id'])
-                                    ->whereIsCash(true)
-                                    ->select('id', 'name', 'code', 'is_cash')
-                                    ->get(),
+                ->whereIsActive(true)
+                ->whereOrganizationId($organization['id'])
+                ->whereIsCash(true)
+                ->select('id', 'name', 'code', 'is_cash')
+                ->get(),
             'projects' => Project::whereOrganizationId($organization['id'])
-                                    ->select('id', 'name', 'code')
-                                    ->get(),
+                ->select('id', 'name', 'code')
+                ->get(),
             'programs' => Program::whereIsActive(true)
-                                    ->whereOrganizationId($organization['id'])
-                                    ->select('id', 'name', 'code')
-                                    ->get(), 
+                ->whereOrganizationId($organization['id'])
+                ->select('id', 'name', 'code')
+                ->get(),
             'departments' => Department::whereIsActive(true)
-                                        ->whereOrganizationId($organization['id'])
-                                        ->select('id', 'name', 'code')
-                                        ->get(),
+                ->whereOrganizationId($organization['id'])
+                ->select('id', 'name', 'code')
+                ->get(),
         ]);
     }
 
@@ -133,35 +137,35 @@ class CashMutationController extends Controller
         $validated = $request->validate([
             'date' => [
                 'required',
-                'date',               
+                'date',
             ],
             'description' => [
                 'required',
-                'string',               
+                'string',
             ],
             'no_ref' => [
                 'required',
-                'string', 
-                Rule::unique('cash_mutations')->where(function ($query) use ($request, $organization){
+                'string',
+                Rule::unique('cash_mutations')->where(function ($query) use ($organization) {
                     return $query->where('organization_id', $organization['id']);
-                })               
+                }),
             ],
             'accountDebit' => [
                 'required',
-                'exists:accounts,id'
+                'exists:accounts,id',
             ],
             'accountCredit' => [
                 'required',
-                'exists:accounts,id'
+                'exists:accounts,id',
             ],
             'value' => [
                 'required',
                 'numeric',
-                'min:1'
+                'min:1',
             ],
             'is_approved' => [
                 'required',
-                'boolean'
+                'boolean',
             ],
             'department_id' => [
                 'nullable',
@@ -176,8 +180,8 @@ class CashMutationController extends Controller
 
         // cek tanggal
         // jika tanggal lebih tinggi dari hari sekarang, maka kirimkan error\
-        if ($validated['date'] > $this->now->isoFormat("YYYY-MM-DD")) {
-            return redirect()->back()->withErrors(["date" => "Date Value is Unexpected!"]);
+        if ($validated['date'] > $this->now->isoFormat('YYYY-MM-DD')) {
+            return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
         }
 
         // jika tahun, tidak dalam peride
@@ -186,7 +190,7 @@ class CashMutationController extends Controller
         $yearInput = $tempDateInput->isoFormat('YYYY');
 
         if ($yearInput !== $year) {
-             return redirect()->back()->withErrors(["date" => "Date Value is Unexpected!"]);        
+            return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
         }
 
         // siapkan variabel akun untuk buku besar
@@ -196,7 +200,7 @@ class CashMutationController extends Controller
             'code' => '',
             'is_cash' => 1,
             'debit' => $validated['value'],
-            'credit' => 0
+            'credit' => 0,
         ];
         $validated['accounts'][1] = [
             'id' => $validated['accountCredit'],
@@ -204,7 +208,7 @@ class CashMutationController extends Controller
             'code' => '',
             'is_cash' => 1,
             'debit' => 0,
-            'credit' => $validated['value']
+            'credit' => $validated['value'],
         ];
 
         $validated['organization_id'] = $organization['id'];
@@ -222,10 +226,10 @@ class CashMutationController extends Controller
 
         CashMutation::create($validated);
 
-        $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah menambahkan DATA pada MUTASI KAS dengan DATA : ' . json_encode($log));
+        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menambahkan DATA pada MUTASI KAS dengan DATA : '.json_encode($log));
 
         return redirect(route('cashflow.cash-mutation.create', $organization['id']));
-       
+
     }
 
     /**
@@ -233,7 +237,7 @@ class CashMutationController extends Controller
      */
     public function show(Organization $organization, CashMutation $cashMutation)
     {
-        $user = Auth::user();     
+        $user = Auth::user();
 
         $journal = Journal::find($cashMutation['journal_id']);
         $journalUser = $journal->user()->get();
@@ -259,7 +263,7 @@ class CashMutationController extends Controller
         $user = Auth::user();
 
         $ledgers = $cashMutation->journal->ledgers;
-        
+
         foreach ($ledgers as $ledger) {
             if ($ledger['debit'] > 0) {
                 $cashMutation['accountDebit'] = [
@@ -280,6 +284,7 @@ class CashMutationController extends Controller
         $cashMutation->journal->program;
         $cashMutation->journal->project;
         $cashMutation->journal->department;
+
         // dd($cashMutation);
         return Inertia::render('CashMutation/Edit', [
             'cashMutation' => $cashMutation,
@@ -288,22 +293,22 @@ class CashMutationController extends Controller
             'newRef' => $this->newRef($organization, request('date')),
             'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
             'cashAccounts' => Account::filter(request(['account']))
-                                    ->whereIsActive(true)
-                                    ->whereOrganizationId($organization['id'])
-                                    ->whereIsCash(true)
-                                    ->select('id', 'name', 'code', 'is_cash')
-                                    ->get(),
+                ->whereIsActive(true)
+                ->whereOrganizationId($organization['id'])
+                ->whereIsCash(true)
+                ->select('id', 'name', 'code', 'is_cash')
+                ->get(),
             'projects' => Project::whereOrganizationId($organization['id'])
-                                    ->select('id', 'name', 'code')
-                                    ->get(),
+                ->select('id', 'name', 'code')
+                ->get(),
             'programs' => Program::whereIsActive(true)
-                                    ->whereOrganizationId($organization['id'])
-                                    ->select('id', 'name', 'code')
-                                    ->get(), 
+                ->whereOrganizationId($organization['id'])
+                ->select('id', 'name', 'code')
+                ->get(),
             'departments' => Department::whereIsActive(true)
-                                        ->whereOrganizationId($organization['id'])
-                                        ->select('id', 'name', 'code')
-                                        ->get(),
+                ->whereOrganizationId($organization['id'])
+                ->select('id', 'name', 'code')
+                ->get(),
         ]);
     }
 
@@ -317,35 +322,35 @@ class CashMutationController extends Controller
         $validated = $request->validate([
             'date' => [
                 'required',
-                'date',               
+                'date',
             ],
             'description' => [
                 'required',
-                'string',               
+                'string',
             ],
             'no_ref' => [
                 'required',
-                'string', 
-                Rule::unique('cash_mutations')->where(function ($query) use ($request, $organization){
+                'string',
+                Rule::unique('cash_mutations')->where(function ($query) use ($organization) {
                     return $query->where('organization_id', $organization['id']);
-                })->ignore($cashMutation['id'])               
+                })->ignore($cashMutation['id']),
             ],
             'accountDebit' => [
                 'required',
-                'exists:accounts,id'
+                'exists:accounts,id',
             ],
             'accountCredit' => [
                 'required',
-                'exists:accounts,id'
+                'exists:accounts,id',
             ],
             'value' => [
                 'required',
                 'numeric',
-                'min:1'
+                'min:1',
             ],
             'is_approved' => [
                 'required',
-                'boolean'
+                'boolean',
             ],
             'department_id' => [
                 'nullable',
@@ -360,19 +365,19 @@ class CashMutationController extends Controller
 
         // cek apakah role user yang mengakses adalah admin atau pengguna yang membuat data, jika bukan, maka redirect ke halaman awal
         $organizationUser = User::whereId($user['id'])
-                                ->with('organizations', function ($query) use ($organization){
-                                    $query->whereOrganizationId($organization['id']);
-                                })
-                                ->first();
-        
+            ->with('organizations', function ($query) use ($organization) {
+                $query->whereOrganizationId($organization['id']);
+            })
+            ->first();
+
         if ($user['id'] !== $cashMutation['created_by_id'] && $organizationUser->organizations[0]->pivot->role !== 'admin') {
             return redirect(route('cashflow.journal', $organization['id']))->with('error', 'Anda Tidak Memiliki Hak Akses');
         }
 
         // cek tanggal
         // jika tanggal lebih tinggi dari hari sekarang, maka kirimkan error\
-        if ($validated['date'] > $this->now->isoFormat("YYYY-MM-DD")) {
-            return redirect()->back()->withErrors(["date" => "Date Value is Unexpected!"]);
+        if ($validated['date'] > $this->now->isoFormat('YYYY-MM-DD')) {
+            return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
         }
 
         // jika tahun, tidak dalam peride
@@ -381,7 +386,7 @@ class CashMutationController extends Controller
         $yearInput = $tempDateInput->isoFormat('YYYY');
 
         if ($yearInput !== $year) {
-             return redirect()->back()->withErrors(["date" => "Date Value is Unexpected!"]);        
+            return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
         }
 
         // siapkan variabel akun untuk buku besar
@@ -391,7 +396,7 @@ class CashMutationController extends Controller
             'code' => '',
             'is_cash' => 1,
             'debit' => $validated['value'],
-            'credit' => 0
+            'credit' => 0,
         ];
         $validated['accounts'][1] = [
             'id' => $validated['accountCredit'],
@@ -399,7 +404,7 @@ class CashMutationController extends Controller
             'code' => '',
             'is_cash' => 1,
             'debit' => 0,
-            'credit' => $validated['value']
+            'credit' => $validated['value'],
         ];
 
         $validated['organization_id'] = $organization['id'];
@@ -407,7 +412,7 @@ class CashMutationController extends Controller
 
         $cashMutation->update($validated);
 
-        $this->journalRepository->update($validated, $cashMutation->journal);   
+        $this->journalRepository->update($validated, $cashMutation->journal);
 
         $log = [
             'description' => $validated['description'],
@@ -416,7 +421,7 @@ class CashMutationController extends Controller
             'value' => $validated['value'],
         ];
 
-        $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah mengubah DATA pada MUTASI KAS dengan DATA : ' . json_encode($log));
+        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah mengubah DATA pada MUTASI KAS dengan DATA : '.json_encode($log));
 
         return redirect(route('cashflow.cash-mutation.edit', ['organization' => $organization['id'], 'cashMutation' => $cashMutation]));
     }
@@ -430,8 +435,8 @@ class CashMutationController extends Controller
 
         // cek tanggal
         // jika tanggal lebih tinggi dari hari sekarang, maka kirimkan error\
-        if ($cashMutation['date'] > $this->now->isoFormat("YYYY-MM-DD")) {
-            return redirect()->back()->withErrors(["date" => "Date Value is Unexpected!"]);
+        if ($cashMutation['date'] > $this->now->isoFormat('YYYY-MM-DD')) {
+            return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
         }
 
         // jika tahun, tidak dalam peride
@@ -440,16 +445,16 @@ class CashMutationController extends Controller
         $yearInput = $tempDateInput->isoFormat('YYYY');
 
         if ($yearInput !== $year) {
-             return redirect()->back()->withErrors(["date" => "Date Value is Unexpected!"]);        
+            return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
         }
 
         // cek apakah role user yang mengakses adalah admin atau pengguna yang membuat data, jika bukan, maka redirect ke halaman awal
         $organizationUser = User::whereId($user['id'])
-                                ->with('organizations', function ($query) use ($organization){
-                                    $query->whereOrganizationId($organization['id']);
-                                })
-                                ->first();
-        
+            ->with('organizations', function ($query) use ($organization) {
+                $query->whereOrganizationId($organization['id']);
+            })
+            ->first();
+
         if ($user['id'] !== $cashMutation['user_id'] && $organizationUser->organizations[0]->pivot->role !== 'admin') {
             return redirect(route('cashflow.cash-mutation', $organization['id']))->with('error', 'Anda Tidak Memiliki Hak Akses');
         }
@@ -461,10 +466,11 @@ class CashMutationController extends Controller
             'description' => $cashMutation['description'],
             'date' => $cashMutation['date'],
             'no_ref' => $cashMutation['no_ref'],
-            'value' => $cashMutation['value']
+            'value' => $cashMutation['value'],
         ];
 
-        $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah menghapus DATA pada MUTASI KAS, yaitu DATA : ' . json_encode($log));
+        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menghapus DATA pada MUTASI KAS, yaitu DATA : '.json_encode($log));
+
         return redirect(route('cashflow.cash-mutation', $organization['id']));
     }
 }

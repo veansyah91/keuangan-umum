@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use Inertia\Inertia;
-use Inertia\Response;
 use App\Models\Contact;
-use App\Models\Organization;
-use Illuminate\Http\Request;
 use App\Models\ContactCategory;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Organization;
 use App\Repositories\Log\LogRepository;
 use App\Repositories\User\UserRepository;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class ContactController extends Controller
 {
     protected $userRepository;
+
     protected $logRepository;
 
     public function __construct(UserRepository $userRepository, LogRepository $logRepository)
@@ -22,6 +23,7 @@ class ContactController extends Controller
         $this->userRepository = $userRepository;
         $this->logRepository = $logRepository;
     }
+
     /**
      * Display a listing of the resource.
      */
@@ -30,15 +32,15 @@ class ContactController extends Controller
         $user = Auth::user();
 
         $contacts = Contact::filter(request(['search']))
-                            ->whereOrganizationId($organization['id'])
-                            ->with('contactCategories')
-                            ->paginate(50);
+            ->whereOrganizationId($organization['id'])
+            ->with('contactCategories')
+            ->paginate(50);
 
         return Inertia::render('Contact/Index', [
             'organization' => $organization,
             'contacts' => $contacts,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
-            'searchFilter' => request('search')
+            'searchFilter' => request('search'),
         ]);
     }
 
@@ -50,14 +52,14 @@ class ContactController extends Controller
         $user = Auth::user();
 
         $categories = ContactCategory::whereOrganizationId($organization['id'])
-                                        ->select('id', 'name')
-                                        ->orderBy('name')
-                                        ->get();
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get();
 
         return Inertia::render('Contact/Create', [
             'organization' => $organization,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
-            'categories' => $categories
+            'categories' => $categories,
         ]);
     }
 
@@ -67,12 +69,12 @@ class ContactController extends Controller
     public function store(Request $request, Organization $organization)
     {
         $validated = $request->validate([
-            'name' => "required|string",
-            'address' => "string|nullable",
-            'phone' => "string|nullable",
-            'description' => "string|nullable",
-            'category' => "required",
-            'category.*' => "numeric"
+            'name' => 'required|string',
+            'address' => 'string|nullable',
+            'phone' => 'string|nullable',
+            'description' => 'string|nullable',
+            'category' => 'required',
+            'category.*' => 'numeric',
         ]);
 
         $log = [
@@ -93,7 +95,7 @@ class ContactController extends Controller
 
         $user = Auth::user();
 
-        $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah menambahkan DATA pada KONTAK, Data: ' . json_encode($log));
+        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menambahkan DATA pada KONTAK, Data: '.json_encode($log));
 
         return redirect(route('data-master.contact.create', $organization['id']));
     }
@@ -114,12 +116,12 @@ class ContactController extends Controller
         $user = Auth::user();
 
         $categories = ContactCategory::whereOrganizationId($organization['id'])
-                                        ->select('id', 'name')
-                                        ->orderBy('name')
-                                        ->get();
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get();
 
-        $contactCategories =  $contact->contactCategories()->select('contact_category_id as id')->get();
-        
+        $contactCategories = $contact->contactCategories()->select('contact_category_id as id')->get();
+
         $selected = [];
 
         foreach ($contactCategories as $key => $contactCategory) {
@@ -131,7 +133,7 @@ class ContactController extends Controller
             'contact' => $contact,
             'contactCategory' => $selected,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
-            'categories' => $categories
+            'categories' => $categories,
         ]);
     }
 
@@ -141,12 +143,12 @@ class ContactController extends Controller
     public function update(Request $request, Organization $organization, Contact $contact)
     {
         $validated = $request->validate([
-            'name' => "required|string",
-            'address' => "string|nullable",
-            'phone' => "string|nullable",
-            'description' => "string|nullable",
-            'category' => "required",
-            'category.*' => "numeric"
+            'name' => 'required|string',
+            'address' => 'string|nullable',
+            'phone' => 'string|nullable',
+            'description' => 'string|nullable',
+            'category' => 'required',
+            'category.*' => 'numeric',
         ]);
 
         $log = [
@@ -163,7 +165,7 @@ class ContactController extends Controller
 
         $user = Auth::user();
 
-        $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah mengubah DATA pada KONTAK menjadi : ' . json_encode($log));
+        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah mengubah DATA pada KONTAK menjadi : '.json_encode($log));
 
         return redirect(route('data-master.contact.edit', ['organization' => $organization['id'], 'contact' => $contact['id']]));
     }

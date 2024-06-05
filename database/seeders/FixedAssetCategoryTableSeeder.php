@@ -2,10 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\FixedAssetCategory;
 use App\Models\Organization;
 use Illuminate\Database\Seeder;
-use App\Models\FixedAssetCategory;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class FixedAssetCategoryTableSeeder extends Seeder
 {
@@ -17,27 +16,27 @@ class FixedAssetCategoryTableSeeder extends Seeder
         $data = [
             [
                 'lifetime' => 0,
-                'name' => "TANAH",
+                'name' => 'TANAH',
                 'status' => true,
             ],
             [
                 'lifetime' => 48,
-                'name' => "MESIN DAN PERALATAN",
+                'name' => 'MESIN DAN PERALATAN',
                 'status' => true,
             ],
             [
                 'lifetime' => 96,
-                'name' => "KENDARAAN",
+                'name' => 'KENDARAAN',
                 'status' => true,
             ],
             [
                 'lifetime' => 48,
-                'name' => "HARTA LAINNYA",
+                'name' => 'HARTA LAINNYA',
                 'status' => true,
             ],
             [
                 'lifetime' => 240,
-                'name' => "GEDUNG",
+                'name' => 'GEDUNG',
                 'status' => true,
             ],
         ];

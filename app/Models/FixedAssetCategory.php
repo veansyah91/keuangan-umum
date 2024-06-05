@@ -13,7 +13,7 @@ class FixedAssetCategory extends Model
         'lifetime',
         'name',
         'status',
-        'organization_id'
+        'organization_id',
     ];
 
     public function scopeFilter($query, $filters)
@@ -23,7 +23,7 @@ class FixedAssetCategory extends Model
         });
 
         $query->when($filters['status'] ?? false, function ($query, $status) {
-            return $query->where('status', $status == "true" ? true : false);
+            return $query->where('status', $status == 'true' ? true : false);
         });
     }
 }

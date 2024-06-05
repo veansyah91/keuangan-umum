@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string('disposal_ref')->nullable();
             $table->string('disposal_description')->nullable();
 
-            $table->unsignedBigInteger('disposal_journal_id')->nullable();          
-            $table->foreign('disposal_journal_id')->references('id')->on('journals'); 
+            $table->unsignedBigInteger('disposal_journal_id')->nullable();
+            $table->foreign('disposal_journal_id')->references('id')->on('journals');
         });
     }
 
@@ -33,7 +33,7 @@ return new class extends Migration
             $table->dropColumn('disposal_ref');
             $table->dropColumn('disposal_description');
 
-            $table->dropForeign('disposal_journal_id');   
+            $table->dropForeign('disposal_journal_id');
         });
     }
 };

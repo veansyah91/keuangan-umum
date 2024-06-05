@@ -2,14 +2,14 @@
 
 namespace App\Console\Commands;
 
-use Carbon\Carbon;
 use App\Helpers\NewRef;
 use App\Models\Account;
-use App\Models\Journal;
 use App\Models\FixedAsset;
+use App\Models\Journal;
+use App\Repositories\Journal\JournalRepository;
+use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Command;
-use App\Repositories\Journal\JournalRepository;
 
 class DepreciationCron extends Command
 {
@@ -17,17 +17,17 @@ class DepreciationCron extends Command
     {
         $date = $dateRequest;
         $dateRef = Carbon::create($date);
-        $refHeader = "JU-" . $dateRef->isoFormat('YYYY') . $dateRef->isoFormat('MM');
-        $newRef = $refHeader . '001';
+        $refHeader = 'JU-'.$dateRef->isoFormat('YYYY').$dateRef->isoFormat('MM');
+        $newRef = $refHeader.'001';
 
         $journal = Journal::whereOrganizationId($organization)
-                            ->where('no_ref', 'like', $refHeader . '%')
-                            ->orderBy('no_ref')
-                            ->get()
-                            ->last();
+            ->where('no_ref', 'like', $refHeader.'%')
+            ->orderBy('no_ref')
+            ->get()
+            ->last();
 
         if ($journal) {
-            $newRef = NewRef::create("JU-", $journal['no_ref']);
+            $newRef = NewRef::create('JU-', $journal['no_ref']);
         }
 
         return $newRef;
@@ -53,10 +53,10 @@ class DepreciationCron extends Command
     public function handle()
     {
         try {
-            \Log::info("Depreciation Schedule Cron job Berhasil di jalankan " . date('Y-m-d H:i:s'));
+            \Log::info('Depreciation Schedule Cron job Berhasil di jalankan '.date('Y-m-d H:i:s'));
             $fixedAssets = FixedAsset::where('is_disposed', false)
-                                    ->whereColumn('value', '<>', 'depreciation_accumulated')
-                                    ->get();
+                ->whereColumn('value', '<>', 'depreciation_accumulated')
+                ->get();
 
             $now = CarbonImmutable::now();
 
@@ -78,19 +78,19 @@ class DepreciationCron extends Command
                     }
 
                     $fixedAsset->update([
-                        'depreciation_accumulated' => $fixedAsset['depreciation_accumulated'] + $depreciationValue
+                        'depreciation_accumulated' => $fixedAsset['depreciation_accumulated'] + $depreciationValue,
                     ]);
 
                     //acccounts
                     //depreciation accumulation
                     $dep_acc = Account::find($fixedAsset['accumulated_depreciation']);
-                    
+
                     //depreciation cost
                     $dep_cost = Account::find($fixedAsset['depreciation']);
 
                     // journal
                     $validated['no_ref'] = $this->newRef($fixedAsset['organization_id'], $now->isoFormat('YYYY-MM-DD'));
-                    $validated['description'] = "Penyusutan Harta Tetap " . $fixedAsset['name'];
+                    $validated['description'] = 'Penyusutan Harta Tetap '.$fixedAsset['name'];
                     $validated['date'] = $now->isoFormat('YYYY-MM-DD');
                     $validated['value'] = $depreciationValue;
                     $validated['organization_id'] = $fixedAsset['organization_id'];
@@ -100,23 +100,22 @@ class DepreciationCron extends Command
                             'id' => $dep_acc['id'],
                             'code' => $dep_acc['code'],
                             'debit' => 0,
-                            'credit' =>  $depreciationValue,
+                            'credit' => $depreciationValue,
                             'is_cash' => $dep_acc['is_cash'],
                         ],
                         [
                             'id' => $dep_cost['id'],
                             'code' => $dep_cost['code'],
                             'debit' => $depreciationValue,
-                            'credit' =>  0,
+                            'credit' => 0,
                             'is_cash' => $dep_cost['is_cash'],
                         ],
                     ];
 
-                    $journalRepository->store($validated);      
-                }               
+                    $journalRepository->store($validated);
+                }
 
             }
-
 
             // \Log::info($fixedAssets);
 

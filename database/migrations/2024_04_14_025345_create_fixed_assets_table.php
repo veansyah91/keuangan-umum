@@ -14,24 +14,24 @@ return new class extends Migration
         Schema::create('fixed_assets', function (Blueprint $table) {
             $table->id();
             $table->foreignUuid('organization_id')->constrained()->cascadeOnDelete();
-            
-            $table->unsignedBigInteger('user_id');          
-            $table->foreign('user_id')->references('id')->on('users'); 
-            
-            $table->unsignedBigInteger('fixed_asset_category_id');          
-            $table->foreign('fixed_asset_category_id')->references('id')->on('fixed_asset_categories'); 
 
-            $table->unsignedBigInteger('asset');          
-            $table->foreign('asset')->references('id')->on('accounts'); 
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users');
 
-            $table->unsignedBigInteger('accumulated_depreciation')->nullable();          
-            $table->foreign('accumulated_depreciation')->references('id')->on('accounts'); 
+            $table->unsignedBigInteger('fixed_asset_category_id');
+            $table->foreign('fixed_asset_category_id')->references('id')->on('fixed_asset_categories');
 
-            $table->unsignedBigInteger('depreciation')->nullable();          
-            $table->foreign('depreciation')->references('id')->on('accounts'); 
+            $table->unsignedBigInteger('asset');
+            $table->foreign('asset')->references('id')->on('accounts');
 
-            $table->unsignedBigInteger('credit_account')->nullable();          
-            $table->foreign('credit_account')->references('id')->on('accounts'); 
+            $table->unsignedBigInteger('accumulated_depreciation')->nullable();
+            $table->foreign('accumulated_depreciation')->references('id')->on('accounts');
+
+            $table->unsignedBigInteger('depreciation')->nullable();
+            $table->foreign('depreciation')->references('id')->on('accounts');
+
+            $table->unsignedBigInteger('credit_account')->nullable();
+            $table->foreign('credit_account')->references('id')->on('accounts');
 
             $table->integer('lifetime')->default(0); //dalam bulan
             $table->string('name');

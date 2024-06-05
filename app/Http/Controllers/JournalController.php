@@ -2,34 +2,33 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
-use App\Models\User;
-use Inertia\Inertia;
-use App\Models\Ledger;
 use App\Helpers\NewRef;
 use App\Models\Account;
+use App\Models\Department;
 use App\Models\Journal;
+use App\Models\Ledger;
+use App\Models\Organization;
 use App\Models\Program;
 use App\Models\Project;
-use App\Models\Cashflow;
-use App\Models\Department;
-use Carbon\CarbonImmutable;
-use App\Models\Organization;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use App\Repositories\Journal\JournalRepository;
 use App\Repositories\Log\LogRepository;
 use App\Repositories\User\UserRepository;
-use Illuminate\Support\Facades\Validator;
-use App\Repositories\Journal\JournalRepository;
-use Illuminate\Database\Query\Builder;
-
+use Carbon\Carbon;
+use Carbon\CarbonImmutable;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
+use Inertia\Inertia;
 
 class JournalController extends Controller
 {
     protected $userRepository;
+
     protected $logRepository;
+
     protected $journalRepository;
+
     protected $now;
 
     public function __construct(UserRepository $userRepository, LogRepository $logRepository, JournalRepository $journalRepository)
@@ -45,29 +44,29 @@ class JournalController extends Controller
         $now = $this->now;
         $date = $dateRequest ?? $now->isoFormat('YYYY-MM-DD');
         $dateRef = Carbon::create($date);
-        $refHeader = "JU-" . $dateRef->isoFormat('YYYY') . $dateRef->isoFormat('MM');
-        $newRef = $refHeader . '001';
+        $refHeader = 'JU-'.$dateRef->isoFormat('YYYY').$dateRef->isoFormat('MM');
+        $newRef = $refHeader.'001';
 
         $journal = Journal::whereOrganizationId($organization['id'])
-                            ->where('no_ref', 'like', $refHeader . '%')
-                            ->orderBy('no_ref')
-                            ->get()
-                            ->last();
+            ->where('no_ref', 'like', $refHeader.'%')
+            ->orderBy('no_ref')
+            ->get()
+            ->last();
 
         if ($journal) {
-            $newRef = NewRef::create("JU-", $journal['no_ref']);
+            $newRef = NewRef::create('JU-', $journal['no_ref']);
         }
 
         return $newRef;
     }
-    
+
     public function index(Organization $organization)
     {
         $journals = Journal::filter(request(['search', 'start_date', 'end_date', 'is_approved', 'program', 'project', 'department']))
-                            ->whereOrganizationId($organization['id'])
-                            ->orderBy('date', 'desc')
-                            ->orderBy('no_ref', 'desc')
-                            ->paginate(50);
+            ->whereOrganizationId($organization['id'])
+            ->orderBy('date', 'desc')
+            ->orderBy('no_ref', 'desc')
+            ->paginate(50);
 
         $user = Auth::user();
 
@@ -77,18 +76,18 @@ class JournalController extends Controller
             'organization' => $organization,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'journals' => $journals,
-            'isApproved' => request('is_approved') == "true" ? true : false,
+            'isApproved' => request('is_approved') == 'true' ? true : false,
             'projects' => Project::whereOrganizationId($organization['id'])
-                                    ->select('id', 'name', 'code')
-                                    ->get(),
+                ->select('id', 'name', 'code')
+                ->get(),
             'programs' => Program::whereIsActive(true)
-                                    ->whereOrganizationId($organization['id'])
-                                    ->select('id', 'name', 'code')
-                                    ->get(), 
+                ->whereOrganizationId($organization['id'])
+                ->select('id', 'name', 'code')
+                ->get(),
             'departments' => Department::whereIsActive(true)
-                                        ->whereOrganizationId($organization['id'])
-                                        ->select('id', 'name', 'code')
-                                        ->get(),
+                ->whereOrganizationId($organization['id'])
+                ->select('id', 'name', 'code')
+                ->get(),
         ]);
     }
 
@@ -97,7 +96,7 @@ class JournalController extends Controller
      */
     public function create(Organization $organization)
     {
-        $user = Auth::user();                     
+        $user = Auth::user();
 
         return Inertia::render('Journal/Create', [
             'organization' => $organization,
@@ -105,21 +104,21 @@ class JournalController extends Controller
             'newRef' => $this->newRef($organization, request('date')),
             'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
             'accounts' => Account::filter(request(['search']))
-                                    ->whereIsActive(true)
-                                    ->whereOrganizationId($organization['id'])
-                                    ->select('id', 'name', 'code', 'is_cash')
-                                    ->get(),
+                ->whereIsActive(true)
+                ->whereOrganizationId($organization['id'])
+                ->select('id', 'name', 'code', 'is_cash')
+                ->get(),
             'projects' => Project::whereOrganizationId($organization['id'])
-                                    ->select('id', 'name', 'code')
-                                    ->get(),
+                ->select('id', 'name', 'code')
+                ->get(),
             'programs' => Program::whereIsActive(true)
-                                    ->whereOrganizationId($organization['id'])
-                                    ->select('id', 'name', 'code')
-                                    ->get(), 
+                ->whereOrganizationId($organization['id'])
+                ->select('id', 'name', 'code')
+                ->get(),
             'departments' => Department::whereIsActive(true)
-                                        ->whereOrganizationId($organization['id'])
-                                        ->select('id', 'name', 'code')
-                                        ->get(),
+                ->whereOrganizationId($organization['id'])
+                ->select('id', 'name', 'code')
+                ->get(),
 
         ]);
     }
@@ -134,43 +133,43 @@ class JournalController extends Controller
         $validated = $request->validate([
             'date' => [
                 'required',
-                'date',               
+                'date',
             ],
             'description' => [
                 'required',
-                'string',               
+                'string',
             ],
             'no_ref' => [
                 'required',
-                'string', 
-                Rule::unique('journals')->where(function ($query) use ($request, $organization){
+                'string',
+                Rule::unique('journals')->where(function ($query) use ($organization) {
                     return $query->where('organization_id', $organization['id']);
-                })               
+                }),
             ],
             'accounts' => [
                 'required',
             ],
             'accounts.*.id' => [
                 'required',
-                'exists:accounts,id'
+                'exists:accounts,id',
             ],
             'accounts.*.debit' => [
                 'required',
                 'numeric',
-                'min:0'
+                'min:0',
             ],
             'accounts.*.credit' => [
                 'required',
                 'numeric',
-                'min:0'
+                'min:0',
             ],
             'accounts.*.is_cash' => [
                 'required',
-                'boolean'
+                'boolean',
             ],
             'is_approved' => [
                 'required',
-                'boolean'
+                'boolean',
             ],
             'department_id' => [
                 'nullable',
@@ -189,8 +188,8 @@ class JournalController extends Controller
 
         // cek tanggal
         // jika tanggal lebih tinggi dari hari sekarang, maka kirimkan error\
-        if ($validated['date'] > $this->now->isoFormat("YYYY-MM-DD")) {
-            return redirect()->back()->withErrors(["date" => "Date Value is Unexpected!"]);
+        if ($validated['date'] > $this->now->isoFormat('YYYY-MM-DD')) {
+            return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
         }
 
         // jika tahun, tidak dalam peride
@@ -199,7 +198,7 @@ class JournalController extends Controller
         $yearInput = $tempDateInput->isoFormat('YYYY');
 
         if ($yearInput !== $year) {
-             return redirect()->back()->withErrors(["date" => "Date Value is Unexpected!"]);        
+            return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
         }
 
         foreach ($validated['accounts'] as $value) {
@@ -212,7 +211,7 @@ class JournalController extends Controller
         }
 
         if ($totalDebit - $totalCredit !== 0) {
-            return redirect()->back()->withErrors(['balance'=>'Not Balances']);
+            return redirect()->back()->withErrors(['balance' => 'Not Balances']);
         }
 
         $validated['value'] = $totalDebit;
@@ -224,12 +223,12 @@ class JournalController extends Controller
             'description' => $validated['description'],
             'date' => $validated['date'],
             'no_ref' => $validated['no_ref'],
-            'value' => $totalDebit
+            'value' => $totalDebit,
         ];
 
         $this->journalRepository->store($validated);
 
-        $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah menambahkan DATA pada JURNAL dengan DATA : ' . json_encode($log));
+        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menambahkan DATA pada JURNAL dengan DATA : '.json_encode($log));
 
         return redirect(route('data-ledger.journal.create', $organization['id']));
     }
@@ -239,7 +238,7 @@ class JournalController extends Controller
      */
     public function show(Organization $organization, Journal $journal)
     {
-        $user = Auth::user();     
+        $user = Auth::user();
         $journalUser = $journal->user()->get();
 
         return Inertia::render('Journal/Show', [
@@ -248,33 +247,33 @@ class JournalController extends Controller
             'journal' => $journal,
             'journalUser' => $journalUser,
             'ledgers' => Ledger::whereJournalId($journal['id'])
-                                ->with('account')
-                                ->get(),
+                ->with('account')
+                ->get(),
             'program' => Program::find($journal['program_id']),
             'project' => Project::find($journal['project_id']),
             'department' => Department::find($journal['department_id']),
         ]);
     }
- 
+
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(Organization $organization, Journal $journal)
     {
-        $user = Auth::user();     
-        
+        $user = Auth::user();
+
         // cek apakah role user yang mengakses adalah admin atau pengguna yang membuat data, jika bukan, maka redirect ke halaman awal
         $organizationUser = User::whereId($user['id'])
-                                ->with('organizations', function ($query) use ($organization){
-                                    $query->whereOrganizationId($organization['id']);
-                                })
-                                ->first();
-        
+            ->with('organizations', function ($query) use ($organization) {
+                $query->whereOrganizationId($organization['id']);
+            })
+            ->first();
+
         if ($user['id'] !== $journal['user_id'] && $organizationUser->organizations[0]->pivot->role !== 'admin') {
             return redirect(route('data-ledger.journal', $organization['id']))->with('error', 'Anda Tidak Memiliki Hak Akses');
         }
 
-        if (!$journal['is_direct']) {
+        if (! $journal['is_direct']) {
             return redirect(route('data-ledger.journal', $organization['id']))->with('error', 'Tidak Bisa Diedit Di Journal');
         }
 
@@ -284,19 +283,19 @@ class JournalController extends Controller
         $yearInput = $tempDateInput->isoFormat('YYYY');
 
         if ($yearInput !== $year) {
-             return redirect()->back()->withErrors(["date" => "Date Value is Unexpected!"]);        
+            return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
         }
 
         $accounts = Account::filter(request(['search']))
-                            ->whereIsActive(true)
-                            ->whereOrganizationId($organization['id'])
-                            ->select('id', 'name', 'code', 'is_cash')
-                            ->get();               
+            ->whereIsActive(true)
+            ->whereOrganizationId($organization['id'])
+            ->select('id', 'name', 'code', 'is_cash')
+            ->get();
 
         $now = Carbon::now();
         $date = request('date') ?? $journal['date'];
 
-        return Inertia::render('Journal/Edit',[
+        return Inertia::render('Journal/Edit', [
             'organization' => $organization,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'newRef' => $this->newRef($organization, request('date')),
@@ -308,16 +307,16 @@ class JournalController extends Controller
             'project' => Project::find($journal['project_id']),
             'department' => Department::find($journal['department_id']),
             'projects' => Project::whereOrganizationId($organization['id'])
-                                    ->select('id', 'name', 'code')
-                                    ->get(),
+                ->select('id', 'name', 'code')
+                ->get(),
             'programs' => Program::whereIsActive(true)
-                                    ->whereOrganizationId($organization['id'])
-                                    ->select('id', 'name', 'code')
-                                    ->get(), 
+                ->whereOrganizationId($organization['id'])
+                ->select('id', 'name', 'code')
+                ->get(),
             'departments' => Department::whereIsActive(true)
-                                        ->whereOrganizationId($organization['id'])
-                                        ->select('id', 'name', 'code')
-                                        ->get(),
+                ->whereOrganizationId($organization['id'])
+                ->select('id', 'name', 'code')
+                ->get(),
         ]);
     }
 
@@ -330,60 +329,60 @@ class JournalController extends Controller
 
         // cek apakah role user yang mengakses adalah admin atau pengguna yang membuat data, jika bukan, maka redirect ke halaman awal
         $organizationUser = User::whereId($user['id'])
-                                ->with('organizations', function ($query) use ($organization){
-                                    $query->whereOrganizationId($organization['id']);
-                                })
-                                ->first();
-        
+            ->with('organizations', function ($query) use ($organization) {
+                $query->whereOrganizationId($organization['id']);
+            })
+            ->first();
+
         if ($user['id'] !== $journal['user_id'] && $organizationUser->organizations[0]->pivot->role !== 'admin') {
             return redirect(route('data-ledger.journal', $organization['id']))->with('error', 'Anda Tidak Memiliki Hak Akses');
         }
 
-        if (!$journal['is_direct']) {
+        if (! $journal['is_direct']) {
             return redirect(route('data-ledger.journal', $organization['id']))->with('error', 'Tidak Bisa Diedit Di Journal');
         }
 
         $validated = $request->validate([
             'date' => [
                 'required',
-                'date',               
+                'date',
             ],
             'description' => [
                 'required',
-                'string',               
+                'string',
             ],
             'no_ref' => [
                 'required',
-                'string', 
-                Rule::unique('journals')->where(function ($query) use ($request, $organization){
+                'string',
+                Rule::unique('journals')->where(function ($query) use ($organization) {
                     return $query->where('organization_id', $organization['id']);
-                })->ignore($journal['id'])               
+                })->ignore($journal['id']),
             ],
             'accounts' => [
                 'required',
             ],
             'accounts.*.id' => [
                 'required',
-                'exists:accounts,id'
+                'exists:accounts,id',
             ],
             'accounts.*.debit' => [
                 'required',
                 'numeric',
-                'min:0'
+                'min:0',
             ],
             'accounts.*.credit' => [
                 'required',
                 'numeric',
-                'min:0'
+                'min:0',
             ],
             'accounts.*.is_cash' => [
                 'required',
-                'boolean'
+                'boolean',
             ],
             'is_approved' => [
                 'required',
-                'boolean'
-            ],            
+                'boolean',
+            ],
             'department_id' => [
                 'nullable',
             ],
@@ -397,8 +396,8 @@ class JournalController extends Controller
 
         // cek tanggal
         // jika tanggal lebih tinggi dari hari sekarang, maka kirimkan error\
-        if (($validated['date'] > $this->now->isoFormat("YYYY-MM-DD")) || ($journal['date'] > $this->now->isoFormat("YYYY-MM-DD"))) {
-            return redirect()->back()->withErrors(["date" => "Date Value is Unexpected!"]);
+        if (($validated['date'] > $this->now->isoFormat('YYYY-MM-DD')) || ($journal['date'] > $this->now->isoFormat('YYYY-MM-DD'))) {
+            return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
         }
 
         // jika tahun, tidak dalam peride
@@ -407,7 +406,7 @@ class JournalController extends Controller
         $yearInput = $tempDateInput->isoFormat('YYYY');
 
         if ($yearInput !== $year) {
-             return redirect()->back()->withErrors(["date" => "Date Value is Unexpected!"]);        
+            return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
         }
 
         // cek balancing debit dan kredit
@@ -424,7 +423,7 @@ class JournalController extends Controller
         }
 
         if ($totalDebit - $totalCredit !== 0) {
-            return redirect()->back()->withErrors(['balance'=>'Not Balances']);
+            return redirect()->back()->withErrors(['balance' => 'Not Balances']);
         }
 
         $validated['value'] = $totalDebit;
@@ -435,12 +434,12 @@ class JournalController extends Controller
             'description' => $validated['description'],
             'date' => $validated['date'],
             'no_ref' => $validated['no_ref'],
-            'value' => $totalDebit
+            'value' => $totalDebit,
         ];
 
-        $this->journalRepository->update($validated, $journal);      
-        
-        $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah mengubah DATA pada JURNAL menjadi : ' . json_encode($log));
+        $this->journalRepository->update($validated, $journal);
+
+        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah mengubah DATA pada JURNAL menjadi : '.json_encode($log));
 
         return redirect(route('data-ledger.journal.edit', ['organization' => $organization['id'], 'journal' => $journal]));
     }
@@ -452,13 +451,13 @@ class JournalController extends Controller
     {
         $user = Auth::user();
 
-        if (!$journal['is_direct']) {
+        if (! $journal['is_direct']) {
             return redirect(route('data-ledger.journal', $organization['id']))->withErrors(['isNotDirect' => 'Tidak Bisa Dihapus Di Journal']);
         }
         // cek tanggal
         // jika tanggal lebih tinggi dari hari sekarang, maka kirimkan error\
-        if ($journal['date'] > $this->now->isoFormat("YYYY-MM-DD")) {
-            return redirect()->back()->withErrors(["date" => "Date Value is Unexpected!"]);
+        if ($journal['date'] > $this->now->isoFormat('YYYY-MM-DD')) {
+            return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
         }
 
         // jika tahun, tidak dalam periode
@@ -467,30 +466,30 @@ class JournalController extends Controller
         $yearInput = $tempDateInput->isoFormat('YYYY');
 
         if ($yearInput !== $year) {
-             return redirect()->back()->withErrors(["date" => "Date Value is Unexpected!"]);        
+            return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
         }
 
         // cek apakah role user yang mengakses adalah admin atau pengguna yang membuat data, jika bukan, maka redirect ke halaman awal
         $organizationUser = User::whereId($user['id'])
-                                ->with('organizations', function ($query) use ($organization){
-                                    $query->whereOrganizationId($organization['id']);
-                                })
-                                ->first();
-        
+            ->with('organizations', function ($query) use ($organization) {
+                $query->whereOrganizationId($organization['id']);
+            })
+            ->first();
+
         if ($user['id'] !== $journal['user_id'] && $organizationUser->organizations[0]->pivot->role !== 'admin') {
             return redirect(route('data-ledger.journal', $organization['id']))->with('error', 'Anda Tidak Memiliki Hak Akses');
-        }       
-        
+        }
+
         $journal->delete();
 
         $log = [
             'description' => $journal['description'],
             'date' => $journal['date'],
             'no_ref' => $journal['no_ref'],
-            'value' => $journal['value']
+            'value' => $journal['value'],
         ];
 
-        $this->logRepository->store($organization['id'], strtoupper($user['name']) . ' telah menghapus DATA pada JURNAL, yaitu DATA : ' . json_encode($log));
+        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menghapus DATA pada JURNAL, yaitu DATA : '.json_encode($log));
 
         return redirect()->back();
     }
