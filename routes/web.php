@@ -85,6 +85,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             // Users
             Route::get('/users', [AdminUserController::class, 'index'])->name('admin.users');
+            Route::patch('/users/{user}/affiliation', [AdminUserController::class, 'storeAffiliation'])->name('admin.user.store.affiliation');
 
             // Organizations
             Route::get('/organization-menu', OrganizationMenuController::class)->name('admin.organization.menu');

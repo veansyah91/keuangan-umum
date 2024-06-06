@@ -18,6 +18,7 @@ import TitleDesktop from '@/Components/Desktop/TitleDesktop';
 import ContentDesktop from '@/Components/Desktop/ContentDesktop';
 import { IoEllipsisVertical, IoTrash } from 'react-icons/io5/index.esm';
 import { GiTakeMyMoney } from "react-icons/gi";
+import TextInput from '@/Components/TextInput';
 
 function Index({users, userCollections, searchFilter, affiliateCoderecommendation}) {
     const [showSearch, setShowSearch] = useState(false);
@@ -28,16 +29,18 @@ function Index({users, userCollections, searchFilter, affiliateCoderecommendatio
         endDate: ''
     });
     const [showDateFilter, setShowDateFilter] = useState(false);
+    const [showAffilateModal, setShowAffiliateModal] = useState(false);
 
     const [debounceValue] = useDebounce(search, 500);
     const [debounceDateValue] = useDebounce(dateValue, 500);
 
     const prevSearch = usePrevious(search);
 
-    const { data, setData, patch } = useForm({
+    const { data, setData, patch, errors, processing } = useForm({
         'id': null,
         'name' : '',
-        'affiliatedCode' : ''
+        'affiliatedCode' : '',
+        'insentive' : 10
     })
 
     useEffect(() => {
@@ -67,13 +70,17 @@ function Index({users, userCollections, searchFilter, affiliateCoderecommendatio
     } 
 
     const handleSetAffiliation = (user) => {
-        console.log(user);
+        setShowAffiliateModal(true);
         let newCode = user.name.replace(/\s+/g, '');
-        setData({
+
+        let tempData = data;
+        tempData = {
+            ...data,
             'id': user.id,
             'name': user.name,
             'affiliatedCode' : newCode.toUpperCase()
-        }); 
+        }
+        setData(tempData); 
         router.reload({
             only: ['affiliateCoderecommendation'],
             data: {
@@ -83,6 +90,16 @@ function Index({users, userCollections, searchFilter, affiliateCoderecommendatio
                 console.log(affiliateCoderecommendation);
             }
         });
+    }
+
+    const handleSubmitAffiliation = (e) => {
+        e.preventDefault()
+
+        patch(route('admin.user.store.affiliation', data.id), {
+            onSuccess: () => {
+                console.log('success');
+            }
+        })
     }
 
     return (
@@ -253,7 +270,6 @@ function Index({users, userCollections, searchFilter, affiliateCoderecommendatio
                 {/* Modal */}
                 <Modal show={showFilter} onClose={() => setShowFilter(false)}>
                     <div className='p-5'>
-                    
                         <h2 className="text-lg font-medium text-gray-900">
                             Filter Data
                         </h2>
@@ -277,6 +293,89 @@ function Index({users, userCollections, searchFilter, affiliateCoderecommendatio
                             </PrimaryButton>
                         </div>
                     </div>
+                </Modal>
+
+                <Modal show={showAffilateModal} onClose={() => setShowAffiliateModal(false)}>
+                    <form onSubmit={handleSubmitAffiliation}>
+                        <div className='p-5'>
+                            <h2 className="text-lg font-medium text-gray-900">
+                                Buat Affiliasi
+                            </h2>
+                            <section className='mt-5 space-y-2'>
+                                <div className='flex flex-col sm:flex-row justify-between gap-1'>
+                                    <div className='w-full sm:w-1/3 my-auto'>
+                                        <InputLabel value={'Nama'} htmlFor='name' className=' mx-auto my-auto'/>
+                                    </div>
+                                    
+                                    <div className='w-full sm:w-2/3'>
+                                        <TextInput 
+                                        id="name"
+                                        name='name'
+                                        className={`w-full ${errors?.name && 'border-red-500'}`}
+                                        isFocused={true}
+                                        placeholder='Nama'
+                                        value={data.name}
+                                        onChange={(e) => setData('name', e.target.value.toUpperCase())}
+                                        />
+                                        {
+                                        errors?.name && <span className='text-red-500 text-xs'>{errors.name}</span>
+                                        }
+                                        
+                                    </div>
+                                </div>
+                                <div className='flex flex-col sm:flex-row justify-between gap-1'>
+                                    <div className='w-full sm:w-1/3 my-auto'>
+                                        <InputLabel value={'Kode'} htmlFor='affiliatedCode' className=' mx-auto my-auto'/>
+                                    </div>
+                                    
+                                    <div className='w-full sm:w-2/3'>
+                                        <TextInput 
+                                        id="name"
+                                        name='affiliatedCode'
+                                        className={`w-full ${errors?.affiliatedCode && 'border-red-500'}`}
+                                        placeholder='Kode'
+                                        value={data.affiliatedCode}
+                                        onChange={(e) => setData('affiliatedCode', e.target.value.toUpperCase())}
+                                        />
+                                        {
+                                        errors?.affiliatedCode && <span className='text-red-500 text-xs'>{errors.affiliatedCode}</span>
+                                        }
+                                        
+                                    </div>
+                                </div>
+                                <div className='flex flex-col sm:flex-row justify-between gap-1'>
+                                    <div className='w-full sm:w-1/3 my-auto'>
+                                        <InputLabel value={'Insenstive (%)'} htmlFor='insentive' className=' mx-auto my-auto'/>
+                                    </div>
+                                    
+                                    <div className='w-full sm:w-2/3'>
+                                        <TextInput 
+                                        id="name"
+                                        name='insentive'
+                                        className={`w-full ${errors?.insentive && 'border-red-500'}`}
+                                        placeholder='Kode'
+                                        value={data.insentive}
+                                        onChange={(e) => setData('insentive', e.target.value.toUpperCase())}
+                                        />
+                                        {
+                                        errors?.insentive && <span className='text-red-500 text-xs'>{errors.insentive}</span>
+                                        }
+                                        
+                                    </div>
+                                </div>
+                            </section>
+
+                            <div className="mt-6 flex justify-end">
+                                <SecondaryButton onClick={() => setShowAffiliateModal(false)}>Batal</SecondaryButton>
+
+                                <PrimaryButton className="ms-3" 
+                                    disabled={processing}
+                                >
+                                    Buat Afiliasi
+                                </PrimaryButton>
+                            </div>
+                        </div>
+                    </form>
                 </Modal>
             {/* Desktop */}
 

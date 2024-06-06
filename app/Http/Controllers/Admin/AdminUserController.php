@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Carbon\Carbon;
@@ -37,5 +38,10 @@ class AdminUserController extends Controller
             'searchFilter' => request('searchFilter'),
             'affiliateCoderecommendation' => Inertia::lazy(fn () => $this->codeRecomendation(request('name')))
         ]);
+    }
+
+    public function storeAffiliation(Request $request, User $user)
+    {
+        dd($user);
     }
 }
