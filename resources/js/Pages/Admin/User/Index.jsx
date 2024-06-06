@@ -20,7 +20,22 @@ import { IoEllipsisVertical, IoTrash } from 'react-icons/io5/index.esm';
 import { GiTakeMyMoney } from "react-icons/gi";
 import TextInput from '@/Components/TextInput';
 
-function Index({users, userCollections, searchFilter, affiliateCoderecommendation}) {
+const getNumber = (name) => {
+    // let numberCode = name.match(/\d+/g);
+
+    // return numberCode[0];
+    // This regex will match sequences of digits
+    const regex = /(\d+)/;
+    
+    // Use the regex to split the string
+    const parts = name.split(regex);
+
+    // Filter out any empty strings
+    return parts.filter(part => part !== "");
+}
+
+function Index({users, userCollections, searchFilter, affiliateCodeRecommendation}) {
+    
     const [showSearch, setShowSearch] = useState(false);
     const [showFilter, setShowFilter] = useState(false);
     const [search, setSearch] = useState(searchFilter || '');
@@ -39,7 +54,7 @@ function Index({users, userCollections, searchFilter, affiliateCoderecommendatio
     const { data, setData, patch, errors, processing } = useForm({
         'id': null,
         'name' : '',
-        'affiliatedCode' : '',
+        'no_ref' : '',
         'insentive' : 10
     })
 
@@ -72,22 +87,38 @@ function Index({users, userCollections, searchFilter, affiliateCoderecommendatio
     const handleSetAffiliation = (user) => {
         setShowAffiliateModal(true);
         let newCode = user.name.replace(/\s+/g, '');
-
-        let tempData = data;
-        tempData = {
-            ...data,
-            'id': user.id,
-            'name': user.name,
-            'affiliatedCode' : newCode.toUpperCase()
-        }
-        setData(tempData); 
+        
         router.reload({
-            only: ['affiliateCoderecommendation'],
+            only: ['affiliateCodeRecommendation'],
             data: {
                 'name' : newCode.toUpperCase()
             },
-            onSuccess : () => {
-                console.log(affiliateCoderecommendation);
+            onSuccess : ({ props }) => {
+                let tempData = data;
+
+                let newRef = newCode.toUpperCase();
+
+                if (props.affiliateCodeRecommendation) {
+                    // cek apakah ada angka pada ref lama
+                    // jika ya ditambah angka yang ada dengan 1
+                    let findNumberInRef = getNumber(props.affiliateCodeRecommendation.no_ref);
+
+                    if (findNumberInRef.length > 1) {
+                        let addNumber = parseInt(findNumberInRef[1]) + 1;
+                        newRef = newRef + addNumber.toString();
+                    } else {
+                        newRef = newRef + '1';
+                    }
+                    // jika tidak tambahkan angka 1
+                }
+
+                tempData = {
+                    ...data,
+                    'id': user.id,
+                    'name': user.name,
+                    'no_ref' : newRef
+                }
+                setData(tempData); 
             }
         });
     }
@@ -98,6 +129,7 @@ function Index({users, userCollections, searchFilter, affiliateCoderecommendatio
         patch(route('admin.user.store.affiliation', data.id), {
             onSuccess: () => {
                 console.log('success');
+                setShowAffiliateModal(false);
             }
         })
     }
@@ -241,23 +273,31 @@ function Index({users, userCollections, searchFilter, affiliateCoderecommendatio
                                             }
                                             </td>
                                             <td className=''>
-
+                                                {
+                                                    user.affiliation
+                                                }
                                             </td>
-                                            <td className='text-end'>
-                                                <div className="dropdown dropdown-left">
-                                                    <div                             
-                                                        tabIndex={0} 
-                                                        role="button" className={`bg-inherit border-none hover:bg-gray-100 -z-50 text-gray-300'`}>
-                                                        <IoEllipsisVertical />
+                                            <td className='text-end'>                                                
+                                                {
+                                                    !user.affiliation && 
+                                                    <div className="dropdown dropdown-left">
+                                                        <div                             
+                                                            tabIndex={0} 
+                                                            role="button" className={`bg-inherit border-none hover:bg-gray-100 -z-50 text-gray-300'`}>
+                                                            <IoEllipsisVertical />
+                                                        </div>
+                                                            
+                                                            <ul tabIndex={0} className="dropdown-content z-[50] menu p-2 shadow bg-base-100 rounded-box w-56">
+                                                                <li>                                
+                                                                    <button 
+                                                                        onClick={() => handleSetAffiliation(user)}
+                                                                    ><GiTakeMyMoney />Afiliasi</button>
+                                                                </li>
+                                                            </ul>
+                                                            
                                                     </div>
-                                                    <ul tabIndex={0} className="dropdown-content z-[50] menu p-2 shadow bg-base-100 rounded-box w-56">
-                                                        <li>                                
-                                                            <button 
-                                                                onClick={() => handleSetAffiliation(user)}
-                                                            ><GiTakeMyMoney />Afiliasi</button>
-                                                        </li>
-                                                    </ul>
-                                                </div>
+                                                }
+
                                             </td>
                                         </tr>
                                     )
@@ -325,20 +365,20 @@ function Index({users, userCollections, searchFilter, affiliateCoderecommendatio
                                 </div>
                                 <div className='flex flex-col sm:flex-row justify-between gap-1'>
                                     <div className='w-full sm:w-1/3 my-auto'>
-                                        <InputLabel value={'Kode'} htmlFor='affiliatedCode' className=' mx-auto my-auto'/>
+                                        <InputLabel value={'Kode'} htmlFor='no_ref' className=' mx-auto my-auto'/>
                                     </div>
                                     
                                     <div className='w-full sm:w-2/3'>
                                         <TextInput 
-                                        id="name"
-                                        name='affiliatedCode'
-                                        className={`w-full ${errors?.affiliatedCode && 'border-red-500'}`}
+                                        id="no_ref"
+                                        name='no_ref'
+                                        className={`w-full ${errors?.no_ref && 'border-red-500'}`}
                                         placeholder='Kode'
-                                        value={data.affiliatedCode}
-                                        onChange={(e) => setData('affiliatedCode', e.target.value.toUpperCase())}
+                                        value={data.no_ref}
+                                        onChange={(e) => setData('no_ref', e.target.value.toUpperCase())}
                                         />
                                         {
-                                        errors?.affiliatedCode && <span className='text-red-500 text-xs'>{errors.affiliatedCode}</span>
+                                        errors?.no_ref && <span className='text-red-500 text-xs'>{errors.no_ref}</span>
                                         }
                                         
                                     </div>
@@ -350,7 +390,7 @@ function Index({users, userCollections, searchFilter, affiliateCoderecommendatio
                                     
                                     <div className='w-full sm:w-2/3'>
                                         <TextInput 
-                                        id="name"
+                                        id="insentive"
                                         name='insentive'
                                         className={`w-full ${errors?.insentive && 'border-red-500'}`}
                                         placeholder='Kode'

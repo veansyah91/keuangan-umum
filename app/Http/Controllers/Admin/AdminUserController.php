@@ -2,25 +2,28 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Carbon\Carbon;
+use App\Models\User;
+use Inertia\Inertia;
+use App\Models\Affiliation;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use Carbon\Carbon;
-use Inertia\Inertia;
 
 class AdminUserController extends Controller
 {
     protected function codeRecomendation($name)
     {
-        return $name;
+        $affiliate = Affiliation::whereNoRef($name)->get()->last();
+        return $affiliate;
     }
 
     public function index()
     {
-        $users = User::with('affilation')->filter(request(['search', 'start_date', 'end_date']))->whereNot('role', 'super-admin')->paginate(50);
+        $users = User::filter(request(['search', 'start_date', 'end_date']))->whereNot('role', 'super-admin')->paginate(50);
 
         $userCollection = $users->map(function ($user) {
             $date = new Carbon($user['created_at']);
+            $affilate = Affiliation::where('user_id', $user['id'])->first();
 
             return [
                 'id' => $user['id'],
@@ -29,6 +32,7 @@ class AdminUserController extends Controller
                 'date' => $date->isoFormat('D MMMM Y'),
                 'role' => $user['role'],
                 'email_verified_at' => $user['email_verified_at'],
+                'affiliation' => $affilate ? $affilate['no_ref'] : ''
             ];
         });
 
@@ -36,12 +40,24 @@ class AdminUserController extends Controller
             'users' => $users,
             'userCollections' => $userCollection,
             'searchFilter' => request('searchFilter'),
-            'affiliateCoderecommendation' => Inertia::lazy(fn () => $this->codeRecomendation(request('name')))
+            'affiliateCodeRecommendation' => Inertia::lazy(fn () => $this->codeRecomendation(request('name')))
         ]);
     }
 
     public function storeAffiliation(Request $request, User $user)
     {
-        dd($user);
+        $validated = $request->validate([
+            'no_ref' => [
+                'required',
+                'unique:affiliations',
+                'string'
+            ],
+        ]);
+
+        $validated['user_id'] = $user['id'];
+
+        Affiliation::create($validated);
+
+        return redirect()->back();
     }
 }

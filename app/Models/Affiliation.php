@@ -16,6 +16,7 @@ class Affiliation extends Model
         'balance',
         'bank_account',
         'bank_name',
+        'is_active'
     ];
 
     public function user(): BelongsTo
