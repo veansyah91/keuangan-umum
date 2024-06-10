@@ -366,7 +366,19 @@ class OrganizationController extends Controller
             ->with('users', function ($query) use ($user) {
                 $query->where('user_id', $user['id']);
             })
+            ->whereNot('status', 'deactive')
             ->get();
+
+        if (config('app.env') === 'local') {
+            $organizations = Organization::filter(request(['search']))
+            ->whereHas('users', function ($query) use ($user) {
+                $query->where('user_id', $user['id']);
+            })
+            ->with('users', function ($query) use ($user) {
+                $query->where('user_id', $user['id']);
+            })
+            ->get();
+        }
 
         return Inertia::render('Organization/Index',
             [

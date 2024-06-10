@@ -17,6 +17,7 @@ import SecondaryButton from "@/Components/SecondaryButton";
 import DangerButton from "@/Components/DangerButton";
 import { Menu } from "@headlessui/react";
 import { FaMoneyBill1 } from "react-icons/fa6";
+import SuccessButton from "@/Components/SuccessButton";
 
 export default function Index({auth, organizations, searchFilter, affiliation}) {
     console.log(affiliation);
@@ -159,9 +160,9 @@ export default function Index({auth, organizations, searchFilter, affiliation}) 
                                 <div className="flex justify-end gap-3">
                                     <div>
                                         <Link href='/organizations/create'>
-                                            <PrimaryButton className="gap-2">
+                                            <SuccessButton className="gap-2">
                                                 <FaMoneyBill1 /> Afiliasi
-                                            </PrimaryButton>
+                                            </SuccessButton>
                                         </Link>
                                     </div>
                                     <div>
@@ -184,7 +185,7 @@ export default function Index({auth, organizations, searchFilter, affiliation}) 
                                         </Link>
                                     </div>
                                     <div>
-                                        <Link className={'btn btn-circle bg-gray-800 text-white'} href='/organizations/create'>
+                                        <Link className={'btn btn-circle bg-green-800 text-white'} href='/organizations/create'>
                                             <div className="text-xl font-bold">
                                                 <FaMoneyBill1 height={20} width={20}/>
                                             </div>
