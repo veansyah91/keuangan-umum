@@ -52,6 +52,10 @@ class AdminUserController extends Controller
                 'unique:affiliations',
                 'string'
             ],
+            'insentive' => [
+                'required',
+                'numeric',
+            ]
         ]);
 
         $validated['user_id'] = $user['id'];

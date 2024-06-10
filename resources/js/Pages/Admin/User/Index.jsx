@@ -395,7 +395,7 @@ function Index({users, userCollections, searchFilter, affiliateCodeRecommendatio
                                         className={`w-full ${errors?.insentive && 'border-red-500'}`}
                                         placeholder='Kode'
                                         value={data.insentive}
-                                        onChange={(e) => setData('insentive', e.target.value.toUpperCase())}
+                                        onChange={(e) => setData('insentive', parseInt(e.target.value))}
                                         />
                                         {
                                         errors?.insentive && <span className='text-red-500 text-xs'>{errors.insentive}</span>

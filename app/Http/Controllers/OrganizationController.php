@@ -2,22 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Contact;
-use App\Models\ContactCategory;
-use App\Models\FixedAssetCategory;
-use App\Models\Organization;
-use App\Models\User;
-use App\Repositories\Account\AccountRepositoryInterface;
-use App\Repositories\AccountCategory\AccountCategoryRepositoryInterface;
-use App\Repositories\Village\VillageRepository;
 use Carbon\Carbon;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
+use App\Models\User;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Models\Contact;
+use App\Models\Affiliation;
+use Illuminate\Support\Str;
+use App\Models\Organization;
+use Illuminate\Http\Request;
+use App\Models\ContactCategory;
+use Illuminate\Validation\Rule;
+use App\Models\FixedAssetCategory;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\RedirectResponse;
+use App\Repositories\Village\VillageRepository;
+use App\Repositories\Account\AccountRepositoryInterface;
+use App\Repositories\AccountCategory\AccountCategoryRepositoryInterface;
 
 class OrganizationController extends Controller
 {
@@ -356,6 +357,8 @@ class OrganizationController extends Controller
     {
         $user = Auth::user();
 
+        $affiliation = Affiliation::where('user_id', $user['id'])->first();
+
         $organizations = Organization::filter(request(['search']))
             ->whereHas('users', function ($query) use ($user) {
                 $query->where('user_id', $user['id']);
@@ -368,6 +371,7 @@ class OrganizationController extends Controller
         return Inertia::render('Organization/Index',
             [
                 'organizations' => $organizations,
+                'affiliation' => $affiliation,
                 'searchFilter' => request('search'),
             ]
         );
@@ -529,6 +533,7 @@ class OrganizationController extends Controller
             'addressDetail.village_id' => 'string|nullable',
         ]);
 
+        $validated['slug'] = Str::slug($validated['name']);
         $validated['province'] = $validated['addressDetail']['province'];
         $validated['province_id'] = $validated['addressDetail']['province_id'];
         $validated['regency'] = $validated['addressDetail']['regency'];

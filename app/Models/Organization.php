@@ -30,6 +30,7 @@ class Organization extends Model
         'village_id',
         'slug',
         'is_profit',
+        'affiliation_id'
     ];
 
     public function users(): BelongsToMany

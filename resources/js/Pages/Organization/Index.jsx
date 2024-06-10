@@ -16,8 +16,10 @@ import Modal from "@/Components/Modal";
 import SecondaryButton from "@/Components/SecondaryButton";
 import DangerButton from "@/Components/DangerButton";
 import { Menu } from "@headlessui/react";
+import { FaMoneyBill1 } from "react-icons/fa6";
 
-export default function Index({auth, organizations, searchFilter}) {
+export default function Index({auth, organizations, searchFilter, affiliation}) {
+    console.log(affiliation);
     const { flash } = usePage().props;
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const [organizationDelete, setOrganizationDelete] = useState({});
@@ -98,7 +100,6 @@ export default function Index({auth, organizations, searchFilter}) {
                                 <div className='sm:hidden text-gray-800 flex flex-col-reverse gap-5'>
                                     <div className="my-auto">
                                         Daftar Organisasi / Bisnis
-                                        
                                     </div>
                                     <div className="flex flex-row-reverse text-end">
                                         <div>
@@ -155,20 +156,37 @@ export default function Index({auth, organizations, searchFilter}) {
                             
                             <div className='sm:flex-1 my-auto text-end hidden md:block'>
                                 {/* Desktop */}
+                                <div className="flex justify-end gap-3">
+                                    <div>
+                                        <Link href='/organizations/create'>
+                                            <PrimaryButton className="gap-2">
+                                                <FaMoneyBill1 /> Afiliasi
+                                            </PrimaryButton>
+                                        </Link>
+                                    </div>
+                                    <div>
                                     <Link href='/organizations/create'>
                                         <PrimaryButton>
                                             Tambah Organisasi
                                         </PrimaryButton>
-                                        
                                     </Link>
+                                    </div>
+                                </div>
                                 {/* End Desktop */}
                             </div>
-                            <div className='md:hidden block fixed left-2 bottom-2'>
+                            <div className='md:hidden flex fixed left-2 bottom-2'>
                                 {/* Mobile */}
                                     <div>
                                         <Link className={'btn btn-circle bg-gray-800 text-white'} href='/organizations/create'>
                                             <div className="text-xl font-bold">
                                                 <IoAddOutline height={20} width={20}/>
+                                            </div>
+                                        </Link>
+                                    </div>
+                                    <div>
+                                        <Link className={'btn btn-circle bg-gray-800 text-white'} href='/organizations/create'>
+                                            <div className="text-xl font-bold">
+                                                <FaMoneyBill1 height={20} width={20}/>
                                             </div>
                                         </Link>
                                     </div>

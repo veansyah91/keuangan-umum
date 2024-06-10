@@ -29,7 +29,7 @@ class DeactiveOrganizationCron extends Command
     public function handle()
     {
         // Sample
-        \Log::info('Cron job Deactive Organization di jalankan '.date('Y-m-d H:i:s'));
+        // \Log::info('Cron job Deactive Organization di jalankan '.date('Y-m-d H:i:s'));
 
         $now = CarbonImmutable::now();
         $organizations = Organization::where('status', '<>', 'deactive')->get();
@@ -43,7 +43,7 @@ class DeactiveOrganizationCron extends Command
                 $organization->update([
                     'status' => 'deactive',
                 ]);
-                \Log::info($organization);
+                // \Log::info($organization);
 
             }
 

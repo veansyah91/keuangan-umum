@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\NewRef;
-use App\Models\Organization;
-use App\Models\OrganizationInvoice;
 use Carbon\Carbon;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Helpers\NewRef;
+use App\Models\Affiliation;
+use App\Models\Organization;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use App\Models\OrganizationInvoice;
+use Illuminate\Http\RedirectResponse;
 
 class OrganizationInvoiceController extends Controller
 {
@@ -61,10 +62,17 @@ class OrganizationInvoiceController extends Controller
         if ($dateNow > $tempExpiredDate) {
             $tempExpiredDate = $dateNow;
         }
-        $expiredAdd12Month = $tempExpiredDate->addMonths(12);
+
+        $affiliate = Affiliation::where('no_ref', request('affiliate'))->first();
+
+        $expiredAdd12Month = $affiliate ?  $tempExpiredDate->addMonths(15) : $tempExpiredDate->addMonths(12);
         $organization['expiredAdd12Month'] = $expiredAdd12Month->isoFormat('D MMMM Y');
 
-        return Inertia::render('Organization/Invoice/Create', compact('organization'));
+
+        return Inertia::render('Organization/Invoice/Create', [
+            'organization' => $organization,
+            'affiliate' => $affiliate
+        ]);
     }
 
     public function store(Organization $organization, Request $request): RedirectResponse
@@ -74,6 +82,10 @@ class OrganizationInvoiceController extends Controller
                 'required',
                 Rule::in(['Tahunan', 'Bulanan']),
             ],
+            'affiliation_id' => [
+                'nullable',
+                'exists:affiliations,id'
+            ]
         ]);
 
         $date = Carbon::now();
@@ -93,6 +105,12 @@ class OrganizationInvoiceController extends Controller
         }
 
         $organizationInvoice = OrganizationInvoice::create($validated);
+
+        if ($validated['affiliation_id']) {
+            $organization->update([
+                'affiliation_id' => $validated['affiliation_id']
+            ]);
+        }
 
         return redirect(route('organization.invoice.show', [$organization['id'], $organizationInvoice['id']]))->with('success', 'Pesanan Perpanjangan Layanan Berhasil Dibuat!');
     }
