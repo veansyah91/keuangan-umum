@@ -1,41 +1,42 @@
 
 <?php
 
-use App\Http\Controllers\AccountCategoryController;
-use App\Http\Controllers\AccountController;
-use App\Http\Controllers\Admin\AdminDashboardController;
-use App\Http\Controllers\Admin\AdminMasterController;
-use App\Http\Controllers\Admin\AdminOrganizationController;
-use App\Http\Controllers\Admin\AdminOrganizationInvoiceController;
-use App\Http\Controllers\Admin\AdminUserController;
-use App\Http\Controllers\Admin\DistrictController;
-use App\Http\Controllers\Admin\OrganizationMenuController;
-use App\Http\Controllers\Admin\ProvinceController;
-use App\Http\Controllers\Admin\RegencyController;
-use App\Http\Controllers\Admin\VillageController;
-use App\Http\Controllers\CashflowController;
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Foundation\Application;
+use App\Http\Controllers\LogController;
 use App\Http\Controllers\CashinController;
-use App\Http\Controllers\CashMutationController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\CashoutController;
-use App\Http\Controllers\ContactCategoryController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\JournalController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProgramController;
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\CashflowController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DataLedgerController;
 use App\Http\Controllers\DataMasterController;
 use App\Http\Controllers\DepartmentController;
-use App\Http\Controllers\FixedAssetCategoryController;
 use App\Http\Controllers\FixedAssetController;
-use App\Http\Controllers\JournalController;
-use App\Http\Controllers\LogController;
+use App\Http\Controllers\AffiliationController;
+use App\Http\Controllers\CashMutationController;
 use App\Http\Controllers\OrganizationController;
+use App\Http\Controllers\Admin\RegencyController;
+use App\Http\Controllers\Admin\VillageController;
+use App\Http\Controllers\Admin\DistrictController;
+use App\Http\Controllers\Admin\ProvinceController;
+use App\Http\Controllers\AccountCategoryController;
+use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\ContactCategoryController;
+use App\Http\Controllers\Admin\AdminMasterController;
+use App\Http\Controllers\FixedAssetCategoryController;
 use App\Http\Controllers\OrganizationInvoiceController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ProgramController;
-use App\Http\Controllers\ProjectController;
-use App\Http\Controllers\ReportController;
-use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\OrganizationMenuController;
+use App\Http\Controllers\Admin\AdminOrganizationController;
+use App\Http\Controllers\Admin\AdminOrganizationInvoiceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -115,6 +116,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/organizations/{organization}/invoices/create', [OrganizationInvoiceController::class, 'create'])->name('organization.invoice.create');
     Route::post('/organizations/{organization}/invoices/', [OrganizationInvoiceController::class, 'store'])->name('organization.invoice.post');
     Route::get('/organizations/{organization}/invoices/{organizationInvoice}', [OrganizationInvoiceController::class, 'show'])->name('organization.invoice.show')->middleware('user.has.organization:{parameter}');
+
+    //Affiliation
+    Route::get('/affiliation', [AffiliationController::class, 'index'])->name('affiliation.index');
 
     Route::middleware([
         'user.has.organization:{parameter}',

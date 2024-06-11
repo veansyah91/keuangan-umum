@@ -159,7 +159,7 @@ export default function Index({auth, organizations, searchFilter, affiliation}) 
                                 {/* Desktop */}
                                 <div className="flex justify-end gap-3">
                                     <div>
-                                        <Link href='/organizations/create'>
+                                        <Link href={route('affiliation.index')}>
                                             <SuccessButton className="gap-2">
                                                 <FaMoneyBill1 /> Afiliasi
                                             </SuccessButton>
@@ -185,7 +185,7 @@ export default function Index({auth, organizations, searchFilter, affiliation}) 
                                         </Link>
                                     </div>
                                     <div>
-                                        <Link className={'btn btn-circle bg-green-800 text-white'} href='/organizations/create'>
+                                        <Link className={'btn btn-circle bg-green-800 text-white'} href={route('affiliation.index')}>
                                             <div className="text-xl font-bold">
                                                 <FaMoneyBill1 height={20} width={20}/>
                                             </div>
