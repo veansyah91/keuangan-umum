@@ -78,7 +78,6 @@ class AdminOrganizationInvoiceController extends Controller
             $expiredDate = $expiredDate->add(3, 'month');
         }
 
-
         $organization->update([
             'expired' => $expiredDate,
             'status' => 'active',
@@ -88,6 +87,7 @@ class AdminOrganizationInvoiceController extends Controller
 
         if ($affiliation ) {
             $balance = $affiliation['balance'] + ($affiliation['insentive']*$organizationInvoice['price']/100);
+
             $affiliation->update([
                 'balance' => $balance
             ]);
