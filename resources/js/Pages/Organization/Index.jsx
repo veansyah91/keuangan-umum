@@ -20,7 +20,6 @@ import { FaMoneyBill1 } from "react-icons/fa6";
 import SuccessButton from "@/Components/SuccessButton";
 
 export default function Index({auth, organizations, searchFilter, affiliation}) {
-    console.log(affiliation);
     const { flash } = usePage().props;
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const [organizationDelete, setOrganizationDelete] = useState({});
