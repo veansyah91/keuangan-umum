@@ -10,15 +10,11 @@ use Illuminate\Support\Facades\Auth;
 
 class AffiliationController extends Controller
 {
-	public function index()
+	public function index(Affiliation $affiliation)
 	{
 		$user = Auth::user();
 
-		$affiliation = Affiliation::whereUserId('user_id')->first();
-
 		$affiliationWithdraw = AffiliationWithdraw::whereUserId('user_id')->get();
-
-		// dd($user);
 
 		return Inertia::render('Affiliation/Affiliation', [
 			'user' => $user,

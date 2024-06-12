@@ -158,13 +158,16 @@ export default function Index({auth, organizations, searchFilter, affiliation}) 
                             <div className='sm:flex-1 my-auto text-end hidden md:block'>
                                 {/* Desktop */}
                                 <div className="flex justify-end gap-3">
-                                    <div>
-                                        <Link href={route('affiliation.index')}>
+                                    {
+                                     affiliation && <div>
+                                        <Link href={route('affiliation.index', affiliation.id)}>
                                             <SuccessButton className="gap-2">
                                                 <FaMoneyBill1 /> Afiliasi
                                             </SuccessButton>
                                         </Link>
-                                    </div>
+                                    </div>   
+                                    }
+                                    
                                     <div>
                                     <Link href='/organizations/create'>
                                         <PrimaryButton>
@@ -184,13 +187,16 @@ export default function Index({auth, organizations, searchFilter, affiliation}) 
                                             </div>
                                         </Link>
                                     </div>
-                                    <div>
-                                        <Link className={'btn btn-circle bg-green-800 text-white'} href={route('affiliation.index')}>
-                                            <div className="text-xl font-bold">
-                                                <FaMoneyBill1 height={20} width={20}/>
-                                            </div>
-                                        </Link>
-                                    </div>
+                                    {
+                                        affiliation && <div>
+                                            <Link className={'btn btn-circle bg-green-800 text-white'} href={route('affiliation.index', affiliation.id)}>
+                                                <div className="text-xl font-bold">
+                                                    <FaMoneyBill1 height={20} width={20}/>
+                                                </div>
+                                            </Link>
+                                        </div>
+                                    }
+                                    
                                 {/* End Mobile */}
                             </div>                            
                         </div>

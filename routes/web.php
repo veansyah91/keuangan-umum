@@ -118,7 +118,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/organizations/{organization}/invoices/{organizationInvoice}', [OrganizationInvoiceController::class, 'show'])->name('organization.invoice.show')->middleware('user.has.organization:{parameter}');
 
     //Affiliation
-    Route::get('/affiliation', [AffiliationController::class, 'index'])->name('affiliation.index');
+    Route::get('/affiliation/{affiliation}', [AffiliationController::class, 'index'])->name('affiliation.index');
 
     Route::middleware([
         'user.has.organization:{parameter}',
