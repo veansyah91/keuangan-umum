@@ -17,7 +17,6 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users');
 
             $table->string('no_ref'); //Penarikan Saldo (PS)
-            $table->date('date');
             $table->bigInteger('value');
             $table->boolean('status'); //false => belum ditransfer, true => sudah ditransfer
 

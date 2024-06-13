@@ -14,7 +14,6 @@ class AffiliationWithdraw extends Model
     protected $fillable = [
         'user_id',
         'no_ref',
-        'date',
         'value',
         'status'
     ];

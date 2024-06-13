@@ -119,6 +119,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     //Affiliation
     Route::get('/affiliation/{affiliation}', [AffiliationController::class, 'index'])->name('affiliation.index');
+    Route::patch('/affiliation/{affiliation}', [AffiliationController::class, 'withdraw'])->name('affiliation.patch');
 
     Route::middleware([
         'user.has.organization:{parameter}',
