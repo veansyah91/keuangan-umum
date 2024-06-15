@@ -119,6 +119,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     //Affiliation
     Route::get('/affiliation/{affiliation}', [AffiliationController::class, 'index'])->name('affiliation.index');
+    Route::get('/affiliation-withdraw/{affiliationWithdraw}/detail', [AffiliationController::class, 'detail'])->name('affiliationWithdraw.detail');
     Route::patch('/affiliation/{affiliation}', [AffiliationController::class, 'withdraw'])->name('affiliation.patch');
 
     Route::middleware([

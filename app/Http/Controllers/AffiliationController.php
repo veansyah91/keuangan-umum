@@ -43,12 +43,12 @@ class AffiliationController extends Controller
 			return redirect(route('organization'))->with(['error' => 'Anda tidak memiliki hak akses']);
 		}
 
-		$affiliationWithdraw = AffiliationWithdraw::whereUserId('user_id')->get();
+		$affiliationWithdraws = AffiliationWithdraw::whereUserId($user['id'])->get();
 
 		return Inertia::render('Affiliation/Affiliation', [
 			'user' => $user,
 			'affiliation' => $affiliation,
-			'affiliationWithdraw' => $affiliationWithdraw,
+			'affiliationWithdraws' => $affiliationWithdraws,
 		]);
 	}
 
@@ -87,5 +87,12 @@ class AffiliationController extends Controller
 
 		return redirect()->back()->with('success', 'Pengajuan Penarikan Saldo Sudah Dilakukan, Silakan Tunggu 3x24 jam');
 
+	}
+
+	public function detail(AffiliationWithdraw $affiliationWithdraw)
+	{
+		return Inertia::render('Affiliation/Detail', [
+			'affiliationWithdraw' => $affiliationWithdraw
+		]);
 	}
 }

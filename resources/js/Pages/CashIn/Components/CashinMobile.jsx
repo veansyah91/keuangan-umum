@@ -6,7 +6,7 @@ import { IoCreateOutline, IoEllipsisVertical, IoSearchOutline, IoTrash } from 'r
 
 export default function CashInMobile({cashIn, role, handleDelete}) {
   return (
-    <div className=' text-gray-900 py-2 px-3 border flex gap-5 justify-between'>
+    <div className='text-gray-900 py-2 px-3 border flex gap-5 justify-between'>
       <div className='text-start my-auto w-1/2'>
         <div className='text-xs'>
           {dayjs(cashIn.date).format('MMM DD, YYYY')}

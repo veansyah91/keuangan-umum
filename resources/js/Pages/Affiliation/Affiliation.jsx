@@ -1,5 +1,5 @@
 import { Head, Link, router, useForm } from '@inertiajs/react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 
 import { IoAddCircleOutline, IoArrowBackOutline, IoEllipsisVertical, IoSearchOutline } from 'react-icons/io5';
 import TextInput from '@/Components/TextInput';
@@ -17,10 +17,12 @@ import SecondaryButton from '@/Components/SecondaryButton';
 import { NumericFormat } from 'react-number-format';
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
+import dayjs from 'dayjs';
+import AffiliationWithdrawMobile from './Components/AffiliationWithdrawMobile';
 
 
-export default function Affiliation({ auth, affiliation }) {
-
+export default function Affiliation({ auth, affiliation, affiliationWithdraws }) {
+  
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);  
 
   const { data, setData, patch, errors, setError } = useForm({
@@ -28,6 +30,12 @@ export default function Affiliation({ auth, affiliation }) {
     bank_account : affiliation.bank_account || '',
     bank_name : affiliation.bank_name || ''
   })
+
+  useLayoutEffect(() => {
+    const screenHeight = window.screen.height;
+    document.getElementById("content-desktop").style.height = `${screenHeight-374}px`;
+    document.getElementById("content-mobile").style.height = `${screenHeight-374}px`;
+  }, []);
 
   const handleSearch = _ => {
     router.reload({ 
@@ -169,13 +177,20 @@ export default function Affiliation({ auth, affiliation }) {
 
             {/* Content Penarikan */}
             {/* Mobile */}
-            <div className='sm:hidden'>
-
+            <div className='sm:hidden overflow-auto' id='content-desktop'>
+              {
+                affiliationWithdraws.map(affiliationWithdraw => 
+                  <AffiliationWithdrawMobile 
+                    affiliationWithdraw = {affiliationWithdraw}
+                    key={affiliationWithdraw.id}
+                  />
+                )
+              }
             </div>
 
             {/* Desktop */}
-            <div className='hidden sm:block'>
-
+            <div className='hidden sm:block' id='content-mobile'>
+              
             </div>
           </div>
         </div>
