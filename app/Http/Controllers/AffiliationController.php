@@ -91,8 +91,15 @@ class AffiliationController extends Controller
 
 	public function detail(AffiliationWithdraw $affiliationWithdraw)
 	{
+		$user = Auth::user();
+
+		$affiliation = Affiliation::whereUserId($user['id'])->first();
+
 		return Inertia::render('Affiliation/Detail', [
-			'affiliationWithdraw' => $affiliationWithdraw
+			'affiliationWithdraw' => $affiliationWithdraw,
+			'affiliation' => $affiliation,
+			'appName' => env('APP_NAME'),
+            'whatsappContact' => env('WHATSAPP_CONTACT'),
 		]);
 	}
 }

@@ -19,13 +19,15 @@ import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import dayjs from 'dayjs';
 import AffiliationWithdrawMobile from './Components/AffiliationWithdrawMobile';
+import BadgeSuccess from '@/Components/Badges/BadgeSuccess';
+import BadgeWarning from '@/Components/Badges/BadgeWarning';
 
 
 export default function Affiliation({ auth, affiliation, affiliationWithdraws }) {
   
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);  
 
-  const { data, setData, patch, errors, setError } = useForm({
+  const { data, setData, patch, errors, setError, processing } = useForm({
     value: affiliation.balance || 0,
     bank_account : affiliation.bank_account || '',
     bank_name : affiliation.bank_name || ''
@@ -104,97 +106,136 @@ export default function Affiliation({ auth, affiliation, affiliationWithdraws })
       <Head title='Afiliasi' />
       <ToastContainer  />
 
-      {/* Dekstop */}
-        <div className='bg-gray-100 min-h-screen'>
-          <div className='bg-white max-w-7xl mx-auto sm:px-6 lg:px-8'>
-            {/* Breadcrumbs */}
-            <div className="text-sm breadcrumbs px-4 py-4">
-              <ul>
-                <li className='font-bold'><Link href={route('organization')}>Daftar Organisasi</Link></li> 
-                <li>Afiliasi</li>
-              </ul>
+      <div className='bg-gray-100 min-h-screen'>
+        <div className='bg-white mx-auto sm:px-6 lg:px-8 max-w-4xl'>
+          {/* Breadcrumbs */}
+          <div className="text-sm breadcrumbs px-4 py-4">
+            <ul>
+              <li className='font-bold'><Link href={route('organization')}>Daftar Organisasi</Link></li> 
+              <li>Afiliasi</li>
+            </ul>
+          </div>
+
+          {/* Title */}
+          <Header>
+            <div className='bg-white overflow-hidden shadow-sm sm:rounded-t-lg'>
+                <div className='sm:p-6 px-6 py-3 text-gray-800 flex-none sm:flex'>
+                    <div className='sm:hidden text-gray-800 flex flex-col-reverse gap-5'>
+                        <div className="my-auto">
+                            Afiliasi
+                        </div>
+                        <div className="flex flex-row-reverse text-end">
+                            <div>
+                                <div className='text-gray-400 text-sm'>
+                                    {auth.user.name}
+                                </div>                                    
+                                <div className=' text-xs text-green-400'>
+                                    {auth.user.email}
+                                </div>
+                            </div>
+                        </div>                                    
+                    </div>
+                    <div className='sm:flex-1 my-auto sm:block hidden'>
+                        Afiliasi
+                    </div>
+                    <div className='sm:flex-1 sm:block hidden text-end text-gray-800'>
+                        <div className="flex flex-row-reverse">
+                            <div>
+                                <div className='text-gray-400'>
+                                    {auth.user.name}
+                                </div>
+                                
+                                <div className=' text-sm text-green-400'>
+                                    {auth.user.email}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+          </Header>
 
-            {/* Title */}
-            <Header>
-              <div className='bg-white overflow-hidden shadow-sm sm:rounded-t-lg'>
-                  <div className='sm:p-6 px-6 py-3 text-gray-800 flex-none sm:flex'>
-                      <div className='sm:hidden text-gray-800 flex flex-col-reverse gap-5'>
-                          <div className="my-auto">
-                              Afiliasi
-                          </div>
-                          <div className="flex flex-row-reverse text-end">
-                              <div>
-                                  <div className='text-gray-400 text-sm'>
-                                      {auth.user.name}
-                                  </div>                                    
-                                  <div className=' text-xs text-green-400'>
-                                      {auth.user.email}
-                                  </div>
-                              </div>
-                          </div>                                    
-                      </div>
-                      <div className='sm:flex-1 my-auto sm:block hidden'>
-                          Afiliasi
-                      </div>
-                      <div className='sm:flex-1 sm:block hidden text-end text-gray-800'>
-                          <div className="flex flex-row-reverse">
-                              <div>
-                                  <div className='text-gray-400'>
-                                      {auth.user.name}
-                                  </div>
-                                  
-                                  <div className=' text-sm text-green-400'>
-                                      {auth.user.email}
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-            </Header>
+          <div className='py-3 px-6 text-gray-900 flex-none sm:flex sm:flex-row-reserve sm:gap-2 sm:justify-between space-y-5 sm:space-y-0'>
+            <div className='flex gap-2'>
+              <div className='my-auto'><GiTakeMyMoney /> </div>
+              <div className='my-auto'>Saldo Anda: <span className='font-bold text-lg text-green-500'>Rp. { formatNumber(affiliation.balance) }</span></div>
+            </div>
+            {
+              affiliation.balance > 0 && 
+                <div className='flex gap-2'>
+                  <PrimaryButton className='w-full' onClick={() => handleSetShowWithdrawModal()}>
+                    <div className='w-full'>Ajukan Penarikan</div>                  
+                  </PrimaryButton>
+                </div>
+            }
+          </div>
+            
 
-            <div className='py-3 px-6 text-gray-900 flex-none sm:flex sm:flex-row-reserve sm:gap-2 sm:justify-between space-y-5 sm:space-y-0'>
-              <div className='flex gap-2'>
-                <div className='my-auto'><GiTakeMyMoney /> </div>
-                <div className='my-auto'>Saldo Anda: <span className='font-bold text-lg text-green-500'>Rp. { formatNumber(affiliation.balance) }</span></div>
-              </div>
+          {/* Sub Header */}
+          <div className='mt-5 px-4 font-bold'>
+            <h4>Riwayat Penarikan Saldo</h4>              
+          </div>
+
+          {/* Content Penarikan */}
+          
+          {/* Mobile */}
+          <div className='sm:hidden overflow-auto' id='content-mobile'>
+            {
+              affiliationWithdraws.map(affiliationWithdraw => 
+                <AffiliationWithdrawMobile 
+                  affiliationWithdraw = {affiliationWithdraw}
+                  key={affiliationWithdraw.id}
+                />
+              )
+            }
+          </div>
+
+          {/* Desktop */}
+          <div className='hidden sm:block mt-5' id='content-desktop'>
+            <div className='flex gap-5 font-bold border-b-2 pb-2 border-gray-500'>
+                <div className='w-3/12 text-start'>Tanggal</div>
+                <div className='w-2/12 text-start'>No Ref</div>
+                <div className='w-3/12 text-end'>Nilai Pengajuan</div>
+                <div className='w-2/12 text-start'>Status</div>
+                <div className='w-2/12 text-end'></div>
+            </div>
+            <div className='z-20'>
               {
-                affiliation.balance > 0 && 
-                  <div className='flex gap-2'>
-                    <PrimaryButton className='w-full' onClick={() => handleSetShowWithdrawModal()}>
-                      <div className='w-full'>Ajukan Penarikan</div>                  
-                    </PrimaryButton>
+                affiliationWithdraws.map((affiliationWithdraw) => 
+                <div className='flex gap-5 my-3' key={affiliationWithdraw.id}>
+                  <div className='w-3/12'>{ dayjs(affiliationWithdraw.created_at).format('MMM DD, YYYY') }</div>
+                  <div className='w-2/12'>{ affiliationWithdraw.no_ref }</div>
+                  <div className='w-3/12 text-end'>IDR. { formatNumber(affiliationWithdraw.value) }</div>
+                  <div className='w-2/12'>
+                  { affiliationWithdraw > 0 
+                    ? <BadgeSuccess>Sukses</BadgeSuccess>
+                    : <BadgeWarning>Mengunggu</BadgeWarning>
+                  }
                   </div>
-              }
-            </div>
-              
-
-            {/* Sub Header */}
-            <div className='mt-4 px-4 font-bold'>
-              <h4>Riwayat Penarikan Saldo</h4>              
-            </div>
-
-            {/* Content Penarikan */}
-            {/* Mobile */}
-            <div className='sm:hidden overflow-auto' id='content-desktop'>
-              {
-                affiliationWithdraws.map(affiliationWithdraw => 
-                  <AffiliationWithdrawMobile 
-                    affiliationWithdraw = {affiliationWithdraw}
-                    key={affiliationWithdraw.id}
-                  />
+                  <div className='w-2/12'>
+                    <div className="dropdown dropdown-left my-auto">
+                      <div                             
+                        tabIndex={0} 
+                        role="button" className={`bg-inherit border-none hover:bg-gray-100 -z-50 text-gray-300'`}>
+                        <IoEllipsisVertical />
+                      </div>
+                        <ul tabIndex={0} className="dropdown-content z-[50] menu p-2 shadow bg-base-100 rounded-box w-56">
+                            
+                            <li>           
+                              <Link href={route('affiliationWithdraw.detail', affiliationWithdraw.id)}>
+                                <IoSearchOutline /> Detail / Tanda Terima
+                              </Link>
+                            </li>
+                        </ul>
+                    </div>
+                  </div>
+                </div>
                 )
               }
             </div>
-
-            {/* Desktop */}
-            <div className='hidden sm:block' id='content-mobile'>
-              
-            </div>
           </div>
         </div>
-      {/* Dekstop */}
+      </div>
 
       {/* Modal */}
       <Modal show={showWithdrawModal} onClose={() => setShowWithdrawModal(false)}>
@@ -264,7 +305,7 @@ export default function Affiliation({ auth, affiliation, affiliationWithdraws })
             <div className='text-end space-x-2'>
               <SecondaryButton type='button' onClick={ () => setShowWithdrawModal(false) }>Batal</SecondaryButton>
               <SuccessButton
-              
+                disabled={processing}
               >
                 Ajukan
               </SuccessButton>

@@ -1,3 +1,5 @@
+import BadgeSuccess from '@/Components/Badges/BadgeSuccess'
+import BadgeWarning from '@/Components/Badges/BadgeWarning'
 import formatNumber from '@/Utils/formatNumber'
 import { Link } from '@inertiajs/react'
 import dayjs from 'dayjs'
@@ -19,8 +21,9 @@ export default function AffiliationWithdrawMobile({ affiliationWithdraw }) {
         </div>
         <div className='text-sm'>
           Status: { affiliationWithdraw > 0 
-                    ? <span className='text-green-500 font-bold italic'>Dikirim</span> 
-                    : <span className='text-yellow-500 font-bold italic'>Menunggu</span> }
+                    ? <BadgeSuccess>Sukses</BadgeSuccess>
+                    : <BadgeWarning>Mengunggu</BadgeWarning>
+                  }
         </div>
       </div>
       <div className='text-end w-5/12 my-auto'>
