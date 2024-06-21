@@ -13,7 +13,7 @@ export default function Index() {
 
       {/* Desktop */}
       <ContainerDesktop>
-            <div className='flex justify-start pt-5 pb-10 gap-2'>
+            <div className='flex justify-center pt-5 pb-10 gap-2'>
                 <Link href={route('admin.data-master.province')}>
                     <CardMenu 
                         bgColor={'bg-orange-500'}
@@ -29,9 +29,9 @@ export default function Index() {
           <div className='sm:hidden flex flex-wrap pt-14 pb-5 px-2 mx-auto bg-white gap-2 w-full justify-center'>
             <Link href={route('admin.data-master.province')}>
                 <CardMenu 
-                    bgColor={'bg-orange-500'}
-                    icon={<IoMap />}
-                    title={'Data Wilayah'}
+                  bgColor={'bg-orange-500'}
+                  icon={<IoMap />}
+                  title={'Data Wilayah'}
                 />
             </Link>
           </div>

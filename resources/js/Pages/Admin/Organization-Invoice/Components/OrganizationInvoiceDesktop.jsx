@@ -4,7 +4,6 @@ import React from 'react'
 import { IoCreateOutline, IoEllipsisVertical } from 'react-icons/io5';
 
 export default function OrganizationInvoiceDesktop({organizationInvoice, className, handleEdit, ...props}) {
-    console.log(organizationInvoice);
     return (
         <tr className={className} {...props}>
             <td>{organizationInvoice.organization.name}</td>

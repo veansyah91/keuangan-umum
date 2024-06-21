@@ -30,7 +30,9 @@ use App\Http\Controllers\Admin\ProvinceController;
 use App\Http\Controllers\AccountCategoryController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\ContactCategoryController;
+use App\Http\Controllers\Admin\UserMasterController;
 use App\Http\Controllers\Admin\AdminMasterController;
+use App\Http\Controllers\Admin\UserWithdrawController;
 use App\Http\Controllers\FixedAssetCategoryController;
 use App\Http\Controllers\OrganizationInvoiceController;
 use App\Http\Controllers\Admin\AdminDashboardController;
@@ -84,9 +86,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/data-master/villages', [VillageController::class, 'index'])->name('admin.data-master.village');
             Route::post('/data-master/villages', [VillageController::class, 'post'])->name('admin.data-master.village.post');
 
+            // User Master
+            Route::get('/user-master', UserMasterController::class)->name('admin.user-master');
+
             // Users
-            Route::get('/users', [AdminUserController::class, 'index'])->name('admin.users');
+            Route::get('/users', [AdminUserController::class, 'index'])->name('admin.user-master.users');
             Route::patch('/users/{user}/affiliation', [AdminUserController::class, 'storeAffiliation'])->name('admin.user.store.affiliation');
+
+            // User Affiliation
+            Route::get('/users/withdraws', [UserWithdrawController::class, 'index'])->name('admin.user-master.withdraws');
 
             // Organizations
             Route::get('/organization-menu', OrganizationMenuController::class)->name('admin.organization.menu');

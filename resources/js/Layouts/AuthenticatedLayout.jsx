@@ -78,9 +78,12 @@ export default function Authenticated({ user, header, children, organization = '
                                                 <NavLink href={route('admin.data-master')} active={route().current('admin.data-master*')}>
                                                     DATA MASTER
                                                 </NavLink>
-                                                <NavLink href={route('admin.users')} active={route().current('admin.users*')}>
-                                                    DATA USER
+                                                <NavLink href={route('admin.user-master')} active={route().current('admin.user-master*')}>
+                                                    DATA PENGGUNA
                                                 </NavLink>
+                                                {/* <NavLink href={route('admin.users')} active={route().current('admin.users*')}>
+                                                    DATA PENGGUNA
+                                                </NavLink> */}
                                                 <NavLink href={route('admin.organization.menu')} active={route().current('admin.organization*')}>
                                                     ORGANISASI
                                                 </NavLink>
@@ -204,7 +207,7 @@ export default function Authenticated({ user, header, children, organization = '
                             {/* Sidebar content here */}                            
                                 <li className={`${route().current('admin.dashboard*') ? 'border-l-2 border-[#4f8315] font-bold' :''}`}><Link href={route('admin.dashboard')}>Dasbor</Link></li>
                                 <li className={`${route().current('admin.data-master*') ? 'border-l-2 border-[#4f8315] font-bold' :''}`}><Link href={route('admin.data-master')}>Data Master</Link></li>
-                                <li className={`${route().current('admin.users*') ? 'border-l-2 border-[#4f8315] font-bold' : ''}`}><Link href={route('admin.users')}>Data Pengguna</Link></li>     
+                                <li className={`${route().current('admin.user-master*') ? 'border-l-2 border-[#4f8315] font-bold' : ''}`}><Link href={route('admin.user-master')}>Data Pengguna</Link></li>     
                                 <li className={`${route().current('admin.organization*') ? 'border-l-2 border-[#4f8315] font-bold' : ''}`}><Link href={route('admin.organization.menu')}>Organisasi</Link></li>     
                                 <hr />
                                 <li className={`${route().current('organizations*') ? 'border-l-2 border-[#4f8315] font-bold' : ''}`}><Link href={route('logout')} method='post' as='button'>Keluar</Link></li>

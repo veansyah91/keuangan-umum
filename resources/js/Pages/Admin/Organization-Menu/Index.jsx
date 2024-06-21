@@ -14,7 +14,7 @@ export default function Index() {
 
         {/* Desktop */}
         <ContainerDesktop>
-            <div className='flex justify-start pt-5 pb-10 gap-2'>
+            <div className='flex justify-center pt-5 pb-10 gap-2'>
                 <Link href={route('admin.organization.index')}>
                     <CardMenu 
                         bgColor={'bg-orange-500'}

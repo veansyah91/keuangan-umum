@@ -2,7 +2,7 @@ import { Head, Link, router, useForm } from '@inertiajs/react';
 import React, { useEffect, useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { IoArrowBackOutline, IoCalendarOutline, IoFilter, IoPlayBack, IoPlayForward, IoSearchSharp } from 'react-icons/io5';
+import { IoArrowBackOutline, IoFilter, IoPlayBack, IoPlayForward, IoSearchSharp } from 'react-icons/io5';
 import { useDebounce } from 'use-debounce';
 import { usePrevious } from 'react-use';    
 import formatNumber from '@/Utils/formatNumber';
@@ -34,7 +34,9 @@ const getNumber = (name) => {
     return parts.filter(part => part !== "");
 }
 
-function Index({users, userCollections, searchFilter, affiliateCodeRecommendation}) {
+function Index({users, userCollections, searchFilter, affiliateCodeRecommendation, affiliationFilterQuery}) {
+  
+    const [showModalFilter, setShowModalFilter] = useState(false);
     
     const [showSearch, setShowSearch] = useState(false);
     const [showFilter, setShowFilter] = useState(false);
@@ -56,7 +58,9 @@ function Index({users, userCollections, searchFilter, affiliateCodeRecommendatio
         'name' : '',
         'no_ref' : '',
         'insentive' : 10
-    })
+    });
+
+    const [affiliationFilter, setAffiliationFilter] = useState(affiliationFilterQuery == 'true' ? true : false);
 
     useEffect(() => {
         if(prevSearch!==undefined) {
@@ -134,6 +138,21 @@ function Index({users, userCollections, searchFilter, affiliateCodeRecommendatio
         })
     }
 
+    const handleSubmitFilter = (e) => {
+      e.preventDefault();
+
+      // reload page
+      router.reload({
+        only: ['userCollections'],
+        data: {
+          'affiliationFilterQuery' : affiliationFilter
+        },
+        preserveState: true
+      });
+
+      setShowModalFilter(false);
+    }
+
     return (
         <>
             <Head title='Pengguna' />
@@ -146,12 +165,12 @@ function Index({users, userCollections, searchFilter, affiliateCodeRecommendatio
                     setSearch= {e => setSearch(e.target.value)}
                     pageBefore={
                         users.links[0].url 
-                        ? <Link href={`/admin/data-master/users?page=${users.current_page - 1}&search=${search}`}preserveState><IoPlayBack /></Link>
+                        ? <Link href={`/admin/users?page=${users.current_page - 1}&search=${search}`}preserveState><IoPlayBack /></Link>
                         : <div className='text-gray-300'><IoPlayBack /></div>
                     }
                     pageAfter={
                         users.links[users.links.length-1].url 
-                        ? <Link href={`/admin/data-master/users?page=${users.current_page + 1}&search=${search}`}
+                        ? <Link href={`/admin/users?page=${users.current_page + 1}&search=${search}`}
                             only={['users']} preserveState>
                             <IoPlayForward />
                         </Link>
@@ -166,6 +185,7 @@ function Index({users, userCollections, searchFilter, affiliateCodeRecommendatio
                     hasDate={true}
                     dateValue={dateValue}
                     onChangeDate={handleDateValueChange}
+                    showFilter={() => setShowModalFilter(true)}
                 />
 
                 {/* Content */}
@@ -203,6 +223,8 @@ function Index({users, userCollections, searchFilter, affiliateCodeRecommendatio
                 <ContainerDesktop>
                     {/* Title, Pagination, Search */}
                     <TitleDesktop>
+                        <button className='py-2 px-3 border rounded-lg' onClick={() => setShowModalFilter(true)}><IoFilter /></button>
+
                         <div className='w-1/4 my-auto '>
                             <Datepicker
                                 value={dateValue} 
@@ -308,33 +330,6 @@ function Index({users, userCollections, searchFilter, affiliateCodeRecommendatio
                 </ContainerDesktop>
 
                 {/* Modal */}
-                <Modal show={showFilter} onClose={() => setShowFilter(false)}>
-                    <div className='p-5'>
-                        <h2 className="text-lg font-medium text-gray-900">
-                            Filter Data
-                        </h2>
-                        <div className="mt-6 flex justify-between space-x-5">
-                            <InputLabel htmlFor="date-input" className='my-auto'>Tanggal</InputLabel>
-                            <Datepicker
-                                value={dateValue} 
-                                onChange={handleDateValueChange} 
-                                classNames={'z-100'}
-                            />
-                            {/* <input type="date" /> */}
-                        </div>
-
-                        <div className="mt-6 flex justify-end">
-                            <SecondaryButton onClick={() => setShowFilter(false)}>Batal</SecondaryButton>
-
-                            <PrimaryButton className="ms-3" 
-                                // disabled={processing}
-                            >
-                                Filter
-                            </PrimaryButton>
-                        </div>
-                    </div>
-                </Modal>
-
                 <Modal show={showAffilateModal} onClose={() => setShowAffiliateModal(false)}>
                     <form onSubmit={handleSubmitAffiliation}>
                         <div className='p-5'>
@@ -417,6 +412,42 @@ function Index({users, userCollections, searchFilter, affiliateCodeRecommendatio
                         </div>
                     </form>
                 </Modal>
+
+                <Modal
+                  show={showModalFilter}
+                  onClose={() => setShowModalFilter(false)}
+                >
+                  <form onSubmit={handleSubmitFilter}>
+                    <div className='p-5'>
+                    <h2 className="text-lg font-medium text-gray-900">
+                      Filter
+                    </h2>
+                    <section className='mt-5 space-y-2'>
+                      <div className="form-control w-1/6">
+                        <label className="label cursor-pointer gap-2" htmlFor={`affiliation`}>
+                            <input 
+                              type="checkbox" 
+                              className="checkbox" 
+                              id={`affiliation`}
+                              value={affiliationFilter}
+                              onChange={() => setAffiliationFilter(!affiliationFilter)}
+                              checked={affiliationFilter}
+                            />
+                            <span className="label-text font-bold">Afiliasi</span> 
+                        </label>
+                      </div>
+                    </section>
+                    <div className="mt-6 flex justify-end">
+                      <SecondaryButton onClick={() => setShowModalFilter(false)}>Batal</SecondaryButton>
+
+                      <PrimaryButton className="ms-3" 
+                        >
+                        Filter
+                      </PrimaryButton>
+                    </div>
+                    </div>
+                  </form>
+                </Modal>
             {/* Desktop */}
 
         </>
@@ -424,10 +455,17 @@ function Index({users, userCollections, searchFilter, affiliateCodeRecommendatio
 }
 
 Index.layout = page => <AuthenticatedLayout
-    header={<Header>Data User</Header>}
+    header={<Header>Data Pengguna</Header>}
     children={page}
     user={page.props.auth.user}
-    title="Data User"
+    title="Data Pengguna"
+    backLink={<Link href={route('admin.user-master')}><IoArrowBackOutline/></Link>}
+    breadcrumbs={<div className="text-sm breadcrumbs">
+        <ul>
+            <li className='font-bold'><Link href={route('admin.user-master')}>Data Master Pengguna</Link></li> 
+            <li>Data Pengguna</li>
+        </ul>
+    </div>}
 />
 
 export default Index;

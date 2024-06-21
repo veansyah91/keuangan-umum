@@ -109,4 +109,9 @@ class User extends Authenticatable implements MustVerifyEmail
             return $query->where('created_at', '<=', $end_date);
         });
     }
+
+    public function scopeAffiliation($query, $affiliate)
+    {
+        
+    }
 }

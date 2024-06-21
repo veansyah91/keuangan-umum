@@ -19,7 +19,14 @@ class AdminUserController extends Controller
 
     public function index()
     {
-        $users = User::filter(request(['search', 'start_date', 'end_date']))->whereNot('role', 'super-admin')->paginate(50);
+        $affiliationFilter = filter_var(request('affiliationFilterQuery'), FILTER_VALIDATE_BOOLEAN);
+        
+        $users = User::filter(request(['search', 'start_date', 'end_date']))
+                        ->when($affiliationFilter == true, function ($query){
+                            return $query->has('affilation');
+                        })
+                        ->whereNot('role', 'super-admin')
+                        ->paginate(50);
 
         $userCollection = $users->map(function ($user) {
             $date = new Carbon($user['created_at']);
@@ -40,7 +47,8 @@ class AdminUserController extends Controller
             'users' => $users,
             'userCollections' => $userCollection,
             'searchFilter' => request('searchFilter'),
-            'affiliateCodeRecommendation' => Inertia::lazy(fn () => $this->codeRecomendation(request('name')))
+            'affiliateCodeRecommendation' => Inertia::lazy(fn () => $this->codeRecomendation(request('name'))),
+            'affiliationFilterQuery' => request('affiliationFilterQuery')
         ]);
     }
 
