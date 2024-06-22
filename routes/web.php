@@ -95,6 +95,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             // User Affiliation
             Route::get('/users/withdraws', [UserWithdrawController::class, 'index'])->name('admin.user-master.withdraws');
+            Route::patch('/users/withdraws/{withdraw}', [UserWithdrawController::class, 'update'])->name('admin.user-master.withdraws.update');
 
             // Organizations
             Route::get('/organization-menu', OrganizationMenuController::class)->name('admin.organization.menu');

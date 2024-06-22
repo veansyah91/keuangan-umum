@@ -64,6 +64,7 @@ export default function Index({ cashOuts, startDate, endDate, role, organization
 		startDate: startDate || '', 
 		endDate: endDate || ''
   	});
+    
 	const [debounceDateValue] = useDebounce(dateValue, 500);
 
 	const prevSearch = usePrevious(search);

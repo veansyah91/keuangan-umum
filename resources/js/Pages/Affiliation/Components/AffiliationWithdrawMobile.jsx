@@ -20,7 +20,7 @@ export default function AffiliationWithdrawMobile({ affiliationWithdraw }) {
           {affiliationWithdraw.description}
         </div>
         <div className='text-sm'>
-          Status: { affiliationWithdraw > 0 
+          Status: { affiliationWithdraw.status > 0 
                     ? <BadgeSuccess>Sukses</BadgeSuccess>
                     : <BadgeWarning>Mengunggu</BadgeWarning>
                   }

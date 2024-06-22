@@ -85,6 +85,7 @@ export default function Affiliation({ auth, affiliation, affiliationWithdraws })
         toast.success(flash.success, {
           position: toast.POSITION.TOP_CENTER
         });
+        setShowWithdrawModal(false);
       },
       onError: errors => {
         const { status } = errors;
@@ -94,10 +95,6 @@ export default function Affiliation({ auth, affiliation, affiliationWithdraws })
           position: toast.POSITION.TOP_CENTER
         });
       },
-      onFinish: () => {
-        setShowWithdrawModal(false);
-
-      }
     })
   }
 
@@ -207,7 +204,7 @@ export default function Affiliation({ auth, affiliation, affiliationWithdraws })
                   <div className='w-2/12'>{ affiliationWithdraw.no_ref }</div>
                   <div className='w-3/12 text-end'>IDR. { formatNumber(affiliationWithdraw.value) }</div>
                   <div className='w-2/12'>
-                  { affiliationWithdraw > 0 
+                  { affiliationWithdraw.status > 0 
                     ? <BadgeSuccess>Sukses</BadgeSuccess>
                     : <BadgeWarning>Mengunggu</BadgeWarning>
                   }

@@ -1,5 +1,5 @@
 import { Head, Link, router, useForm } from '@inertiajs/react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
 import { IoArrowBackOutline, IoFilter, IoPlayBack, IoPlayForward, IoSearchSharp } from 'react-icons/io5';
@@ -12,25 +12,144 @@ import ContentMobile from '@/Components/Mobiles/ContentMobile';
 import dayjs from 'dayjs';
 import { IoCreateOutline, IoEllipsisVertical } from 'react-icons/io5/index.esm';
 import ContentDesktop from '@/Components/Desktop/ContentDesktop';
+import Modal from '@/Components/Modal';
+import PrimaryButton from '@/Components/PrimaryButton';
+import SecondaryButton from '@/Components/SecondaryButton';
+import { ToastContainer, toast } from 'react-toastify';
+import BadgeSuccess from '@/Components/Badges/BadgeSuccess';
+import BadgeWarning from '@/Components/Badges/BadgeWarning';
+import { usePrevious } from 'react-use';
+import { useDebounce } from 'use-debounce';
 
-function Index({ withdraws, searchFilter }) {
-  console.log(withdraws);
+
+function Index({ withdraws, searchFilter, statusFilter, affiliation, startDate, endDate }) {
+  // console.log(withdraws);
   const [search, setSearch] = useState(searchFilter || '');
+  const [filterValue, setFilterValue] = useState({
+    status: statusFilter || false,
+  });
+
   const [showModalFilter, setShowModalFilter] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
   const [dateValue, setDateValue] = useState({
-    startDate: '', 
-    endDate: ''
+    startDate: startDate, 
+    endDate: endDate
   });
+
+  const { data, setData, patch, processing, reset } = useForm({
+    name: '',
+    no_ref: '',
+    email: '',
+    value: 0,
+    bank_account: '',
+    bank_name : '',
+    date: '',
+    id: null
+  });
+
+	const [debounceDateValue] = useDebounce(dateValue, 500);
+  const [debounceValue] = useDebounce(search, 500);
+
+	const prevSearch = usePrevious(search);
+
+  // useEffect
+  useEffect(() => {
+    console.log(debounceDateValue);
+    if(prevSearch!==undefined) {
+      handleReloadPage();
+    }
+  },[debounceDateValue, debounceValue])
 
   // function
   const handleDateValueChange = (newValue) => {
     setDateValue(newValue); 
   } 
 
+  const handleShowConfirmationModal = (data) => {
+    setShowConfirmationModal(true);
+
+    router.reload({
+      only: ['affiliation'],
+      data: {
+        'user_id' : data.user_id
+      },
+      onSuccess: result => {
+        const { props } = result;
+        setData({
+          name: data.user.name,
+          date: dayjs(data.created_at).format('MMMM YYYY, DD'),
+          no_ref: data.no_ref,
+          email: data.user.email,
+          value: data.value,
+          bank_account: props.affiliation.bank_account,
+          bank_name : props.affiliation.bank_name,
+          id: data.id
+        });
+      },
+      preserveState: true
+    });
+  } 
+
+  const handleCloseConfirmationModal = () => {
+    setShowConfirmationModal(false);
+    router.reload({
+      only: ['withdraws'],
+      data: {
+        'user_id' : ''
+      },
+      onSuccess: _ => {
+        reset();
+      },
+      preserveState: true
+    });
+  }
+
+  const handleSubmitConfirmation = (e) => {
+    e.preventDefault();
+    patch(route('admin.user-master.withdraws.update', data.id), {
+      onSuccess: result => {
+        toast.success(`Penarikan Saldo No. Ref: ${data.no_ref} Berhasil Dikonfirmasi`, {
+          position: toast.POSITION.TOP_CENTER
+        });
+        reset();
+        setShowConfirmationModal(false);
+
+      }
+    })
+  }
+
+  const handleChangeStatusFilterValue = () => {
+    let temp = filterValue.status;
+
+    setFilterValue({
+      ...filterValue,
+      status: !temp
+    });
+  }
+  
+  const handleReloadPage = () => {
+    router.reload({
+      only:['withdraws'],
+      data: {
+        search,
+        'start_date' : debounceDateValue.startDate, 
+        'end_date' : debounceDateValue.endDate,
+      }
+    })
+  }
+
+  const handleSubmitFilter = (e) => {
+    e.preventDefault();
+
+    console.log('filter');
+  }
+
   return (
     <>
       <Head title='Penarikan Saldo Afiliasi' />
+
+      <ToastContainer />  
 
       {/* Mobile */}
       <TitleMobile 
@@ -81,8 +200,8 @@ function Index({ withdraws, searchFilter }) {
                 <div className='text-sm'>
                     {
                         withdraw.status 
-                        ? <div className='italic text-green-600'>Telah Dikirim</div>
-                        : <div className='italic text-red-600'>Belum Dikirim</div>
+                        ? <BadgeSuccess>Telah Dikirim</BadgeSuccess>
+                        : <BadgeWarning>Belum Dikirim</BadgeWarning>
                     }
                 </div>
               </div>
@@ -103,9 +222,9 @@ function Index({ withdraws, searchFilter }) {
                     </div>
                     <ul tabIndex={0} className="dropdown-content z-[50] menu p-2 shadow bg-base-100 rounded-box w-56">
                         <li>                                
-                        <Link>
-                          <IoCreateOutline /> Edit
-                        </Link>   
+                          <button onClick={() => handleShowConfirmationModal(withdraw)}>
+                            <IoCreateOutline /> Edit
+                          </button> 
                         </li>
                     </ul>
                 </div>
@@ -130,7 +249,7 @@ function Index({ withdraws, searchFilter }) {
             </div>
             <div className='w-1/4 border flex rounded-lg'>
               <label htmlFor='search-input' className='my-auto ml-2'><IoSearchSharp /></label>
-              <input id='search-input' name='search-input' type="search" placeholder='Cari Pengguna' className='w-full border-none focus:outline-none focus:ring-0' value={search || ''}
+              <input id='search-input' name='search-input' type="search" placeholder='Cari' className='w-full border-none focus:outline-none focus:ring-0' value={search || ''}
               onChange={e => setSearch(e.target.value)}/>
             </div>
 
@@ -172,10 +291,165 @@ function Index({ withdraws, searchFilter }) {
                   <th className='bg-gray-200'></th>
                 </tr>
               </thead>
+              <tbody>
+                {
+                  withdraws.data.map(withdraw =>
+                    <tr key={withdraw.id}>
+                      <td className=''>{ withdraw.no_ref }</td>
+                      <td className=''>{ withdraw.user.name.toUpperCase() }</td>
+                      <td className=''>{ withdraw.user.email }</td>
+                      <td className=''>{ dayjs(withdraw.created_at).format('MMMM YYYY, DD') }</td>
+                      <td className=''>
+                      { 
+                        withdraw.created_at === withdraw.updated_at 
+                        ? ''
+                        : dayjs(withdraw.updated_at).format('MMMM YYYY, DD')
+                      }
+                      </td>
+                      <td className=''>
+                      {
+                        withdraw.status 
+                        ? <BadgeSuccess>Telah Dikirim</BadgeSuccess>
+                        : <BadgeWarning>Belum Dikirim</BadgeWarning>
+                      }
+                      </td>
+                      <td className=''>
+                        <div className="dropdown dropdown-left">
+                          <div                             
+                            tabIndex={0} 
+                            role="button" className={`bg-inherit border-none hover:bg-gray-100 -z-50 text-gray-300'`}>
+                            <IoEllipsisVertical />
+                          </div>
+                          <ul tabIndex={0} className="dropdown-content z-[50] menu p-2 shadow bg-base-100 rounded-box w-56">
+                            <li>
+                              <button onClick={() => handleShowConfirmationModal(withdraw)}>
+                                <IoCreateOutline /> Konfirmasi  
+                              </button> 
+                            </li>
+                          </ul>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                }
+              </tbody>
             </table>  
           </ContentDesktop>
         </ContainerDesktop>
       {/* Desktop */}
+
+      {/* Modal */}
+        <Modal show={showConfirmationModal} onClose={handleCloseConfirmationModal}>
+          <form onSubmit={handleSubmitConfirmation}>
+            <div className="p-5">
+              <h2 className="text-lg font-medium text-gray-900">
+                  Konfirmasi Pengiriman Saldo Afiliasi
+              </h2>
+              <div className="mt-6 space-y-3">
+                <div className='flex gap-2'>
+                    <div className='w-1/4 flex justify-between'>
+                        <div>No Ref</div>
+                        <div>:</div>
+                    </div>
+                    <div className='w-3/4'>{ data.no_ref }</div>
+                </div>
+                <div className='flex gap-2'>
+                    <div className='w-1/4 flex justify-between'>
+                        <div>Tanggal Pengajuan</div>
+                        <div>:</div>
+                    </div>
+                    <div className='w-3/4'>{ data.date }</div>
+                </div>
+                <div className='flex gap-2'>
+                    <div className='w-1/4 flex justify-between'>
+                        <div>Nama</div>
+                        <div>:</div>
+                    </div>
+                    <div className='w-3/4'>{ data.name.toUpperCase() }</div>
+                </div>
+                <div className='flex gap-2'>
+                    <div className='w-1/4 flex justify-between'>
+                        <div>Email</div>
+                        <div>:</div>
+                    </div>
+                    <div className='w-3/4'>{ data.email }</div>
+                </div>
+                <div className='flex gap-2'>
+                    <div className='w-1/4 flex justify-between'>
+                        <div>Nilai Pengajuan</div>
+                        <div>:</div>
+                    </div>
+                    <div className='w-3/4'>IDR { formatNumber(data.value) }</div>
+                </div>
+                <div className='flex gap-2'>
+                    <div className='w-1/4 flex justify-between'>
+                        <div>No. Rekening</div>
+                        <div>:</div>
+                    </div>
+                    <div className='w-3/4'>{ data.bank_account }</div>
+                </div>
+                <div className='flex gap-2'>
+                    <div className='w-1/4 flex justify-between'>
+                        <div>Nama Bank</div>
+                        <div>:</div>
+                    </div>
+                    <div className='w-3/4'>{ data.bank_name }</div>
+                </div>
+                <div className="mt-6 flex sm:flex-row flex-col-reverse gap-2 sm:gap-0 sm:justify-end">
+                  <SecondaryButton 
+                    onClick={handleCloseConfirmationModal}
+                  >
+                    <div className='w-full'>
+                        Batal
+                    </div>
+                  </SecondaryButton>
+
+                  {/* Mobile */}
+                  <PrimaryButton className="sm:hidden" 
+                    disabled={processing}
+                    >
+                    <div className='w-full'>
+                        Konfirmasi
+                    </div>
+                  </PrimaryButton>
+
+                  {/* Desktop */}
+                  <PrimaryButton className="ms-3 hidden sm:block" 
+                    disabled={processing}
+                    >
+                    Konfirmasi
+                  </PrimaryButton>
+                </div>
+              </div>
+            </div>
+          </form>
+        </Modal>
+
+        <Modal show={showModalFilter} onClose={() => setShowModalFilter(false)}>
+          <form onSubmit={handleSubmitFilter}>
+            <div className="p-5">
+              <h2 className="text-lg font-medium text-gray-900">
+                Filter
+              </h2>
+              <section className='mt-5 space-y-2'>
+                <div className="form-control w-2/6">
+                  <label className="label cursor-pointer" htmlFor={`status`}>
+                      <input 
+                        type="checkbox" 
+                        className="checkbox" 
+                        id={`status`}
+                        value={filterValue.status}
+                        onChange={() => handleChangeStatusFilterValue()}
+                        checked={filterValue.status}
+                      />
+                      <span className="label-text font-bold">Telah Dikirim</span> 
+                  </label>
+                </div>
+              </section>
+            </div>
+          </form>
+        </Modal>
+      {/* Modal */}
 
     </>
   )
