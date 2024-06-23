@@ -135,14 +135,15 @@ function Index({ withdraws, searchFilter, statusFilter, affiliation, startDate, 
         search,
         'start_date' : debounceDateValue.startDate, 
         'end_date' : debounceDateValue.endDate,
+        'status' : filterValue.status
       }
     })
   }
 
   const handleSubmitFilter = (e) => {
     e.preventDefault();
-
-    console.log('filter');
+    handleReloadPage();
+    setShowModalFilter(false);
   }
 
   return (
@@ -432,20 +433,27 @@ function Index({ withdraws, searchFilter, statusFilter, affiliation, startDate, 
                 Filter
               </h2>
               <section className='mt-5 space-y-2'>
-                <div className="form-control w-2/6">
-                  <label className="label cursor-pointer" htmlFor={`status`}>
-                      <input 
-                        type="checkbox" 
-                        className="checkbox" 
-                        id={`status`}
-                        value={filterValue.status}
-                        onChange={() => handleChangeStatusFilterValue()}
-                        checked={filterValue.status}
-                      />
-                      <span className="label-text font-bold">Telah Dikirim</span> 
-                  </label>
+                <div className='flex w-full gap-1'>
+                    <div className='w-3/12 my-auto'>Status</div>
+                    <div className='w-8/12'>
+                        <select className="w-full rounded-lg border-gray-300" onChange={(e) => setFilterValue({status: e.target.value})} value={filterValue.status}>
+                            <option value=''>Semua</option>
+                            <option value="false">Belum Dikirim</option>
+                            <option value="true">Telah Dikirim</option>
+                        </select>
+                    </div>
+                    <div className='w-1/12 my-auto'>
+                        
+                    </div>
                 </div>
               </section>
+              <div className="mt-6 flex justify-end">
+                <SecondaryButton onClick={() => setShowModalFilter(false)}>Batal</SecondaryButton>
+
+                <PrimaryButton className="ms-3">
+                  Filter
+                </PrimaryButton>
+              </div>
             </div>
           </form>
         </Modal>

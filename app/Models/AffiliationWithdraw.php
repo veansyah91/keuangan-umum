@@ -29,6 +29,10 @@ class AffiliationWithdraw extends Model
             return $query->where('no_ref', 'like', '%'.$search.'%');
         });
 
+        // $query->when($filters['status'] ?? false, function ($query, $status) {
+        //     return $query->where('status', $status);
+        // });
+
         $query->when($filters['start_date'] ?? false, function ($query, $start_date) {
             return $query->where('created_at', '>=', $start_date);
         });
