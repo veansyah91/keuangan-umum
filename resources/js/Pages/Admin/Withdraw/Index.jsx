@@ -26,7 +26,7 @@ function Index({ withdraws, searchFilter, statusFilter, affiliation, startDate, 
   // console.log(withdraws);
   const [search, setSearch] = useState(searchFilter || '');
   const [filterValue, setFilterValue] = useState({
-    status: statusFilter || false,
+    status: statusFilter || null,
   });
 
   const [showModalFilter, setShowModalFilter] = useState(false);

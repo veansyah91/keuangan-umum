@@ -80,7 +80,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(Organization::class)->withPivot('role', 'is_waiting');
     }
 
-    public function affilation(): HasOne
+    public function affiliation(): HasOne
     {
         return $this->hasOne(Affiliation::class);
     }
@@ -108,10 +108,5 @@ class User extends Authenticatable implements MustVerifyEmail
         $query->when($filters['end_date'] ?? false, function ($query, $end_date) {
             return $query->where('created_at', '<=', $end_date);
         });
-    }
-
-    public function scopeAffiliation($query, $affiliate)
-    {
-        
     }
 }

@@ -96,10 +96,10 @@ export default function Detail({ auth, affiliation, affiliationWithdraw, appName
                     <div className='mt-3 space-y-2 sm:w-1/2'>
                       <div>Konfirmasi: </div>
                       <div>
-                          <SuccessButton type="button" className='space-x-2' onClick={handleConfirm}>
-                              <span><IoLogoWhatsapp /></span>
-                              <span>Konfirmasi Pengajuan Penarikan Saldo</span>                                        
-                          </SuccessButton>
+                        <SuccessButton type="button" className='space-x-2' onClick={handleConfirm}>
+                          <span><IoLogoWhatsapp /></span>
+                          <span>Konfirmasi Pengajuan Penarikan Saldo</span>                                        
+                        </SuccessButton>
                       </div>
                     </div>
                   </div>
