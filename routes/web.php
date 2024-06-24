@@ -62,9 +62,6 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/organizations', [OrganizationController::class, 'index'])->name('organization');
-
-
 Route::middleware(['auth', 'verified'])->group(function () {
     // Admin
     Route::middleware('is.admin')->group(function () {
@@ -111,7 +108,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     //Organization's list
-    // Route::get('/organizations', [OrganizationController::class, 'index'])->name('organization');
+    Route::get('/organizations', [OrganizationController::class, 'index'])->name('organization');
     Route::get('/organizations/create', [OrganizationController::class, 'create'])->name('organization.create');
     Route::get('/organizations/{organization}', [OrganizationController::class, 'show'])->name('organization.show');
     Route::post('/organizations', [OrganizationController::class, 'store'])->name('organization.store');
