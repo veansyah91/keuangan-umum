@@ -10,7 +10,7 @@ import Datepicker from 'react-tailwindcss-datepicker';
 import formatNumber from '@/Utils/formatNumber';
 import ContentMobile from '@/Components/Mobiles/ContentMobile';
 import dayjs from 'dayjs';
-import { IoCreateOutline, IoEllipsisVertical } from 'react-icons/io5/index.esm';
+import { IoCreateOutline, IoEllipsisVertical, IoTrashOutline } from 'react-icons/io5/index.esm';
 import ContentDesktop from '@/Components/Desktop/ContentDesktop';
 import Modal from '@/Components/Modal';
 import PrimaryButton from '@/Components/PrimaryButton';
@@ -138,7 +138,8 @@ function Index({ withdraws, searchFilter, statusFilter, affiliation, affiliators
         search,
         'start_date' : debounceDateValue.startDate, 
         'end_date' : debounceDateValue.endDate,
-        'status' : filterValue.status
+        'status' : filterValue.status,
+        'user_id' : selectedAffiliator.id
       }
     })
   }
@@ -147,6 +148,12 @@ function Index({ withdraws, searchFilter, statusFilter, affiliation, affiliators
     e.preventDefault();
     handleReloadPage();
     setShowModalFilter(false);
+  }
+
+  const handleDeleteSelectedAffiliator = () => {
+    setSelectedAffiliator({
+      id: null, name: '', email:''
+    })
   }
 
   return (
@@ -460,6 +467,15 @@ function Index({ withdraws, searchFilter, statusFilter, affiliation, affiliators
                         />
                       </div>
                     <div className='w-1/12 my-auto'>
+                    {
+                      selectedAffiliator.id && 
+                      <button 
+                        type='button' className='text-red-500 text-xl hover:bg-slate-200 rounded-full p-2'
+                        onClick={handleDeleteSelectedAffiliator}
+                      >
+                        <IoTrashOutline />
+                      </button>
+                    }
                     </div>
                 </div>
                 <div className='flex w-full gap-1'>
@@ -472,6 +488,7 @@ function Index({ withdraws, searchFilter, statusFilter, affiliation, affiliators
                         </select>
                     </div>
                     <div className='w-1/12 my-auto'>
+                      
                     </div>
                 </div>
               </section>

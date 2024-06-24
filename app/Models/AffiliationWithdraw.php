@@ -36,5 +36,9 @@ class AffiliationWithdraw extends Model
         $query->when($filters['end_date'] ?? false, function ($query, $end_date) {
             return $query->where('created_at', '<=', $end_date);
         });
+
+        $query->when($filters['user_id'] ?? false, function ($query, $user_id) {
+            return $query->where('user_id', $user_id);
+        });
     }
 }

@@ -18,7 +18,7 @@ class UserWithdrawController extends Controller
             $affiliationFilter = filter_var(request('status'), FILTER_VALIDATE_BOOLEAN);
         }
 
-        $withdraws = AffiliationWithdraw::filter(request(['search', 'start_date', 'end_date']))
+        $withdraws = AffiliationWithdraw::filter(request(['search', 'start_date', 'end_date', 'user_id']))
                                             ->when($affiliationFilter !== null , function ($query) use ($affiliationFilter){
                                                 return $query->where('status', $affiliationFilter);
                                             })
@@ -31,7 +31,6 @@ class UserWithdrawController extends Controller
                                 return $query->where('name', 'like', '%'.$user.'%')
                                                 ->orWhere('email', 'like', '%'.$user.'%');
                             })
-                            // ->with('affiliation')
                             ->select('id','name', 'email')
                             ->get();
 
