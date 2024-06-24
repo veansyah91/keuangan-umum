@@ -1,1 +1,0 @@
-import{j as t}from"./app-6da0e1a2.js";function n({province:r,className:e}){return t.jsx(t.Fragment,{children:t.jsxs("tr",{className:e,children:[t.jsx("td",{children:r.id}),t.jsx("td",{children:r.name}),t.jsx("td",{})]})})}export{n as default};
