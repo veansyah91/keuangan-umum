@@ -4,11 +4,11 @@ import Header from '@/Components/Header';
 import { Head, Link } from '@inertiajs/react';
 import ContainerDesktop from '@/Components/Desktop/ContainerDesktop';
 import CardMenu from '@/Components/CardMenu';
-import { PiNotebook } from "react-icons/pi";
+import { PiNotebook } from 'react-icons/pi';
 import { LiaClipboardListSolid } from 'react-icons/lia';
-import { RiBookletLine } from "react-icons/ri";
+import { RiBookletLine } from 'react-icons/ri';
 
-export default function Index({organization}) {
+export default function Index({ organization }) {
     return (
         <>
             <Head title='Data Akun' />
@@ -16,25 +16,17 @@ export default function Index({organization}) {
             <ContainerDesktop>
                 <div className='flex justify-center pt-5 pb-10 gap-5'>
                     <Link href={route('data-ledger.account-category', organization.id)}>
-                        <CardMenu 
+                        <CardMenu
                             bgColor={'bg-cyan-500'}
                             icon={<LiaClipboardListSolid />}
                             title={'Data Kategori Akun'}
                         />
                     </Link>
                     <Link href={route('data-ledger.account', organization.id)}>
-                        <CardMenu 
-                            bgColor={'bg-orange-500'}
-                            icon={<PiNotebook />}
-                            title={'Data Akun'}
-                        />
+                        <CardMenu bgColor={'bg-orange-500'} icon={<PiNotebook />} title={'Data Akun'} />
                     </Link>
                     <Link href={route('data-ledger.journal', organization.id)}>
-                        <CardMenu 
-                            bgColor={'bg-emerald-500'}
-                            icon={<RiBookletLine />}
-                            title={'Jurnal Umum'}
-                        />
+                        <CardMenu bgColor={'bg-emerald-500'} icon={<RiBookletLine />} title={'Jurnal Umum'} />
                     </Link>
                 </div>
             </ContainerDesktop>
@@ -43,38 +35,27 @@ export default function Index({organization}) {
             {/* Mobile */}
             <div className='sm:hidden flex flex-wrap pt-14 pb-5 px-2 mx-auto bg-white gap-2 w-full justify-center'>
                 <Link href={route('data-ledger.account-category', organization.id)}>
-                    <CardMenu 
-                        bgColor={'bg-cyan-500'}
-                        icon={<LiaClipboardListSolid />}
-                        title={'Data Kategori Akun'}
-                    />
+                    <CardMenu bgColor={'bg-cyan-500'} icon={<LiaClipboardListSolid />} title={'Data Kategori Akun'} />
                 </Link>
                 <Link href={route('data-ledger.account', organization.id)}>
-                    <CardMenu 
-                        bgColor={'bg-orange-500'}
-                        icon={<PiNotebook />}
-                        title={'Data Akun'}
-                    />
-                </Link>        
+                    <CardMenu bgColor={'bg-orange-500'} icon={<PiNotebook />} title={'Data Akun'} />
+                </Link>
                 <Link href={route('data-ledger.journal', organization.id)}>
-                    <CardMenu 
-                        bgColor={'bg-emerald-500'}
-                        icon={<RiBookletLine />}
-                        title={'Jurnal Umum'}
-                    />
-                </Link>        
+                    <CardMenu bgColor={'bg-emerald-500'} icon={<RiBookletLine />} title={'Jurnal Umum'} />
+                </Link>
             </div>
             {/* Mobile */}
-
         </>
-    )
+    );
 }
 
-Index.layout = page => <AuthenticatedLayout
-    header={<Header></Header>}
-    children={page}
-    user={page.props.auth.user}
-    role={page.props.role}
-    organization={page.props.organization}
-    title="Buku Besar"
-/>
+Index.layout = (page) => (
+    <AuthenticatedLayout
+        header={<Header></Header>}
+        children={page}
+        user={page.props.auth.user}
+        role={page.props.role}
+        organization={page.props.organization}
+        title='Buku Besar'
+    />
+);

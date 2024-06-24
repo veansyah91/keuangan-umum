@@ -20,7 +20,8 @@ export default function ForgotPassword({ status }) {
             <Head title='Forgot Password' />
 
             <div className='mb-4 text-sm text-gray-600'>
-                Lupa password anda? Tidak Masalah. Silakan masukkan email anda, lalu kami akan mengirimkan Link untuk mengatur kembali password anda.
+                Lupa password anda? Tidak Masalah. Silakan masukkan email anda, lalu kami akan mengirimkan Link untuk
+                mengatur kembali password anda.
             </div>
 
             {status && <div className='mb-4 font-medium text-sm text-green-600'>{status}</div>}

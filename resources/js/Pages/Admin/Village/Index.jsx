@@ -21,8 +21,16 @@ import ContentDesktop from '@/Components/Desktop/ContentDesktop';
 import NavgroupRegional from '@/Components/NavgroupRegional';
 import GeneralSelectInput from '@/Components/SelectInput/GeneralSelectInput';
 
-export default function Index({villages, provinces, regencies, districts, searchFilter, provinceFilter, regencyFilter, districtFilter}) {
-
+export default function Index({
+    villages,
+    provinces,
+    regencies,
+    districts,
+    searchFilter,
+    provinceFilter,
+    regencyFilter,
+    districtFilter,
+}) {
     // state
     const [showSearch, setShowSearch] = useState(false);
     const [showModalImport, setShowModalImport] = useState(false);
@@ -34,7 +42,7 @@ export default function Index({villages, provinces, regencies, districts, search
     const prevSearch = usePrevious(search);
 
     const { data, setData, post, progress, reset, processing } = useForm({
-        village: ''
+        village: '',
     });
 
     // Province Select
@@ -54,120 +62,120 @@ export default function Index({villages, provinces, regencies, districts, search
 
     // Useeffect
     useEffect(() => {
-        if(prevSearch!==undefined) {
+        if (prevSearch !== undefined) {
             handleReloadPage();
         }
     }, [debounceValue]);
 
     useEffect(() => {
-        if(prevSearch!==undefined) {
-            handleReloadPageOnlyProvince();            
+        if (prevSearch !== undefined) {
+            handleReloadPageOnlyProvince();
         }
     }, [debounceQueryProvince, selectedProvince]);
 
     useEffect(() => {
-        if(prevSearch!==undefined) {
-            handleReloadPageOnlyRegency();            
+        if (prevSearch !== undefined) {
+            handleReloadPageOnlyRegency();
         }
     }, [debounceQueryRegency, selectedRegency, selectedProvince]);
 
     useEffect(() => {
-        if(prevSearch!==undefined) {
-            handleReloadPageOnlyDistrict();            
+        if (prevSearch !== undefined) {
+            handleReloadPageOnlyDistrict();
         }
     }, [debounceQueryDistrict, selectedDistrict, selectedRegency]);
 
     // Function
     const handleShowSearch = () => {
         setShowSearch(!showSearch);
-    }
+    };
 
     const handleInputFile = (e) => {
         if (e.currentTarget.files) {
-            setData("village", e.currentTarget.files[0]);
+            setData('village', e.currentTarget.files[0]);
         }
-    }
+    };
 
     const handleSubmitImport = (e) => {
         e.preventDefault();
-        post(route('admin.data-master.village.post'),{
+        post(route('admin.data-master.village.post'), {
             onSuccess: () => {
                 reset();
                 setShowModalImport(false);
                 toast.success(`Desa / Kelurahan Berhasil Diimport`, {
-                    position: toast.POSITION.TOP_CENTER
+                    position: toast.POSITION.TOP_CENTER,
                 });
             },
-            onError: errors => {
+            onError: (errors) => {
                 console.log(errors);
-            }
+            },
         });
-    }
+    };
 
     const handleFilter = (e) => {
         e.preventDefault();
         setShowModalFilter(false);
-        handleReloadPage();        
-    }
+        handleReloadPage();
+    };
 
     const handleReloadPage = () => {
-        router.reload({ 
+        router.reload({
             only: ['villages'],
             data: {
                 search,
-                'province' : selectedProvince.id,
-                'regency' : selectedRegency.id,
-                'district' : selectedDistrict.id,
-            }
-         });
-    }
+                province: selectedProvince.id,
+                regency: selectedRegency.id,
+                district: selectedDistrict.id,
+            },
+        });
+    };
 
     const handleReloadPageOnlyProvince = () => {
-        router.reload({ 
+        router.reload({
             only: ['provinces'],
             data: {
-                'searchProvince' : queryProvince
+                searchProvince: queryProvince,
             },
-            preserveState: true
-         });
-    }   
+            preserveState: true,
+        });
+    };
 
     const handleReloadPageOnlyRegency = () => {
-        router.reload({ 
+        router.reload({
             only: ['regencies'],
             data: {
-                'searchRegency' : queryRegency,
-                'province' : selectedProvince.id
+                searchRegency: queryRegency,
+                province: selectedProvince.id,
             },
-            preserveState: true
-         });
-    }   
+            preserveState: true,
+        });
+    };
 
     const handleReloadPageOnlyDistrict = () => {
-        router.reload({ 
+        router.reload({
             only: ['districts'],
             data: {
-                'searchDistrict' : queryDistrict,
-                'regency' : selectedRegency.id
+                searchDistrict: queryDistrict,
+                regency: selectedRegency.id,
             },
-            preserveState: true
-         });
-    }   
+            preserveState: true,
+        });
+    };
 
     const handleDeleteProvinceFilter = () => {
         setSelectedProvince('');
         setQueryProvince('');
-    }
+    };
 
     const handleDeleteRegencyFilter = () => {
         setSelectedRegency('');
         setQueryRegency('');
-    }
+    };
 
     const handleDeleteDistrictFilter = () => {
         setSelectedDistrict('');
         setQueryDistrict('');
-    }
+    };
 
     return (
         <>
@@ -175,275 +183,303 @@ export default function Index({villages, provinces, regencies, districts, search
             <ToastContainer />
 
             {/* Mobile */}
-                {/* Sub Nav Mobile */}
-                <div className="btm-nav sm:hidden">
-                    <NavgroupRegionalMobile onClick={() => setShowModalImport(true)}/>
-                </div> 
+            {/* Sub Nav Mobile */}
+            <div className='btm-nav sm:hidden'>
+                <NavgroupRegionalMobile onClick={() => setShowModalImport(true)} />
+            </div>
 
-                <TitleMobile 
-                    zIndex={'z-50'}
-                    search={search}
-                    setSearch= {e => setSearch(e.target.value)}
-                    pageBefore={
-                        villages.links[0].url 
-                        ? <Link href={`/admin/data-master/villages?page=${villages.current_page - 1}&search=${search}`}preserveState><IoPlayBack /></Link>
-                        : <div className='text-gray-300'><IoPlayBack /></div>
-                    }
-                    pageAfter={
-                        villages.links[villages.links.length-1].url 
-                        ? <Link href={`/admin/data-master/villages?page=${villages.current_page + 1}&search=${search}`}
-                            only={['villages']} preserveState>
+            <TitleMobile
+                zIndex={'z-50'}
+                search={search}
+                setSearch={(e) => setSearch(e.target.value)}
+                pageBefore={
+                    villages.links[0].url ? (
+                        <Link
+                            href={`/admin/data-master/villages?page=${villages.current_page - 1}&search=${search}`}
+                            preserveState>
+                            <IoPlayBack />
+                        </Link>
+                    ) : (
+                        <div className='text-gray-300'>
+                            <IoPlayBack />
+                        </div>
+                    )
+                }
+                pageAfter={
+                    villages.links[villages.links.length - 1].url ? (
+                        <Link
+                            href={`/admin/data-master/villages?page=${villages.current_page + 1}&search=${search}`}
+                            only={['villages']}
+                            preserveState>
                             <IoPlayForward />
                         </Link>
-                        : <div className='text-gray-300'><IoPlayForward /></div>
-                    }
-                    page={
-                        <>
-                            {villages.current_page}/{villages.last_page}
-                        </>
-                    }
-                    data={villages}
-                    hasFilter={true}
-                    showFilter={() => setShowModalFilter(true)}
-                />
-                <ContentMobile>
-                    {
-                        villages.data.map(village => 
-                            <VillageMobile
-                                village={village}
-                                key={village.id}
-                            />
-                        )
-                    }
-                </ContentMobile>
+                    ) : (
+                        <div className='text-gray-300'>
+                            <IoPlayForward />
+                        </div>
+                    )
+                }
+                page={
+                    <>
+                        {villages.current_page}/{villages.last_page}
+                    </>
+                }
+                data={villages}
+                hasFilter={true}
+                showFilter={() => setShowModalFilter(true)}
+            />
+            <ContentMobile>
+                {villages.data.map((village) => (
+                    <VillageMobile village={village} key={village.id} />
+                ))}
+            </ContentMobile>
             {/* Mobile */}
 
             {/* Desktop */}
-                <ContainerDesktop>
+            <ContainerDesktop>
                 {/* Title, Pagination, Search */}
-                    <TitleDesktop>  
-                        <div className='my-auto w-6/12'>
-                            <PrimaryButton className='py-3' onClick={() => setShowModalImport(true)}>
-                                Import Kelurahan / Desa
-                            </PrimaryButton>
-                        </div>           
-                        <div className='w-1/12 text-end'>
-                            <button className='p-3 border rounded-lg' onClick={() => setShowModalFilter(true)}><IoFilter /></button> 
-                        </div>
-                                  
-                        <div className='w-3/12 border flex rounded-lg'>
-                            <label htmlFor='search-input' className='my-auto ml-2'><IoSearchSharp /></label>
-                            <input id='search-input' name='search-input' type="search" placeholder='Cari Kecamatan' className='w-full border-none focus:outline-none focus:ring-0' value={search || ''}
-                            onChange={e => setSearch(e.target.value)}/>
-                        </div>
+                <TitleDesktop>
+                    <div className='my-auto w-6/12'>
+                        <PrimaryButton className='py-3' onClick={() => setShowModalImport(true)}>
+                            Import Kelurahan / Desa
+                        </PrimaryButton>
+                    </div>
+                    <div className='w-1/12 text-end'>
+                        <button className='p-3 border rounded-lg' onClick={() => setShowModalFilter(true)}>
+                            <IoFilter />
+                        </button>
+                    </div>
 
-                        <div className='italic text-xs my-auto w-1/12 text-center'>
-                            <PageNumber data={villages} />
-                        </div>
+                    <div className='w-3/12 border flex rounded-lg'>
+                        <label htmlFor='search-input' className='my-auto ml-2'>
+                            <IoSearchSharp />
+                        </label>
+                        <input
+                            id='search-input'
+                            name='search-input'
+                            type='search'
+                            placeholder='Cari Kecamatan'
+                            className='w-full border-none focus:outline-none focus:ring-0'
+                            value={search || ''}
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
+                    </div>
 
-                        <div className='my-auto flex space-x-2 w-1/12'>
-                            <div className='my-auto'>
-                                {
-                                    villages.links[0].url 
-                                    ? <Link 
-                                            href={`/admin/data-master/villages?page=${villages.current_page - 1}&search=${search}${selectedProvince && `&province=${selectedProvince.id}`}${selectedRegency && `&regency=${selectedRegency.id}`}${selectedDistrict && `&district=${selectedDistrict.id}`}
+                    <div className='italic text-xs my-auto w-1/12 text-center'>
+                        <PageNumber data={villages} />
+                    </div>
+
+                    <div className='my-auto flex space-x-2 w-1/12'>
+                        <div className='my-auto'>
+                            {villages.links[0].url ? (
+                                <Link
+                                    href={`/admin/data-master/villages?page=${villages.current_page - 1}&search=${search}${selectedProvince && `&province=${selectedProvince.id}`}${selectedRegency && `&regency=${selectedRegency.id}`}${selectedDistrict && `&district=${selectedDistrict.id}`}
                                                 `}
-                                            preserveState only={['villages']}
-                                        >
-                                            <IoPlayBack />
-                                        </Link>
-                                    : <div className='text-gray-300'><IoPlayBack /></div>
-                                }                                
-                            </div>
-                            <div className='my-auto'>{villages.current_page}/{villages.last_page}</div>
-                            <div className='my-auto'>
-                                {
-                                    villages.links[villages.links.length-1].url 
-                                    ? <Link 
-                                            href={`/admin/data-master/villages?page=${villages.current_page + 1}&search=${search}${selectedProvince && `&province=${selectedProvince.id}`}${selectedRegency && `&regency=${selectedRegency.id}`}${selectedDistrict && `&district=${selectedDistrict.id}`}`}
-                                            only={['villages']} preserveState
-                                        >
-                                        <IoPlayForward />
-                                    </Link>
-                                    : <div className='text-gray-300'><IoPlayForward /></div>
-                                }   
-                            </div>
+                                    preserveState
+                                    only={['villages']}>
+                                    <IoPlayBack />
+                                </Link>
+                            ) : (
+                                <div className='text-gray-300'>
+                                    <IoPlayBack />
+                                </div>
+                            )}
                         </div>
-                    </TitleDesktop>
-
-                    <div className='sm:flex hidden gap-5'>
-                        <div className='w-11/12'>
-                            <ContentDesktop>
-                                <table className='table table-pin-rows table-pin-cols text-base'>
-                                    <thead className='text-base text-gray-900'>
-                                        <tr className=''>
-                                            <th className='bg-gray-200'>Kode</th>
-                                            <th className='bg-gray-200'>Nama Desa / Kelurahan</th>
-                                            <th className='bg-gray-200'>Nama Kecamatan</th>
-                                            <th className='bg-gray-200'>Nama Kabupaten / Kota</th>
-                                            <th className='bg-gray-200'>Nama Provinsi</th>
-                                            <th className='bg-gray-200'></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {
-                                            villages.data.map((village, index) =>
-                                                <VillageDesktop 
-                                                    key={index} 
-                                                    village={village} 
-                                                    className={`${index % 2 == 0 && 'bg-gray-100'}`} 
-                                                />
-                                            )
-                                        }
-                                    </tbody>
-                                </table>
-                            </ContentDesktop>
+                        <div className='my-auto'>
+                            {villages.current_page}/{villages.last_page}
                         </div>
-                        <div className='w-1/12 text-end'>
-                            <NavgroupRegional />
+                        <div className='my-auto'>
+                            {villages.links[villages.links.length - 1].url ? (
+                                <Link
+                                    href={`/admin/data-master/villages?page=${villages.current_page + 1}&search=${search}${selectedProvince && `&province=${selectedProvince.id}`}${selectedRegency && `&regency=${selectedRegency.id}`}${selectedDistrict && `&district=${selectedDistrict.id}`}`}
+                                    only={['villages']}
+                                    preserveState>
+                                    <IoPlayForward />
+                                </Link>
+                            ) : (
+                                <div className='text-gray-300'>
+                                    <IoPlayForward />
+                                </div>
+                            )}
                         </div>
                     </div>
-                    
-                </ContainerDesktop>
+                </TitleDesktop>
+
+                <div className='sm:flex hidden gap-5'>
+                    <div className='w-11/12'>
+                        <ContentDesktop>
+                            <table className='table table-pin-rows table-pin-cols text-base'>
+                                <thead className='text-base text-gray-900'>
+                                    <tr className=''>
+                                        <th className='bg-gray-200'>Kode</th>
+                                        <th className='bg-gray-200'>Nama Desa / Kelurahan</th>
+                                        <th className='bg-gray-200'>Nama Kecamatan</th>
+                                        <th className='bg-gray-200'>Nama Kabupaten / Kota</th>
+                                        <th className='bg-gray-200'>Nama Provinsi</th>
+                                        <th className='bg-gray-200'></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {villages.data.map((village, index) => (
+                                        <VillageDesktop
+                                            key={index}
+                                            village={village}
+                                            className={`${index % 2 == 0 && 'bg-gray-100'}`}
+                                        />
+                                    ))}
+                                </tbody>
+                            </table>
+                        </ContentDesktop>
+                    </div>
+                    <div className='w-1/12 text-end'>
+                        <NavgroupRegional />
+                    </div>
+                </div>
+            </ContainerDesktop>
             {/* Desktop */}
 
             {/* Modal */}
-                {/* Modal Import */}
-                    <Modal show={showModalImport} onClose={() => setShowModalImport(false)}>
-                        <form 
-                            onSubmit={handleSubmitImport} 
-                            className="p-6">
-                            <h2 className="text-lg font-medium text-gray-900">
-                                Import Desa / Kelurahan
-                            </h2>
+            {/* Modal Import */}
+            <Modal show={showModalImport} onClose={() => setShowModalImport(false)}>
+                <form onSubmit={handleSubmitImport} className='p-6'>
+                    <h2 className='text-lg font-medium text-gray-900'>Import Desa / Kelurahan</h2>
 
-                            <div className="mt-6 ">
-                                <div className='flex flex-col sm:flex-row w-full gap-1'>
-                                    <div className='sm:w-1/4 w-full my-auto'>File Desa / Kelurahan</div>
-                                    <div className='sm:w-3/4 w-full'>
-                                    <input type="file" className="file-input file-input-bordered file-input-sm w-full" 
-                                        value={undefined} 
-                                        onChange={handleInputFile}
-                                    />
-                                    {progress && (
-                                        <progress value={progress.percentage} max="100">
-                                            {progress.percentage}%
-                                        </progress>
-                                    )}
-                                    </div>
-                                </div>
-                                
+                    <div className='mt-6 '>
+                        <div className='flex flex-col sm:flex-row w-full gap-1'>
+                            <div className='sm:w-1/4 w-full my-auto'>File Desa / Kelurahan</div>
+                            <div className='sm:w-3/4 w-full'>
+                                <input
+                                    type='file'
+                                    className='file-input file-input-bordered file-input-sm w-full'
+                                    value={undefined}
+                                    onChange={handleInputFile}
+                                />
+                                {progress && (
+                                    <progress value={progress.percentage} max='100'>
+                                        {progress.percentage}%
+                                    </progress>
+                                )}
                             </div>
+                        </div>
+                    </div>
 
-                            <div className="mt-6 flex justify-end">
-                                <SecondaryButton onClick={() => setShowModalImport(false)}>Batal</SecondaryButton>
+                    <div className='mt-6 flex justify-end'>
+                        <SecondaryButton onClick={() => setShowModalImport(false)}>Batal</SecondaryButton>
 
-                                <PrimaryButton className="ms-3" 
-                                    disabled={processing}
-                                    >
-                                    Import
-                                </PrimaryButton>
+                        <PrimaryButton className='ms-3' disabled={processing}>
+                            Import
+                        </PrimaryButton>
+                    </div>
+                </form>
+            </Modal>
+            {/* Modal Import */}
+
+            {/* Modal Filter */}
+            <Modal show={showModalFilter} onClose={() => setShowModalFilter(false)}>
+                <form onSubmit={handleFilter} className='p-6'>
+                    <h2 className='text-lg font-medium text-gray-900'>Filter Desa</h2>
+
+                    <div className='mt-6 space-y-2'>
+                        <div className='flex w-full gap-1'>
+                            <div className='w-3/12 my-auto'>Provinsi</div>
+                            <div className='w-8/12'>
+                                <GeneralSelectInput
+                                    data={provinces}
+                                    selected={selectedProvince}
+                                    setSelected={setSelectedProvince}
+                                    query={queryProvince}
+                                    setQuery={setQueryProvince}
+                                    maxHeight='max-h-40'
+                                    placeholder='Cari Provinsi'
+                                />
                             </div>
-                        </form>
-                    </Modal>
-                {/* Modal Import */}
-
-                {/* Modal Filter */}
-                    <Modal show={showModalFilter} onClose={() => setShowModalFilter(false)}>
-                        <form 
-                            onSubmit={handleFilter} 
-                            className="p-6">
-                            <h2 className="text-lg font-medium text-gray-900">
-                                Filter Desa
-                            </h2>
-
-                            <div className="mt-6 space-y-2">
-                                <div className='flex w-full gap-1'>
-                                    <div className='w-3/12 my-auto'>Provinsi</div>
-                                    <div className='w-8/12'>
-                                        <GeneralSelectInput 
-                                            data={provinces}
-                                            selected={selectedProvince}
-                                            setSelected={setSelectedProvince}
-                                            query={queryProvince}
-                                            setQuery={setQueryProvince}
-                                            maxHeight='max-h-40'
-                                            placeholder='Cari Provinsi'
-                                        />
-                                    </div>
-                                    <div className='w-1/12 my-auto'>
-                                        {
-                                            selectedProvince && <button className='p-2' onClick={handleDeleteProvinceFilter}><IoTrash /></button>
-                                        }                                    
-                                    </div>
-                                </div>   
-
-                                <div className='flex w-full gap-1'>
-                                    <div className='w-3/12 my-auto'>Kabupaten / Kota</div>
-                                    <div className='w-8/12'>
-                                        <GeneralSelectInput 
-                                            data={regencies}
-                                            selected={selectedRegency}
-                                            setSelected={setSelectedRegency}
-                                            query={queryRegency}
-                                            setQuery={setQueryRegency}
-                                            maxHeight='max-h-40'
-                                            placeholder='Cari Kabupaten / Kota'
-                                        />
-                                    </div>
-                                    <div className='w-1/12 my-auto'>
-                                        {
-                                            selectedRegency && <button className='p-2' onClick={handleDeleteRegencyFilter}><IoTrash /></button>
-                                        }                                    
-                                    </div>
-                                </div>    
-
-                                <div className='flex w-full gap-1'>
-                                    <div className='w-3/12 my-auto'>Kecamatan</div>
-                                    <div className='w-8/12'>
-                                        <GeneralSelectInput 
-                                            data={districts}
-                                            selected={selectedDistrict}
-                                            setSelected={setSelectedDistrict}
-                                            query={queryDistrict}
-                                            setQuery={setQueryDistrict}
-                                            maxHeight='max-h-40'
-                                            placeholder='Cari Kecamatan'
-                                        />
-                                    </div>
-                                    <div className='w-1/12 my-auto'>
-                                        {
-                                            selectedDistrict && <button className='p-2' onClick={handleDeleteDistrictFilter}><IoTrash /></button>
-                                        }                                    
-                                    </div>
-                                </div>                           
+                            <div className='w-1/12 my-auto'>
+                                {selectedProvince && (
+                                    <button className='p-2' onClick={handleDeleteProvinceFilter}>
+                                        <IoTrash />
+                                    </button>
+                                )}
                             </div>
+                        </div>
 
-                            <div className="mt-6 flex justify-end">
-                                <SecondaryButton onClick={() => setShowModalFilter(false)}>Batal</SecondaryButton>
-
-                                <PrimaryButton className="ms-3">
-                                    Filter
-                                </PrimaryButton>
+                        <div className='flex w-full gap-1'>
+                            <div className='w-3/12 my-auto'>Kabupaten / Kota</div>
+                            <div className='w-8/12'>
+                                <GeneralSelectInput
+                                    data={regencies}
+                                    selected={selectedRegency}
+                                    setSelected={setSelectedRegency}
+                                    query={queryRegency}
+                                    setQuery={setQueryRegency}
+                                    maxHeight='max-h-40'
+                                    placeholder='Cari Kabupaten / Kota'
+                                />
                             </div>
-                        </form>
-                    </Modal>
-                {/* Modal Filter */}
+                            <div className='w-1/12 my-auto'>
+                                {selectedRegency && (
+                                    <button className='p-2' onClick={handleDeleteRegencyFilter}>
+                                        <IoTrash />
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className='flex w-full gap-1'>
+                            <div className='w-3/12 my-auto'>Kecamatan</div>
+                            <div className='w-8/12'>
+                                <GeneralSelectInput
+                                    data={districts}
+                                    selected={selectedDistrict}
+                                    setSelected={setSelectedDistrict}
+                                    query={queryDistrict}
+                                    setQuery={setQueryDistrict}
+                                    maxHeight='max-h-40'
+                                    placeholder='Cari Kecamatan'
+                                />
+                            </div>
+                            <div className='w-1/12 my-auto'>
+                                {selectedDistrict && (
+                                    <button className='p-2' onClick={handleDeleteDistrictFilter}>
+                                        <IoTrash />
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className='mt-6 flex justify-end'>
+                        <SecondaryButton onClick={() => setShowModalFilter(false)}>Batal</SecondaryButton>
+
+                        <PrimaryButton className='ms-3'>Filter</PrimaryButton>
+                    </div>
+                </form>
+            </Modal>
+            {/* Modal Filter */}
             {/* Modal */}
         </>
-    )
+    );
 }
 
-Index.layout = page => <AuthenticatedLayout
-    header={<Header>Data Desa / Kelurahan</Header>}
-    breadcrumbs={<div className="text-sm breadcrumbs">
-                    <ul>
-                        <li className='font-bold'><Link href={route('admin.data-master')}>Data Master</Link></li> 
-                        <li>Data Desa / Kelurahan</li>
-                    </ul>
-                </div>}
-    children={page}
-    user={page.props.auth.user}
-    title="Data Desa / Kelurahan"
-    backLink={<Link href={route('admin.data-master')}><IoArrowBackOutline/></Link>}
-/>
+Index.layout = (page) => (
+    <AuthenticatedLayout
+        header={<Header>Data Desa / Kelurahan</Header>}
+        breadcrumbs={
+            <div className='text-sm breadcrumbs'>
+                <ul>
+                    <li className='font-bold'>
+                        <Link href={route('admin.data-master')}>Data Master</Link>
+                    </li>
+                    <li>Data Desa / Kelurahan</li>
+                </ul>
+            </div>
+        }
+        children={page}
+        user={page.props.auth.user}
+        title='Data Desa / Kelurahan'
+        backLink={
+            <Link href={route('admin.data-master')}>
+                <IoArrowBackOutline />
+            </Link>
+        }
+    />
+);

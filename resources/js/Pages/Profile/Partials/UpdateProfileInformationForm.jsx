@@ -24,9 +24,7 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status, clas
             <header>
                 <h2 className='text-lg font-medium text-gray-900'>Informasi Profil</h2>
 
-                <p className='mt-1 text-sm text-gray-600'>
-                    Perbarui informasi profil akun dan alamat email anda.
-                </p>
+                <p className='mt-1 text-sm text-gray-600'>Perbarui informasi profil akun dan alamat email anda.</p>
             </header>
 
             <form onSubmit={submit} className='mt-6 space-y-6'>

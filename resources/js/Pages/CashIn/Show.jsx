@@ -3,15 +3,15 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
 import { Head, Link } from '@inertiajs/react';
 import { IoArrowBackOutline } from 'react-icons/io5';
-import { FaPrint } from "react-icons/fa";
+import { FaPrint } from 'react-icons/fa';
 import SecondaryButton from '@/Components/SecondaryButton';
 import dayjs from 'dayjs';
 import formatNumber from '@/Utils/formatNumber';
 
-export default function Show({cashIn, organization, program, department, project, journal, ledgers, journalUser}) {
+export default function Show({ cashIn, organization, program, department, project, journal, ledgers, journalUser }) {
     const handlePrint = () => {
         window.print();
-    }
+    };
     return (
         <>
             <Head title='Detail Kas Masuk Umum' />
@@ -22,7 +22,9 @@ export default function Show({cashIn, organization, program, department, project
                     <div className='text-end px-3 print:hidden'>
                         <SecondaryButton onClick={handlePrint}>
                             <div className='flex gap-2'>
-                                <div className='my-auto'><FaPrint /></div>
+                                <div className='my-auto'>
+                                    <FaPrint />
+                                </div>
                                 <div className='my-auto'>Print</div>
                             </div>
                         </SecondaryButton>
@@ -30,13 +32,14 @@ export default function Show({cashIn, organization, program, department, project
 
                     {/* Title */}
                     <div className='uppercase pt-10 pb-5 border-b hidden print:flex print:justify-between'>
-                        <div className='w-1/2 text-2xl my-auto'>
-                            voucher Kas Masuk 
-                        </div>
+                        <div className='w-1/2 text-2xl my-auto'>voucher Kas Masuk</div>
                         <div className='w-1/2 text-end mt-auto'>
                             <div>{organization.name}</div>
                             <div className='text-xs'>{organization.address}</div>
-                            <div className='text-xs'>{organization.village}, {organization.district}, {organization.regency}, {organization.province}</div>
+                            <div className='text-xs'>
+                                {organization.village}, {organization.district}, {organization.regency},{' '}
+                                {organization.province}
+                            </div>
                         </div>
                     </div>
 
@@ -60,32 +63,27 @@ export default function Show({cashIn, organization, program, department, project
                             </div>
                         </div>
                         <div className='w-7/12 space-y-3'>
-                            {
-                                program &&
+                            {program && (
                                 <div className='flex gap-2'>
                                     <div className='w-4/12'>Program Kegiatan</div>
                                     <div className='w-1/12 text-end'>:</div>
                                     <div className='w-7/12'>{program.name}</div>
                                 </div>
-                            }
-                            {
-                                project && 
+                            )}
+                            {project && (
                                 <div className='flex gap-2'>
                                     <div className='w-4/12'>Proyek</div>
                                     <div className='w-1/12 text-end'>:</div>
                                     <div className='w-7/12'>{project.name}</div>
                                 </div>
-                            }
-                            {
-                                department && 
+                            )}
+                            {department && (
                                 <div className='flex gap-2'>
                                     <div className='w-4/12'>Departemen</div>
                                     <div className='w-1/12 text-end'>:</div>
                                     <div className='w-7/12'>{department.name}</div>
                                 </div>
-                            }
-                            
-                            
+                            )}
                         </div>
                     </div>
 
@@ -101,22 +99,30 @@ export default function Show({cashIn, organization, program, department, project
                                 </tr>
                             </thead>
                             <tbody>
-                                {
-                                    ledgers.map(ledger => 
-                                        <tr key={ledger.id} className='border border-slate-800'>
-                                            <td className='px-3 py-2 border border-slate-800'>{ledger.account.code}</td>
-                                            <td className='px-3 py-2 border border-slate-800'>{ledger.account.name}</td>
-                                            <td className='text-end px-3 py-2 border border-slate-800'>IDR {formatNumber(ledger.debit)}</td>
-                                            <td className='text-end px-3 py-2 border border-slate-800'>IDR {formatNumber(ledger.credit)}</td>
-                                        </tr>
-                                    )
-                                }
+                                {ledgers.map((ledger) => (
+                                    <tr key={ledger.id} className='border border-slate-800'>
+                                        <td className='px-3 py-2 border border-slate-800'>{ledger.account.code}</td>
+                                        <td className='px-3 py-2 border border-slate-800'>{ledger.account.name}</td>
+                                        <td className='text-end px-3 py-2 border border-slate-800'>
+                                            IDR {formatNumber(ledger.debit)}
+                                        </td>
+                                        <td className='text-end px-3 py-2 border border-slate-800'>
+                                            IDR {formatNumber(ledger.credit)}
+                                        </td>
+                                    </tr>
+                                ))}
                             </tbody>
                             <tfoot className='border border-slate-800 bg-slate-800 text-white print:text-slate-800'>
                                 <tr>
-                                    <th colSpan={2} className='text-start px-3 py-2'>Total</th>
-                                    <th className='text-end px-3 py-2 border border-slate-800'>IDR {formatNumber(journal.value)}</th>
-                                    <th className='text-end px-3 py-2 border border-slate-800'>IDR {formatNumber(journal.value)}</th>
+                                    <th colSpan={2} className='text-start px-3 py-2'>
+                                        Total
+                                    </th>
+                                    <th className='text-end px-3 py-2 border border-slate-800'>
+                                        IDR {formatNumber(journal.value)}
+                                    </th>
+                                    <th className='text-end px-3 py-2 border border-slate-800'>
+                                        IDR {formatNumber(journal.value)}
+                                    </th>
                                 </tr>
                             </tfoot>
                         </table>
@@ -129,29 +135,40 @@ export default function Show({cashIn, organization, program, department, project
                             <div className='w-full text-center'>Dibuat Oleh</div>
                             <div className='w-full text-center border-t border-slate-900'>{journalUser[0].name}</div>
                         </div>
-                        
                     </div>
                 </div>
             </div>
 
             {/* Mobile */}
         </>
-    )
+    );
 }
 
-Show.layout = page => <AuthenticatedLayout
-    header={<Header>Detail Kas Masuk</Header>}
-    children={page}
-    user={page.props.auth.user}
-    organization={page.props.organization}
-    title="Detail Kas Masuk"
-    backLink={<Link href={route('cashflow.cash-in',page.props.organization.id)}><IoArrowBackOutline/></Link>}
-    breadcrumbs={<div className="text-sm breadcrumbs">
-        <ul>
-            <li className='font-bold'><Link href={route('cashflow',page.props.organization.id)}>Buku Besar</Link></li> 
-            <li className='font-bold'><Link href={route('cashflow.cash-in',page.props.organization.id)}>Kas Masuk Umum</Link></li> 
-            <li>Detail Kas Masuk</li>
-        </ul>
-    </div>}
-    role={page.props.role}
-/>
+Show.layout = (page) => (
+    <AuthenticatedLayout
+        header={<Header>Detail Kas Masuk</Header>}
+        children={page}
+        user={page.props.auth.user}
+        organization={page.props.organization}
+        title='Detail Kas Masuk'
+        backLink={
+            <Link href={route('cashflow.cash-in', page.props.organization.id)}>
+                <IoArrowBackOutline />
+            </Link>
+        }
+        breadcrumbs={
+            <div className='text-sm breadcrumbs'>
+                <ul>
+                    <li className='font-bold'>
+                        <Link href={route('cashflow', page.props.organization.id)}>Buku Besar</Link>
+                    </li>
+                    <li className='font-bold'>
+                        <Link href={route('cashflow.cash-in', page.props.organization.id)}>Kas Masuk Umum</Link>
+                    </li>
+                    <li>Detail Kas Masuk</li>
+                </ul>
+            </div>
+        }
+        role={page.props.role}
+    />
+);

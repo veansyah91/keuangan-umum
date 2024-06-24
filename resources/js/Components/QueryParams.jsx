@@ -1,7 +1,5 @@
-import React from 'react'
+import React from 'react';
 
 export default function QueryParams() {
-  return (
-    <div>QueryParams</div>
-  )
+    return <div>QueryParams</div>;
 }

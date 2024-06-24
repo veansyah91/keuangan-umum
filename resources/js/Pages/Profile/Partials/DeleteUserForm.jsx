@@ -49,7 +49,8 @@ export default function DeleteUserForm({ className = '' }) {
                 <h2 className='text-lg font-medium text-gray-900'>Hapus Akun</h2>
 
                 <p className='mt-1 text-sm text-gray-600'>
-                    Ketika akun anda dihapus, semua data akan dihapus secara permanen. Sebelum menghapus akun, silakan unduh data dan informasi yang dibutuhkan.
+                    Ketika akun anda dihapus, semua data akan dihapus secara permanen. Sebelum menghapus akun, silakan
+                    unduh data dan informasi yang dibutuhkan.
                 </p>
             </header>
 
@@ -60,8 +61,8 @@ export default function DeleteUserForm({ className = '' }) {
                     <h2 className='text-lg font-medium text-gray-900'>Apakah anda yakin menghapus akun?</h2>
 
                     <p className='mt-1 text-sm text-gray-600'>
-                        Ketika akun dihapus, semua data akan dihapus secara permanen.
-                        Silakan masukkan password untuk mengkonfirmasi.
+                        Ketika akun dihapus, semua data akan dihapus secara permanen. Silakan masukkan password untuk
+                        mengkonfirmasi.
                     </p>
 
                     <div className='mt-6'>

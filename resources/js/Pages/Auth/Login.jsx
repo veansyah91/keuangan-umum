@@ -84,14 +84,9 @@ export default function Login({ status, canResetPassword }) {
                                 className='underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:ring-2 focus:ring-offset-2'>
                                 Lupa Password?
                             </Link>
-                        )}  
-                        
+                        )}
                     </div>
-
-                    
                 </div>
-
-                
 
                 <div className='flex items-center justify-end mt-4'>
                     <Link

@@ -1,7 +1,7 @@
-export default function rupiah (number, currency) {
+export default function rupiah(number, currency) {
     return new Intl.NumberFormat('id-ID', {
-        style: 'currency', 
+        style: 'currency',
         currency: 'IDR',
-        minimumFractionDigits:0
+        minimumFractionDigits: 0,
     }).format(number);
 }

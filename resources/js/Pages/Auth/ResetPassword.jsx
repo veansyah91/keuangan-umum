@@ -69,11 +69,7 @@ export default function ResetPassword({ token, email }) {
 
                 <div className='block mt-4'>
                     <label className='flex items-center'>
-                        <Checkbox
-                            name='show'
-                            checked={showPassword}
-                            onChange={(e) => setShowPassword(!showPassword)}
-                        />
+                        <Checkbox name='show' checked={showPassword} onChange={(e) => setShowPassword(!showPassword)} />
                         <span className='ms-2 text-sm text-gray-600'>Tampilkan Sandi</span>
                     </label>
                 </div>
