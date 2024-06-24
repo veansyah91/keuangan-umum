@@ -26,14 +26,13 @@ class UserWithdrawController extends Controller
                                             ->orderBy('created_at','desc')
                                             ->paginate(50);
 
-        $affiliators = Affiliation::limit(10)->get();
         $affiliators = User::whereHas('affiliation')
                             ->when(request('user') ?? false, function ($query, $user) {
                                 return $query->where('name', 'like', '%'.$user.'%')
                                                 ->orWhere('email', 'like', '%'.$user.'%');
                             })
-                            ->with('affiliation')
-                            ->limit(10)
+                            // ->with('affiliation')
+                            ->select('id','name', 'email')
                             ->get();
 
         return Inertia::render('Admin/Withdraw/Index', [

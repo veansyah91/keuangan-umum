@@ -1,12 +1,30 @@
-import { Fragment } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { Combobox, Transition } from '@headlessui/react'
 import { IoCheckmarkCircleOutline, IoChevronDownOutline } from 'react-icons/io5'
 
 export default function UserSelectInput({
-  data, selected, setSelected, query, setQuery, maxHeight = 'max-h-60', placeholder, className = 'border-gray-300 border'
+  resources, selected, setSelected, maxHeight = 'max-h-60', placeholder, className = 'border-gray-300 border'
 }) 
   {
+  const [query, setQuery] = useState('');
+  const [data, setData] = useState(resources);
 
+  useEffect(()=>{
+    const tempData = 
+            query === ''
+            ? resources
+            : resources.filter((account) => 
+              account.name
+              .toLowerCase()
+              .replace(/\s+/g, '')
+              .includes(query?.toLowerCase().replace(/\s+/g, '')));
+
+    setData(tempData);
+  }, [query]);
+
+  useEffect(() => {
+    setQuery(selected?.name)
+  }, [selected])
   return (
       <Combobox value={selected} onChange={setSelected}>
         <div className="relative mt-1">

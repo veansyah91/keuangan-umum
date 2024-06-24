@@ -20,13 +20,15 @@ import BadgeSuccess from '@/Components/Badges/BadgeSuccess';
 import BadgeWarning from '@/Components/Badges/BadgeWarning';
 import { usePrevious } from 'react-use';
 import { useDebounce } from 'use-debounce';
+import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
+import UserSelectInput from '@/Components/SelectInput/UserSelectInput';
 
 
-function Index({ withdraws, searchFilter, statusFilter, affiliation, startDate, endDate }) {
-  // console.log(withdraws);
+function Index({ withdraws, searchFilter, statusFilter, affiliation, affiliators, startDate, endDate }) {
+  console.log(affiliators);
   const [search, setSearch] = useState(searchFilter || '');
   const [filterValue, setFilterValue] = useState({
-    status: statusFilter || null,
+    status: statusFilter || '',
   });
 
   const [showModalFilter, setShowModalFilter] = useState(false);
@@ -48,6 +50,10 @@ function Index({ withdraws, searchFilter, statusFilter, affiliation, startDate, 
     id: null
   });
 
+  const [selectedAffiliator, setSelectedAffiliator] = useState(
+    {id: null, name: '', email:''}
+  ); 
+
 	const [debounceDateValue] = useDebounce(dateValue, 500);
   const [debounceValue] = useDebounce(search, 500);
 
@@ -55,7 +61,6 @@ function Index({ withdraws, searchFilter, statusFilter, affiliation, startDate, 
 
   // useEffect
   useEffect(() => {
-    console.log(debounceDateValue);
     if(prevSearch!==undefined) {
       handleReloadPage();
     }
@@ -119,12 +124,10 @@ function Index({ withdraws, searchFilter, statusFilter, affiliation, startDate, 
     })
   }
 
-  const handleChangeStatusFilterValue = () => {
-    let temp = filterValue.status;
-
-    setFilterValue({
-      ...filterValue,
-      status: !temp
+  const handleSelectedAffiliator = (data) => {
+    console.log(data);
+    setSelectedAffiliator({
+      id: data.id, name: data.name, email:data.email
     });
   }
   
@@ -196,7 +199,13 @@ function Index({ withdraws, searchFilter, statusFilter, affiliation, startDate, 
                     
                 </div>
                 <div className='text-sm'>
+                  <div>
                     Diajukan Tanggal: { dayjs(withdraw.created_at).format('MMMM YYYY, DD') }
+                  </div>
+                  {
+                    withdraw.status ? <div> Dikirim Tanggal: { dayjs(withdraw.updated_at).format('MMMM YYYY, DD') } </div> : ''
+                  }
+                  
                 </div>
                 <div className='text-sm'>
                     {
@@ -288,6 +297,7 @@ function Index({ withdraws, searchFilter, statusFilter, affiliation, startDate, 
                   <th className='bg-gray-200'>Email</th>
                   <th className='bg-gray-200'>Diajukan Tanggal</th>
                   <th className='bg-gray-200'>Dikirim Tanggal</th>
+                  <th className='bg-gray-200'>Nilai</th>
                   <th className='bg-gray-200'>Status</th>
                   <th className='bg-gray-200'></th>
                 </tr>
@@ -306,6 +316,9 @@ function Index({ withdraws, searchFilter, statusFilter, affiliation, startDate, 
                         ? ''
                         : dayjs(withdraw.updated_at).format('MMMM YYYY, DD')
                       }
+                      </td>
+                      <td>
+                        IDR. { formatNumber(withdraw.value) }
                       </td>
                       <td className=''>
                       {
@@ -434,6 +447,22 @@ function Index({ withdraws, searchFilter, statusFilter, affiliation, startDate, 
               </h2>
               <section className='mt-5 space-y-2'>
                 <div className='flex w-full gap-1'>
+                    <div className='w-3/12 my-auto'>Affiliatior</div>
+                      <div className='w-8/12'>
+                        <UserSelectInput
+                          resources={affiliators}
+                          selected={selectedAffiliator}
+                          setSelected={(selected) => handleSelectedAffiliator(selected)}
+                          maxHeight='max-h-40'
+                          placeholder='Cari Afiliator'
+                          isError={false}
+                          id='affiliator'
+                        />
+                      </div>
+                    <div className='w-1/12 my-auto'>
+                    </div>
+                </div>
+                <div className='flex w-full gap-1'>
                     <div className='w-3/12 my-auto'>Status</div>
                     <div className='w-8/12'>
                         <select className="w-full rounded-lg border-gray-300" onChange={(e) => setFilterValue({status: e.target.value})} value={filterValue.status}>
@@ -443,7 +472,6 @@ function Index({ withdraws, searchFilter, statusFilter, affiliation, startDate, 
                         </select>
                     </div>
                     <div className='w-1/12 my-auto'>
-                        
                     </div>
                 </div>
               </section>
