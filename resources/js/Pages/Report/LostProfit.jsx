@@ -30,6 +30,7 @@ export default function LostProfit({
     const [dataLedgers, setDataLedgers] = useState(ledgers || []);
     const [startDate, setStartDate] = useState(startDateFilter || '');
     const [endDate, setEndDate] = useState(endDateFilter || '');
+    const [type, setType] = useState(0);
 
     const [startDateValue, setStartDateValue] = useState({
         startDate: startDateFilter || '',
@@ -183,7 +184,7 @@ export default function LostProfit({
     return (
         <>
             <Head
-                title={`Laporan Laba Rugi Periode : ${dayjs(startDate).format('MMMM DD, YYYY')} - ${dayjs(endDate).format('MMMM DD, YYYY')}`}
+                title={`Laporan ${ type > 0 ? "Surplus Defisit" : "Laba Rugi" } Periode : ${dayjs(startDate).format('MMMM DD, YYYY')} - ${dayjs(endDate).format('MMMM DD, YYYY')}`}
             />
 
             <div className='sm:pt-0 pb-16 pt-12'>
@@ -191,6 +192,15 @@ export default function LostProfit({
                     {/* Nav Title */}
                     <div className='flex sm:flex-row justify-between gap-2 print:hidden'>
                         <div className='px-3 my-auto flex gap-3'>
+                            <div className='my-auto'>
+                            <   select
+                                    className='w-full rounded-lg border-gray-300'
+                                    onChange={(e) => setType(e.target.value)}
+                                    value={type}>
+                                    <option value={0}>Laba Rugi</option>
+                                    <option value={1}>Surplus Defisit</option>
+                                </select>
+                            </div>
                             <div className='my-auto'>
                                 <Datepicker
                                     value={startDateValue}
@@ -407,7 +417,7 @@ export default function LostProfit({
 
                     {/* Title Print*/}
                     <div className='uppercase pt-9 pb-3 border-b hidden print:flex print:justify-between'>
-                        <div className='w-1/2 text-2xl my-auto'>Laporan laba rugi</div>
+                        <div className='w-1/2 text-2xl my-auto'>Laporan { type > 0 ? "Surplus Defisit" : "Laba Rugi"}</div>
                         <div className='w-1/2 text-end mt-auto'>
                             <div>{organization.name}</div>
                             <div className='text-xs'>{organization.address}</div>
@@ -502,7 +512,7 @@ export default function LostProfit({
                             {dataLedgers.length > 0 && (
                                 <div className='mt-5'>
                                     <div className='flex w-full justify-between py-2 font-bold'>
-                                        <div className='w-5/12 print:w-8/12 uppercase flex gap-2'>Laba Kotor</div>
+                                        <div className='w-5/12 print:w-8/12 uppercase flex gap-2'>{ type > 0 ? "Surplus" : "Laba" } Kotor</div>
                                         <div className='w-2/12 print:w-4/12 text-center flex justify-end gap-3'>
                                             <div className='w-1/4 print:w-2/4 text-end'>Rp. </div>
                                             <div className='w-3/4 print:w-2/4 text-end'>
@@ -511,7 +521,7 @@ export default function LostProfit({
                                         </div>
                                     </div>
                                     <div className='flex w-full justify-between py-2 font-bold'>
-                                        <div className='w-5/12 print:w-8/12 uppercase flex gap-2'>Laba Bersih</div>
+                                        <div className='w-5/12 print:w-8/12 uppercase flex gap-2'>{ type > 0 ? "Surplus" : "Laba" } Bersih</div>
                                         <div className='w-2/12 print:w-4/12 text-center flex justify-end gap-3'>
                                             <div className='w-1/4 print:w-2/4 text-end'>Rp. </div>
                                             <div className='w-3/4 print:w-2/4 text-end'>
@@ -522,7 +532,7 @@ export default function LostProfit({
                                     {(cost.depreciated > 0 || cost.other > 0) && (
                                         <div className='flex w-full justify-between py-2 font-bold'>
                                             <div className='w-5/12 print:w-8/12 uppercase flex gap-2'>
-                                                Laba Bersih Setelah Biaya Lain
+                                                { type > 0 ? "Surplus" : "Laba" } Bersih Setelah Biaya Lain
                                             </div>
                                             <div className='w-2/12 print:w-4/12 text-center flex justify-end gap-3'>
                                                 <div className='w-1/4 print:w-2/4 text-end'>Rp. </div>
