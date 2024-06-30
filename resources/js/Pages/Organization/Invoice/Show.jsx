@@ -13,6 +13,7 @@ import SuccessButton from '@/Components/SuccessButton';
 import { IoLogoWhatsapp } from 'react-icons/io';
 import copy from 'copy-to-clipboard';
 import SecondaryButton from '@/Components/SecondaryButton';
+import ApplicationLogo from '@/Components/ApplicationLogo';
 
 export default function Show({ organization, organizationInvoice, bank, whatsappContact, appName }) {
     const { flash } = usePage().props;
@@ -80,12 +81,17 @@ export default function Show({ organization, organizationInvoice, bank, whatsapp
                     </div>
                 </div>
                 <div className='hidden print:block'>
-                    <h1 className='text-2xl'>{appName.toUpperCase()}</h1>
+                    <div className='flex gap-3 mt-10'>
+                        <ApplicationLogo />
+                        <h1 className='text-2xl my-auto'>{appName.toUpperCase()}</h1>
+                    </div>
 
-                    <div className='mt-5 flex justify-between'>
-                        <div className='mt-auto font-bold'>FAKTUR PEMBAYARAN PERPANJANGAN LAYANAN</div>
+                    <div className='mt-10 flex justify-between'>
+                        <div className='font-bold w-1/2'>
+                            FAKTUR PEMBAYARAN PERPANJANGAN LAYANAN
+                        </div>
                         <div>
-                            Kepada:
+                            <div className='font-bold'>Kepada:</div>
                             <div>{organization.name}</div>
                             <div>{organization.address}</div>
                         </div>
@@ -96,25 +102,25 @@ export default function Show({ organization, organizationInvoice, bank, whatsapp
                 <section className='px-4 py-4'>
                     <div className='sm:flex sm:flex-row-reverse sm:space-x-3'>
                         <div className='mt-2 sm:w-1/2'>
-                            <div>Dibuat Tanggal : </div>
+                            <div className='font-bold'>Dibuat Tanggal : </div>
                             <div>{organizationInvoice.date}</div>
                         </div>
                         <div className='mt-2 sm:w-1/2'>
-                            <div className='sm:-ml-3'>No. Ref : </div>
+                            <div className='sm:-ml-3 font-bold'>No. Faktur : </div>
                             <div className='sm:-ml-3'>{organizationInvoice.no_ref}</div>
                         </div>
                     </div>
                     <div className='mt-2'>
-                        <div>Jenis Layanan :</div>
+                        <div className='font-bold'>Jenis Layanan :</div>
                         <div className='uppercase'>{organizationInvoice.product}</div>
                     </div>
                     <div className='sm:flex sm:space-x-3'>
                         <div className='mt-2 sm:w-1/2'>
-                            <div>Harga :</div>
+                            <div className='font-bold'>Harga :</div>
                             <div>{rupiah(organizationInvoice.price)}</div>
                         </div>
                         <div className='mt-2 sm:w-1/2'>
-                            <div>Status : </div>
+                            <div className='font-bold'>Status : </div>
                             <div>
                                 {organizationInvoice.status == 'pending' && (
                                     <BadgeWarning>Mengunggu Pembayaran</BadgeWarning>
