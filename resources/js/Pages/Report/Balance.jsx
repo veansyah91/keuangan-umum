@@ -417,7 +417,7 @@ export default function Balance({
                     <div className='w-full mt-3 hidden print:flex print:justify-between'>
                         <div className='text-end italic '>Periode : {dayjs(endDate).format('MMMM DD, YYYY')}</div>
                         <div className='text-xs my-auto'>
-                            {programs.length > 0 || projects.length > 0 || departments.length ? (
+                            {(programs.length > 0 || projects.length > 0 || departments.length > 0) ? (
                                 <div>
                                     {selectedProgram.name && (
                                         <div>
@@ -425,7 +425,7 @@ export default function Balance({
                                             {selectedProgram.name.toUpperCase()}
                                         </div>
                                     )}
-                                    {selectedProject && (
+                                    {selectedProject.name && (
                                         <div>
                                             Proyek : {selectedProject.code}-{selectedProject.name.toUpperCase()}
                                         </div>
