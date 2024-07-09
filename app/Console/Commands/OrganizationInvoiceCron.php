@@ -28,6 +28,7 @@ class OrganizationInvoiceCron extends Command
      */
     public function handle()
     {
+        \Log::info('Cron job Organization Invoice dijalankan '.date('Y-m-d H:i:s'));
 
         $now = CarbonImmutable::now();
         $organizations = OrganizationInvoice::where('status', 'pending')->get();
