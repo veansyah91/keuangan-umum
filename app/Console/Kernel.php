@@ -17,8 +17,8 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         $schedule->command('depreciation:cron')
-            // ->daily();
-        ->everyMinute();
+            ->daily();
+            // ->everyMinute();
         $schedule->command('deactiveOrganization:cron')
             ->daily();
         // ->everyMinute();
