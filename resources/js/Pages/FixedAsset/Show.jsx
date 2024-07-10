@@ -17,6 +17,7 @@ export default function Show({
     depreciationAccumulationAccount,
     depreciationCostAccount,
 }) {
+    console.log(fixedAsset);
     return (
         <>
             <Head title='Detail Harta Tetap' />
@@ -44,6 +45,13 @@ export default function Show({
                                 <div className='sm:w-2/3 flex gap-1'>
                                     <span className='hidden sm:block'>:</span>
                                     {dayjs(fixedAsset.date).format('MMM DD, YYYY')}
+                                </div>
+                            </div>
+                            <div className='flex flex-col sm:flex-row justify-between gap-1'>
+                                <div className='sm:w-1/3 font-bold'>Usia Pakai</div>
+                                <div className='sm:w-2/3 flex gap-1'>
+                                    <span className='hidden sm:block'>:</span>
+                                    {fixedAsset.lifetime} bulan
                                 </div>
                             </div>
                             <div className='flex flex-col sm:flex-row justify-between gap-1'>
