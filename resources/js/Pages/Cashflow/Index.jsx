@@ -15,25 +15,51 @@ export default function Index({ organization }) {
 
             {/* Desktop */}
             <ContainerDesktop>
-                <div className='flex justify-center pt-5 pb-10 gap-6'>
-                    <Link href={route('cashflow.cash-in', organization.id)}>
-                        <CardMenu bgColor={'bg-cyan-500'} icon={<FaHandHoldingUsd />} title={'Penerimaan'} />
-                    </Link>
-                    <Link href={route('cashflow.cash-out', organization.id)}>
-                        <CardMenu
-                            bgColor={'bg-rose-500'}
-                            icon={
-                                <div className='rotate-180'>
-                                    <FaHandHoldingUsd />
-                                </div>
-                            }
-                            title={'Pengeluaran'}
-                        />
-                    </Link>
-                    <Link href={route('cashflow.cash-mutation', organization.id)}>
-                        <CardMenu bgColor={'bg-orange-500'} icon={<FaMoneyBillTransfer />} title={'Mutasi Kas'} />
-                    </Link>
-                </div>
+                <section className='pt-5 pb-10'>
+                    <div className='flex justify-center gap-6'>
+                        <Link href={route('cashflow.cash-in', organization.id)}>
+                            <CardMenu bgColor={'bg-cyan-500'} icon={<FaHandHoldingUsd />} title={'Penerimaan'} />
+                        </Link>
+                        <Link href={route('cashflow.cash-out', organization.id)}>
+                            <CardMenu
+                                bgColor={'bg-rose-500'}
+                                icon={
+                                    <div className='rotate-180'>
+                                        <FaHandHoldingUsd />
+                                    </div>
+                                }
+                                title={'Pengeluaran'}
+                            />
+                        </Link>
+                        <Link href={route('cashflow.cash-mutation', organization.id)}>
+                            <CardMenu bgColor={'bg-orange-500'} icon={<FaMoneyBillTransfer />} title={'Mutasi Kas'} />
+                        </Link>
+                    </div>
+                </section>
+                <section className='pt-5 pb-10'>
+                    <div className='text-center font-bold'>
+                        Tabungan
+                    </div>
+                    <div className='flex justify-center gap-6'>
+                        <Link href={route('cashflow.cash-in', organization.id)}>
+                            <CardMenu bgColor={'bg-cyan-500'} icon={<FaHandHoldingUsd />} title={'Penerimaan'} />
+                        </Link>
+                        <Link href={route('cashflow.cash-out', organization.id)}>
+                            <CardMenu
+                                bgColor={'bg-rose-500'}
+                                icon={
+                                    <div className='rotate-180'>
+                                        <FaHandHoldingUsd />
+                                    </div>
+                                }
+                                title={'Pengeluaran'}
+                            />
+                        </Link>
+                        <Link href={route('cashflow.cash-mutation', organization.id)}>
+                            <CardMenu bgColor={'bg-orange-500'} icon={<FaMoneyBillTransfer />} title={'Mutasi Kas'} />
+                        </Link>
+                    </div>
+                </section>  
             </ContainerDesktop>
             {/* Desktop */}
 
