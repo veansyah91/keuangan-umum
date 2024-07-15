@@ -27,6 +27,7 @@ use App\Http\Controllers\Admin\RegencyController;
 use App\Http\Controllers\Admin\VillageController;
 use App\Http\Controllers\Admin\DistrictController;
 use App\Http\Controllers\Admin\ProvinceController;
+use App\Http\Controllers\StudentContactController;
 use App\Http\Controllers\AccountCategoryController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\ContactCategoryController;
@@ -269,6 +270,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::patch('/cash-mutation/{cashMutation}', [CashMutationController::class, 'update'])->name('cashflow.cash-mutation.update');
             Route::delete('/cash-mutation/{cashMutation}', [CashMutationController::class, 'destroy'])->name('cashflow.cash-mutation.delete');
             Route::post('/cash-mutation/create', [CashMutationController::class, 'store'])->name('cashflow.cash-mutation.post');
+
+            // school
+            Route::get('/students', [StudentContactController::class, 'index'])->name('cashflow.students');
 
         });
 

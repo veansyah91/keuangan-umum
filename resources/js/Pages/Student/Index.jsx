@@ -87,7 +87,7 @@ export default function Index({ role, organization, contacts, searchFilter }) {
     return (
         <>
             {/* Mobile */}
-            <Head title='Data Kontak' />
+            <Head title='Data Siswa' />
             <ToastContainer />
 
             {role !== 'viewer' && (

@@ -7,6 +7,8 @@ import { FaHandHoldingUsd } from 'react-icons/fa';
 import CardMenu from '@/Components/CardMenu';
 import { BsCashCoin } from 'react-icons/bs';
 import { FaMoneyBillTransfer } from 'react-icons/fa6';
+import { IoMdPeople } from 'react-icons/io';
+import { LiaMoneyBillWaveSolid } from 'react-icons/lia';
 
 export default function Index({ organization }) {
     return (
@@ -36,53 +38,56 @@ export default function Index({ organization }) {
                         </Link>
                     </div>
                 </section>
-                <section className='pt-5 pb-10'>
-                    <div className='text-center font-bold'>
-                        Tabungan
-                    </div>
-                    <div className='flex justify-center gap-6'>
-                        <Link href={route('cashflow.cash-in', organization.id)}>
-                            <CardMenu bgColor={'bg-cyan-500'} icon={<FaHandHoldingUsd />} title={'Penerimaan'} />
-                        </Link>
-                        <Link href={route('cashflow.cash-out', organization.id)}>
-                            <CardMenu
-                                bgColor={'bg-rose-500'}
-                                icon={
-                                    <div className='rotate-180'>
-                                        <FaHandHoldingUsd />
-                                    </div>
-                                }
-                                title={'Pengeluaran'}
-                            />
-                        </Link>
-                        <Link href={route('cashflow.cash-mutation', organization.id)}>
-                            <CardMenu bgColor={'bg-orange-500'} icon={<FaMoneyBillTransfer />} title={'Mutasi Kas'} />
-                        </Link>
-                    </div>
-                </section>  
+                <section className='text-center font-bold'>
+                    <div className='uppercase text-xl'>Sekolah</div>
+                    <section className='pt-2 pb-10 space-y-3'>
+                        <div className='text-center font-bold'>
+                            Siswa
+                        </div>
+                        <div className='flex justify-center gap-6'>
+                            <Link href={route('cashflow.students', organization.id)}>
+                                <CardMenu 
+                                    bgColor={'bg-green-500'} 
+                                    icon={<IoMdPeople />} 
+                                    title={'Data Siswa'} 
+                                />
+                            </Link>
+                            <Link href={route('cashflow.cash-in', organization.id)}>
+                                <CardMenu 
+                                    bgColor={'bg-orange-900'} 
+                                    icon={<LiaMoneyBillWaveSolid />} 
+                                    title={'Pembayaran SPP'} 
+                                />
+                            </Link>
+                        </div>
+                    </section>  
+                </section>
+                
             </ContainerDesktop>
             {/* Desktop */}
 
             {/* Mobile */}
-            <div className='sm:hidden flex flex-wrap pt-14 pb-5 px-2 mx-auto bg-white gap-2 w-full justify-center'>
-                <Link href={route('cashflow.cash-in', organization.id)}>
-                    <CardMenu bgColor={'bg-cyan-500'} icon={<FaHandHoldingUsd />} title={'Penerimaan'} />
-                </Link>
-                <Link href={route('cashflow.cash-out', organization.id)}>
-                    <CardMenu
-                        bgColor={'bg-rose-500'}
-                        icon={
-                            <div className='rotate-180'>
-                                <FaHandHoldingUsd />
-                            </div>
-                        }
-                        title={'Pengeluaran'}
-                    />
-                </Link>
-                <Link href={route('cashflow.cash-mutation', organization.id)}>
-                    <CardMenu bgColor={'bg-orange-500'} icon={<FaMoneyBillTransfer />} title={'Mutasi Kas'} />
-                </Link>
-            </div>
+            <section>
+                <div className='sm:hidden flex flex-wrap pt-14 pb-5 px-2 mx-auto bg-white gap-2 w-full justify-center'>
+                    <Link href={route('cashflow.cash-in', organization.id)}>
+                        <CardMenu bgColor={'bg-cyan-500'} icon={<FaHandHoldingUsd />} title={'Penerimaan'} />
+                    </Link>
+                    <Link href={route('cashflow.cash-out', organization.id)}>
+                        <CardMenu
+                            bgColor={'bg-rose-500'}
+                            icon={
+                                <div className='rotate-180'>
+                                    <FaHandHoldingUsd />
+                                </div>
+                            }
+                            title={'Pengeluaran'}
+                        />
+                    </Link>
+                    <Link href={route('cashflow.cash-mutation', organization.id)}>
+                        <CardMenu bgColor={'bg-orange-500'} icon={<FaMoneyBillTransfer />} title={'Mutasi Kas'} />
+                    </Link>
+                </div>
+            </section>
             {/* Mobile */}
         </>
     );

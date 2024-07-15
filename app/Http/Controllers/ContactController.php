@@ -175,12 +175,15 @@ class ContactController extends Controller
      */
     public function destroy(Organization $organization, Contact $contact)
     {
-        // Pengecekan Penggunaan User
+        // Pengecekan Penggunaan User Pada Cashin
+        try {
+            $contact->delete();
 
-        // Pengecekan Penggunaan User
+            return redirect(route('data-master.contact', $organization['id']));
+        } catch (\Throwable $th) {
+            return redirect()->back()->withErrors(['message' => 'Tidak dapat menghapus kontak']);
+        }
 
-        $contact->delete();
-
-        return redirect(route('data-master.contact', $organization['id']));
+        
     }
 }

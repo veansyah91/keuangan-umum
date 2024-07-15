@@ -2,13 +2,15 @@
 
 namespace App\Providers;
 
-use App\Repositories\Account\AccountRepository;
-use App\Repositories\Account\AccountRepositoryInterface;
-use App\Repositories\AccountCategory\AccountCategoryRepository;
-use App\Repositories\AccountCategory\AccountCategoryRepositoryInterface;
-use App\Repositories\Journal\JournalRepository;
-use App\Repositories\Journal\JournalRepositoryInterface;
 use Illuminate\Support\ServiceProvider;
+use App\Repositories\Account\AccountRepository;
+use App\Repositories\Journal\JournalRepository;
+use App\Repositories\Account\AccountRepositoryInterface;
+use App\Repositories\Journal\JournalRepositoryInterface;
+use App\Repositories\AccountCategory\AccountCategoryRepository;
+use App\Repositories\ContactCategory\ContactCategoryRepository;
+use App\Repositories\AccountCategory\AccountCategoryRepositoryInterface;
+use App\Repositories\ContactCategory\ContactCategoryRepositoryInterface;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -42,6 +44,9 @@ class RepositoryServiceProvider extends ServiceProvider
         );
         $this->app->bind(
             JournalRepositoryInterface::class, JournalRepository::class
+        );
+        $this->app->bind(
+            ContactCategoryRepositoryInterface::class, ContactCategoryRepository::class
         );
     }
 }
