@@ -468,10 +468,22 @@ class OrganizationController extends Controller
         //
 
         // Category
-        $contactCategory = ContactCategory::create([
-            'name' => 'UMUM',
-            'organization_id' => $organization['id'],
-        ]);
+        $contactCategories = [
+            'UMUM',
+            'SISWA',
+            'GURU'
+        ];
+
+        foreach ($contactCategories as $contactCategory) {
+            ContactCategory::create([
+                'name' => $contactCategory,
+                'organization_id' => $organization['id'],
+            ]);
+        }
+        // $contactCategory = ContactCategory::create([
+        //     'name' => 'UMUM',
+        //     'organization_id' => $organization['id'],
+        // ]);
 
         Contact::create([
             'organization_id' => $organization['id'],

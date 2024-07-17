@@ -45,13 +45,6 @@ export default function Index({ organization }) {
                             Siswa
                         </div>
                         <div className='flex justify-center gap-6'>
-                            <Link href={route('cashflow.students', organization.id)}>
-                                <CardMenu 
-                                    bgColor={'bg-green-500'} 
-                                    icon={<IoMdPeople />} 
-                                    title={'Data Siswa'} 
-                                />
-                            </Link>
                             <Link href={route('cashflow.cash-in', organization.id)}>
                                 <CardMenu 
                                     bgColor={'bg-orange-900'} 

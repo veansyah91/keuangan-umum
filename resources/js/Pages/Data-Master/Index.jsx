@@ -1,53 +1,122 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import ContainerDesktop from '@/Components/Desktop/ContainerDesktop';
 import CardMenu from '@/Components/CardMenu';
 import { IoIdCardOutline, IoPeopleOutline } from 'react-icons/io5';
 import { MdChecklist } from 'react-icons/md';
-import { LiaClipboardListSolid } from 'react-icons/lia';
+import { LiaClipboardListSolid, LiaMoneyBillWaveSolid } from 'react-icons/lia';
 import { CgListTree } from 'react-icons/cg';
 import { TbBuildingCommunity } from 'react-icons/tb';
 import { BsBuildings } from 'react-icons/bs';
+import { IoMdPeople } from 'react-icons/io';
+import { FaPeopleGroup } from 'react-icons/fa6';
+import { BiDetail } from "react-icons/bi";
+import { ToastContainer, toast } from 'react-toastify';
 
-export default function Index({ organization, role }) {
+
+export default function Index({ organization }) {
+    const { errors } = usePage().props;
+
+    useEffect(() => {
+        console.log(errors);
+        errors && 
+        toast.error(errors.message, {
+            position: toast.POSITION.TOP_CENTER,
+        });
+    },[])
+
     return (
         <>
             <Head title='Data Master' />
+            <ToastContainer />
+
             {/* Desktop */}
             <ContainerDesktop>
-                <div className='flex flex-wrap justify-center pt-5 pb-10 gap-5'>
-                    <Link href={route('data-master.contact-category', organization.id)}>
-                        <CardMenu bgColor={'bg-cyan-500'} icon={<IoIdCardOutline />} title={'Data Kategori Kontak'} />
-                    </Link>
-                    <Link href={route('data-master.contact', organization.id)}>
-                        <CardMenu bgColor={'bg-orange-500'} icon={<IoPeopleOutline />} title={'Data Kontak'} />
-                    </Link>
-                    <Link href={route('data-master.project', organization.id)}>
-                        <CardMenu bgColor={'bg-emerald-500'} icon={<MdChecklist />} title={'Data Proyek'} />
-                    </Link>
-                    <Link href={route('data-master.program', organization.id)}>
-                        <CardMenu
-                            bgColor={'bg-red-500'}
-                            icon={<LiaClipboardListSolid />}
-                            title={'Data Program Kegiatan'}
-                        />
-                    </Link>
-                    <Link href={route('data-master.department', organization.id)}>
-                        <CardMenu bgColor={'bg-slate-500'} icon={<CgListTree />} title={'Data Departemen'} />
-                    </Link>
-                    <Link href={route('data-master.fixed-asset-category', organization.id)}>
-                        <CardMenu
-                            bgColor={'bg-blue-500'}
-                            icon={<TbBuildingCommunity />}
-                            title={'Kelompok Harta Tetap'}
-                        />
-                    </Link>
-                    <Link href={route('data-master.fixed-asset', organization.id)}>
-                        <CardMenu bgColor={'bg-rose-500'} icon={<BsBuildings />} title={'Data Harta Tetap'} />
-                    </Link>
-                </div>
+                <section>
+                    <div className='flex flex-wrap justify-center pt-5 pb-10 gap-5'>
+                        <Link href={route('data-master.contact-category', organization.id)}>
+                            <CardMenu bgColor={'bg-cyan-500'} icon={<IoIdCardOutline />} title={'Data Kategori Kontak'} />
+                        </Link>
+                        <Link href={route('data-master.contact', organization.id)}>
+                            <CardMenu bgColor={'bg-orange-500'} icon={<IoPeopleOutline />} title={'Data Kontak'} />
+                        </Link>
+                        <Link href={route('data-master.project', organization.id)}>
+                            <CardMenu bgColor={'bg-emerald-500'} icon={<MdChecklist />} title={'Data Proyek'} />
+                        </Link>
+                        <Link href={route('data-master.program', organization.id)}>
+                            <CardMenu
+                                bgColor={'bg-red-500'}
+                                icon={<LiaClipboardListSolid />}
+                                title={'Data Program Kegiatan'}
+                            />
+                        </Link>
+                        <Link href={route('data-master.department', organization.id)}>
+                            <CardMenu bgColor={'bg-slate-500'} icon={<CgListTree />} title={'Data Departemen'} />
+                        </Link>
+                        <Link href={route('data-master.fixed-asset-category', organization.id)}>
+                            <CardMenu
+                                bgColor={'bg-blue-500'}
+                                icon={<TbBuildingCommunity />}
+                                title={'Kelompok Harta Tetap'}
+                            />
+                        </Link>
+                        <Link href={route('data-master.fixed-asset', organization.id)}>
+                            <CardMenu bgColor={'bg-rose-500'} icon={<BsBuildings />} title={'Data Harta Tetap'} />
+                        </Link>
+                    </div>
+                </section>
+                <section className='text-center font-bold'>
+                    <div className='uppercase text-xl'>Sekolah</div>
+                    <section className='pt-2 pb-10 space-y-3'>
+                        <div className='text-center font-bold'>
+                            Siswa
+                        </div>
+                        <div className='flex justify-center gap-6'>
+                            <Link 
+                                href={route('data-master.students', organization.id)}
+                                onError={errors => 
+                                    toast.error(errors.message, {
+                                        position: toast.POSITION.TOP_CENTER,
+                                    })
+                                }    
+                            >
+                                <CardMenu 
+                                    bgColor={'bg-green-500'} 
+                                    icon={<IoMdPeople />} 
+                                    title={'Data Siswa'} 
+                                />
+                            </Link>
+                            <Link href={route('cashflow.cash-in', organization.id)}>
+                                <CardMenu 
+                                    bgColor={'bg-orange-900'} 
+                                    icon={<BiDetail />} 
+                                    title={'Rincian Biaya Bulanan'} 
+                                />
+                            </Link>
+                        </div>
+                    </section>  
+                    <section className='pt-2 pb-10 space-y-3'>
+                        <div className='text-center font-bold'>
+                            Staff / Guru
+                        </div>
+                        <div className='flex justify-center gap-6'>
+                            <Link 
+                                href={route('cashflow.cash-in', organization.id)}
+                                onError={error => {
+
+                                }}
+                            >
+                                <CardMenu 
+                                    bgColor={'bg-cyan-900'} 
+                                    icon={<FaPeopleGroup />} 
+                                    title={'Data Guru'} 
+                                />
+                            </Link>
+                        </div>
+                    </section>  
+                </section>
             </ContainerDesktop>
             {/* Desktop */}
 

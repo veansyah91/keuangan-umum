@@ -199,6 +199,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::delete('fixed-assets/{fixedAsset}', [FixedAssetController::class, 'destroy'])->name('data-master.fixed-asset.destroy');
             Route::patch('fixed-assets/{fixedAsset}/disposal', [FixedAssetController::class, 'disposal'])->name('data-master.fixed-asset.disposal');
 
+            // Student
+            Route::get('/students', [StudentContactController::class, 'index'])->name('data-master.students');
+
         });
 
         // Accountancy
@@ -272,7 +275,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/cash-mutation/create', [CashMutationController::class, 'store'])->name('cashflow.cash-mutation.post');
 
             // school
-            Route::get('/students', [StudentContactController::class, 'index'])->name('cashflow.students');
+            
 
         });
 
