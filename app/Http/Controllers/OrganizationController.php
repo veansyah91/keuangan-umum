@@ -66,6 +66,10 @@ class OrganizationController extends Controller
             'name' => 'PIUTANG',
         ],
         [
+            'code' => '121000000',
+            'name' => 'PIUTANG IURAN BULANAN SISWA',
+        ],
+        [
             'code' => '130000000',
             'name' => 'BIAYA DIBAYAR DI MUKA',
         ],
@@ -99,8 +103,16 @@ class OrganizationController extends Controller
             'name' => 'KEWAJIBAN',
         ],
         [
+            'code' => '211000000',
+            'name' => 'UTANG GAJI STAFF',
+        ],
+        [
             'code' => '220000000',
             'name' => 'PENDAPATAN DITERIMA DI MUKA',
+        ],
+        [
+            'code' => '221000000',
+            'name' => 'PEMBAYARAN IURAN BULANAN SISWA DITERIMA DI MUKA',
         ],
         [
             'code' => '230000000',
@@ -133,6 +145,10 @@ class OrganizationController extends Controller
         [
             'code' => '420000000',
             'name' => 'PENDAPATAN DARI SUMBANGAN',
+        ],
+        [
+            'code' => '430000000',
+            'name' => 'PENDAPATAN IURAN BULANAN SISWA',
         ],
         //
         // Pengeluaran Variabel
@@ -179,7 +195,12 @@ class OrganizationController extends Controller
         [
             'category_name' => 'PIUTANG',
             'code' => '120000000',
-            'name' => 'PIUTAN',
+            'name' => 'PIUTANG',
+        ],
+        [
+            'category_name' => 'PIUTANG IURAN BULANAN SISWA',
+            'code' => '121000000',
+            'name' => 'PIUTANG IURAN BULANAN SISWA',
         ],
         [
             'category_name' => 'BIAYA DIBAYAR DI MUKA',
@@ -257,6 +278,11 @@ class OrganizationController extends Controller
             'name' => 'PENDAPATAN DITERIMA DI MUKA',
         ],
         [
+            'category_name' => 'PEMBAYARAN IURAN BULANAN SISWA DITERIMA DI MUKA',
+            'code' => '221000000',
+            'name' => 'PEMBAYARAN IURAN BULANAN SISWA DITERIMA DI MUKA',
+        ],
+        [
             'category_name' => 'UTANG PAJAK',
             'code' => '230000000',
             'name' => 'UTANG PAJAK',
@@ -292,6 +318,11 @@ class OrganizationController extends Controller
             'name' => 'PENDAPATAN DARI SUMBANGAN',
         ],
         [
+            'category_name' => 'PENDAPATAN IURAN BULANAN SISWA',
+            'code' => '430000000',
+            'name' => 'PENDAPATAN IURAN BULANAN SISWA',
+        ],
+        [
             'category_name' => 'AKOMODASI USTAD',
             'code' => '510000000',
             'name' => 'AKOMODASI USTAD',
@@ -320,6 +351,11 @@ class OrganizationController extends Controller
             'category_name' => 'BEBAN OPERASIONAL',
             'code' => '620000000',
             'name' => 'BEBAN GAJI',
+        ],
+        [
+            'category_name' => 'BEBAN OPERASIONAL',
+            'code' => '620000000',
+            'name' => 'BEBAN GAJI GURU',
         ],
         [
             'category_name' => 'BEBAN PENYUSUTAN',
@@ -480,10 +516,6 @@ class OrganizationController extends Controller
                 'organization_id' => $organization['id'],
             ]);
         }
-        // $contactCategory = ContactCategory::create([
-        //     'name' => 'UMUM',
-        //     'organization_id' => $organization['id'],
-        // ]);
 
         Contact::create([
             'organization_id' => $organization['id'],
