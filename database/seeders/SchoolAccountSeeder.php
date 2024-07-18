@@ -71,7 +71,6 @@ class SchoolAccountSeeder extends Seeder
 		]);
 		
 		$contactCategoriesData = collect([
-			'UMUM',
 			'SISWA',
 			'GURU'
 		]);
