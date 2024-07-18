@@ -20,7 +20,6 @@ export default function Index({ organization }) {
     const { errors } = usePage().props;
 
     useEffect(() => {
-        console.log(errors);
         errors && 
         toast.error(errors.message, {
             position: toast.POSITION.TOP_CENTER,

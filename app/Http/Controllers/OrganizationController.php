@@ -150,6 +150,10 @@ class OrganizationController extends Controller
             'code' => '430000000',
             'name' => 'PENDAPATAN IURAN BULANAN SISWA',
         ],
+        [
+            'code' => '431000000',
+            'name' => 'PENDAPATAN IURAN MASUK SISWA',
+        ],
         //
         // Pengeluaran Variabel
         [
@@ -323,6 +327,11 @@ class OrganizationController extends Controller
             'name' => 'PENDAPATAN IURAN BULANAN SISWA',
         ],
         [
+            'category_name' => 'PENDAPATAN IURAN MASUK SISWA',
+            'code' => '431000000',
+            'name' => 'PENDAPATAN IURAN MASUK SISWA',
+        ],
+        [
             'category_name' => 'AKOMODASI USTAD',
             'code' => '510000000',
             'name' => 'AKOMODASI USTAD',
@@ -461,7 +470,7 @@ class OrganizationController extends Controller
             'addressDetail.district_id' => 'string|nullable',
             'addressDetail.village' => 'string|nullable',
             'addressDetail.village_id' => 'string|nullable',
-        ]);
+        ]);        
 
         $validated['slug'] = Str::slug($validated['name']);
 
@@ -488,6 +497,7 @@ class OrganizationController extends Controller
             return $organization->accountCategory()->create($accountCategory);
         });
         //
+        
         //create default account (accountancy)
         $accountsDefault = collect($this->accountsDefault);
 
@@ -498,7 +508,13 @@ class OrganizationController extends Controller
                 $account['organization_id'] = $accountCategory['organization_id'];
                 $account['can_be_deleted'] = $account['code'] == '320000000' ? false : true;
 
-                return $accountCategory->accounts()->create($account);
+                $accountDB = $accountCategory->accounts()->create($account);
+
+                // akun pendapatan iuran bulanan siswa
+                if ($accountDB['name'] == 'PENDAPATAN IURAN BULANAN SISWA') {
+                    # code...
+                }
+                return $account;
             });
         });
         //
