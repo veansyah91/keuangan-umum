@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Account;
 use App\Models\Organization;
+use App\Models\AccountCategory;
 use App\Models\ContactCategory;
 use Illuminate\Database\Seeder;
 use App\Models\SchoolAccountSetting;
@@ -84,47 +85,48 @@ class SchoolAccountSeeder extends Seeder
 
 			$attribute = [
 				'organization_id' => $organization['id'],
-				'revenue_student_account_id' => null,
-				'receivable_student_account_id' => null,
-				'prepaid_student_account_id' => null,
-				'staff_salary_expense_account_id' => null,
-				'entry_student_account_id' => null
 			];
 
-			$accountCategoriesCollection->map(function ($accountCategory) use ($accountsData, $organization) {
-				$filteredAccount = $accountsData->where('category_name', $accountCategory['name']);
+			foreach ($accountCategoriesCollection as $accountCategory) {
+				$filteredAccounts = $accountsData->where('category_name', $accountCategory['name']);
 
-				$filteredAccount->map(function ($account) use ($accountCategory, $organization) {
-						$accountDB = Account::create([
-							'code' => $account['code'],
-							'name' => $account['name'],
-							'account_category_id' => $accountCategory['id'],
-							'organization_id' => $organization['id']
-						]);
+				foreach ($filteredAccounts as $filteredAccount) {
+					$account = Account::create([
+						'code' => $filteredAccount['code'],
+						'name' => $filteredAccount['name'],
+						'account_category_id' => $accountCategory['id'],
+						'organization_id' => $organization['id']
+					]);
+				}
+				
+				// akun pendapatan iuran bulanan siswa
+				if ($account['name'] == 'PENDAPATAN IURAN BULANAN SISWA') {
+					$attribute['revenue_student_account_id'] = $account['id'];
+				}
+				if ($account['name'] == 'PIUTANG IURAN BULANAN SISWA') {
+					$attribute['receivable_student_account_id'] = $account['id'];
+				}
+				if ($account['name'] == 'PENDAPATAN IURAN BULANAN SISWA DITERIMA DI MUKA') {
+					$attribute['prepaid_student_account_id'] = $account['id'];
+				}
+				if ($account['name'] == 'PENDAPATAN IURAN MASUK SISWA') {
+					$attribute['entry_student_account_id'] = $account['id'];
+				}
+			}
 
-						// akun pendapatan iuran bulanan siswa
-						if ($accountDB['name'] == 'PENDAPATAN IURAN BULANAN SISWA') {
-							$attribute['revenue_student_account_id'] = $accountDB['id'];
-							dd($attribute);
-						}
-						if ($accountDB['name'] == 'PIUTANG IURAN BULANAN SISWA') {
-							$attribute['receivable_student_account_id'] = $accountDB['id'];
-						}
-						if ($accountDB['name'] == 'PENDAPATAN IURAN BULANAN SISWA DITERIMA DI MUKA') {
-							$attribute['prepaid_student_account_id'] = $accountDB['id'];
-						}
-						if ($accountDB['name'] == 'PENDAPATAN IURAN MASUK SISWA') {
-							$attribute['entry_student_account_id'] = $accountDB['id'];
-						}
-						return $accountDB;
-				});
-			});
+			$accountCategoryOperational = AccountCategory::whereOrganizationId($organization['id'])->whereName('BEBAN OPERASIONAL')->first();
+			$filteredAccount = $accountsData->where('category_name', $accountCategoryOperational['name'])->first();
+			$account = Account::create([
+				'code' => $filteredAccount['code'],
+				'name' => $filteredAccount['name'],
+				'account_category_id' => $accountCategory['id'],
+				'organization_id' => $organization['id']
+			]);
+			$attribute['staff_salary_expense_account_id'] = $account['id'];
 
 			SchoolAccountSetting::create($attribute);
-
-			return;
+			
 			// kategori kontak
-
 			foreach ($contactCategoriesData as $contactCategory) {
 				ContactCategory::create([
 					'name' => $contactCategory,
