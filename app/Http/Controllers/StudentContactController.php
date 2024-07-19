@@ -44,6 +44,7 @@ class StudentContactController extends Controller
                             ->whereHas('contactCategories', function ($query) use ($contactCategory){
                                 $query->where('contact_category_id', $contactCategory['id']);
                             })
+                            ->orderBy('name')
                             ->paginate(50);
         
         return Inertia::render('Student/Index',[
@@ -51,6 +52,17 @@ class StudentContactController extends Controller
             'contacts' => $contacts,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'searchFilter' => request('search'),
+        ]);
+    }
+
+    public function create(Organization $organization)
+    {
+        $user = Auth::user();
+
+        return Inertia::render('Student/Create',[
+            'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+            'organization' => $organization,
+            'category' => ContactCategory::whereOrganizationId($organization['id'])->whereName('SISWA')->first()
         ]);
     }
 }

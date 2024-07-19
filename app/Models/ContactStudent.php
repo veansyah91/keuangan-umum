@@ -14,7 +14,8 @@ class ContactStudent extends Model
                             'father_name',
                             'mother_name',
                             'birthday',
-                            'entry_year'
+                            'entry_year',
+                            'no_ref'
                           ];
 
     

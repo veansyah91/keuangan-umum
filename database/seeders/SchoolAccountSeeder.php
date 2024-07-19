@@ -17,29 +17,30 @@ class SchoolAccountSeeder extends Seeder
 	 */
 	public function run(): void
 	{
-		$organizations = Organization::orderBy('created_at')->get();
+
+		$organizations = Organization::orderBy('created_at')->skip(200)->take(10)->get();
 
 		$accountCategoriesData = collect([
-				[
-						'code' => '121000000',
-						'name' => 'PIUTANG SISWA',
-				],
-				[
-						'code' => '211000000',
-						'name' => 'UTANG GAJI STAFF',
-				],
-				[
-						'code' => '221000000',
-						'name' => 'PENDAPATAN IURAN BULANAN SISWA DITERIMA DI MUKA',
-				],
-				[
-						'code' => '430000000',
-						'name' => 'PENDAPATAN IURAN BULANAN SISWA',
-				],
-				[
-						'code' => '431000000',
-						'name' => 'PENDAPATAN IURAN MASUK SISWA',
-				],
+      [
+        'code' => '121000000',
+        'name' => 'PIUTANG SISWA',
+      ],
+      [
+        'code' => '211000000',
+        'name' => 'UTANG GAJI STAFF',
+      ],
+      [
+        'code' => '221000000',
+        'name' => 'PENDAPATAN IURAN BULANAN SISWA DITERIMA DI MUKA',
+      ],
+      [
+        'code' => '430000000',
+        'name' => 'PENDAPATAN IURAN BULANAN SISWA',
+      ],
+      [
+        'code' => '431000000',
+        'name' => 'PENDAPATAN IURAN MASUK SISWA',
+      ],
 		]);
 
 		$accountsData = collect([
@@ -49,29 +50,29 @@ class SchoolAccountSeeder extends Seeder
 				'name' => 'PIUTANG IURAN MASUK SISWA',
 			],
 			[
-					'category_name' => 'PIUTANG SISWA',
-					'code' => '121000001',
-					'name' => 'PIUTANG IURAN BULANAN SISWA',
+        'category_name' => 'PIUTANG SISWA',
+        'code' => '121000001',
+        'name' => 'PIUTANG IURAN BULANAN SISWA',
 			],
 			[
-					'category_name' => 'PENDAPATAN IURAN BULANAN SISWA DITERIMA DI MUKA',
-					'code' => '221000000',
-					'name' => 'PENDAPATAN IURAN BULANAN SISWA DITERIMA DI MUKA',
+        'category_name' => 'PENDAPATAN IURAN BULANAN SISWA DITERIMA DI MUKA',
+        'code' => '221000000',
+        'name' => 'PENDAPATAN IURAN BULANAN SISWA DITERIMA DI MUKA',
 			],
 			[
-					'category_name' => 'PENDAPATAN IURAN BULANAN SISWA',
-					'code' => '430000000',
-					'name' => 'PENDAPATAN IURAN BULANAN SISWA',
+        'category_name' => 'PENDAPATAN IURAN BULANAN SISWA',
+        'code' => '430000000',
+        'name' => 'PENDAPATAN IURAN BULANAN SISWA',
 			],
 			[
-					'category_name' => 'PENDAPATAN IURAN MASUK SISWA',
-					'code' => '431000000',
-					'name' => 'PENDAPATAN IURAN MASUK SISWA',
+        'category_name' => 'PENDAPATAN IURAN MASUK SISWA',
+        'code' => '431000000',
+        'name' => 'PENDAPATAN IURAN MASUK SISWA',
 			],
 			[
-					'category_name' => 'BEBAN OPERASIONAL',
-					'code' => '620000001',
-					'name' => 'BEBAN GAJI GURU',
+        'category_name' => 'BEBAN OPERASIONAL',
+        'code' => '620000001',
+        'name' => 'BEBAN GAJI GURU',
 			],
 		]);
 		
@@ -125,7 +126,14 @@ class SchoolAccountSeeder extends Seeder
 			}
 
 			$accountCategoryOperational = AccountCategory::whereOrganizationId($organization['id'])->whereName('BEBAN OPERASIONAL')->first();
-			$filteredAccount = $accountsData->where('category_name', $accountCategoryOperational['name'])->first();
+			if (!$accountCategoryOperational) {
+				$accountCategoryOperational = AccountCategory::create([
+					'organization_id' => $organization['id'],
+					'code' => '610000000',
+					'name' => 'BEBAN OPERASIONAL'
+				]);	
+			}
+			$filteredAccount = $accountsData->where('category_name', strtoupper($accountCategoryOperational['name']))->first();
 			$account = Account::create([
 				'code' => $filteredAccount['code'],
 				'name' => $filteredAccount['name'],

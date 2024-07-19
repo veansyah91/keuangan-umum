@@ -60,7 +60,7 @@ export default function Index({ role, organization, contacts, searchFilter }) {
         });
     };
     const handleDelete = (contact) => {
-        setTitleDeleteModal(`Hapus Kontak ${contact.name}`);
+        setTitleDeleteModal(`Hapus Siswa ${contact.name}`);
         setShowDeleteConfirmation(true);
         setData('id', contact.id);
     };
@@ -68,10 +68,10 @@ export default function Index({ role, organization, contacts, searchFilter }) {
     const handleSubmitDelete = (e) => {
         e.preventDefault();
 
-        destroy(route('data-master.contact.destroy', { organization: organization.id, contact: data.id }), {
+        destroy(route('data-master.students.destroy', { organization: organization.id, contact: data.id }), {
             onSuccess: () => {
                 setShowDeleteConfirmation(false);
-                toast.success(`Kontak Berhasil Dihapus`, {
+                toast.success(`Siswa Berhasil Dihapus`, {
                     position: toast.POSITION.TOP_CENTER,
                 });
                 reset();
@@ -91,7 +91,7 @@ export default function Index({ role, organization, contacts, searchFilter }) {
             <ToastContainer />
 
             {role !== 'viewer' && (
-                <Link href={route('data-master.contact.create', organization.id)}>
+                <Link href={route('data-master.students.create', organization.id)}>
                     <AddButtonMobile label={'Tambah'} />
                 </Link>
             )}
@@ -151,7 +151,7 @@ export default function Index({ role, organization, contacts, searchFilter }) {
                 <TitleDesktop>
                     <div className='my-auto w-7/12'>
                         {role !== 'viewer' && (
-                            <Link href={route('data-master.contact.create', organization.id)}>
+                            <Link href={route('data-master.students.create', organization.id)}>
                                 <PrimaryButton className='py-3'>Tambah Data</PrimaryButton>
                             </Link>
                         )}
@@ -164,7 +164,7 @@ export default function Index({ role, organization, contacts, searchFilter }) {
                             id='search-input'
                             name='search-input'
                             type='search'
-                            placeholder='Cari Kontak'
+                            placeholder='Cari Siswa'
                             className='w-full border-none focus:outline-none focus:ring-0'
                             value={search || ''}
                             onChange={(e) => setSearch(e.target.value)}
@@ -215,9 +215,9 @@ export default function Index({ role, organization, contacts, searchFilter }) {
                                 <thead className='text-base text-gray-900'>
                                     <tr className=''>
                                         <th className='bg-gray-200'>Nama</th>
-                                        <th className='bg-gray-200'>No. HP</th>
+                                        <th className='bg-gray-200'>Kelas (Tahun Ajaran Ini)</th>
                                         <th className='bg-gray-200'>Alamat</th>
-                                        <th className='bg-gray-200'></th>
+                                        <th className='bg-gray-200'>Status</th>
                                         <th className='bg-gray-200'></th>
                                     </tr>
                                 </thead>
@@ -260,11 +260,11 @@ export default function Index({ role, organization, contacts, searchFilter }) {
 
 Index.layout = (page) => (
     <AuthenticatedLayout
-        header={<Header>Data Kontak</Header>}
+        header={<Header>Data Siswa</Header>}
         children={page}
         user={page.props.auth.user}
         organization={page.props.organization}
-        title='Data Kontak'
+        title='Data Siswa'
         backLink={
             <Link href={route('data-master', page.props.organization.id)}>
                 <IoArrowBackOutline />
@@ -276,7 +276,7 @@ Index.layout = (page) => (
                     <li className='font-bold'>
                         <Link href={route('data-master', page.props.organization.id)}>Data Master</Link>
                     </li>
-                    <li>Data Kontak</li>
+                    <li>Data Siswa</li>
                 </ul>
             </div>
         }

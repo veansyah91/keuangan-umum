@@ -201,6 +201,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             // Student
             Route::get('/students', [StudentContactController::class, 'index'])->name('data-master.students');
+            Route::get('/students/create', [StudentContactController::class, 'create'])->name('data-master.students.create');
+            Route::get('/students/{student}/edit', [StudentContactController::class, 'edit'])->name('data-master.students.update');
+            Route::post('/students', [StudentContactController::class, 'store'])->name('data-master.students.post');
+            Route::patch('/students/{student}', [StudentContactController::class, 'update'])->name('data-master.students.update');
+            Route::delete('/students/{student}', [StudentContactController::class, 'destroy'])->name('data-master.students.destroy');
 
         });
 
