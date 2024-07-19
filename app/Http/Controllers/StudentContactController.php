@@ -13,6 +13,7 @@ use App\Helpers\ContactCategoryHelper;
 use App\Repositories\Log\LogRepository;
 use App\Repositories\User\UserRepository;
 use App\Repositories\ContactCategory\ContactCategoryRepository;
+use Illuminate\Database\Eloquent\Builder;
 
 class StudentContactController extends Controller
 {
@@ -39,8 +40,10 @@ class StudentContactController extends Controller
         
         $contacts = Contact::filter(request(['search']))
                             ->whereOrganizationId($organization['id'])
-                            ->whereCategoryId($contactCategory['id '])
                             ->with('contactCategories')
+                            ->whereHas('contactCategories', function ($query) use ($contactCategory){
+                                $query->where('contact_category_id', $contactCategory['id']);
+                            })
                             ->paginate(50);
         
         return Inertia::render('Student/Index',[

@@ -11,10 +11,12 @@ class SchoolAccountSetting extends Model
 
     protected $fillable = [
         'organization_id',
-        'revenue_student_account_id',
-        'receivable_student_account_id',
-        'prepaid_student_account_id',
-        'entry_student_account_id',
-        'staff_salary_expense_account_id'
+        'revenue_student',
+        'receivable_monthly_student',
+        'receivable_entry_student',
+        'prepaid_student',
+        'entry_student',
+        'staff_salary_expense',
+        'update_level_auto',
     ];
 }

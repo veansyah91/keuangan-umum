@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('contacts', function (Blueprint $table) {
-            $table->boolean('is_active')->default(true);
+        Schema::table('school_account_settings', function (Blueprint $table) {
+            $table->boolean('update_level_auto')->default(true);
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('contacts', function (Blueprint $table) {
-            $table->dropColumn('is_active');
+        Schema::table('school_account_settings', function (Blueprint $table) {
+            $table->dropColumn('update_level_auto');
         });
     }
 };

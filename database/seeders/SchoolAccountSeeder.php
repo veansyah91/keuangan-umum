@@ -22,7 +22,7 @@ class SchoolAccountSeeder extends Seeder
 		$accountCategoriesData = collect([
 				[
 						'code' => '121000000',
-						'name' => 'PIUTANG IURAN BULANAN SISWA',
+						'name' => 'PIUTANG SISWA',
 				],
 				[
 						'code' => '211000000',
@@ -44,8 +44,13 @@ class SchoolAccountSeeder extends Seeder
 
 		$accountsData = collect([
 			[
-					'category_name' => 'PIUTANG IURAN BULANAN SISWA',
-					'code' => '121000000',
+				'category_name' => 'PIUTANG SISWA',
+				'code' => '121000000',
+				'name' => 'PIUTANG IURAN MASUK SISWA',
+			],
+			[
+					'category_name' => 'PIUTANG SISWA',
+					'code' => '121000001',
 					'name' => 'PIUTANG IURAN BULANAN SISWA',
 			],
 			[
@@ -65,7 +70,7 @@ class SchoolAccountSeeder extends Seeder
 			],
 			[
 					'category_name' => 'BEBAN OPERASIONAL',
-					'code' => '620000000',
+					'code' => '620000001',
 					'name' => 'BEBAN GAJI GURU',
 			],
 		]);
@@ -95,21 +100,27 @@ class SchoolAccountSeeder extends Seeder
 						'name' => $filteredAccount['name'],
 						'account_category_id' => $accountCategory['id'],
 						'organization_id' => $organization['id']
-					]);
-				}
+					]);				
 				
-				// akun pendapatan iuran bulanan siswa
-				if ($account['name'] == 'PENDAPATAN IURAN BULANAN SISWA') {
-					$attribute['revenue_student_account_id'] = $account['id'];
-				}
-				if ($account['name'] == 'PIUTANG IURAN BULANAN SISWA') {
-					$attribute['receivable_student_account_id'] = $account['id'];
-				}
-				if ($account['name'] == 'PENDAPATAN IURAN BULANAN SISWA DITERIMA DI MUKA') {
-					$attribute['prepaid_student_account_id'] = $account['id'];
-				}
-				if ($account['name'] == 'PENDAPATAN IURAN MASUK SISWA') {
-					$attribute['entry_student_account_id'] = $account['id'];
+					// akun pendapatan iuran bulanan siswa
+					if ($account['name'] == 'PENDAPATAN IURAN BULANAN SISWA') {
+						$attribute['revenue_student'] = $account['id'];
+					}
+					if ($account['name'] == 'PIUTANG IURAN BULANAN SISWA') {
+						$attribute['receivable_monthly_student'] = $account['id'];
+					}
+					if ($account['name'] == 'PIUTANG IURAN MASUK SISWA') {
+						$attribute['receivable_entry_student'] = $account['id'];
+					}
+					if ($account['name'] == 'PENDAPATAN IURAN BULANAN SISWA DITERIMA DI MUKA') {
+						$attribute['prepaid_student'] = $account['id'];
+					}
+					if ($account['name'] == 'PENDAPATAN IURAN MASUK SISWA') {
+						$attribute['entry_student'] = $account['id'];
+					}
+					if ($account['name'] == 'PENDAPATAN IURAN MASUK SISWA') {
+						$attribute['entry_student'] = $account['id'];
+					}
 				}
 			}
 
@@ -121,7 +132,7 @@ class SchoolAccountSeeder extends Seeder
 				'account_category_id' => $accountCategory['id'],
 				'organization_id' => $organization['id']
 			]);
-			$attribute['staff_salary_expense_account_id'] = $account['id'];
+			$attribute['staff_salary_expense'] = $account['id'];
 
 			SchoolAccountSetting::create($attribute);
 			

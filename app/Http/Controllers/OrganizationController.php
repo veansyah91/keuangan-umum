@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\User;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Models\Account;
 use App\Models\Contact;
 use App\Models\Affiliation;
 use Illuminate\Support\Str;
@@ -14,6 +15,7 @@ use Illuminate\Http\Request;
 use App\Models\ContactCategory;
 use Illuminate\Validation\Rule;
 use App\Models\FixedAssetCategory;
+use App\Models\SchoolAccountSetting;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use App\Repositories\Village\VillageRepository;
@@ -67,7 +69,7 @@ class OrganizationController extends Controller
         ],
         [
             'code' => '121000000',
-            'name' => 'PIUTANG IURAN BULANAN SISWA',
+            'name' => 'PIUTANG SISWA',
         ],
         [
             'code' => '130000000',
@@ -112,7 +114,7 @@ class OrganizationController extends Controller
         ],
         [
             'code' => '221000000',
-            'name' => 'PEMBAYARAN IURAN BULANAN SISWA DITERIMA DI MUKA',
+            'name' => 'PENDAPATAN IURAN BULANAN SISWA DITERIMA DI MUKA',
         ],
         [
             'code' => '230000000',
@@ -202,8 +204,13 @@ class OrganizationController extends Controller
             'name' => 'PIUTANG',
         ],
         [
-            'category_name' => 'PIUTANG IURAN BULANAN SISWA',
+            'category_name' => 'PIUTANG SISWA',
             'code' => '121000000',
+            'name' => 'PIUTANG IURAN MASUK SISWA',
+        ],
+        [
+            'category_name' => 'PIUTANG SISWA',
+            'code' => '121000001',
             'name' => 'PIUTANG IURAN BULANAN SISWA',
         ],
         [
@@ -282,9 +289,9 @@ class OrganizationController extends Controller
             'name' => 'PENDAPATAN DITERIMA DI MUKA',
         ],
         [
-            'category_name' => 'PEMBAYARAN IURAN BULANAN SISWA DITERIMA DI MUKA',
+            'category_name' => 'PENDAPATAN IURAN BULANAN SISWA DITERIMA DI MUKA',
             'code' => '221000000',
-            'name' => 'PEMBAYARAN IURAN BULANAN SISWA DITERIMA DI MUKA',
+            'name' => 'PENDAPATAN IURAN BULANAN SISWA DITERIMA DI MUKA',
         ],
         [
             'category_name' => 'UTANG PAJAK',
@@ -363,7 +370,7 @@ class OrganizationController extends Controller
         ],
         [
             'category_name' => 'BEBAN OPERASIONAL',
-            'code' => '620000000',
+            'code' => '620000001',
             'name' => 'BEBAN GAJI GURU',
         ],
         [
@@ -501,23 +508,63 @@ class OrganizationController extends Controller
         //create default account (accountancy)
         $accountsDefault = collect($this->accountsDefault);
 
-        $accountCategoriesCollection->map(function ($accountCategory) use ($accountsDefault) {
-            $filteredAccount = $accountsDefault->where('category_name', $accountCategory['name']);
+        $attribute = [
+            'organization_id' => $organization['id'],
+        ];
 
-            $filteredAccount->map(function ($account) use ($accountCategory) {
-                $account['organization_id'] = $accountCategory['organization_id'];
-                $account['can_be_deleted'] = $account['code'] == '320000000' ? false : true;
+        // $accountCategoriesCollection->map(function ($accountCategory) use ($accountsDefault) {
+        //     $filteredAccount = $accountsDefault->where('category_name', $accountCategory['name']);
 
-                $accountDB = $accountCategory->accounts()->create($account);
+        //     $filteredAccount->map(function ($account) use ($accountCategory) {
+        //         $account['organization_id'] = $accountCategory['organization_id'];
+        //         $account['can_be_deleted'] = $account['code'] == '320000000' ? false : true;
 
+        //         $accountDB = $accountCategory->accounts()->create($account);
+
+        //         // akun pendapatan iuran bulanan siswa
+        //         if ($accountDB['name'] == 'PENDAPATAN IURAN BULANAN SISWA') {
+        //             # code...
+        //         }
+        //         return $account;
+        //     });
+        // });
+        foreach ($accountCategoriesCollection as $accountCategory) {
+            $filteredAccounts = $accountsDefault->where('category_name', $accountCategory['name']);
+
+            foreach ($filteredAccounts as $filteredAccount) {
+                $account = Account::create([
+                    'code' => $filteredAccount['code'],
+                    'name' => $filteredAccount['name'],
+                    'account_category_id' => $accountCategory['id'],
+                    'organization_id' => $organization['id']
+                ]);				
+            
                 // akun pendapatan iuran bulanan siswa
-                if ($accountDB['name'] == 'PENDAPATAN IURAN BULANAN SISWA') {
-                    # code...
+                if ($account['name'] == 'PENDAPATAN IURAN BULANAN SISWA') {
+                    $attribute['revenue_student'] = $account['id'];
                 }
-                return $account;
-            });
-        });
+                if ($account['name'] == 'PIUTANG IURAN BULANAN SISWA') {
+                    $attribute['receivable_monthly_student'] = $account['id'];
+                }
+                if ($account['name'] == 'PIUTANG IURAN MASUK SISWA') {
+                    $attribute['receivable_entry_student'] = $account['id'];
+                }
+                if ($account['name'] == 'PENDAPATAN IURAN BULANAN SISWA DITERIMA DI MUKA') {
+                    $attribute['prepaid_student'] = $account['id'];
+                }
+                if ($account['name'] == 'PENDAPATAN IURAN MASUK SISWA') {
+                    $attribute['entry_student'] = $account['id'];
+                }
+                if ($account['name'] == 'PENDAPATAN IURAN MASUK SISWA') {
+                    $attribute['entry_student'] = $account['id'];
+                }
+                if ($account['name'] == 'BEBAN GAJI GURU') {
+                    $attribute['staff_salary_expense'] = $account['id'];
+                }
+            }
+        }
         //
+        SchoolAccountSetting::create($attribute);
 
         // Category
         $contactCategories = [
@@ -532,12 +579,6 @@ class OrganizationController extends Controller
                 'organization_id' => $organization['id'],
             ]);
         }
-
-        Contact::create([
-            'organization_id' => $organization['id'],
-            'name' => 'UMUM',
-
-        ]);
 
         // Fixed Asset Category
         $fixedAssetCategoriesCollection = collect($this->fixedAssetCategory);

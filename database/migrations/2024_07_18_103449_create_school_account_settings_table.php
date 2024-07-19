@@ -16,24 +16,28 @@ return new class extends Migration
             $table->foreignUuid('organization_id')->constrained()->cascadeOnDelete();
 
             // akun pendapatan pembayaran iuran bulanan sekolah (rv_)
-            $table->unsignedBigInteger('revenue_student_account_id');
-            $table->foreign('revenue_student_account_id')->references('id')->on('accounts');
+            $table->unsignedBigInteger('revenue_student');
+            $table->foreign('revenue_student')->references('id')->on('accounts');
 
             // akun piutang pembayaran iuran bulanan sekolah
-            $table->unsignedBigInteger('receivable_student_account_id');
-            $table->foreign('receivable_student_account_id')->references('id')->on('accounts');
+            $table->unsignedBigInteger('receivable_monthly_student');
+            $table->foreign('receivable_monthly_student')->references('id')->on('accounts');
+
+            // akun piutang pembayaran iuran bulanan sekolah
+            $table->unsignedBigInteger('receivable_entry_student');
+            $table->foreign('receivable_entry_student')->references('id')->on('accounts');
 
             // akun pembayaran di muka iuran bulanan sekolah
-            $table->unsignedBigInteger('prepaid_student_account_id');
-            $table->foreign('prepaid_student_account_id')->references('id')->on('accounts');
+            $table->unsignedBigInteger('prepaid_student');
+            $table->foreign('prepaid_student')->references('id')->on('accounts');
 
             // akun pembayaran uang masuk sekolah
-            $table->unsignedBigInteger('entry_student_account_id');
-            $table->foreign('entry_student_account_id')->references('id')->on('accounts');
+            $table->unsignedBigInteger('entry_student');
+            $table->foreign('entry_student')->references('id')->on('accounts');
 
             // akun pembayaran gaji
-            $table->unsignedBigInteger('staff_salary_expense_account_id');
-            $table->foreign('staff_salary_expense_account_id')->references('id')->on('accounts');
+            $table->unsignedBigInteger('staff_salary_expense');
+            $table->foreign('staff_salary_expense')->references('id')->on('accounts');
 
             $table->timestamps();
         });

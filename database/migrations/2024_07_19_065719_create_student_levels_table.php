@@ -11,8 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('contacts', function (Blueprint $table) {
-            $table->boolean('is_active')->default(true);
+        Schema::create('student_levels', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('contact_id');
+            $table->integer('level')->default(1);
+            $table->string('year'); // tahun ajaran
+            $table->timestamps();
         });
     }
 
@@ -21,8 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('contacts', function (Blueprint $table) {
-            $table->dropColumn('is_active');
-        });
+        Schema::dropIfExists('student_levels');
     }
 };

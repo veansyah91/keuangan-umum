@@ -16,12 +16,12 @@ import ContainerDesktop from '@/Components/Desktop/ContainerDesktop';
 import TitleDesktop from '@/Components/Desktop/TitleDesktop';
 import PageNumber from '@/Components/PageNumber';
 import TitleMobile from '@/Components/Mobiles/TitleMobile';
-import ContactMobile from './Components/ContactMobile';
 import ContentMobile from '@/Components/Mobiles/ContentMobile';
 import ContentDesktop from '@/Components/Desktop/ContentDesktop';
-import ContactDesktop from './Components/ContactDesktop';
 import DangerButton from '@/Components/DangerButton';
 import { usePrevious } from 'react-use';
+import StudentMobile from './Components/StudentMobile';
+import StudentDesktop from './Components/StudentDesktop';
 
 export default function Index({ role, organization, contacts, searchFilter }) {
     // State
@@ -136,7 +136,7 @@ export default function Index({ role, organization, contacts, searchFilter }) {
             />
             <ContentMobile>
                 {contacts.data.map((contact) => (
-                    <ContactMobile
+                    <StudentMobile
                         contact={contact}
                         key={contact.id}
                         handleDelete={() => handleDelete(contact)}
@@ -223,7 +223,7 @@ export default function Index({ role, organization, contacts, searchFilter }) {
                                 </thead>
                                 <tbody>
                                     {contacts.data.map((contact, index) => (
-                                        <ContactDesktop
+                                        <StudentDesktop
                                             key={index}
                                             contact={contact}
                                             className={`${index % 2 == 0 && 'bg-gray-100'}`}
