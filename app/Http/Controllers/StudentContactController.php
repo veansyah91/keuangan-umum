@@ -65,4 +65,29 @@ class StudentContactController extends Controller
             'category' => ContactCategory::whereOrganizationId($organization['id'])->whereName('SISWA')->first()
         ]);
     }
+
+    public function store(Request $request, Organization $organization)
+    {
+
+        $validated = $request->validate([
+            'name' => "required|string",
+            'phone' => "string|nullable",
+            'address' => "string|nullable",
+            'description' => 'string|nullable',
+            'father' => 'string|nullable',
+            'mother' => 'string|nullable',
+            'no_ref' => 'string|nullable',
+            'level' => 'numeric|required',
+            'birthday' => 'date|nullable',
+            'entry_year' => 'numeric|required',
+            'category' => ['required', 'exists:contact_categories,id']
+        ]);
+
+        // store to contacts table
+
+        // store to contact_students table
+
+        // store to student_levels table
+
+    }
 }

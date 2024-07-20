@@ -12,9 +12,33 @@ import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
 import SecondaryButton from '@/Components/SecondaryButton';
 import PrimaryButton from '@/Components/PrimaryButton';
+import dayjs from 'dayjs';
 
 const yearList = () => {
-    
+    const now = dayjs().year();
+
+    const start = now - 6;
+
+    let arrayYear = [];
+
+    for (let index = start; index < now + 1; index++) {
+        arrayYear = [
+            ...arrayYear, index
+        ];
+    }
+    return arrayYear;
+}
+
+const levelArr = () => {
+    let levelArr = [];
+
+    for (let index = 1; index < 13; index++) {
+        levelArr = [
+            ...levelArr, index
+        ];
+    }
+
+    return levelArr;
 }
 
 export default function Create({ organization, category }) {
@@ -27,7 +51,9 @@ export default function Create({ organization, category }) {
         father:'',
         mother:'',
         no_ref:'',
-        entry_year:'',
+        level:levelArr()[0],
+        birthday:'',
+        entry_year:yearList()[6],
         category: category.id,
     });
 
@@ -35,30 +61,24 @@ export default function Create({ organization, category }) {
     const [selectedCategory, setSelectedCategory] = useState([]);
 
     // useEffect
-    useEffect(() => {
-        setData('category', selectedCategory);
-    }, [selectedCategory]);
+    // useEffect(() => {
+    //     setData('category', selectedCategory);
+    // }, [selectedCategory]);
 
     // function
-    const handleCheckboxChange = (categoryId) => {
-        if (selectedCategory.includes(categoryId)) {
-            setSelectedCategory(selectedCategory.filter((item) => item !== categoryId));
-        } else {
-            setSelectedCategory([...selectedCategory, categoryId]);
-        }
-        setData('category', selectedCategory);
-    };
-
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        post(route('data-master.students.store', organization.id), {
+        post(route('data-master.students.post', organization.id), {
             onSuccess: () => {
                 toast.success(`Siswa Berhasil Ditambahkan`, {
                     position: toast.POSITION.TOP_CENTER,
                 });
                 reset();
                 setSelectedCategory([]);
+            },
+            onError: errors => {
+                console.log(errors);
             },
             preserveScroll: true,
         });
@@ -147,14 +167,15 @@ export default function Create({ organization, category }) {
                             </div>
 
                             <div className='w-full sm:w-2/3'>
-                                <TextInput
-                                    id='entry_year'
-                                    name='entry_year'
-                                    className={`w-full ${errors?.entry_year && 'border-red-500'}`}
-                                    placeholder='Tahun Masuk'
-                                    value={data.entry_year}
-                                    onChange={(e) => setData('entry_year', e.target.value.toUpperCase())}
-                                />
+                                <select className="select select-bordered w-full" defaultValue={data.entry_year} onChange={e => e.target.value} id='entry_year'>
+                                    {
+                                        yearList().map(year => 
+                                            <option 
+                                                key={year} 
+                                            >{year}</option>
+                                        )
+                                    }
+                                </select>
                                 {errors?.entry_year && <span className='text-red-500 text-xs'>{errors.entry_year}</span>}
                             </div>
                         </div>
@@ -184,22 +205,90 @@ export default function Create({ organization, category }) {
                         <div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
                             <div className='w-full sm:w-1/3 my-auto'>
                                 <InputLabel
-                                    value={'Alamat (opsional)'}
-                                    htmlFor='address'
+                                    value={'Kelas Tahun Ini'}
+                                    htmlFor='entry_year'
+                                    className=' mx-auto my-auto'
+                                />
+                            </div>
+
+                            <div className='w-full sm:w-2/3'>
+                                <select className="select select-bordered w-full" defaultValue={data.level} onChange={e => e.target.value} id='level'>
+                                    {
+                                        levelArr().map(level => 
+                                            <option 
+                                                key={level} 
+                                            >{level}</option>
+                                        )
+                                    }
+                                </select>
+                                {errors?.level && <span className='text-red-500 text-xs'>{errors.level}</span>}
+                            </div>
+                        </div>
+
+                        <div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
+                            <div className='w-full sm:w-1/3 my-auto'>
+                                <InputLabel
+                                    value={'Nama Ayah (opsional)'}
+                                    htmlFor='father'
                                     className=' mx-auto my-auto'
                                 />
                             </div>
 
                             <div className='w-full sm:w-2/3'>
                                 <TextInput
-                                    id='address'
-                                    name='address'
-                                    className={`w-full ${errors?.address && 'border-red-500'}`}
-                                    placeholder='Alamat'
-                                    value={data.address}
-                                    onChange={(e) => setData('address', e.target.value.toUpperCase())}
+                                    id='father'
+                                    name='father'
+                                    className={`w-full ${errors?.father && 'border-red-500'}`}
+                                    placeholder='Nama Ayah'
+                                    value={data.father}
+                                    onChange={(e) => setData('father', e.target.value.toUpperCase())}
                                 />
-                                {errors?.address && <span className='text-red-500 text-xs'>{errors.address}</span>}
+                                {errors?.father && <span className='text-red-500 text-xs'>{errors.father}</span>}
+                            </div>
+                        </div>
+
+                        <div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
+                            <div className='w-full sm:w-1/3 my-auto'>
+                                <InputLabel
+                                    value={'Nama Ibu (opsional)'}
+                                    htmlFor='mother'
+                                    className=' mx-auto my-auto'
+                                />
+                            </div>
+
+                            <div className='w-full sm:w-2/3'>
+                                <TextInput
+                                    id='mother'
+                                    name='mother'
+                                    className={`w-full ${errors?.mother && 'border-red-500'}`}
+                                    placeholder='Nama Ibu'
+                                    value={data.mother}
+                                    onChange={(e) => setData('mother', e.target.value.toUpperCase())}
+                                />
+                                {errors?.mother && <span className='text-red-500 text-xs'>{errors.mother}</span>}
+                            </div>
+                        </div>
+
+                        <div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
+                            <div className='w-full sm:w-1/3 my-auto'>
+                                <InputLabel
+                                    value={'Tanggal Lahir (opsional)'}
+                                    htmlFor='birthday'
+                                    className=' mx-auto my-auto'
+                                />
+                            </div>
+
+                            <div className='w-full sm:w-2/3'>
+                                <TextInput
+                                    id='birthday'
+                                    name='birthday'
+                                    className={`w-full ${errors?.birthday && 'border-red-500'}`}
+                                    placeholder='Tanggal Lahir'
+                                    value={data.birthday}
+                                    onChange={(e) => setData('birthday', e.target.value)}
+                                    type={'date'}
+                                />
+                                {errors?.birthday && <span className='text-red-500 text-xs'>{errors.birthday}</span>}
                             </div>
                         </div>
 
