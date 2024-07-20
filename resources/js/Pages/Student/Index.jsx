@@ -215,7 +215,7 @@ export default function Index({ role, organization, contacts, searchFilter }) {
                                 <thead className='text-base text-gray-900'>
                                     <tr className=''>
                                         <th className='bg-gray-200'>Nama</th>
-                                        <th className='bg-gray-200'>Kelas (Tahun Ajaran Ini)</th>
+                                        <th className='bg-gray-200'>Kelas (Tahun Ajaran)</th>
                                         <th className='bg-gray-200'>Alamat</th>
                                         <th className='bg-gray-200'>Status</th>
                                         <th className='bg-gray-200'></th>

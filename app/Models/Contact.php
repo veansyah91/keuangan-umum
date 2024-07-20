@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\StudentLevel;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Contact extends Model
@@ -15,6 +18,16 @@ class Contact extends Model
     public function contactCategories(): BelongsToMany
     {
         return $this->belongsToMany(ContactCategory::class, 'contact_contact_category', 'contact_id', 'contact_category_id');
+    }
+
+    public function student(): HasOne
+    {
+        return $this->hasOne(ContactStudent::class);
+    }
+
+    public function levels(): HasMany
+    {
+        return $this->hasMany(StudentLevel::class);
     }
 
     public function scopeFilter($query, $filters)

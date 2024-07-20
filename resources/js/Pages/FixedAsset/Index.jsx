@@ -509,7 +509,7 @@ export default function Index({
                 <form onSubmit={handleSubmitFilter} className='p-6' id='filterForm' name='filterForm'>
                     <h2 className='text-lg font-medium text-gray-900'>Filter Data</h2>
                     <div className='mt-5 space-y-2'>
-                        <div className='w-1/3'>
+                        <div className='w-1/4'>
                             <div className='form-control '>
                                 <label className='label cursor-pointer gap-2' htmlFor={`is_cash`}>
                                     <input

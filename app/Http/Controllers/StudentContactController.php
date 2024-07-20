@@ -6,14 +6,16 @@ use Inertia\Inertia;
 use Inertia\Response;
 use App\Models\Contact;
 use App\Models\Organization;
+use App\Models\StudentLevel;
 use Illuminate\Http\Request;
+use App\Models\ContactStudent;
 use App\Models\ContactCategory;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\ContactCategoryHelper;
 use App\Repositories\Log\LogRepository;
 use App\Repositories\User\UserRepository;
-use App\Repositories\ContactCategory\ContactCategoryRepository;
 use Illuminate\Database\Eloquent\Builder;
+use App\Repositories\ContactCategory\ContactCategoryRepository;
 
 class StudentContactController extends Controller
 {
@@ -41,6 +43,8 @@ class StudentContactController extends Controller
         $contacts = Contact::filter(request(['search']))
                             ->whereOrganizationId($organization['id'])
                             ->with('contactCategories')
+                            ->with('student')
+                            ->with('levels')
                             ->whereHas('contactCategories', function ($query) use ($contactCategory){
                                 $query->where('contact_category_id', $contactCategory['id']);
                             })
@@ -68,26 +72,73 @@ class StudentContactController extends Controller
 
     public function store(Request $request, Organization $organization)
     {
-
         $validated = $request->validate([
             'name' => "required|string",
             'phone' => "string|nullable",
             'address' => "string|nullable",
             'description' => 'string|nullable',
-            'father' => 'string|nullable',
-            'mother' => 'string|nullable',
+            'father_name' => 'string|nullable',
+            'mother_name' => 'string|nullable',
             'no_ref' => 'string|nullable',
             'level' => 'numeric|required',
             'birthday' => 'date|nullable',
             'entry_year' => 'numeric|required',
+            'year' => 'string|required',
             'category' => ['required', 'exists:contact_categories,id']
         ]);
 
-        // store to contacts table
+        $validated['organization_id'] = $organization['id'];
 
+        // store to contacts table
+        $contact = Contact::create($validated);
+        $contact->contactCategories()->attach($validated['category']);
+
+        $validated['contact_id'] = $contact['id'];
+        
         // store to contact_students table
+        $contactStudent = ContactStudent::create($validated);
 
         // store to student_levels table
+        $studentLevel = StudentLevel::create($validated);
+
+        return redirect()->back()->with('success', 'Data Siswa Berhasil Disimpan');
+    }
+
+    public function edit(Organization $organization, Contact $contact)
+    {
+        $user = Auth::user();
+
+        $studentLevel = StudentLevel::whereContactId($contact['id'])->get();
+
+        return Inertia::render('Student/Edit',[
+            'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+            'organization' => $organization,
+            'contact' => $contact,
+            'student' => ContactStudent::whereContactId($contact['id'])->first(),
+            'level' => $studentLevel[0]
+        ]);
+    }
+
+    public function update(Request $request, Organization $organization, Contact $contact)
+    {
+        $validated = $request->validate([
+            'name' => "required|string",
+            'phone' => "string|nullable",
+            'address' => "string|nullable",
+            'description' => 'string|nullable',
+            'father_name' => 'string|nullable',
+            'mother_name' => 'string|nullable',
+            'no_ref' => 'string|nullable',
+            'level' => 'numeric|required',
+            'birthday' => 'date|nullable',
+            'entry_year' => 'numeric|required',
+            'year' => 'string|required',
+            'category' => ['required', 'exists:contact_categories,id'],
+            'is_active' =>'boolean|required',
+            'student_id' => ['required', 'exists:contact_students,id'],
+            'student_level_id' => ['required', 'exists:student_levels,id'],
+        ]);
+        dd($validated);
 
     }
 }

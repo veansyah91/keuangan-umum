@@ -32,9 +32,9 @@ class ContactController extends Controller
         $user = Auth::user();
 
         $contacts = Contact::filter(request(['search']))
-            ->whereOrganizationId($organization['id'])
-            ->with('contactCategories')
-            ->paginate(50);
+                            ->whereOrganizationId($organization['id'])
+                            ->with('contactCategories')
+                            ->paginate(50);
 
         return Inertia::render('Contact/Index', [
             'organization' => $organization,

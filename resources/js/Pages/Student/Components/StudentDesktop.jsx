@@ -1,14 +1,28 @@
+import BadgeDanger from '@/Components/Badges/BadgeDanger';
+import BadgeSuccess from '@/Components/Badges/BadgeSuccess';
 import { Link } from '@inertiajs/react';
 import React from 'react';
 import { IoCreateOutline, IoEllipsisVertical, IoTrash } from 'react-icons/io5';
 
 export default function StudentDesktop({ contact, className, role, handleDelete }) {
+    const studentLevel = () => {
+        const length = contact.levels.length;
+
+        return  contact.levels[length-1];
+    }
+    
     return (
         <tr className={className}>
             <td>{contact.name}</td>
-            <td>{contact.phone}</td>
+            <td>{studentLevel().level} ({studentLevel().year})</td>
             <td>{contact.address}</td>
-            <td>{contact.contact_categories.map((category) => category.name).join(', ')}</td>
+            <td>
+            {
+                contact.is_active 
+                ? <BadgeSuccess>Aktif</BadgeSuccess>
+                : <BadgeDanger>Tidak Aktif</BadgeDanger>
+            }
+            </td>
             <td>
                 {role !== 'viewer' && (
                     <div className='dropdown dropdown-left'>
@@ -23,7 +37,7 @@ export default function StudentDesktop({ contact, className, role, handleDelete 
                             className='dropdown-content z-[50] menu p-2 shadow bg-base-100 rounded-box w-56'>
                             <li>
                                 <Link
-                                    href={route('data-master.contact.edit', {
+                                    href={route('data-master.students.edit', {
                                         organization: contact.organization_id,
                                         contact: contact.id,
                                     })}>

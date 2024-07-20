@@ -42,27 +42,23 @@ const levelArr = () => {
     return levelArr;
 }
 
-// const studyYear = () => {
-//     const now = dayjs();
-
-//     return now.month() < 6 ? `${now.year()-1}/${now.year()}` : `${now.year()}/${now.year()+1}`;
-// }
-
-export default function Create({ organization, category }) {
+export default function Edit({ organization, contact, student, level }) {
     // state
-    const { data, setData, processing, post, errors, setError, reset } = useForm({
-        name: '',
-        phone: '',
-        address: '',
-        description: '',
-        father_name:'',
-        mother_name:'',
-        no_ref:'',
+    const { data, setData, processing, patch, errors, setError, reset } = useForm({
+        name: contact.name || '',
+        phone: contact.phone || '',
+        address: contact.address || '',
+        description: contact.description || '',
+        father_name:student.father_name || '',
+        mother_name:student.mother_name || '',
+        no_ref:student.no_ref || '',
         level:levelArr()[0],
-        birthday:'',
-        entry_year:yearList()[10],
+        birthday:student.birthday || '',
+        entry_year: parseInt(student.entry_year),
         year:studyYear(),
-        category: category.id,
+        student_id: student.id,
+        student_level_id: level.id,
+        is_active : contact.is_active
     });
 
     // Category Select
@@ -74,9 +70,9 @@ export default function Create({ organization, category }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         
-        post(route('data-master.students.post', organization.id), {
+        patch(route('data-master.students.update', {organization: organization.id, contact: contact.id}), {
             onSuccess: () => {
-                toast.success(`Siswa Berhasil Ditambahkan`, {
+                toast.success(`Siswa Berhasil DiUbahkan`, {
                     position: toast.POSITION.TOP_CENTER,
                 });
                 reset();
@@ -91,7 +87,7 @@ export default function Create({ organization, category }) {
 
     return (
         <>
-            <Head title='Tambah Data Siswa' />
+            <Head title='Ubah Data Siswa' />
             <ToastContainer />
 
             <FormInput onSubmit={handleSubmit}>
@@ -299,7 +295,7 @@ export default function Create({ organization, category }) {
                         <div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
                             <div className='w-full sm:w-1/3 my-auto'>
                                 <InputLabel
-                                    value={'Informasi Tambahan (opsional)'}
+                                    value={'Informasi Ubahan (opsional)'}
                                     htmlFor='description'
                                     className=' mx-auto my-auto'
                                 />
@@ -310,7 +306,7 @@ export default function Create({ organization, category }) {
                                     id='description'
                                     name='description'
                                     className={`w-full ${errors?.description && 'border-red-500'}`}
-                                    placeholder='Informasi Tambahan'
+                                    placeholder='Informasi Ubahan'
                                     value={data.description}
                                     onChange={(e) => setData('description', e.target.value.toUpperCase())}
                                 />
@@ -320,11 +316,27 @@ export default function Create({ organization, category }) {
                             </div>
                         </div>
 
+                        <div className='w-1/6 mt-5'>
+                            <div className='form-control '>
+                                <label className='label cursor-pointer gap-2' htmlFor={`is_active`}>
+                                    <input
+                                        type='checkbox'
+                                        className='checkbox'
+                                        id={`is_active`}
+                                        value={data.is_active}
+                                        onChange={() => setData('is_active', !data.is_active)}
+                                        checked={data.is_active}
+                                    />
+                                    <span className='label-text font-bold'>Aktif</span>
+                                </label>
+                            </div>
+                        </div>
+
                         <div className='flex justify-end flex-col-reverse sm:flex-row gap-2 mt-5'>
                             <div className='w-full sm:w-1/6 my-auto text-center'>
                                 <Link href={route('data-master.students', organization.id)}>
                                     <SecondaryButton className='w-full'>
-                                        <div className='text-center w-full'>Batal</div>
+                                        <div className='text-center w-full'>Kembali</div>
                                     </SecondaryButton>
                                 </Link>
                             </div>
@@ -342,13 +354,13 @@ export default function Create({ organization, category }) {
     );
 }
 
-Create.layout = (page) => (
+Edit.layout = (page) => (
     <AuthenticatedLayout
-        header={<Header>Tambah Data Siswa</Header>}
+        header={<Header>Ubah Data Siswa</Header>}
         children={page}
         user={page.props.auth.user}
         organization={page.props.organization}
-        title='Tambah Data Siswa'
+        title='Ubah Data Siswa'
         backLink={
             <Link href={route('data-master.students', page.props.organization.id)}>
                 <IoArrowBackOutline />
@@ -363,7 +375,7 @@ Create.layout = (page) => (
                     <li className='font-bold'>
                         <Link href={route('data-master.students', page.props.organization.id)}>Data Siswa</Link>
                     </li>
-                    <li>Tambah Data Siswa</li>
+                    <li>Ubah Data Siswa</li>
                 </ul>
             </div>
         }
