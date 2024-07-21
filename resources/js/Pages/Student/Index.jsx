@@ -77,6 +77,7 @@ export default function Index({ role, organization, contacts, searchFilter }) {
                 reset();
             },
             onError: (error) => {
+                setShowDeleteConfirmation(false);
                 toast.error(error.message, {
                     position: toast.POSITION.TOP_CENTER,
                 });

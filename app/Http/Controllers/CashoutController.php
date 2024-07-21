@@ -114,15 +114,18 @@ class CashoutController extends Controller
                 ->whereIsActive(true)
                 ->whereOrganizationId($organization['id'])
                 ->select('id', 'name', 'code', 'is_cash')
+                ->orderBy('code')
                 ->get(),
             'cashAccounts' => Account::filter(request(['account']))
                 ->whereIsActive(true)
                 ->whereOrganizationId($organization['id'])
                 ->whereIsCash(true)
                 ->select('id', 'name', 'code', 'is_cash')
+                ->orderBy('code')
                 ->get(),
             'contacts' => Contact::filter(request(['contact']))
                 ->whereOrganizationId($organization['id'])
+                ->whereIsActive(true)
                 ->with('contactCategories')
                 ->select('id', 'name', 'phone')
                 ->get(),

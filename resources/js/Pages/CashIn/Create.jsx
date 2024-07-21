@@ -28,6 +28,7 @@ export default function Create({
     programs,
     departments,
     contacts,
+    contactFilter,
 }) {
     // state
     const [selectedAccount, setSelectedAccount] = useState([{ id: null, name: '', code: '' }]);
@@ -318,6 +319,7 @@ export default function Create({
                                         placeholder='Cari Akun'
                                         isError={errors.cash_account_id ? true : false}
                                         id='cash_account'
+                                        contactFilter={contactFilter || ''}
                                     />
                                     {selectedCashAccount?.code && (
                                         <div className='absolute text-xs'>Kode: {selectedCashAccount.code}</div>

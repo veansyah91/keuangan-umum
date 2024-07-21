@@ -65,9 +65,6 @@ export default function Create({ organization, category }) {
         category: category.id,
     });
 
-    // Category Select
-    const [selectedCategory, setSelectedCategory] = useState([]);
-
     // useEffect
 
     // function
@@ -76,11 +73,11 @@ export default function Create({ organization, category }) {
         
         post(route('data-master.students.post', organization.id), {
             onSuccess: () => {
+                
                 toast.success(`Siswa Berhasil Ditambahkan`, {
                     position: toast.POSITION.TOP_CENTER,
                 });
                 reset();
-                setSelectedCategory([]);
             },
             onError: errors => {
                 console.log(errors);
@@ -324,7 +321,7 @@ export default function Create({ organization, category }) {
                             <div className='w-full sm:w-1/6 my-auto text-center'>
                                 <Link href={route('data-master.students', organization.id)}>
                                     <SecondaryButton className='w-full'>
-                                        <div className='text-center w-full'>Batal</div>
+                                        <div className='text-center w-full'>Kembali</div>
                                     </SecondaryButton>
                                 </Link>
                             </div>

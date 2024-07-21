@@ -43,7 +43,6 @@ const levelArr = () => {
 }
 
 export default function Edit({ organization, contact, student, level }) {
-    console.log(level);
     // state
     const { data, setData, processing, patch, errors, setError, reset } = useForm({
         name: contact.name || '',
@@ -62,9 +61,6 @@ export default function Edit({ organization, contact, student, level }) {
         is_active : contact.is_active
     });
 
-    // Category Select
-    const [selectedCategory, setSelectedCategory] = useState([]);
-
     // useEffect
 
     // function
@@ -72,12 +68,11 @@ export default function Edit({ organization, contact, student, level }) {
         e.preventDefault();
         
         patch(route('data-master.students.update', {organization: organization.id, contact: contact.id}), {
-            onSuccess: () => {
-                toast.success(`Siswa Berhasil DiUbahkan`, {
+            onSuccess: ({ props }) => {
+                const { flash } = props;
+                toast.success(flash.success, {
                     position: toast.POSITION.TOP_CENTER,
                 });
-                reset();
-                setSelectedCategory([]);
             },
             onError: errors => {
                 console.log(errors);
@@ -344,7 +339,7 @@ export default function Edit({ organization, contact, student, level }) {
 
                             <div className='w-full sm:w-1/6 text-center'>
                                 <PrimaryButton className='w-full' disabled={processing}>
-                                    <div className='text-center w-full'>Simpan</div>
+                                    <div className='text-center w-full'>Ubah</div>
                                 </PrimaryButton>
                             </div>
                         </div>

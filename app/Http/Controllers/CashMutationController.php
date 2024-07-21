@@ -113,6 +113,7 @@ class CashMutationController extends Controller
                 ->whereOrganizationId($organization['id'])
                 ->whereIsCash(true)
                 ->select('id', 'name', 'code', 'is_cash')
+                ->orderBy('code')
                 ->get(),
             'projects' => Project::whereOrganizationId($organization['id'])
                 ->select('id', 'name', 'code')

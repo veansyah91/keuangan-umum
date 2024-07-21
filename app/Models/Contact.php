@@ -13,7 +13,7 @@ class Contact extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'phone', 'address', 'description', 'organization_id'];
+    protected $fillable = ['name', 'phone', 'address', 'description', 'organization_id', 'is_active'];
 
     public function contactCategories(): BelongsToMany
     {
@@ -38,6 +38,10 @@ class Contact extends Model
                 ->orWhereHas('contactCategories', function ($query) use ($search) {
                     $query->where('name', 'like', '%'.$search.'%');
                 });
+        });
+
+        $query->when($filters['contact'] ?? false, function ($query, $search) {
+            return $query->where('name', 'like', '%'.$search.'%');
         });
     }
 }

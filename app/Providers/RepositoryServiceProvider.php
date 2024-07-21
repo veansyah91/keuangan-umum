@@ -48,5 +48,8 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             ContactCategoryRepositoryInterface::class, ContactCategoryRepository::class
         );
+        $this->app->bind(
+            ContactRepositoryInterface::class, ContactRepository::class
+        );
     }
 }

@@ -11,13 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('student_levels', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('contact_id');
+        Schema::table('student_levels', function (Blueprint $table) {
             $table->foreign('contact_id')->references('id')->on('contacts');
-            $table->integer('level')->default(1);
-            $table->string('year'); // tahun ajaran
-            $table->timestamps();
         });
     }
 
@@ -26,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('student_levels');
+        Schema::table('student_levels', function (Blueprint $table) {
+            //
+        });
     }
 };

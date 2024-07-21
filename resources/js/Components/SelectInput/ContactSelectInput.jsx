@@ -1,6 +1,9 @@
 import { Fragment, useEffect, useState } from 'react';
 import { Combobox, Transition } from '@headlessui/react';
 import { IoCheckmarkCircleOutline, IoChevronDownOutline } from 'react-icons/io5';
+import { router } from '@inertiajs/react';
+import { usePrevious } from 'react-use';
+import { useDebounce } from 'use-debounce';
 
 export default function ContactSelectInput({
     resources,
@@ -11,22 +14,34 @@ export default function ContactSelectInput({
     onCLick,
     isError = true,
     id = '',
+    contactFilter = ''
 }) {
-    const [query, setQuery] = useState('');
+    const [query, setQuery] = useState(contactFilter);
     const [data, setData] = useState(resources);
 
-    // console.log(resources);
+    const prevQuery = usePrevious(query);
+    const [debounceValue] = useDebounce(query, 500);
 
     useEffect(() => {
-        const tempData =
-            query === ''
-                ? resources
-                : resources.filter((account) =>
-                      account.name.toLowerCase().replace(/\s+/g, '').includes(query?.toLowerCase().replace(/\s+/g, ''))
-                  );
+        if (prevQuery !== undefined) {
+            handleReloadPage();
+        }
+    }, [debounceValue]);
 
-        setData(tempData);
-    }, [query]);
+    //function
+    const handleReloadPage = () => {
+        router.reload({
+            only: ['contacts'],
+            data: {
+                contact: query,
+            },
+            onSuccess: ({ props }) => {
+                const { contacts: contactResult } = props;
+
+                setData(contactResult);
+            }
+        });
+    };
 
     useEffect(() => {
         setQuery(selected?.name);

@@ -2,26 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
+use App\Models\User;
+use Inertia\Inertia;
+use App\Models\Cashin;
+use App\Models\Ledger;
 use App\Helpers\NewRef;
 use App\Models\Account;
-use App\Models\Cashin;
 use App\Models\Contact;
-use App\Models\Department;
 use App\Models\Journal;
-use App\Models\Ledger;
-use App\Models\Organization;
 use App\Models\Program;
 use App\Models\Project;
-use App\Models\User;
-use App\Repositories\Journal\JournalRepository;
+use App\Models\Department;
+use Carbon\CarbonImmutable;
+use App\Models\Organization;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 use App\Repositories\Log\LogRepository;
 use App\Repositories\User\UserRepository;
-use Carbon\Carbon;
-use Carbon\CarbonImmutable;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
-use Inertia\Inertia;
+use App\Repositories\Contact\ContactRepository;
+use App\Repositories\Journal\JournalRepository;
 
 class CashinController extends Controller
 {
@@ -31,13 +32,16 @@ class CashinController extends Controller
 
     protected $journalRepository;
 
+    protected $contactRepository;
+
     protected $now;
 
-    public function __construct(UserRepository $userRepository, LogRepository $logRepository, JournalRepository $journalRepository)
+    public function __construct(UserRepository $userRepository, LogRepository $logRepository, JournalRepository $journalRepository, ContactRepository $contactRepository)
     {
         $this->userRepository = $userRepository;
         $this->logRepository = $logRepository;
         $this->journalRepository = $journalRepository;
+        $this->contactRepository = $contactRepository;
         $this->now = CarbonImmutable::now();
     }
 
@@ -105,6 +109,7 @@ class CashinController extends Controller
     {
         $user = Auth::user();
 
+        // dd($this->contactRepository->getData($organization['id'], request(['contact'])));
         return Inertia::render('CashIn/Create', [
             'organization' => $organization,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
@@ -112,20 +117,20 @@ class CashinController extends Controller
             'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
             'accounts' => Account::filter(request(['account']))
                 ->whereIsActive(true)
+                ->where('is_cash', false)
                 ->whereOrganizationId($organization['id'])
                 ->select('id', 'name', 'code', 'is_cash')
+                ->orderBy('code')
                 ->get(),
             'cashAccounts' => Account::filter(request(['account']))
                 ->whereIsActive(true)
                 ->whereOrganizationId($organization['id'])
                 ->whereIsCash(true)
                 ->select('id', 'name', 'code', 'is_cash')
+                ->orderBy('code')
                 ->get(),
-            'contacts' => Contact::filter(request(['contact']))
-                ->whereOrganizationId($organization['id'])
-                ->with('contactCategories')
-                ->select('id', 'name', 'phone')
-                ->get(),
+            'contacts' => $this->contactRepository
+                              ->getData($organization['id'], request(['contact'])),
             'projects' => Project::whereOrganizationId($organization['id'])
                 ->select('id', 'name', 'code')
                 ->get(),

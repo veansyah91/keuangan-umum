@@ -208,9 +208,15 @@ class AccountController extends Controller
 
         $account->delete();
 
+        $data = [
+            'id' => $account['id'],
+            'name' => $account['name'],
+            'code' => $account['code']
+        ];
+
         $user = Auth::user();
 
-        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menghapus DATA pada AKUN, Data : '.json_encode($validated));
+        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menghapus DATA pada AKUN, Data : '.json_encode($data));
 
         return redirect(route('data-ledger.account', $organization['id']));
     }

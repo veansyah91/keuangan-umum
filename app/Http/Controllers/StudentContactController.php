@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Models\Cashin;
 use App\Models\Contact;
 use App\Models\Organization;
 use App\Models\StudentLevel;
@@ -137,14 +138,49 @@ class StudentContactController extends Controller
             'student_id' => ['required', 'exists:contact_students,id'],
             'student_level_id' => ['required', 'exists:student_levels,id'],
         ]);
-        
-        // $contact->update($validated);
+
+        $contact->update([
+            'name' => $validated['name'],
+            'phone' => $validated['phone'],
+            'address' => $validated['address'],
+            'description' => $validated['description'],
+            'is_active' => $validated['is_active'],
+        ]);
 
         $contactStudent = ContactStudent::find($validated['student_id']);
+        $contactStudent->update([
+            'father_name' => $validated['father_name'],
+            'mother_name' => $validated['mother_name'],
+            'birthday' => $validated['birthday'],
+            'entry_year' => $validated['entry_year'],
+            'no_ref' => $validated['no_ref'],
+        ]);
 
         $studentLevel = StudentLevel::find($validated['student_level_id']);
+        $studentLevel->update([
+            'level' => $validated['level'],
+        ]);
         
-        dd($studentLevel);
+        return redirect()->back()->with('success', 'Data Siswa Berhasil Diubah');
+    }
 
+    public function destroy(Organization $organization, Contact $contact)
+    {
+        // cek pada cash in,
+        // apabila terah terjadi transaksi, maka tidak dapat dilakukan
+        // jika belum, maka lanjutkan proses
+
+        $cashIn = Cashin::whereContactId($contact['id'])->first();
+
+        if ($cashIn) {
+            return redirect()->back()->withErrors(['message' => 'Tidak dapat menghapus Data Siswa']);
+        }
+
+        $studentLevel = StudentLevel::whereContactId($contact['id'])->first();
+        $studentLevel->delete();
+
+        $contact->delete();
+
+        return redirect()->back()->with('success', 'Data Siswa Berhasil Dihapus');
     }
 }

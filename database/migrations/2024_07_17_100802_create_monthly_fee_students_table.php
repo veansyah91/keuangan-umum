@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('monthly_fee_students', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('contact_id');
-            $table->foreign('contact_id')->references('id')->on('users');
+            $table->foreign('contact_id')->references('id')->on('contacts');
             $table->bigInteger('value')->default(0);
             $table->timestamps();
         });
