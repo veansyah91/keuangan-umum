@@ -43,6 +43,7 @@ const levelArr = () => {
 }
 
 export default function Edit({ organization, contact, student, level }) {
+    console.log(level);
     // state
     const { data, setData, processing, patch, errors, setError, reset } = useForm({
         name: contact.name || '',
@@ -52,10 +53,10 @@ export default function Edit({ organization, contact, student, level }) {
         father_name:student.father_name || '',
         mother_name:student.mother_name || '',
         no_ref:student.no_ref || '',
-        level:levelArr()[0],
+        level:level.level,
         birthday:student.birthday || '',
         entry_year: parseInt(student.entry_year),
-        year:studyYear(),
+        year:level.year,
         student_id: student.id,
         student_level_id: level.id,
         is_active : contact.is_active
