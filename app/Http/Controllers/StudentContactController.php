@@ -133,12 +133,18 @@ class StudentContactController extends Controller
             'birthday' => 'date|nullable',
             'entry_year' => 'numeric|required',
             'year' => 'string|required',
-            'category' => ['required', 'exists:contact_categories,id'],
             'is_active' =>'boolean|required',
             'student_id' => ['required', 'exists:contact_students,id'],
             'student_level_id' => ['required', 'exists:student_levels,id'],
         ]);
-        dd($validated);
+        
+        // $contact->update($validated);
+
+        $contactStudent = ContactStudent::find($validated['student_id']);
+
+        $studentLevel = StudentLevel::find($validated['student_level_id']);
+        
+        dd($studentLevel);
 
     }
 }
