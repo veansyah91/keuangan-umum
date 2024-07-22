@@ -105,6 +105,21 @@ class StudentContactController extends Controller
         return redirect()->back()->with('success', 'Data Siswa Berhasil Disimpan');
     }
 
+    public function show(Organization $organization, Contact $contact)
+    {
+        $user = Auth::user();
+
+        $studentLevel = StudentLevel::whereContactId($contact['id'])->get();
+
+        return Inertia::render('Student/Show',[
+            'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+            'organization' => $organization,
+            'contact' => $contact,
+            'student' => ContactStudent::whereContactId($contact['id'])->first(),
+            'level' => $studentLevel[0]
+        ]);
+    }
+
     public function edit(Organization $organization, Contact $contact)
     {
         $user = Auth::user();

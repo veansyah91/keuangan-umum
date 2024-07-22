@@ -1,8 +1,9 @@
 import BadgeDanger from '@/Components/Badges/BadgeDanger';
 import BadgeSuccess from '@/Components/Badges/BadgeSuccess';
+import DropdownAction from '@/Components/DropdownAction';
 import { Link } from '@inertiajs/react';
 import React from 'react';
-import { IoCreateOutline, IoEllipsisVertical, IoTrash } from 'react-icons/io5';
+import { IoCreateOutline, IoEllipsisVertical, IoSearchOutline, IoTrash } from 'react-icons/io5';
 
 export default function StudentMobile({ contact, role, handleDelete }) {
     const studentLevel = () => {
@@ -35,7 +36,7 @@ export default function StudentMobile({ contact, role, handleDelete }) {
             }
             </div>
             <div className='text-start my-auto w-1/12'>
-                {role !== 'viewer' && (
+                {role !== 'viewer' && 
                     <div className='dropdown dropdown-left'>
                         <div
                             tabIndex={0}
@@ -56,6 +57,15 @@ export default function StudentMobile({ contact, role, handleDelete }) {
                                 </Link>
                             </li>
                             <li>
+                                <Link
+                                    href={route('data-master.students.show', {
+                                        organization: contact.organization_id,
+                                        contact: contact.id,
+                                    })}>
+                                    <IoSearchOutline /> Detail
+                                </Link>
+                            </li>
+                            <li>
                                 <button onClick={handleDelete}>
                                     <IoTrash />
                                     Hapus
@@ -63,7 +73,8 @@ export default function StudentMobile({ contact, role, handleDelete }) {
                             </li>
                         </ul>
                     </div>
-                )}
+
+                }
             </div>
         </div>
     );
