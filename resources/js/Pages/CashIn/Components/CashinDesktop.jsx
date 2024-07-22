@@ -12,7 +12,7 @@ export default function CashInDesktop({ cashIn, className, handleDelete, handleE
     return (
         <>
             <tr className={className}>
-                <td>{dayjs(cashIn.date).format('MMM DD, YYYY')}</td>
+                <td>{dayjs(cashIn.date).locale('id').format('MMM DD, YYYY')}</td>
                 <td>{cashIn.no_ref}</td>
                 <td>{cashIn.contact.name}</td>
                 <td>{cashIn.description}</td>

@@ -11,7 +11,7 @@ export default function CashMutationDesktop({ cashMutation, className, handleDel
     return (
         <>
             <tr className={className}>
-                <td>{dayjs(cashMutation.date).format('MMM DD, YYYY')}</td>
+                <td>{dayjs(cashMutation.date).locale('id').format('MMM DD, YYYY')}</td>
                 <td>{cashMutation.no_ref}</td>
                 <td>{cashMutation.description}</td>
                 <td className='text-end'>IDR {formatNumber(cashMutation.value)}</td>

@@ -11,7 +11,7 @@ export default function CashOutDesktop({ cashOut, className, handleDelete, handl
     return (
         <>
             <tr className={className}>
-                <td>{dayjs(cashOut.date).format('MMM DD, YYYY')}</td>
+                <td>{dayjs(cashOut.date).locale('id').format('MMM DD, YYYY')}</td>
                 <td>{cashOut.no_ref}</td>
                 <td>{cashOut.contact.name}</td>
                 <td>{cashOut.description}</td>

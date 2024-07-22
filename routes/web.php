@@ -208,6 +208,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::patch('/students/{contact}', [StudentContactController::class, 'update'])->name('data-master.students.update');
             Route::delete('/students/{contact}', [StudentContactController::class, 'destroy'])->name('data-master.students.destroy');
 
+            Route::get('/students/import', [StudentContactController::class, 'import'])->name('data-master.students.import');
+
         });
 
         // Accountancy

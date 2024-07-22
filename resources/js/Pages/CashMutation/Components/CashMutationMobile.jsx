@@ -8,7 +8,7 @@ export default function CashMutationMobile({ cashMutation, role, handleDelete })
     return (
         <div className=' text-gray-900 py-2 px-3 border flex gap-5 justify-between'>
             <div className='text-start my-auto w-1/2'>
-                <div className='text-xs'>{dayjs(cashMutation.date).format('MMM DD, YYYY')}</div>
+                <div className='text-xs'>{dayjs(cashMutation.date).locale('id').format('MMM DD, YYYY')}</div>
                 <div>{cashMutation.no_ref}</div>
                 <div className='text-xs'>{cashMutation.description}</div>
             </div>

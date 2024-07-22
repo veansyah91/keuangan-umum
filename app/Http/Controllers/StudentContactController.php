@@ -109,14 +109,14 @@ class StudentContactController extends Controller
     {
         $user = Auth::user();
 
-        $studentLevel = StudentLevel::whereContactId($contact['id'])->get();
+        $studentsLevel = StudentLevel::whereContactId($contact['id'])->get();
 
         return Inertia::render('Student/Show',[
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'organization' => $organization,
             'contact' => $contact,
             'student' => ContactStudent::whereContactId($contact['id'])->first(),
-            'level' => $studentLevel[0]
+            'levels' => $studentsLevel
         ]);
     }
 
@@ -197,5 +197,15 @@ class StudentContactController extends Controller
         $contact->delete();
 
         return redirect()->back()->with('success', 'Data Siswa Berhasil Dihapus');
+    }
+
+    public function import(Organization $organization)
+    {
+        $user = Auth::user();
+
+        return Inertia::render('Student/Import',[
+            'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+            'organization' => $organization,
+        ]);
     }
 }

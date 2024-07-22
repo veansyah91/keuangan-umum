@@ -11,7 +11,7 @@ export default function JournalDesktop({ journal, className, handleDelete, handl
     return (
         <>
             <tr className={className}>
-                <td>{dayjs(journal.date).format('MMM DD, YYYY')}</td>
+                <td>{dayjs(journal.date).locale('id').format('MMM DD, YYYY')}</td>
                 <td>{journal.no_ref}</td>
                 <td>{journal.description}</td>
                 <td className='text-end'>IDR {formatNumber(journal.value)}</td>

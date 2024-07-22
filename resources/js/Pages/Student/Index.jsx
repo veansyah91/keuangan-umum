@@ -22,6 +22,7 @@ import DangerButton from '@/Components/DangerButton';
 import { usePrevious } from 'react-use';
 import StudentMobile from './Components/StudentMobile';
 import StudentDesktop from './Components/StudentDesktop';
+import SuccessButton from '@/Components/SuccessButton';
 
 export default function Index({ role, organization, contacts, searchFilter }) {
     // State
@@ -152,9 +153,14 @@ export default function Index({ role, organization, contacts, searchFilter }) {
                 <TitleDesktop>
                     <div className='my-auto w-7/12'>
                         {role !== 'viewer' && (
-                            <Link href={route('data-master.students.create', organization.id)}>
-                                <PrimaryButton className='py-3'>Tambah Data</PrimaryButton>
-                            </Link>
+                            <div className='space-x-2'>
+                                <Link href={route('data-master.students.create', organization.id)}>
+                                    <PrimaryButton className='py-3'>Tambah Data</PrimaryButton>
+                                </Link>
+                                <Link href={route('data-master.students.import', organization.id)}>
+                                    <SuccessButton className='py-3'>Import Data (.csv)</SuccessButton>
+                                </Link>
+                            </div>
                         )}
                     </div>
                     <div className='w-3/12 border flex rounded-lg'>

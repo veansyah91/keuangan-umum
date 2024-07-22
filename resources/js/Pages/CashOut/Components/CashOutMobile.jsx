@@ -8,7 +8,7 @@ export default function CashOutMobile({ cashOut, role, handleDelete }) {
     return (
         <div className=' text-gray-900 py-2 px-3 border flex gap-5 justify-between'>
             <div className='text-start my-auto w-1/2'>
-                <div className='text-xs'>{dayjs(cashOut.date).format('MMM DD, YYYY')}</div>
+                <div className='text-xs'>{dayjs(cashOut.date).locale('id').format('MMM DD, YYYY')}</div>
                 <div>{cashOut.no_ref}</div>
                 <div className='text-xs'>{cashOut.description}</div>
             </div>

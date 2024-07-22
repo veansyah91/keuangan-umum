@@ -8,7 +8,7 @@ export default function JournalMobile({ journal, role, handleDelete }) {
     return (
         <div className=' text-gray-900 py-2 px-3 border flex gap-5 justify-between'>
             <div className='text-start my-auto w-1/2'>
-                <div className='text-xs'>{dayjs(journal.date).format('MMM DD, YYYY')}</div>
+                <div className='text-xs'>{dayjs(journal.date).locale('id').format('MMM DD, YYYY')}</div>
                 <div>{journal.no_ref}</div>
                 <div className='text-xs'>{journal.description}</div>
             </div>
