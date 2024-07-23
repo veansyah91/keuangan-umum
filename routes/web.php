@@ -202,13 +202,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
             // Student
             Route::get('/students', [StudentContactController::class, 'index'])->name('data-master.students');
             Route::get('/students/create', [StudentContactController::class, 'create'])->name('data-master.students.create');
+            Route::get('/students/import', [StudentContactController::class, 'importStudent'])->name('data-master.students.import');
+            Route::post('/students/import', [StudentContactController::class, 'storeImportStudent'])->name('data-master.students.import.post');
+            Route::get('/students/download-template', [StudentContactController::class, 'downloadTemplate'])->name('data-master.students.download-template');
             Route::get('/students/{contact}', [StudentContactController::class, 'show'])->name('data-master.students.show');
             Route::get('/students/{contact}/edit', [StudentContactController::class, 'edit'])->name('data-master.students.edit');
             Route::post('/students', [StudentContactController::class, 'store'])->name('data-master.students.post');
             Route::patch('/students/{contact}', [StudentContactController::class, 'update'])->name('data-master.students.update');
             Route::delete('/students/{contact}', [StudentContactController::class, 'destroy'])->name('data-master.students.destroy');
-
-            Route::get('/students/import', [StudentContactController::class, 'import'])->name('data-master.students.import');
 
         });
 

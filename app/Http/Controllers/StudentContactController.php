@@ -14,6 +14,7 @@ use App\Models\ContactCategory;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\ContactCategoryHelper;
 use App\Repositories\Log\LogRepository;
+use Illuminate\Support\Facades\Storage;
 use App\Repositories\User\UserRepository;
 use Illuminate\Database\Eloquent\Builder;
 use App\Repositories\ContactCategory\ContactCategoryRepository;
@@ -199,7 +200,7 @@ class StudentContactController extends Controller
         return redirect()->back()->with('success', 'Data Siswa Berhasil Dihapus');
     }
 
-    public function import(Organization $organization)
+    public function importStudent(Organization $organization)
     {
         $user = Auth::user();
 
@@ -207,5 +208,16 @@ class StudentContactController extends Controller
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'organization' => $organization,
         ]);
+    }
+
+    public function downloadTemplate()
+    {
+        $disk = 'local'; // Atau 'sftp' atau disk lainnya
+        $filename = 'public/templates/student.csv';
+
+        if (!Storage::disk($disk)->exists($filename)) {
+            abort(404, 'File not found.');
+        }
+        return Storage::disk($disk)->download($filename);
     }
 }
