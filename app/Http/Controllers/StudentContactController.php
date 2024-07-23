@@ -220,4 +220,15 @@ class StudentContactController extends Controller
         }
         return Storage::disk($disk)->download($filename);
     }
+
+    public function storeImportStudent(Request $request, Organization $organization)
+    {
+
+        $validated = $request->validate([
+            'students' => ['required','file','mimes:csv,xlsx,xls'],
+        ]);
+
+        $file = $request->file('students');
+        dd($validated);
+    }
 }
