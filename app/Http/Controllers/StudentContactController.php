@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Throwable;
 use Inertia\Inertia;
 use Inertia\Response;
 use App\Models\Cashin;
@@ -10,8 +11,10 @@ use App\Models\Organization;
 use App\Models\StudentLevel;
 use Illuminate\Http\Request;
 use App\Models\ContactStudent;
+use App\Imports\StudentsImport;
 use App\Models\ContactCategory;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Helpers\ContactCategoryHelper;
 use App\Repositories\Log\LogRepository;
 use Illuminate\Support\Facades\Storage;
@@ -225,10 +228,23 @@ class StudentContactController extends Controller
     {
 
         $validated = $request->validate([
-            'students' => ['required','file','mimes:csv,xlsx,xls'],
+            'students' => [
+                'required',
+                'file',
+                // 'mimes:csv,xlsx,xls'
+            ],
         ]);
 
         $file = $request->file('students');
+
+        // Excel::import(new StudentsImport, $file);
+        Excel::import(new StudentsImport($organization['id']), $file);
+
+        try {
+            Excel::import(new StudentsImport($organization['id']), $file);
+        } catch (Throwable $th) {
+            abort(503, 'Something Wrong');
+        }
         dd($validated);
     }
 }

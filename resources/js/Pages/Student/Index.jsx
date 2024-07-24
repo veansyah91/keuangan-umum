@@ -157,9 +157,9 @@ export default function Index({ role, organization, contacts, searchFilter }) {
                                 <Link href={route('data-master.students.create', organization.id)}>
                                     <PrimaryButton className='py-3'>Tambah Data</PrimaryButton>
                                 </Link>
-                                <Link href={route('data-master.students.import', organization.id)}>
+                                {/* <Link href={route('data-master.students.import', organization.id)}>
                                     <SuccessButton className='py-3'>Import Data (.csv)</SuccessButton>
-                                </Link>
+                                </Link> */}
                             </div>
                         )}
                     </div>
