@@ -24,8 +24,18 @@ class StudentsImport implements ToCollection, WithChunkReading, ShouldQueue
     {
         foreach ($rows as $key => $row) 
         {
+            // $contact = Contact::create([
+            //     'organization_id' => $this->organization,
+            //     'name' => $row[0],
+            //     'phone' => $row[1],
+            //     'alamat' => $row[2],
+            // ]);
             if ($key > 0) {
                 // dd($this->organization);
+                $validated = $row->validate([
+                    0 => 'required|string'
+                ]);
+                dd($validated);
                 $contact = Contact::create([
                     'organization_id' => $this->organization,
                     'name' => $row[0],
