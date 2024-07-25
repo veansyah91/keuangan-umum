@@ -95,6 +95,11 @@ class ContactCategoryController extends Controller
             ],
         ]);
 
+        if ($validator->fails()) {
+            // Handle validation failure
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
         $validated = $validator->validated();
 
         $contactCategory->update($validated);

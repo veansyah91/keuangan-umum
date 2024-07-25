@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+use App\Models\StudentEntryPaymentCategory;
+use App\Repositories\Log\LogRepository;
+use App\Repositories\User\UserRepository;
 use Inertia\Inertia;
 use App\Models\Organization;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use App\Models\StudentPaymentCategory;
-use App\Repositories\Log\LogRepository;
-use App\Repositories\User\UserRepository;
 
-class StudentPaymentCategoryController extends Controller
+class StudentEntryPaymentCategoryController extends Controller
 {
     protected $userRepository;
 
@@ -27,9 +27,9 @@ class StudentPaymentCategoryController extends Controller
     {
         $user = Auth::user();
 
-        return Inertia::render('Student-Payment-Category/Index', [
+        return Inertia::render('Student-Entry-Payment-Category/Index', [
             'organization' => $organization,
-            'studentPaymentCategories' => StudentPaymentCategory::filter(request(['search']))
+            'studentPaymentCategories' => StudentEntryPaymentCategory::filter(request(['search']))
                                                 ->whereOrganizationId($organization['id'])
                                                 ->paginate(50),
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
@@ -64,12 +64,12 @@ class StudentPaymentCategoryController extends Controller
         $validated = $validator->validated();
         $validated['organization_id'] = $organization['id'];
 
-        StudentPaymentCategory::create($validated);
+        StudentEntryPaymentCategory::create($validated);
 
         return redirect()->back()->with('success', 'Kategori Berhasil Ditambahkan');
     }
 
-    public function update(Request $request, Organization $organization, StudentPaymentCategory $studentPaymentCategory)
+    public function update(Request $request, Organization $organization, StudentEntryPaymentCategory $studentEntryPaymentCategory)
     {
         $validator = Validator::make($request->all(), [
             'name' => [
@@ -77,7 +77,7 @@ class StudentPaymentCategoryController extends Controller
                 'string',
                 Rule::unique('student_payment_categories')->where(function ($query) use ($organization) {
                     return $query->where('organization_id', $organization['id']);
-                })->ignore($studentPaymentCategory['id']),
+                })->ignore($studentEntryPaymentCategory['id']),
             ],
             'value' => [
                 'required',
@@ -96,16 +96,16 @@ class StudentPaymentCategoryController extends Controller
 
         $validated = $validator->validated();
         
-        $studentPaymentCategory->update($validated);
+        $studentEntryPaymentCategory->update($validated);
 
         return redirect()->back()->with('success', 'Kategori Berhasil Diubah');
     }
 
-    public function destroy(Organization $organization, StudentPaymentCategory $studentPaymentCategory)
+    public function destroy(Organization $organization, StudentEntryPaymentCategory $studentEntryPaymentCategory)
     {
         // cek penggunaan
 
-        $studentPaymentCategory->delete();
+        $studentEntryPaymentCategory->delete();
         return redirect()->back()->with('success', 'Kategori Berhasil Dihapus');
 
     }

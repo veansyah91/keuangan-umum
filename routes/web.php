@@ -38,7 +38,9 @@ use App\Http\Controllers\FixedAssetCategoryController;
 use App\Http\Controllers\OrganizationInvoiceController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\OrganizationMenuController;
+use App\Http\Controllers\StudentPaymentCategoryController;
 use App\Http\Controllers\Admin\AdminOrganizationController;
+use App\Http\Controllers\StudentEntryPaymentCategoryController;
 use App\Http\Controllers\Admin\AdminOrganizationInvoiceController;
 
 /*
@@ -212,7 +214,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::delete('/students/{contact}', [StudentContactController::class, 'destroy'])->name('data-master.students.destroy');
 
             // Student Payment Category
+            Route::get('/student-payment-category', [StudentPaymentCategoryController::class, 'index'])->name('data-master.student-payment-category');
+            Route::post('/student-payment-category', [StudentPaymentCategoryController::class, 'store'])->name('data-master.student-payment-category.store');
+            Route::patch('/student-payment-category/{studentPaymentCategory}', [StudentPaymentCategoryController::class, 'update'])->name('data-master.student-payment-category.update');
+            Route::delete('/student-payment-category/{studentPaymentCategory}', [StudentPaymentCategoryController::class, 'destroy'])->name('data-master.student-payment-category.destroy');
 
+            // Student Entry Payment Category
+            // Student Payment Category
+            Route::get('/student-entry-payment-category', [StudentEntryPaymentCategoryController::class, 'index'])->name('data-master.student-entry-payment-category');
+            Route::post('/student-entry-payment-category', [StudentEntryPaymentCategoryController::class, 'store'])->name('data-master.student-entry-payment-category.store');
+            Route::patch('/student-entry-payment-category/{studentEntryPaymentCategory}', [StudentEntryPaymentCategoryController::class, 'update'])->name('data-master.student-entry-payment-category.update');
+            Route::delete('/student-entry-payment-category/{studentEntryPaymentCategory}', [StudentEntryPaymentCategoryController::class, 'destroy'])->name('data-master.student-entry-payment-category.destroy');
         });
 
         // Accountancy

@@ -12,8 +12,9 @@ import { TbBuildingCommunity } from 'react-icons/tb';
 import { BsBuildings } from 'react-icons/bs';
 import { IoMdPeople } from 'react-icons/io';
 import { FaPeopleGroup } from 'react-icons/fa6';
-import { BiDetail } from "react-icons/bi";
+import { BiCategory, BiDetail } from "react-icons/bi";
 import { ToastContainer, toast } from 'react-toastify';
+import { RiFileListLine } from 'react-icons/ri';
 
 
 export default function Index({ organization }) {
@@ -87,11 +88,18 @@ export default function Index({ organization }) {
                                     title={'Data Siswa'} 
                                 />
                             </Link>
-                            <Link href={route('cashflow.cash-in', organization.id)}>
+                            <Link href={route('data-master.student-payment-category', organization.id)}>
                                 <CardMenu 
                                     bgColor={'bg-orange-900'} 
                                     icon={<BiDetail />} 
                                     title={'Rincian Biaya Bulanan'} 
+                                />
+                            </Link>
+                            <Link href={route('data-master.student-entry-payment-category', organization.id)}>
+                                <CardMenu 
+                                    bgColor={'bg-slate-900'} 
+                                    icon={<BiCategory />} 
+                                    title={'Rincian Biaya Masuk'} 
                                 />
                             </Link>
                         </div>
@@ -103,14 +111,18 @@ export default function Index({ organization }) {
                         <div className='flex justify-center gap-6'>
                             <Link 
                                 href={route('cashflow.cash-in', organization.id)}
-                                onError={error => {
-
-                                }}
                             >
                                 <CardMenu 
                                     bgColor={'bg-cyan-900'} 
                                     icon={<FaPeopleGroup />} 
-                                    title={'Data Guru'} 
+                                    title={'Data staff'} 
+                                />
+                            </Link>
+                            <Link href={route('data-master.student-entry-payment-category', organization.id)}>
+                                <CardMenu 
+                                    bgColor={'bg-rose-700'} 
+                                    icon={<RiFileListLine />} 
+                                    title={'Rincian Penggajian'} 
                                 />
                             </Link>
                         </div>
@@ -120,29 +132,31 @@ export default function Index({ organization }) {
             {/* Desktop */}
 
             {/* Mobile */}
-            <div className='sm:hidden flex flex-wrap pt-14 pb-5 px-2 mx-auto bg-white gap-2 w-full justify-center'>
-                <Link href={route('data-master.contact-category', organization.id)}>
-                    <CardMenu bgColor={'bg-cyan-500'} icon={<IoIdCardOutline />} title={'Data Kategori Kontak'} />
-                </Link>
-                <Link href={route('data-master.contact', organization.id)}>
-                    <CardMenu bgColor={'bg-orange-500'} icon={<IoPeopleOutline />} title={'Data Kontak'} />
-                </Link>
-                <Link href={route('data-master.project', organization.id)}>
-                    <CardMenu bgColor={'bg-emerald-500'} icon={<MdChecklist />} title={'Data Proyek'} />
-                </Link>
-                <Link href={route('data-master.program', organization.id)}>
-                    <CardMenu bgColor={'bg-red-500'} icon={<LiaClipboardListSolid />} title={'Data Program Kegiatan'} />
-                </Link>
-                <Link href={route('data-master.department', organization.id)}>
-                    <CardMenu bgColor={'bg-slate-500'} icon={<CgListTree />} title={'Data Departemen'} />
-                </Link>
-                <Link href={route('data-master.fixed-asset-category', organization.id)}>
-                    <CardMenu bgColor={'bg-blue-500'} icon={<TbBuildingCommunity />} title={'Kelompok Harta Tetap'} />
-                </Link>
-                <Link href={route('data-master.fixed-asset', organization.id)}>
-                    <CardMenu bgColor={'bg-rose-500'} icon={<BsBuildings />} title={'Data Harta Tetap'} />
-                </Link>
-            </div>
+            <section>
+                <div className='sm:hidden flex flex-wrap pt-14 pb-5 px-2 mx-auto bg-white gap-2 w-full justify-center'>
+                    <Link href={route('data-master.contact-category', organization.id)}>
+                        <CardMenu bgColor={'bg-cyan-500'} icon={<IoIdCardOutline />} title={'Data Kategori Kontak'} />
+                    </Link>
+                    <Link href={route('data-master.contact', organization.id)}>
+                        <CardMenu bgColor={'bg-orange-500'} icon={<IoPeopleOutline />} title={'Data Kontak'} />
+                    </Link>
+                    <Link href={route('data-master.project', organization.id)}>
+                        <CardMenu bgColor={'bg-emerald-500'} icon={<MdChecklist />} title={'Data Proyek'} />
+                    </Link>
+                    <Link href={route('data-master.program', organization.id)}>
+                        <CardMenu bgColor={'bg-red-500'} icon={<LiaClipboardListSolid />} title={'Data Program Kegiatan'} />
+                    </Link>
+                    <Link href={route('data-master.department', organization.id)}>
+                        <CardMenu bgColor={'bg-slate-500'} icon={<CgListTree />} title={'Data Departemen'} />
+                    </Link>
+                    <Link href={route('data-master.fixed-asset-category', organization.id)}>
+                        <CardMenu bgColor={'bg-blue-500'} icon={<TbBuildingCommunity />} title={'Kelompok Harta Tetap'} />
+                    </Link>
+                    <Link href={route('data-master.fixed-asset', organization.id)}>
+                        <CardMenu bgColor={'bg-rose-500'} icon={<BsBuildings />} title={'Data Harta Tetap'} />
+                    </Link>
+                </div>
+            </section>
             {/* Mobile */}
         </>
     );

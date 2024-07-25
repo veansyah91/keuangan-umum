@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('student_payment_categories', function (Blueprint $table) {
+        Schema::create('contact_staff', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('organization_id')->constrained()->cascadeOnDelete();
-            $table->string('name');
-            $table->bigInteger('value')->default(0);
-            $table->boolean('is_active')->default(true);
+            $table->unsignedBigInteger('contact_id');
+            $table->foreign('contact_id')->references('id')->on('users');
+            $table->year('entry_year');
+            $table->string('description')->nullable();
+            $table->string('position')->nullable();
             $table->timestamps();
         });
     }
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('student_payment_categories');
+        Schema::dropIfExists('contact_staff');
     }
 };
