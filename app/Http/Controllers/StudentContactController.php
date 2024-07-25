@@ -237,14 +237,12 @@ class StudentContactController extends Controller
 
         $file = $request->file('students');
 
-        // Excel::import(new StudentsImport, $file);
-        // Excel::import(new StudentsImport($organization['id']), $file);
-
         try {
             Excel::import(new StudentsImport($organization['id']), $file);
         } catch (Throwable $th) {
             abort(503, 'Something Wrong');
         }
-        dd($validated);
+        
+        return redirect()->back()->with('success', "Import data siswa Berhasil");
     }
 }

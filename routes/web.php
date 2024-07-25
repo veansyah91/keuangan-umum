@@ -211,6 +211,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::patch('/students/{contact}', [StudentContactController::class, 'update'])->name('data-master.students.update');
             Route::delete('/students/{contact}', [StudentContactController::class, 'destroy'])->name('data-master.students.destroy');
 
+            // Student Payment Category
+
         });
 
         // Accountancy

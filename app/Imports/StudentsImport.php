@@ -2,7 +2,11 @@
 
 namespace App\Imports;
 
+use Carbon\Carbon;
 use App\Models\Contact;
+use App\Models\StudentLevel;
+use App\Models\ContactStudent;
+use App\Models\ContactCategory;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Maatwebsite\Excel\Concerns\ToCollection;
@@ -15,6 +19,15 @@ class StudentsImport implements ToCollection, WithChunkReading, ShouldQueue
     {
         $this->organization = $organization;
     }
+
+    public function studyYear()
+    {
+        $date = Carbon::now();
+        $month = $date->month;
+        $year = $date->year;
+
+        return $month < 7 ? $year - 1 . "/" . $year : $year . "/" . $year + 1;
+    }
     /**
     * @param array $row
     *
@@ -24,24 +37,34 @@ class StudentsImport implements ToCollection, WithChunkReading, ShouldQueue
     {
         foreach ($rows as $key => $row) 
         {
-            // $contact = Contact::create([
-            //     'organization_id' => $this->organization,
-            //     'name' => $row[0],
-            //     'phone' => $row[1],
-            //     'alamat' => $row[2],
-            // ]);
+            $contactCategory = ContactCategory::whereOrganizationId($this->organization)
+                                                ->whereName('SISWA')
+                                                ->first();
+                                                
             if ($key > 0) {
-                // dd($this->organization);
-                $validated = $row->validate([
-                    0 => 'required|string'
-                ]);
-                dd($validated);
                 $contact = Contact::create([
                     'organization_id' => $this->organization,
-                    'name' => $row[0],
+                    'name' => strtoupper($row[0]),
                     'phone' => $row[1],
-                    'alamat' => $row[2],
+                    'alamat' => strtoupper($row[2]),
                 ]);
+
+                $contact->contactCategories()->attach(['category' => $contactCategory['id']]);
+
+                $contactStudent = ContactStudent::create([
+                    'contact_id' => $contact['id'],
+                    'father_name' => strtoupper($row[6]),
+                    'mother_name' => strtoupper($row[7]),
+                    'entry_year' => $row[3],
+                    'no_ref' => strtoupper($row[4]),
+                ]);
+
+                $studentLevel = StudentLevel::create([
+                    'contact_id' => $contact['id'],
+                    'level' => $row[5],
+                    'year' => $this->studyYear()
+                ]);
+
             }
         }
     }

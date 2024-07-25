@@ -3,6 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
 import { Head, Link, useForm } from '@inertiajs/react';
 
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { IoArrowBackOutline } from 'react-icons/io5';
@@ -31,7 +32,14 @@ export default function Import({ organization }) {
 
         post(route('data-master.students.import.post', organization.id), {
             onSuccess: ({ props }) => {
+                console.log(props);
+                const { flash } = props;
 
+                toast.success(flash.success, {
+                    position: toast.POSITION.TOP_CENTER,
+                });
+                
+                reset();
             },
             onError: errors => {
                 console.log(errors);
@@ -43,6 +51,8 @@ export default function Import({ organization }) {
         <>
             <Head title='Impor Data Siswa' />
 
+            <ToastContainer />
+
             <div className='sm:pt-0 pb-16 pt-12'>
                 <div className='bg-white py-5 px-2 sm:pt-0'>
                     <div className='w-full sm:w-2/3 sm:mt-2 sm:py-5 space-y-5'>
@@ -52,7 +62,7 @@ export default function Import({ organization }) {
                                     <a 
                                         target='_blank'
                                         type={'button'}
-                                        href={'https://drive.google.com/file/d/171fMN6gRNGvwvZQ4wdXQ3h2yrYRXP_kl/view?usp=sharing'}
+                                        href={'https://drive.google.com/file/d/1GT3KmLUS8WYM2UCQA4wi08cKFDWNngfZ/view?usp=sharing'}
                                     >
                                         <SuccessButton>
                                             <div className='flex gap-2 my-auto'>
