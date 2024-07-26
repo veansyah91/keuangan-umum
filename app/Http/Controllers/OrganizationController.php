@@ -570,7 +570,7 @@ class OrganizationController extends Controller
         $contactCategories = [
             'UMUM',
             'SISWA',
-            'STAFF'
+            'STAF'
         ];
 
         foreach ($contactCategories as $contactCategory) {
