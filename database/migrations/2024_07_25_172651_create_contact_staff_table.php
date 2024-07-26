@@ -18,6 +18,7 @@ return new class extends Migration
             $table->year('entry_year');
             $table->string('description')->nullable();
             $table->string('position')->nullable();
+            $table->string('no_ref')->nullable();
             $table->timestamps();
         });
     }

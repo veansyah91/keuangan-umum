@@ -7,6 +7,8 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import { IoArrowBackOutline } from 'react-icons/io5';
 import dayjs from 'dayjs';
+import BadgeSuccess from '@/Components/Badges/BadgeSuccess';
+import BadgeDanger from '@/Components/Badges/BadgeDanger';
 
 export default function Show({ organization, contact, student, levels }) {
     return (
@@ -52,7 +54,7 @@ export default function Show({ organization, contact, student, levels }) {
                                 <div className='sm:w-1/3 font-bold'>Tanggal Lahir</div>
                                 <div className='sm:w-2/3 flex gap-1'>
                                     <span className='hidden sm:block'>:</span>
-                                    {dayjs(student.birthday).locale('id').format('MMMM YYYY, DD')}
+                                    { student.birthday ? dayjs(student.birthday).locale('id').format('MMMM YYYY, DD') : '-'}
                                 </div>
                             </div>
                         </div>
@@ -98,6 +100,19 @@ export default function Show({ organization, contact, student, levels }) {
                                 <div className='sm:w-2/3 flex gap-1'>
                                     <span className='hidden sm:block'>:</span>
                                     {contact.description}
+                                </div>
+                            </div>
+                        </div>
+                        <div className='sm:w-2/3 sm:mx-auto px-3 sm:px-0 space-y-5'>
+                            <div className='flex flex-col sm:flex-row justify-between gap-1'>
+                                <div className='sm:w-1/3 font-bold'>Status</div>
+                                <div className='sm:w-2/3 flex gap-1'>
+                                    <span className='hidden sm:block'>:</span>
+                                    {
+                                        contact.is_active 
+                                        ? <BadgeSuccess>Aktif</BadgeSuccess>
+                                        : <BadgeDanger>Tidak Aktif</BadgeDanger>
+                                    }
                                 </div>
                             </div>
                         </div>

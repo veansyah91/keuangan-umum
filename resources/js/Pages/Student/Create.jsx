@@ -18,7 +18,7 @@ import studyYear from '@/Utils/studyYear';
 const yearList = () => {
     const now = dayjs().year();
 
-    const start = now - 10;
+    const start = now - 20;
 
     let arrayYear = [];
 
@@ -41,12 +41,6 @@ const levelArr = () => {
 
     return levelArr;
 }
-
-// const studyYear = () => {
-//     const now = dayjs();
-
-//     return now.month() < 6 ? `${now.year()-1}/${now.year()}` : `${now.year()}/${now.year()+1}`;
-// }
 
 export default function Create({ organization, category }) {
     // state

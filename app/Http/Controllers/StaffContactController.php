@@ -2,7 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use Inertia\Inertia;
+use App\Models\Cashout;
+use App\Models\Contact;
+use App\Models\ContactStaff;
+use App\Models\Organization;
 use Illuminate\Http\Request;
+use App\Models\ContactCategory;
+use Illuminate\Support\Facades\Auth;
 use App\Repositories\Log\LogRepository;
 use App\Repositories\User\UserRepository;
 
@@ -16,5 +23,98 @@ class StaffContactController extends Controller
     {
         $this->userRepository = $userRepository;
         $this->logRepository = $logRepository;
+    }
+
+    public function index(Organization $organization)
+    {
+        $user = Auth::user();
+
+        $contactCategory = ContactCategory::whereOrganizationId($organization['id'])
+                                            ->whereName('STAF')
+                                            ->first();
+
+        if (!$contactCategory) {
+            return redirect()->back()->withErrors(['message' => 'Silakan Buat Kategori Kontak STAF terlebih dahulu!']);
+        }
+
+        $contacts = Contact::filter(request(['search']))
+                            ->whereOrganizationId($organization['id'])
+                            ->with('contactCategories', 'staff')
+                            ->whereHas('contactCategories', function ($query) use ($contactCategory){
+                                $query->where('contact_category_id', $contactCategory['id']);
+                            })
+                            ->orderBy('name')
+                            ->paginate(50);
+        
+        return Inertia::render('Staff/Index', [
+            'organization' => $organization,
+            'contacts' => $contacts,
+            'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+            'searchFilter' => request('search'),
+            'category' => $contactCategory
+        ]);
+    }
+
+    public function store(Request $request, Organization $organization)
+    {
+        $validated = $request->validate([
+            'name' => "required|string",
+            'phone' => "string|nullable",
+            'address' => "string|nullable",
+            'description' => 'string|nullable',
+            'no_ref' => 'string|nullable',
+            'position' => 'string|nullable',
+            'entry_year' => 'numeric|required',
+            'category' => ['required', 'exists:contact_categories,id']
+        ]);
+
+        $validated['organization_id'] = $organization['id'];
+
+        // store to contacts table
+        $contact = Contact::create($validated);
+        $contact->contactCategories()->attach($validated['category']);
+
+        $validated['contact_id'] = $contact['id'];
+        
+        // store to contact_students table
+        $contactStudent = ContactStaff::create($validated);
+        
+        return redirect()->back()->with('success', 'Data Staf Berhasil Disimpan');
+    }
+
+    public function update(Request $request, Organization $organization, Contact $contact)
+    {
+        $validated = $request->validate([
+            'name' => "required|string",
+            'phone' => "string|nullable",
+            'address' => "string|nullable",
+            'description' => 'string|nullable',
+            'no_ref' => 'string|nullable',
+            'position' => 'string|nullable',
+            'entry_year' => 'numeric|required',
+            'is_active' => 'boolean|required'
+        ]);
+
+        $contact->update($validated);
+
+        $contactStaff = ContactStaff::whereContactId($contact['id'])->first();
+
+        $contactStaff->update($validated);
+
+        return redirect()->back()->with('success', 'Data Staf Berhasil Diubah');
+    }
+
+    public function destroy(Organization $organization, Contact $contact)
+    {
+        // cek kontak
+        $cashOut = Cashout::whereContactId($contact['id'])->first();
+
+        if ($cashOut) {
+            return redirect()->back()->withErrors(['message' => 'Tidak dapat menghapus Data Staf']);
+        }
+
+        $contact->delete();
+
+        return redirect()->back()->with('success', 'Data Staf Berhasil Dihapus');
     }
 }

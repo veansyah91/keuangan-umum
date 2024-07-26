@@ -50,35 +50,35 @@ class SchoolAccountSeeder extends Seeder
 				'name' => 'PIUTANG IURAN MASUK SISWA',
 			],
 			[
-        'category_name' => 'PIUTANG SISWA',
-        'code' => '121000001',
-        'name' => 'PIUTANG IURAN BULANAN SISWA',
+				'category_name' => 'PIUTANG SISWA',
+				'code' => '121000001',
+				'name' => 'PIUTANG IURAN BULANAN SISWA',
 			],
 			[
-        'category_name' => 'PENDAPATAN IURAN BULANAN SISWA DITERIMA DI MUKA',
-        'code' => '221000000',
-        'name' => 'PENDAPATAN IURAN BULANAN SISWA DITERIMA DI MUKA',
+				'category_name' => 'PENDAPATAN IURAN BULANAN SISWA DITERIMA DI MUKA',
+				'code' => '221000000',
+				'name' => 'PENDAPATAN IURAN BULANAN SISWA DITERIMA DI MUKA',
 			],
 			[
-        'category_name' => 'PENDAPATAN IURAN BULANAN SISWA',
-        'code' => '430000000',
-        'name' => 'PENDAPATAN IURAN BULANAN SISWA',
+				'category_name' => 'PENDAPATAN IURAN BULANAN SISWA',
+				'code' => '430000000',
+				'name' => 'PENDAPATAN IURAN BULANAN SISWA',
 			],
 			[
-        'category_name' => 'PENDAPATAN IURAN MASUK SISWA',
-        'code' => '431000000',
-        'name' => 'PENDAPATAN IURAN MASUK SISWA',
+				'category_name' => 'PENDAPATAN IURAN MASUK SISWA',
+				'code' => '431000000',
+				'name' => 'PENDAPATAN IURAN MASUK SISWA',
 			],
 			[
-        'category_name' => 'BEBAN OPERASIONAL',
-        'code' => '620000001',
-        'name' => 'BEBAN GAJI GURU',
+				'category_name' => 'BEBAN OPERASIONAL',
+				'code' => '620000001',
+				'name' => 'BEBAN GAJI STAF',
 			],
 		]);
 		
 		$contactCategoriesData = collect([
 			'SISWA',
-			'GURU'
+			'STAF'
 		]);
 
 		foreach ($organizations as $organization) {

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\ContactStaff;
 use App\Models\StudentLevel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -23,6 +24,11 @@ class Contact extends Model
     public function student(): HasOne
     {
         return $this->hasOne(ContactStudent::class);
+    }
+
+    public function staff(): HasOne
+    {
+        return $this->hasOne(ContactStaff::class);
     }
 
     public function levels(): HasMany

@@ -23,6 +23,7 @@ use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\AffiliationController;
 use App\Http\Controllers\CashMutationController;
 use App\Http\Controllers\OrganizationController;
+use App\Http\Controllers\StaffContactController;
 use App\Http\Controllers\Admin\RegencyController;
 use App\Http\Controllers\Admin\VillageController;
 use App\Http\Controllers\Admin\DistrictController;
@@ -220,11 +221,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::delete('/student-payment-category/{studentPaymentCategory}', [StudentPaymentCategoryController::class, 'destroy'])->name('data-master.student-payment-category.destroy');
 
             // Student Entry Payment Category
-            // Student Payment Category
             Route::get('/student-entry-payment-category', [StudentEntryPaymentCategoryController::class, 'index'])->name('data-master.student-entry-payment-category');
             Route::post('/student-entry-payment-category', [StudentEntryPaymentCategoryController::class, 'store'])->name('data-master.student-entry-payment-category.store');
             Route::patch('/student-entry-payment-category/{studentEntryPaymentCategory}', [StudentEntryPaymentCategoryController::class, 'update'])->name('data-master.student-entry-payment-category.update');
             Route::delete('/student-entry-payment-category/{studentEntryPaymentCategory}', [StudentEntryPaymentCategoryController::class, 'destroy'])->name('data-master.student-entry-payment-category.destroy');
+
+            // Staff Contact
+            Route::get('/staff', [StaffContactController::class, 'index'])->name('data-master.staff');
+            Route::get('/staff/import', [StaffContactController::class, 'importStaff'])->name('data-master.staff.import');
+            Route::post('/staff/import', [StaffContactController::class, 'storeImportStaff'])->name('data-master.staff.import.post');
+            Route::post('/staff', [StaffContactController::class, 'store'])->name('data-master.staff.store');
+            Route::patch('/staff/{contact}', [StaffContactController::class, 'update'])->name('data-master.staff.update');
+            Route::delete('/staff/{contact}', [StaffContactController::class, 'destroy'])->name('data-master.staff.destroy');
+
         });
 
         // Accountancy

@@ -13,6 +13,7 @@ class ContactStaff extends Model
         'contact_id',
         'entry_year',
         'description',
-        'position'
+        'position',
+        'no_ref'
     ];
 }

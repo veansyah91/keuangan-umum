@@ -106,16 +106,16 @@ export default function Index({ organization }) {
                     </section>  
                     <section className='pt-2 pb-10 space-y-3'>
                         <div className='text-center font-bold'>
-                            Staff / Guru
+                            Staff
                         </div>
                         <div className='flex justify-center gap-6'>
                             <Link 
-                                href={route('cashflow.cash-in', organization.id)}
+                                href={route('data-master.staff', organization.id)}
                             >
                                 <CardMenu 
                                     bgColor={'bg-cyan-900'} 
                                     icon={<FaPeopleGroup />} 
-                                    title={'Data staff'} 
+                                    title={'Data Staf'} 
                                 />
                             </Link>
                             <Link href={route('data-master.student-entry-payment-category', organization.id)}>

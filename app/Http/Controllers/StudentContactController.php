@@ -47,9 +47,7 @@ class StudentContactController extends Controller
         
         $contacts = Contact::filter(request(['search']))
                             ->whereOrganizationId($organization['id'])
-                            ->with('contactCategories')
-                            ->with('student')
-                            ->with('levels')
+                            ->with(['contactCategories', 'student', 'levels'])
                             ->whereHas('contactCategories', function ($query) use ($contactCategory){
                                 $query->where('contact_category_id', $contactCategory['id']);
                             })

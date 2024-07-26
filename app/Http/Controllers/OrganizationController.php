@@ -371,7 +371,7 @@ class OrganizationController extends Controller
         [
             'category_name' => 'BEBAN OPERASIONAL',
             'code' => '620000001',
-            'name' => 'BEBAN GAJI GURU',
+            'name' => 'BEBAN GAJI STAF',
         ],
         [
             'category_name' => 'BEBAN PENYUSUTAN',
@@ -558,7 +558,7 @@ class OrganizationController extends Controller
                 if ($account['name'] == 'PENDAPATAN IURAN MASUK SISWA') {
                     $attribute['entry_student'] = $account['id'];
                 }
-                if ($account['name'] == 'BEBAN GAJI GURU') {
+                if ($account['name'] == 'BEBAN GAJI STAF') {
                     $attribute['staff_salary_expense'] = $account['id'];
                 }
             }
@@ -570,7 +570,7 @@ class OrganizationController extends Controller
         $contactCategories = [
             'UMUM',
             'SISWA',
-            'GURU'
+            'STAFF'
         ];
 
         foreach ($contactCategories as $contactCategory) {
