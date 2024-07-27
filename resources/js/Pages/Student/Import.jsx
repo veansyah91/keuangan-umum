@@ -32,7 +32,6 @@ export default function Import({ organization }) {
 
         post(route('data-master.students.import.post', organization.id), {
             onSuccess: ({ props }) => {
-                console.log(props);
                 const { flash } = props;
 
                 toast.success(flash.success, {

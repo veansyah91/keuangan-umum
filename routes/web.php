@@ -28,6 +28,7 @@ use App\Http\Controllers\Admin\RegencyController;
 use App\Http\Controllers\Admin\VillageController;
 use App\Http\Controllers\Admin\DistrictController;
 use App\Http\Controllers\Admin\ProvinceController;
+use App\Http\Controllers\SalaryCategoryController;
 use App\Http\Controllers\StudentContactController;
 use App\Http\Controllers\AccountCategoryController;
 use App\Http\Controllers\Admin\AdminUserController;
@@ -233,6 +234,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/staff', [StaffContactController::class, 'store'])->name('data-master.staff.store');
             Route::patch('/staff/{contact}', [StaffContactController::class, 'update'])->name('data-master.staff.update');
             Route::delete('/staff/{contact}', [StaffContactController::class, 'destroy'])->name('data-master.staff.destroy');
+
+            // Salary Category
+            Route::get('/salary-category', [SalaryCategoryController::class, 'index'])->name('data-master.salary-category');
+            Route::post('/salary-category', [SalaryCategoryController::class, 'store'])->name('data-master.salary-category.store');
+            Route::patch('/salary-category/{studentEntryPaymentCategory}', [SalaryCategoryController::class, 'update'])->name('data-master.salary-category.update');
+            Route::delete('/salary-category/{studentEntryPaymentCategory}', [SalaryCategoryController::class, 'destroy'])->name('data-master.salary-category.destroy');
+
 
         });
 

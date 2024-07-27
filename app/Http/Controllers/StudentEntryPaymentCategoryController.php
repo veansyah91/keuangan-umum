@@ -23,6 +23,7 @@ class StudentEntryPaymentCategoryController extends Controller
         $this->userRepository = $userRepository;
         $this->logRepository = $logRepository;
     }
+    
     public function index(Organization $organization)
     {
         $user = Auth::user();

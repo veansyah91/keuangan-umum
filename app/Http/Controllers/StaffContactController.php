@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Inertia\Inertia;
 use App\Models\Cashout;
 use App\Models\Contact;
+use App\Imports\StaffImport;
 use App\Models\ContactStaff;
 use App\Models\Organization;
 use Illuminate\Http\Request;
@@ -12,6 +13,7 @@ use App\Models\ContactCategory;
 use Illuminate\Support\Facades\Auth;
 use App\Repositories\Log\LogRepository;
 use App\Repositories\User\UserRepository;
+use Maatwebsite\Excel\Facades\Excel;
 
 class StaffContactController extends Controller
 {
@@ -116,5 +118,48 @@ class StaffContactController extends Controller
         $contact->delete();
 
         return redirect()->back()->with('success', 'Data Staf Berhasil Dihapus');
+    }
+
+    public function importStaff(Organization $organization)
+    {
+        $user = Auth::user();
+
+        return Inertia::render('Staff/Import',[
+            'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+            'organization' => $organization,
+        ]);
+    }
+
+    public function downloadTemplate()
+    {
+        $disk = 'local'; // Atau 'sftp' atau disk lainnya
+        $filename = 'public/templates/staff.csv';
+
+        if (!Storage::disk($disk)->exists($filename)) {
+            abort(404, 'File not found.');
+        }
+        return Storage::disk($disk)->download($filename);
+    }
+
+    public function storeImportStaff(Request $request, Organization $organization)
+    {
+
+        $validated = $request->validate([
+            'staff' => [
+                'required',
+                'file',
+                // 'mimes:csv,xlsx,xls'
+            ],
+        ]);
+
+        $file = $request->file('staff');
+
+        try {
+            Excel::import(new StaffImport($organization['id']), $file);
+        } catch (Throwable $th) {
+            abort(503, 'Something Wrong');
+        }
+        
+        return redirect()->back()->with('success', "Import data staf Berhasil");
     }
 }

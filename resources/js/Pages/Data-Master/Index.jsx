@@ -68,7 +68,6 @@ export default function Index({ organization }) {
                     </div>
                 </section>
                 <section className='text-center font-bold'>
-                    <div className='uppercase text-xl'>Sekolah</div>
                     <section className='pt-2 pb-10 space-y-3'>
                         <div className='text-center font-bold'>
                             Siswa
@@ -118,7 +117,7 @@ export default function Index({ organization }) {
                                     title={'Data Staf'} 
                                 />
                             </Link>
-                            <Link href={route('data-master.student-entry-payment-category', organization.id)}>
+                            <Link href={route('data-master.salary-category', organization.id)}>
                                 <CardMenu 
                                     bgColor={'bg-rose-700'} 
                                     icon={<RiFileListLine />} 

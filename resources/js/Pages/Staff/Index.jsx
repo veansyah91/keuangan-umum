@@ -281,7 +281,7 @@ export default function Index({ role, organization, contacts, category, searchFi
             {role !== 'viewer' && (
               <div className='space-x-2'>
                 <PrimaryButton className='py-3' onClick={createData}>Tambah Data</PrimaryButton>
-                <Link href={route('data-master.students.import', organization.id)}>
+                <Link href={route('data-master.staff.import', organization.id)}>
                   <SuccessButton className='py-3'>Import Data (.csv)</SuccessButton>
                 </Link>
               </div>
