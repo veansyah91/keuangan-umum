@@ -39,13 +39,12 @@ export default function Index({ organization }) {
                     </div>
                 </section>
                 <section className='text-center font-bold'>
-                    <div className='uppercase text-xl'>Sekolah</div>
                     <section className='pt-2 pb-10 space-y-3'>
                         <div className='text-center font-bold'>
                             Siswa
                         </div>
                         <div className='flex justify-center gap-6'>
-                            <Link href={route('cashflow.cash-in', organization.id)}>
+                            <Link href={route('cashflow.student-monthly-payment', organization.id)}>
                                 <CardMenu 
                                     bgColor={'bg-orange-900'} 
                                     icon={<LiaMoneyBillWaveSolid />} 

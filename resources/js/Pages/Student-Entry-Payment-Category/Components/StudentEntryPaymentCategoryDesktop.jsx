@@ -9,8 +9,8 @@ export default function StudentDesktop({ category, className, role, handleDelete
         <>
             <tr className={className}>
                 <td>{category.name}</td>
-                <td>IDR. { formatNumber(category.value) }</td>
-                <td>
+                <td className='text-end'>IDR. { formatNumber(category.value) }</td>
+                <td className='text-center'>
                 {
                     category.is_active 
                     ? <BadgeSuccess>Aktif</BadgeSuccess>

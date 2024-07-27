@@ -39,6 +39,7 @@ use App\Http\Controllers\Admin\UserWithdrawController;
 use App\Http\Controllers\FixedAssetCategoryController;
 use App\Http\Controllers\OrganizationInvoiceController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\StudentMonthlyPaymentController;
 use App\Http\Controllers\Admin\OrganizationMenuController;
 use App\Http\Controllers\StudentPaymentCategoryController;
 use App\Http\Controllers\Admin\AdminOrganizationController;
@@ -238,8 +239,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             // Salary Category
             Route::get('/salary-category', [SalaryCategoryController::class, 'index'])->name('data-master.salary-category');
             Route::post('/salary-category', [SalaryCategoryController::class, 'store'])->name('data-master.salary-category.store');
-            Route::patch('/salary-category/{studentEntryPaymentCategory}', [SalaryCategoryController::class, 'update'])->name('data-master.salary-category.update');
-            Route::delete('/salary-category/{studentEntryPaymentCategory}', [SalaryCategoryController::class, 'destroy'])->name('data-master.salary-category.destroy');
+            Route::patch('/salary-category/{salaryCategory}', [SalaryCategoryController::class, 'update'])->name('data-master.salary-category.update');
+            Route::delete('/salary-category/{salaryCategory}', [SalaryCategoryController::class, 'destroy'])->name('data-master.salary-category.destroy');
 
 
         });
@@ -314,7 +315,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::delete('/cash-mutation/{cashMutation}', [CashMutationController::class, 'destroy'])->name('cashflow.cash-mutation.delete');
             Route::post('/cash-mutation/create', [CashMutationController::class, 'store'])->name('cashflow.cash-mutation.post');
 
-            // school
+            // student
+            Route::get('/student-monthly-payment', [StudentMonthlyPaymentController::class, 'index'])->name('cashflow.student-monthly-payment');
             
         });
 

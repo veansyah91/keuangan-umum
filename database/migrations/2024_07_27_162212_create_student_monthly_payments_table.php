@@ -11,15 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('salary_categories', function (Blueprint $table) {
+        Schema::create('student_monthly_payments', function (Blueprint $table) {
             $table->id();
             $table->foreignUuid('organization_id')->constrained()->cascadeOnDelete();
-            $table->string('name');
+            $table->unsignedBigInteger('contact_id');
+            $table->foreign('contact_id')->references('id')->on('users');
+            
+            $table->string('no_ref');
             $table->bigInteger('value')->default(0);
-            $table->boolean('has_hour')->default(false);
-            $table->string('unit')->nullable();
-            $table->boolean('is_cut')->default(false);
-            $table->boolean('is_active')->default(true);
+            $table->enum('type',['prepaid','now', 'receivable']);
+            $table->integer('month');
+            $table->integer('year');
+            $table->string('study_year');
+
             $table->timestamps();
         });
     }
@@ -29,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('salary_categories');
+        Schema::dropIfExists('student_monthly_payments');
     }
 };

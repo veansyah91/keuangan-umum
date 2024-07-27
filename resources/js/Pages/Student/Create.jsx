@@ -18,7 +18,7 @@ import studyYear from '@/Utils/studyYear';
 const yearList = () => {
     const now = dayjs().year();
 
-    const start = now - 20;
+    const start = now - 10;
 
     let arrayYear = [];
 

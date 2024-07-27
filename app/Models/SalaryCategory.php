@@ -13,8 +13,8 @@ class SalaryCategory extends Model
         'organization_id',
         'name',
         'value',
-        'hour',
         'has_hour',
+        'unit',
         'is_active',
         'is_cut',
     ];

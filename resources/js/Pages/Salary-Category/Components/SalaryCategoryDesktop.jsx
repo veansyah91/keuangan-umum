@@ -2,15 +2,15 @@ import BadgeDanger from '@/Components/Badges/BadgeDanger';
 import BadgeSuccess from '@/Components/Badges/BadgeSuccess';
 import formatNumber from '@/Utils/formatNumber';
 import React from 'react';
-import { IoCreateOutline, IoEllipsisVertical, IoSearchOutline, IoTrash } from 'react-icons/io5';
+import { IoCreateOutline, IoEllipsisVertical, IoTrash } from 'react-icons/io5';
 
 export default function StudentDesktop({ category, className, role, handleDelete, handleEdit }) {
     return (
         <>
             <tr className={className}>
-                <td>{category.name}</td>
-                <td>IDR. { formatNumber(category.value) }</td>
-                <td>
+                <td className={category.is_cut ? 'text-red-600' :''}>{category.name}</td>
+                <td className='text-end'>IDR. { formatNumber(category.value) }</td>
+                <td className='text-center'>
                 {
                     category.is_active 
                     ? <BadgeSuccess>Aktif</BadgeSuccess>

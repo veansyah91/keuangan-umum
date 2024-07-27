@@ -300,8 +300,8 @@ export default function Index({ role, organization, studentPaymentCategories, se
                                 <thead className='text-base text-gray-900'>
                                     <tr className=''>
                                         <th className='bg-gray-200'>Nama Kategori</th>
-                                        <th className='bg-gray-200'>Nilai (Default)</th>
-                                        <th className='bg-gray-200'>Status</th>
+                                        <th className='bg-gray-200 text-end'>Nilai (Default)</th>
+                                        <th className='bg-gray-200 text-center'>Status</th>
                                         <th className='bg-gray-200'></th>
                                     </tr>
                                 </thead>
