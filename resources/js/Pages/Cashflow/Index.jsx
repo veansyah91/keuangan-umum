@@ -48,7 +48,7 @@ export default function Index({ organization }) {
                                 <CardMenu 
                                     bgColor={'bg-orange-900'} 
                                     icon={<LiaMoneyBillWaveSolid />} 
-                                    title={'Pembayaran SPP'} 
+                                    title={'Pembayaran Iuran Bulanan'} 
                                 />
                             </Link>
                         </div>

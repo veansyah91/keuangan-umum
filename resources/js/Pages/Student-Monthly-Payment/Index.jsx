@@ -22,7 +22,6 @@ import DangerButton from '@/Components/DangerButton';
 import { usePrevious } from 'react-use';
 import StudentMonthlyPaymentMobile from './Components/StudentMonthlyPaymentMobile';
 import StudentMonthlyPaymentDesktop from './Components/StudentMonthlyPaymentDesktop';
-import SuccessButton from '@/Components/SuccessButton';
 
 export default function Index({ role, organization, payments, searchFilter }) {
     // State
@@ -89,11 +88,11 @@ export default function Index({ role, organization, payments, searchFilter }) {
     return (
         <>
             {/* Mobile */}
-            <Head title='Pemmbayaran Iuran Siswa' />
+            <Head title='Pembayaran Iuran Siswa' />
             <ToastContainer />
 
             {role !== 'viewer' && (
-                <Link href={route('data-master.students.create', organization.id)}>
+                <Link href={route('cashflow.student-monthly-payment.create', organization.id)}>
                     <AddButtonMobile label={'Tambah'} />
                 </Link>
             )}
@@ -154,11 +153,8 @@ export default function Index({ role, organization, payments, searchFilter }) {
                     <div className='my-auto w-7/12'>
                         {role !== 'viewer' && (
                             <div className='space-x-2'>
-                                <Link href={route('data-master.students.create', organization.id)}>
+                                <Link href={route('cashflow.student-monthly-payment.create', organization.id)}>
                                     <PrimaryButton className='py-3'>Tambah Data</PrimaryButton>
-                                </Link>
-                                <Link href={route('data-master.students.import', organization.id)}>
-                                    <SuccessButton className='py-3'>Import Data (.csv)</SuccessButton>
                                 </Link>
                             </div>
                         )}
@@ -267,11 +263,11 @@ export default function Index({ role, organization, payments, searchFilter }) {
 
 Index.layout = (page) => (
     <AuthenticatedLayout
-        header={<Header>Pemmbayaran Iuran Siswa</Header>}
+        header={<Header>Pembayaran Iuran Siswa</Header>}
         children={page}
         user={page.props.auth.user}
         organization={page.props.organization}
-        title='Pemmbayaran Iuran Siswa'
+        title='Pembayaran Iuran Siswa'
         backLink={
             <Link href={route('data-master', page.props.organization.id)}>
                 <IoArrowBackOutline />
@@ -283,7 +279,7 @@ Index.layout = (page) => (
                     <li className='font-bold'>
                         <Link href={route('data-master', page.props.organization.id)}>Data Master</Link>
                     </li>
-                    <li>Pemmbayaran Iuran Siswa</li>
+                    <li>Pembayaran Iuran Siswa</li>
                 </ul>
             </div>
         }
