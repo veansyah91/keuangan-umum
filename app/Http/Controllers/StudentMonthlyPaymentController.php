@@ -7,6 +7,7 @@ use App\Models\Organization;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\StudentMonthlyPayment;
+use App\Models\StudentPaymentCategory;
 use App\Repositories\Log\LogRepository;
 use App\Repositories\User\UserRepository;
 
@@ -42,6 +43,9 @@ class StudentMonthlyPaymentController extends Controller
         return Inertia::render('Student-Monthly-Payment/Create',[
             'organization' => $organization,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+            'categories' => StudentPaymentCategory::whereOrganizationId($organization['id'])
+                                                    ->whereIsActive(true)
+                                                    ->get(),
         ]);
     }
 }
