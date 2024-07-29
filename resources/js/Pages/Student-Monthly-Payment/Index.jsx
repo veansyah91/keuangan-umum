@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -25,6 +25,8 @@ import StudentMonthlyPaymentDesktop from './Components/StudentMonthlyPaymentDesk
 
 export default function Index({ role, organization, payments, searchFilter }) {
     // State
+    const { errors } = usePage().props;
+
     const [showSearch, setShowSearch] = useState(false);
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
@@ -49,6 +51,13 @@ export default function Index({ role, organization, payments, searchFilter }) {
             handleReloadPage();
         }
     }, [debounceValue]);
+
+    useEffect(() => {
+        errors && 
+        toast.error(errors.message, {
+            position: toast.POSITION.TOP_CENTER,
+        });
+    },[]);
 
     //function
     const handleReloadPage = () => {

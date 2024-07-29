@@ -93,12 +93,12 @@ export default function ContactSelectInput({
                           className={`block truncate ${
                             selected ? 'font-medium' : 'font-normal'
                           }`}>
-                          <div className='text-xs'>
-                            {d.contact_categories.map((category, index) => (
-                              <span key={index} className='text-[10px]'>
-                                *{category.name.toUpperCase()}
-                              </span>
-                            ))}
+                          <div className='text-xs space-x-2'>
+                            Kelas : <span>
+                            {
+                              d.levels[d.levels.length - 1].level
+                            }
+                            </span>
                           </div>
                           <div className='text-base'>{d.name.toUpperCase()}</div>
                         </div>

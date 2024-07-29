@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use Inertia\Inertia;
+use App\Models\Contact;
 use App\Models\Organization;
 use Illuminate\Http\Request;
+use App\Models\ContactCategory;
 use Illuminate\Support\Facades\Auth;
 use App\Models\StudentMonthlyPayment;
 use App\Models\StudentPaymentCategory;
@@ -40,12 +42,28 @@ class StudentMonthlyPaymentController extends Controller
     {
         $user = Auth::user();
 
+        $contactCategory = ContactCategory::whereOrganizationId($organization['id'])
+                                            ->whereName('SISWA')
+                                            ->first();
+
+        if (!$contactCategory) {
+            return redirect()->back()->withErrors(['message' => 'Silakan Buat Kategori Kontak SISWA terlebih dahulu!']);
+        }
+
         return Inertia::render('Student-Monthly-Payment/Create',[
             'organization' => $organization,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'categories' => StudentPaymentCategory::whereOrganizationId($organization['id'])
                                                     ->whereIsActive(true)
                                                     ->get(),
+            'contacts' => Contact::filter(request(['contact']))
+                                    ->whereOrganizationId($organization['id'])
+                                    ->with(['contactCategories', 'student', 'levels'])
+                                    ->whereHas('contactCategories', function ($query) use ($contactCategory){
+                                        $query->where('contact_category_id', $contactCategory['id']);
+                                    })
+                                    ->orderBy('name')
+                                    ->get(),
         ]);
     }
 }

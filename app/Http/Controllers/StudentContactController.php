@@ -45,18 +45,16 @@ class StudentContactController extends Controller
             return redirect()->back()->withErrors(['message' => 'Silakan Buat Kategori Kontak SISWA terlebih dahulu!']);
         }
         
-        $contacts = Contact::filter(request(['search']))
-                            ->whereOrganizationId($organization['id'])
-                            ->with(['contactCategories', 'student', 'levels'])
-                            ->whereHas('contactCategories', function ($query) use ($contactCategory){
-                                $query->where('contact_category_id', $contactCategory['id']);
-                            })
-                            ->orderBy('name')
-                            ->paginate(50);
-        
         return Inertia::render('Student/Index',[
             'organization' => $organization,
-            'contacts' => $contacts,
+            'contacts' => Contact::filter(request(['search']))
+                                    ->whereOrganizationId($organization['id'])
+                                    ->whereHas('contactCategories', function ($query) use ($contactCategory){
+                                        $query->where('contact_category_id', $contactCategory['id']);
+                                    })
+                                    ->with(['contactCategories', 'student', 'levels'])
+                                    ->orderBy('name')
+                                    ->paginate(50),
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'searchFilter' => request('search'),
         ]);
