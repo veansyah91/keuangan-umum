@@ -20,6 +20,7 @@ const roles = [
 ];
 
 export default function ShareToOther({ organization, users, userFilter, userOrganization }) {
+    
     const [showAdd, setShowAdd] = useState(false);
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const [user] = useState(userFilter || '');
