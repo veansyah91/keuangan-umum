@@ -19,15 +19,15 @@ import ContactSelectInput from '@/Components/SelectInput/ContactSelectInput';
 import formatNumber from '@/Utils/formatNumber';
 
 export default function Create({
-    organization,
-    newRef,
-    date,
-    accounts,
-    cashAccounts,
-    projects,
-    programs,
-    departments,
-    contacts,
+  organization,
+  newRef,
+  date,
+  accounts,
+  cashAccounts,
+  projects,
+  programs,
+  departments,
+  contacts,
 }) {
     // state
     const [selectedAccount, setSelectedAccount] = useState([{ id: null, name: '', code: '' }]);
@@ -90,7 +90,7 @@ export default function Create({
     // useEffect
     useEffect(() => {
         if (prevDate !== undefined) {
-            reloadNewRef();
+          reloadNewRef();
         }
     }, [debounceDateValue]);
 
@@ -123,9 +123,9 @@ export default function Create({
                     let errorValue = '';
                     arrayOfObjects.map((data) => {
                         if (data.key.split('.').length === 3) {
-                            if (data.key == `accounts.${index}.id`) {
-                                errorValue = 'required';
-                            }
+                          if (data.key == `accounts.${index}.id`) {
+                            errorValue = 'required';
+                          }
                         }
                     });
                     tempAccountErrors = [...tempAccountErrors, errorValue];
