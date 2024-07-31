@@ -399,7 +399,7 @@ class OrganizationController extends Controller
     {
         return Inertia::render('Organization/Create', [
             // 'villages' => $this->village->getFullAddress(request(['village'])),
-            'villages' => Village::filter($filter)
+            'villages' => Village::filter(request(['village']))
                             ->with('district', function ($query) {
                                 $query->with('regency', function ($query) {
                                     $query->with('province');
