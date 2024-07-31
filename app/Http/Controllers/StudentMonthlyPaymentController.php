@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Inertia\Inertia;
+use App\Helpers\NewRef;
 use App\Models\Contact;
+use Carbon\CarbonImmutable;
 use App\Models\Organization;
 use Illuminate\Http\Request;
 use App\Models\ContactCategory;
@@ -12,6 +15,8 @@ use App\Models\StudentMonthlyPayment;
 use App\Models\StudentPaymentCategory;
 use App\Repositories\Log\LogRepository;
 use App\Repositories\User\UserRepository;
+use App\Repositories\Contact\ContactRepository;
+use App\Repositories\Journal\JournalRepository;
 
 class StudentMonthlyPaymentController extends Controller
 {
@@ -19,10 +24,40 @@ class StudentMonthlyPaymentController extends Controller
 
     protected $logRepository;
 
-    public function __construct(UserRepository $userRepository, LogRepository $logRepository)
+    protected $journalRepository;
+
+    protected $contactRepository;
+
+    protected $now;
+
+    public function __construct(UserRepository $userRepository, LogRepository $logRepository, JournalRepository $journalRepository, ContactRepository $contactRepository)
     {
         $this->userRepository = $userRepository;
         $this->logRepository = $logRepository;
+        $this->journalRepository = $journalRepository;
+        $this->contactRepository = $contactRepository;
+        $this->now = CarbonImmutable::now();
+    }
+
+    protected function newRef($organization, $dateRequest = '')
+    {
+        $now = $this->now;
+        $date = $dateRequest ?? $now->isoFormat('YYYY-MM-DD');
+        $dateRef = Carbon::create($date);
+        $refHeader = 'IB-'.$dateRef->isoFormat('YYYY').$dateRef->isoFormat('MM');
+        $newRef = $refHeader.'001';
+
+        $cashIn = StudentMonthlyPayment::whereOrganizationId($organization['id'])
+            ->where('no_ref', 'like', $refHeader.'%')
+            ->orderBy('no_ref')
+            ->get()
+            ->last();
+
+        if ($cashIn) {
+            $newRef = NewRef::create('IB-', $cashIn['no_ref']);
+        }
+
+        return $newRef;
     }
     
     public function index(Organization $organization)
@@ -56,14 +91,18 @@ class StudentMonthlyPaymentController extends Controller
             'categories' => StudentPaymentCategory::whereOrganizationId($organization['id'])
                                                     ->whereIsActive(true)
                                                     ->get(),
-            'contacts' => Contact::filter(request(['contact']))
-                                    ->whereOrganizationId($organization['id'])
-                                    ->with(['contactCategories', 'student', 'levels'])
-                                    ->whereHas('contactCategories', function ($query) use ($contactCategory){
-                                        $query->where('contact_category_id', $contactCategory['id']);
-                                    })
-                                    ->orderBy('name')
-                                    ->get(),
+            'newRef' => $this->newRef($organization, request('date')),
+            'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
+            // 'contacts' => Contact::filter(request(['contact']))
+            //                         ->whereOrganizationId($organization['id'])
+            //                         ->with(['contactCategories', 'student', 'levels'])
+            //                         ->whereHas('contactCategories', function ($query) use ($contactCategory){
+            //                             $query->where('contact_category_id', $contactCategory['id']);
+            //                         })
+            //                         ->orderBy('name')
+            //                         ->get(),
+            'contacts' => $this->contactRepository
+                                ->getStudent($organization['id'], $contactCategory['id'], request(['contact'])),
         ]);
     }
 }

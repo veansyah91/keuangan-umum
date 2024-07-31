@@ -16,4 +16,16 @@ class ContactRepository implements ContactRepositoryInterface
                         ->take(20)
                         ->get();
     }
+
+    public function getStudent($organizationId, $contactCategoryId, $request){
+        return Contact::filter($request)
+                        ->whereOrganizationId($organizationId)
+                        ->with(['contactCategories', 'student', 'levels'])
+                        ->whereHas('contactCategories', function ($query) use ($contactCategoryId){
+                            $query->where('contact_category_id', $contactCategoryId);
+                        })
+                        ->orderBy('name')
+                        ->take(20)
+                        ->get();
+    }
 }

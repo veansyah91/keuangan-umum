@@ -17,6 +17,7 @@ class StudentMonthlyPayment extends Model
         'no_ref',
         'value',
         'type',
+        'date',
         'month',
         'year',
         'study_year'
