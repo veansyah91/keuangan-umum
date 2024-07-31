@@ -22,6 +22,7 @@ use App\Repositories\AccountCategory\AccountCategoryRepositoryInterface;
 
 class OrganizationController extends Controller
 {
+    protected $village;
     protected $fixedAssetCategory = [
         [
             'lifetime' => 0,
@@ -347,10 +348,11 @@ class OrganizationController extends Controller
 
     private $account;
 
-    public function __construct(AccountRepositoryInterface $account, AccountCategoryRepositoryInterface $accountCategory)
+    public function __construct(AccountRepositoryInterface $account, AccountCategoryRepositoryInterface $accountCategory, VillageRepository $village)
     {
         $this->account = $account;
         $this->accountCategory = $accountCategory;
+        $this->village = $village;
     }
 
     public function index(): Response
@@ -394,10 +396,8 @@ class OrganizationController extends Controller
      */
     public function create()
     {
-        $villages = new VillageRepository;
-
         return Inertia::render('Organization/Create', [
-            'villages' => $villages->getFullAddress(request(['village'])),
+            'villages' => $this->village->getFullAddress(request(['village'])),
             'villageFilter' => request('village'),
         ]);
     }
