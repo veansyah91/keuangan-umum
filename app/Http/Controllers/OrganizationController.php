@@ -677,8 +677,7 @@ class OrganizationController extends Controller
 
         $organization->users;
 
-        $users = User::where('email', request('user'))
-            ->get();
+        $users = User::where('email', request('user'))->get();
 
         return Inertia::render('Organization/ShareToOther', [
             'organization' => $organization,

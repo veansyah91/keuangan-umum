@@ -51,7 +51,9 @@ class FixedAssetCategoryController extends Controller
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('fixed_asset_categories'),
+                Rule::unique('fixed_asset_categories')->where(function ($query) use ($organization) {
+                    return $query->where('organization_id', $organization['id']);
+                }),
             ],
             'lifetime' => 'required|numeric',
             'status' => 'required|boolean',

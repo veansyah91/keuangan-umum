@@ -330,11 +330,11 @@ export default function ShareToOther({ organization, users, userFilter, userOrga
                                 <div className='sm:w-3/12 my-auto'>Pengguna</div>
                                 <div className='sm:w-8/12'>
                                     <UserSelectInput
-                                        data={users}
+                                        resources={users}
                                         selected={selectedUser}
                                         setSelected={setSelectedUser}
-                                        query={queryUser}
-                                        setQuery={setQueryUser}
+                                        // query={queryUser}
+                                        // setQuery={setQueryUser}
                                         maxHeight='max-h-40'
                                         placeholder='Cari Pengguna'
                                         className={errors?.user_id && `border-red-500 border`}

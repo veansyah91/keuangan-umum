@@ -33,11 +33,11 @@ class FixedAssetController extends Controller
     protected function createNewAccount($organizationId, $name, $newName, $accountCategory)
     {
         $firstAccount = Account::whereHas('accountCategory', function ($query) use ($accountCategory) {
-            $query->where('name', 'like', '%'.$accountCategory.'%');
-        })
-            ->whereOrganizationId($organizationId)
-            ->where('name', 'like', '%'.$name.'%')
-            ->firstOrFail();
+                                    $query->where('name', 'like', '%'.$accountCategory.'%');
+                                })
+                                ->whereOrganizationId($organizationId)
+                                ->where('name', 'like', '%'.$name.'%')
+                                ->firstOrFail();
 
         $refCode = substr($firstAccount['code'], 0, 4);
 
@@ -213,11 +213,16 @@ class FixedAssetController extends Controller
             return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
         }
 
+        // dd($validated);
+
         // Buat Akun
         $fixedAssetCategory = FixedAssetCategory::find($validated['fixed_asset_category']);
 
         // akun aset
         $asset = Account::create($this->createNewAccount($organization['id'], $fixedAssetCategory['name'], $validated['name'], 'HARTA TETAP BERWUJUD'));
+
+
+
 
         // akun akumulasi penyusutan
         $depreciationAccumulation = $validated['lifetime'] > 0 ? Account::create($this->createNewAccount($organization['id'], $fixedAssetCategory['name'], 'AKUMULASI PENYUSUTAN '.$validated['name'], 'AKUMULASI PENYUSUTAN')) : null;
