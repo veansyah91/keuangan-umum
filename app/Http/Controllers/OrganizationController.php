@@ -397,18 +397,23 @@ class OrganizationController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Organization/Create', [
-            // 'villages' => $this->village->getFullAddress(request(['village'])),
-            'villages' => Village::filter(request(['village']))
-                            ->with('district', function ($query) {
-                                $query->with('regency', function ($query) {
-                                    $query->with('province');
-                                });
-                            })
-                            ->get()
-                            ->take(10),
-            'villageFilter' => request('village'),
-        ]);
+        try {
+            return Inertia::render('Organization/Create', [
+                // 'villages' => $this->village->getFullAddress(request(['village'])),
+                'villages' => Village::filter(request(['village']))
+                                ->with('district', function ($query) {
+                                    $query->with('regency', function ($query) {
+                                        $query->with('province');
+                                    });
+                                })
+                                ->get()
+                                ->take(10),
+                'villageFilter' => request('village'),
+            ]);
+        } catch (\Throwable $th) {
+            dd($th);
+        }
+        
     }
 
     /**
