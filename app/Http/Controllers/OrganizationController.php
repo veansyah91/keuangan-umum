@@ -7,6 +7,7 @@ use App\Models\User;
 use Inertia\Inertia;
 use Inertia\Response;
 use App\Models\Contact;
+use App\Models\Village;
 use App\Models\Affiliation;
 use Illuminate\Support\Str;
 use App\Models\Organization;
@@ -397,7 +398,15 @@ class OrganizationController extends Controller
     public function create()
     {
         return Inertia::render('Organization/Create', [
-            'villages' => $this->village->getFullAddress(request(['village'])),
+            // 'villages' => $this->village->getFullAddress(request(['village'])),
+            'villages' => Village::filter($filter)
+                            ->with('district', function ($query) {
+                                $query->with('regency', function ($query) {
+                                    $query->with('province');
+                                });
+                            })
+                            ->get()
+                            ->take(10),
             'villageFilter' => request('village'),
         ]);
     }
