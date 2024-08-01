@@ -221,9 +221,6 @@ class FixedAssetController extends Controller
         // akun aset
         $asset = Account::create($this->createNewAccount($organization['id'], $fixedAssetCategory['name'], $validated['name'], 'HARTA TETAP BERWUJUD'));
 
-
-
-
         // akun akumulasi penyusutan
         $depreciationAccumulation = $validated['lifetime'] > 0 ? Account::create($this->createNewAccount($organization['id'], $fixedAssetCategory['name'], 'AKUMULASI PENYUSUTAN '.$validated['name'], 'AKUMULASI PENYUSUTAN')) : null;
 
