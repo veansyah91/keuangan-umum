@@ -46,23 +46,27 @@ const monthList = () => {
   return monthListTemp;
 }
 
-const dateNow = () => {
-  let date = dayjs().format('MM')
+const monthNow = () => {
+  let month = dayjs().format('MM')
 
-  return date;
+  return month;
 }
 
 export default function Create({ organization, newRef, contacts, date, categories, studyYears }) {
+
+  // console.log(categories.length);
   // state
+  const [total, setTotal] = useState(0);
+  const [type, setType] = useState('now');
   const { data, setData, processing, post, errors, setError, reset } = useForm({
     contact_id:null,
     date:date,
     level:null,
     student_id:null,
     no_ref:newRef,
-    value:0,
-    type:'now', // set auto
-    month: parseInt(dateNow()),
+    value:total,
+    type:type, // set auto
+    month:parseInt(monthNow()),
     study_year:studyYear(),
     description:'',
     details: []
@@ -73,44 +77,50 @@ export default function Create({ organization, newRef, contacts, date, categorie
   const [dateValue, setDateValue] = useState({
     startDate: date,
     endDate: date,
-});
-
+  });
 
   // useEffect
   useEffect(() => {
+    let tempData = data;
     let temp = categories.map(category => ({
       id: category.id,
       name: category.name,
       value: category.value,
     }));
-    let total = temp.reduce((total, item) => total + item.value, 0);
-    setData({
-      ...data,
-      value: total,
+
+    let tempTotal = temp.reduce((total, item) => total + item.value, 0);
+    setTotal(tempTotal);
+
+    tempData = {
+      ...tempData,
+      value: tempTotal,
       details: temp
-    });
-  },[])
+    }
+    
+    setData(tempData);
+  },[]);
 
   // function
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    console.log(data);
     
-    post(route('cashflow.student-monthly-payment.post', organization.id), {
-      onSuccess: () => {
-        toast.success(`Siswa Berhasil Ditambahkan`, {
-          position: toast.POSITION.TOP_CENTER,
-        });
-        reset();
-      },
-      onError: errors => {
-        console.log(errors);
-      },
-      preserveScroll: true,
-    });
+    // post(route('cashflow.student-monthly-payment.post', organization.id), {
+    //   onSuccess: () => {
+    //     toast.success(`Siswa Berhasil Ditambahkan`, {
+    //       position: toast.POSITION.TOP_CENTER,
+    //     });
+    //     reset();
+    //   },
+    //   onError: errors => {
+    //     console.log(errors);
+    //   },
+    //   preserveScroll: true,
+    // });
   };
 
   const handleSelectedContact = (selected) => {
-    console.log(selected);
     setSelectedContact({ id: selected.id, name: selected.name, phone: selected.phone });
     let temp = data;
     temp = {
@@ -130,6 +140,29 @@ export default function Create({ organization, newRef, contacts, date, categorie
 
   const handleChangeValue = (values, index) => {
     const { value } = values;
+
+    let tempData = [...data.details];
+
+    tempData[index] = { ...tempData[index], value: parseInt(value) };
+    setData('details', tempData);
+
+    let tempTotal = tempData.reduce((total, item) => total + item.value, 0);
+    setTotal(tempTotal);
+  }
+
+  const updateData = () => {
+    let type = 'now';
+    if (data.month < parseInt(monthNow())) {
+      type = 'receivable';
+    } else if (data.month > parseInt(monthNow())) { 
+      type = 'prepaid';
+    }
+
+    let temp = data;
+    temp = {
+      ...temp,
+      type: type
+    }
   }
 
   return (
@@ -277,7 +310,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
             <div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
                 <div className='w-full sm:w-1/3 my-auto'>
                   <InputLabel
-                    value={'Tahun Ajaran'}
+                    value={'Bulan'}
                     htmlFor='month'
                     className=' mx-auto my-auto'
                   />
@@ -299,7 +332,6 @@ export default function Create({ organization, newRef, contacts, date, categorie
 
             <div className='text-center mt-5 font-bold'>Rincian Pembayaran</div>
             {
-              categories.length > 0 && 
               data.details.map((category, index) => 
                 <div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2' key={index}>
                   <div className='w-full sm:w-1/3 my-auto'>
@@ -331,7 +363,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
               </div>
 
               <div className='w-full sm:w-2/3 text-end'>
-                Rp. {formatNumber(data.value)}
+                Rp. {formatNumber(total)}
               </div>
             </div>
 
