@@ -150,6 +150,18 @@ export default function Create({ organization, newRef, contacts, date, categorie
     setTotal(tempTotal);
   }
 
+  const handleChangeMonth = (e) => {
+    console.log('2023/2024' < '2024/2025');
+    
+    let type = 'now';
+
+    if (data.month < parseInt(monthNow())) {
+      type = 'receivable';
+    } else if (data.month > parseInt(monthNow())) { 
+      type = 'prepaid';
+    }
+  }
+
   const updateData = () => {
     let type = 'now';
     if (data.month < parseInt(monthNow())) {
@@ -317,7 +329,13 @@ export default function Create({ organization, newRef, contacts, date, categorie
                 </div>
 
                 <div className='w-full sm:w-2/3'>
-                  <select className="select select-bordered w-full" defaultValue={data.month} onChange={e => setData('month', e.target.value)} id='month'>
+                  <select 
+                    className="select select-bordered w-full" 
+                    defaultValue={data.month} 
+                    // onChange={e => setData('month', e.target.value)} 
+                    onChange={handleChangeMonth} 
+                    id='month'
+                  >
                     {
                       monthList().map((month, index) => 
                         <option 
@@ -337,7 +355,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
                   <div className='w-full sm:w-1/3 my-auto'>
                     <InputLabel
                       value={category.name}
-                      htmlFor={`category-${index}`}
+                      htmlFor='level'
                       className=' mx-auto my-auto'
                     />
                   </div>
@@ -350,7 +368,6 @@ export default function Create({ organization, newRef, contacts, date, categorie
                       thousandSeparator={true}
                       className='text-end w-full border'
                       prefix={'IDR '}
-                      id={`category-${index}`}
                     />
                     {/* {errors?.level && <span className='text-red-500 text-xs'>{errors.level}</span>} */}
                   </div>
