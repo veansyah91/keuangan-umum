@@ -150,20 +150,6 @@ export default function Create({ organization, newRef, contacts, date, categorie
     setTotal(tempTotal);
   }
 
-  const handleChangeLevel = (e) => {
-    let type = 'now';
-
-    if (e.target.value < parseInt(monthNow()) || data.study_year < studyYear()) {
-      type = 'receivable';
-    } else if(e.target.value < parseInt(monthNow()))
-    {
-      e.target.value > parseInt(monthNow())
-    }
-
-    console.log(e.target.value);
-    console.log(studyYear());
-  }
-
   const updateData = () => {
     let type = 'now';
     if (data.month < parseInt(monthNow())) {
@@ -331,13 +317,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
                 </div>
 
                 <div className='w-full sm:w-2/3'>
-                  <select 
-                    className="select select-bordered w-full" 
-                    defaultValue={data.month} 
-                    // onChange={e => setData('month', e.target.value)} 
-                    onChange={handleChangeLevel}
-                    id='month'
-                  >
+                  <select className="select select-bordered w-full" defaultValue={data.month} onChange={e => setData('month', e.target.value)} id='month'>
                     {
                       monthList().map((month, index) => 
                         <option 
