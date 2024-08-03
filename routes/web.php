@@ -318,6 +318,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             // student
             Route::get('/student-monthly-payment', [StudentMonthlyPaymentController::class, 'index'])->name('cashflow.student-monthly-payment');
             Route::get('/student-monthly-payment/create', [StudentMonthlyPaymentController::class, 'create'])->name('cashflow.student-monthly-payment.create');
+            Route::post('/student-monthly-payment', [StudentMonthlyPaymentController::class, 'store'])->name('cashflow.student-monthly-payment.post');
             
         });
 

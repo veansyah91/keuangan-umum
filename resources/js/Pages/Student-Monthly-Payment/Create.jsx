@@ -18,26 +18,18 @@ import StudentSelectInput from '@/Components/SelectInput/StudentSelectInput';
 import Datepicker from 'react-tailwindcss-datepicker';
 import { NumericFormat } from 'react-number-format';
 import formatNumber from '@/Utils/formatNumber';
-
-const yearList = () => {
-  const now = dayjs().year();
-
-  const start = now - 10;
-
-  let arrayYear = [];
-
-  for (let index = start; index < now + 1; index++) {
-    arrayYear = [
-      ...arrayYear, index
-    ];
-  }
-  return arrayYear;
-}
+import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 
 const monthList = () => {
   let monthListTemp = [];
 
-  for (let index = 1; index < 13; index++) {
+  for (let index = 7; index < 13; index++) {
+    monthListTemp = [
+      ...monthListTemp, index
+    ];
+  }
+
+  for (let index = 1; index < 7; index++) {
     monthListTemp = [
       ...monthListTemp, index
     ];
@@ -52,7 +44,7 @@ const monthNow = () => {
   return month;
 }
 
-export default function Create({ organization, newRef, contacts, date, categories, studyYears }) {
+export default function Create({ organization, newRef, contacts, date, categories, studyYears, cashAccounts }) {
 
   // console.log(categories.length);
   // state
@@ -69,10 +61,12 @@ export default function Create({ organization, newRef, contacts, date, categorie
     month:parseInt(monthNow()),
     study_year:studyYear(),
     description:'',
-    details: []
+    details: [],
+    account_id: null
   });
 
   const [selectedContact, setSelectedContact] = useState({ id: null, name: '', phone: '' });
+  const [selectedCashAccount, setSelectedCashAccount] = useState({ id: null, name: '', code: '', is_cash: true });
 
   const [dateValue, setDateValue] = useState({
     startDate: date,
@@ -106,18 +100,20 @@ export default function Create({ organization, newRef, contacts, date, categorie
 
     console.log(data);
     
-    // post(route('cashflow.student-monthly-payment.post', organization.id), {
-    //   onSuccess: () => {
-    //     toast.success(`Siswa Berhasil Ditambahkan`, {
-    //       position: toast.POSITION.TOP_CENTER,
-    //     });
-    //     reset();
-    //   },
-    //   onError: errors => {
-    //     console.log(errors);
-    //   },
-    //   preserveScroll: true,
-    // });
+    post(route('cashflow.student-monthly-payment.post', organization.id), {
+      onSuccess: ({ props }) => {
+        const { flash } = props;
+
+        toast.success(flash.success, {
+          position: toast.POSITION.TOP_CENTER,
+        });
+        reset();
+      },
+      onError: errors => {
+        console.log(errors);
+      },
+      preserveScroll: true,
+    });
   };
 
   const handleSelectedContact = (selected) => {
@@ -150,32 +146,31 @@ export default function Create({ organization, newRef, contacts, date, categorie
     setTotal(tempTotal);
   }
 
-  const handleChangeMonth = (e) => {
-    console.log('2023/2024' < '2024/2025');
-    
+  const handleChangeMonth = (e) => {    
     let type = 'now';
+    let now = parseInt(dayjs().format('YYYY')) * 100 + parseInt(monthNow());
 
-    if (data.month < parseInt(monthNow())) {
-      type = 'receivable';
-    } else if (data.month > parseInt(monthNow())) { 
-      type = 'prepaid';
-    }
-  }
+    let splitYear = data.study_year.split('/');
+    let selectedMonth = parseInt(e.target.value) < 7 ? parseInt(splitYear[1]) * 100 + parseInt(e.target.value) : splitYear[0] * 100 + parseInt(e.target.value);
 
-  const updateData = () => {
-    let type = 'now';
-    if (data.month < parseInt(monthNow())) {
-      type = 'receivable';
-    } else if (data.month > parseInt(monthNow())) { 
+    if (selectedMonth > now) {
       type = 'prepaid';
-    }
+    } else if (selectedMonth < now) { 
+      type = 'receivable';
+    } 
 
     let temp = data;
     temp = {
       ...temp,
-      type: type
-    }
+      month : parseInt(e.target.value),
+      type : type
+    };    
   }
+
+  const handleSelectedCashAccount = (selected) => {
+    setSelectedCashAccount({ id: selected.id, name: selected.name, code: selected.code, is_cash: true });
+    setData('cash_account_id', selected.id);
+};
 
   return (
     <>
@@ -355,7 +350,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
                   <div className='w-full sm:w-1/3 my-auto'>
                     <InputLabel
                       value={category.name}
-                      htmlFor='level'
+                      htmlFor={`category-${index}`}
                       className=' mx-auto my-auto'
                     />
                   </div>
@@ -368,6 +363,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
                       thousandSeparator={true}
                       className='text-end w-full border'
                       prefix={'IDR '}
+                      id={`category-${index}`}
                     />
                     {/* {errors?.level && <span className='text-red-500 text-xs'>{errors.level}</span>} */}
                   </div>
@@ -382,6 +378,32 @@ export default function Create({ organization, newRef, contacts, date, categorie
 
               <div className='w-full sm:w-2/3 text-end'>
                 Rp. {formatNumber(total)}
+              </div>
+            </div>
+
+            <div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
+              <div className='w-full sm:w-1/3 my-auto'>
+                <InputLabel
+                  value={'Akun Kas'}
+                  htmlFor='account'
+                  className=' mx-auto my-auto'
+                />
+              </div>
+
+              <div className='w-full sm:w-2/3'>
+                <ClientSelectInput
+                  resources={cashAccounts}
+                  selected={selectedCashAccount}
+                  setSelected={(selected) => handleSelectedCashAccount(selected)}
+                  maxHeight='max-h-40'
+                  placeholder='Cari Akun'
+                  isError={errors.account ? true : false}
+                  id='account'
+                  contactFilter={''}
+                />
+                {selectedCashAccount?.code && (
+                    <div className='absolute text-xs'>Kode: {selectedCashAccount.code}</div>
+                )}
               </div>
             </div>
 

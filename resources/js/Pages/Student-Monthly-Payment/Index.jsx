@@ -24,6 +24,8 @@ import StudentMonthlyPaymentMobile from './Components/StudentMonthlyPaymentMobil
 import StudentMonthlyPaymentDesktop from './Components/StudentMonthlyPaymentDesktop';
 
 export default function Index({ role, organization, payments, searchFilter }) {
+    console.log(payments);
+    
     // State
     const { errors } = usePage().props;
 

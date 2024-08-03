@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use App\Models\Contact;
+use App\Models\StudentPaymentCategory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -19,7 +21,6 @@ class StudentMonthlyPayment extends Model
         'type',
         'date',
         'month',
-        'year',
         'study_year'
     ];
 
@@ -34,5 +35,10 @@ class StudentMonthlyPayment extends Model
     public function student(): BelongsTo
     {
         return $this->belongsTo(Contact::class);
+    }
+
+    public function details(): HasMany
+    {
+        return $this->hasMany(StudentPaymentCategory::class, 's_monthly_payment_details');
     }
 }
