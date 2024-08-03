@@ -46,18 +46,17 @@ const monthNow = () => {
 
 export default function Create({ organization, newRef, contacts, date, categories, studyYears, cashAccounts }) {
 
-  // console.log(categories.length);
   // state
   const [total, setTotal] = useState(0);
-  const [type, setType] = useState('now');
+  // const [type, setType] = useState('now');
   const { data, setData, processing, post, errors, setError, reset } = useForm({
     contact_id:null,
     date:date,
-    level:null,
-    student_id:null,
+    level:'',
+    student_id:'',
     no_ref:newRef,
     value:total,
-    type:type, // set auto
+    type:'now', // set auto
     month:parseInt(monthNow()),
     study_year:studyYear(),
     description:'',
@@ -75,6 +74,11 @@ export default function Create({ organization, newRef, contacts, date, categorie
 
   // useEffect
   useEffect(() => {
+    setDefault();
+  },[]);
+
+  // function
+  const setDefault = () => {
     let tempData = data;
     let temp = categories.map(category => ({
       id: category.id,
@@ -88,18 +92,13 @@ export default function Create({ organization, newRef, contacts, date, categorie
     tempData = {
       ...tempData,
       value: tempTotal,
-      details: temp
+      details: temp,
     }
     
     setData(tempData);
-  },[]);
-
-  // function
+  }
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    console.log(data);
-    
     post(route('cashflow.student-monthly-payment.post', organization.id), {
       onSuccess: ({ props }) => {
         const { flash } = props;
@@ -108,11 +107,16 @@ export default function Create({ organization, newRef, contacts, date, categorie
           position: toast.POSITION.TOP_CENTER,
         });
         reset();
+        setDefault();
+        setSelectedCashAccount({ id: null, name: '', code: '', is_cash: true });
+        setSelectedContact({ id: null, name: '', phone: '' });
       },
       onError: errors => {
-        console.log(errors);
+        toast.error(errors.error, {
+          position: toast.POSITION.TOP_CENTER,
+        });
       },
-      preserveScroll: true,
+      preserveScroll: false,
     });
   };
 
@@ -122,7 +126,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
     temp = {
       ...temp,
       contact_id: selected.id,
-      description: `Kas Masuk dari ${selected.name.toUpperCase()}`,
+      description: `Kas Masuk / Pembayaran Iuran Bulanan dari ${selected.name.toUpperCase()}`,
       student_id: selected.student.no_ref,
       level: selected.levels[selected.levels.length - 1].level
     };
@@ -140,10 +144,37 @@ export default function Create({ organization, newRef, contacts, date, categorie
     let tempData = [...data.details];
 
     tempData[index] = { ...tempData[index], value: parseInt(value) };
-    setData('details', tempData);
 
     let tempTotal = tempData.reduce((total, item) => total + item.value, 0);
     setTotal(tempTotal);
+    setData({
+      ...data,
+      details: tempData,
+      value: tempTotal
+    })
+  }
+
+  const handleChangeStudyYear = (e) => {
+    let type = 'now';
+    let now = parseInt(dayjs().format('YYYY')) * 100 + parseInt(monthNow());
+
+    let splitYear = e.target.value.split('/');
+    let selectedMonth = parseInt(data.month) < 7 ? parseInt(splitYear[1]) * 100 + parseInt(data.month) : splitYear[0] * 100 + parseInt(data.month);
+
+    if (selectedMonth > now) {
+      type = 'prepaid';
+    } else if (selectedMonth < now) { 
+      type = 'receivable';
+    } 
+
+    let temp = data;
+    temp = {
+      ...temp,
+      study_year : e.target.value,
+      type : type
+    };    
+
+    setData(temp);
   }
 
   const handleChangeMonth = (e) => {    
@@ -165,12 +196,15 @@ export default function Create({ organization, newRef, contacts, date, categorie
       month : parseInt(e.target.value),
       type : type
     };    
+
+    setData(temp);
   }
 
   const handleSelectedCashAccount = (selected) => {
     setSelectedCashAccount({ id: selected.id, name: selected.name, code: selected.code, is_cash: true });
     setData('cash_account_id', selected.id);
-};
+    setError('cash_account_id','');
+  };
 
   return (
     <>
@@ -240,7 +274,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
                       maxHeight='max-h-40'
                       placeholder='Cari Kontak'
                       isError={errors.contact_id ? true : false}
-                      id='contact'
+                      id='name'
                     />
                   {errors?.name && <span className='text-red-500 text-xs'>{errors.name}</span>}
                 </div>
@@ -301,7 +335,12 @@ export default function Create({ organization, newRef, contacts, date, categorie
                 </div>
 
                 <div className='w-full sm:w-2/3'>
-                  <select className="select select-bordered w-full" defaultValue={data.study_year} onChange={e => setData('study_year', e.target.value)} id='study_year'>
+                  <select 
+                    className="select select-bordered w-full" 
+                    defaultValue={data.study_year} 
+                    onChange={handleChangeStudyYear} 
+                    id='study_year'
+                  >
                     {
                       studyYears.map((study_year, index) => 
                         <option 
@@ -327,7 +366,6 @@ export default function Create({ organization, newRef, contacts, date, categorie
                   <select 
                     className="select select-bordered w-full" 
                     defaultValue={data.month} 
-                    // onChange={e => setData('month', e.target.value)} 
                     onChange={handleChangeMonth} 
                     id='month'
                   >
@@ -377,7 +415,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
               </div>
 
               <div className='w-full sm:w-2/3 text-end'>
-                Rp. {formatNumber(total)}
+                Rp. {formatNumber(data.value)}
               </div>
             </div>
 
@@ -397,13 +435,15 @@ export default function Create({ organization, newRef, contacts, date, categorie
                   setSelected={(selected) => handleSelectedCashAccount(selected)}
                   maxHeight='max-h-40'
                   placeholder='Cari Akun'
-                  isError={errors.account ? true : false}
+                  isError={errors.cash_account_id ? true : false}
                   id='account'
                   contactFilter={''}
                 />
                 {selectedCashAccount?.code && (
-                    <div className='absolute text-xs'>Kode: {selectedCashAccount.code}</div>
+                  <div className='absolute text-xs'>Kode: {selectedCashAccount.code}</div>
                 )}
+                {errors?.cash_account_id && <span className='text-red-500 text-xs'>{errors.cash_account_id}</span>}
+
               </div>
             </div>
 

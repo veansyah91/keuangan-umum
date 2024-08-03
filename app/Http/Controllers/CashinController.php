@@ -109,7 +109,6 @@ class CashinController extends Controller
     {
         $user = Auth::user();
 
-        // dd($this->contactRepository->getData($organization['id'], request(['contact'])));
         return Inertia::render('CashIn/Create', [
             'organization' => $organization,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),

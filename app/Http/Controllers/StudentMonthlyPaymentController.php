@@ -181,7 +181,9 @@ class StudentMonthlyPaymentController extends Controller
             ]
         ]);
 
+        $user = Auth::user();
         $validated['organization_id'] = $organization['id'];
+        $validated['user_id'] = $user['id'];
 
         // cek apakah pembayaran sudah dilakukan
         $payment = StudentMonthlyPayment::whereOrganizationId($organization['id'])
@@ -241,9 +243,20 @@ class StudentMonthlyPaymentController extends Controller
                 'credit' => $validated['value'],
             ],
         ];
+
         $journal = $this->journalRepository->store($validated);
         $validated['journal_id'] = $journal['id'];
-        dd($journal);
+
+        $log = [
+            'description' => $validated['description'],
+            'date' => $validated['date'],
+            'no_ref' => $validated['no_ref'],
+            'value' => $validated['value'],
+        ];
+
+        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menambahkan DATA pada PEMBAYARAN IURAN BULANAN dengan DATA : '.json_encode($log));
+
+        return redirect(route('cashflow.student-monthly-payment.create', $organization['id']))->with('success', 'Pembayaran Iuran Bulanan Berhasil Ditambahkan');
 
     }
 }
