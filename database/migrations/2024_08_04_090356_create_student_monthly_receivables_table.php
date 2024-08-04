@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('student_monthly_receivables', function (Blueprint $table) {
             $table->id();
             $table->foreignUuid('organization_id')->constrained()->cascadeOnDelete();
-            $table->unsignedBigInteger('contact_id');
+            $table->unsignedBigInteger('contact_id'); // student
             $table->foreign('contact_id')->references('id')->on('contacts');
             $table->bigInteger('value');
             $table->timestamps();

@@ -22,6 +22,8 @@ return new class extends Migration
             $table->string('no_ref');
             $table->string('description');
             $table->date('date');
+            $table->integer('month');
+            $table->integer('year');
             $table->timestamps();
         });
     }

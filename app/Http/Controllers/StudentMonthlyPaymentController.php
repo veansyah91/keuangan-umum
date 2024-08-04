@@ -195,6 +195,8 @@ class StudentMonthlyPaymentController extends Controller
         if ($payment) {
             return redirect()->back()->withErrors(['error' => 'Data is existed']);
         }
+
+        dd($validated);
         
         $payment = StudentMonthlyPayment::create($validated);
 
