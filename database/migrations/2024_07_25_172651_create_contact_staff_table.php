@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('contact_staff', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('contact_id');
-            $table->foreign('contact_id')->references('id')->on('users');
+            $table->foreign('contact_id')->references('id')->on('contacts');
             $table->year('entry_year');
             $table->string('description')->nullable();
             $table->string('position')->nullable();

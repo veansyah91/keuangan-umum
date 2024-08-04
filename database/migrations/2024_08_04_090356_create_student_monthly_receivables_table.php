@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('contact_students', function (Blueprint $table) {
+        Schema::create('student_monthly_receivables', function (Blueprint $table) {
             $table->id();
+            $table->foreignUuid('organization_id')->constrained()->cascadeOnDelete();
             $table->unsignedBigInteger('contact_id');
             $table->foreign('contact_id')->references('id')->on('contacts');
-            $table->string('father_name')->nullable();
-            $table->string('mother_name')->nullable();
-            $table->date('birthday')->nullable();
-            $table->year('entry_year');
+            $table->bigInteger('value');
             $table->timestamps();
         });
     }
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('contact_students');
+        Schema::dropIfExists('student_monthly_receivables');
     }
 };

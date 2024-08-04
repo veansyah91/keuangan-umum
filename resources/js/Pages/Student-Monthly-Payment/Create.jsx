@@ -93,6 +93,16 @@ export default function Create({ organization, newRef, contacts, date, categorie
       ...tempData,
       value: tempTotal,
       details: temp,
+      contact_id:null,
+      date:date,
+      level:'',
+      student_id:'',
+      no_ref:newRef,
+      type:'now', // set auto
+      month:parseInt(monthNow()),
+      study_year:studyYear(),
+      description:'',
+      account_id: null
     }
     
     setData(tempData);
@@ -106,10 +116,10 @@ export default function Create({ organization, newRef, contacts, date, categorie
         toast.success(flash.success, {
           position: toast.POSITION.TOP_CENTER,
         });
-        reset();
-        setDefault();
         setSelectedCashAccount({ id: null, name: '', code: '', is_cash: true });
         setSelectedContact({ id: null, name: '', phone: '' });
+        setDefault();
+
       },
       onError: errors => {
         toast.error(errors.error, {

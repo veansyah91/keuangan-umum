@@ -22,7 +22,7 @@ return new class extends Migration
             $table->foreignUuid('organization_id')->constrained()->cascadeOnDelete();
 
             $table->unsignedBigInteger('contact_id')->nullable();
-            $table->foreign('contact_id')->references('id')->on('users');
+            $table->foreign('contact_id')->references('id')->on('contacts');
 
             $table->unsignedBigInteger('created_by_id');
             $table->foreign('created_by_id')->references('id')->on('users');
