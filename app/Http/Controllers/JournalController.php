@@ -2,40 +2,40 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
+use App\Models\User;
+use Inertia\Inertia;
+use App\Models\Ledger;
 use App\Helpers\NewRef;
 use App\Models\Account;
-use App\Models\Department;
 use App\Models\Journal;
-use App\Models\Ledger;
-use App\Models\Organization;
 use App\Models\Program;
 use App\Models\Project;
-use App\Models\User;
-use App\Repositories\Journal\JournalRepository;
+use App\Models\Department;
+use Carbon\CarbonImmutable;
+use App\Models\Organization;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 use App\Repositories\Log\LogRepository;
 use App\Repositories\User\UserRepository;
-use Carbon\Carbon;
-use Carbon\CarbonImmutable;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
-use Inertia\Inertia;
+use App\Repositories\Account\AccountRepository;
+use App\Repositories\Journal\JournalRepository;
 
 class JournalController extends Controller
 {
     protected $userRepository;
-
     protected $logRepository;
-
     protected $journalRepository;
-
+    protected $accountRepository;
     protected $now;
 
-    public function __construct(UserRepository $userRepository, LogRepository $logRepository, JournalRepository $journalRepository)
+    public function __construct(UserRepository $userRepository, LogRepository $logRepository, JournalRepository $journalRepository, AccountRepository $accountRepository)
     {
         $this->userRepository = $userRepository;
         $this->logRepository = $logRepository;
         $this->journalRepository = $journalRepository;
+        $this->accountRepository = $accountRepository;
         $this->now = CarbonImmutable::now();
     }
 
@@ -103,11 +103,8 @@ class JournalController extends Controller
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'newRef' => $this->newRef($organization, request('date')),
             'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
-            'accounts' => Account::filter(request(['search']))
-                ->whereIsActive(true)
-                ->whereOrganizationId($organization['id'])
-                ->select('id', 'name', 'code', 'is_cash')
-                ->get(),
+            'accounts' => $this->accountRepository
+                ->getData($organization['id'], request(['search'])),
             'projects' => Project::whereOrganizationId($organization['id'])
                 ->select('id', 'name', 'code')
                 ->get(),
@@ -286,12 +283,6 @@ class JournalController extends Controller
             return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
         }
 
-        $accounts = Account::filter(request(['search']))
-            ->whereIsActive(true)
-            ->whereOrganizationId($organization['id'])
-            ->select('id', 'name', 'code', 'is_cash')
-            ->get();
-
         $now = Carbon::now();
         $date = request('date') ?? $journal['date'];
 
@@ -300,7 +291,8 @@ class JournalController extends Controller
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'newRef' => $this->newRef($organization, request('date')),
             'date' => $date,
-            'accounts' => $accounts,
+            'accounts' => $this->accountRepository
+            ->getData($organization['id'], request(['search'])),
             'journal' => $journal,
             'ledgers' => Ledger::whereJournalId($journal['id'])->with('account')->orderBy('credit', 'asc')->get(),
             'program' => Program::find($journal['program_id']),

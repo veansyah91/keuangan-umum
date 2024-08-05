@@ -106,7 +106,6 @@ export default function Edit({
             let tempOldDate = `${oldDateFormatted.month() + 1}-${oldDateFormatted.year()}`;
 
             tempInputDate !== tempOldDate ? reloadNewRef() : setData('no_ref', cashIn.no_ref);
-            console.log(tempInputDate !== tempOldDate);
         }
     }, [debounceDateValue]);
 

@@ -4,5 +4,6 @@ namespace App\Repositories\Account;
 
 interface AccountRepositoryInterface
 {
-    public function store($validated);
+    public function getData($organizationId, $request);
+    public function getDataNonCash($organizationId, $request);
 }

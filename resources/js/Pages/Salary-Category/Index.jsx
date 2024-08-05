@@ -401,7 +401,7 @@ export default function Index({ role, organization, salaryCategories, searchFilt
               </label>
             </div>
             {
-              data.has_hour && 
+              data.has_hour ? 
               <div className='flex flex-col sm:flex-row w-full gap-1'>
                 <div className='w-full sm:w-1/3 my-auto'>
                   <InputLabel htmlFor='unit' value='Satuan' className='mx-auto my-auto' />
@@ -414,7 +414,7 @@ export default function Index({ role, organization, salaryCategories, searchFilt
                   </select>
                   {errors?.unit && <span className='text-red-500 text-xs'>{errors.unit}</span>}
                 </div>
-              </div>
+              </div> : ''
             }
             <div className='w-2/6'>
               <label htmlFor={`is_cut`} className='flex cursor-pointer gap-5'>

@@ -30,7 +30,7 @@ export default function Edit({
     programs,
     departments,
     contacts,
-}) {
+}) {    
     // state
     const [selectedAccount, setSelectedAccount] = useState(cashOut.selectedAccount);
 
@@ -274,7 +274,7 @@ export default function Edit({
                             </div>
                             <div className='sm:w-1/4 w-full text-slate-900 space-y-2'>
                                 <div>
-                                    <InputLabel value={'Ke Akun Kas'} htmlFor='cash_account' />
+                                    <InputLabel value={'Dari Akun Kas'} htmlFor='cash_account' />
                                 </div>
                                 <div>
                                     <ClientSelectInput

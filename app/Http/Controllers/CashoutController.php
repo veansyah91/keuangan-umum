@@ -2,42 +2,54 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
+use App\Models\User;
+use Inertia\Inertia;
+use App\Models\Ledger;
 use App\Helpers\NewRef;
 use App\Models\Account;
 use App\Models\Cashout;
 use App\Models\Contact;
-use App\Models\Department;
 use App\Models\Journal;
-use App\Models\Ledger;
-use App\Models\Organization;
 use App\Models\Program;
 use App\Models\Project;
-use App\Models\User;
-use App\Repositories\Journal\JournalRepository;
+use App\Models\Department;
+use Carbon\CarbonImmutable;
+use App\Models\Organization;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 use App\Repositories\Log\LogRepository;
 use App\Repositories\User\UserRepository;
-use Carbon\Carbon;
-use Carbon\CarbonImmutable;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
-use Inertia\Inertia;
+use App\Repositories\Account\AccountRepository;
+use App\Repositories\Contact\ContactRepository;
+use App\Repositories\Journal\JournalRepository;
+use App\Repositories\Program\ProgramRepository;
+use App\Repositories\Project\ProjectRepository;
+use App\Repositories\Department\DepartmentRepository;
 
 class CashoutController extends Controller
 {
     protected $userRepository;
-
     protected $logRepository;
-
     protected $journalRepository;
-
+    protected $contactRepository;
+    protected $accountRepository;
+    protected $programRepository;
+    protected $projectRepository;
+    protected $departmentRepository;
     protected $now;
 
-    public function __construct(UserRepository $userRepository, LogRepository $logRepository, JournalRepository $journalRepository)
+    public function __construct(UserRepository $userRepository, LogRepository $logRepository, JournalRepository $journalRepository, ContactRepository $contactRepository, AccountRepository $accountRepository, ProgramRepository $programRepository, ProjectRepository $projectRepository, DepartmentRepository $departmentRepository)
     {
         $this->userRepository = $userRepository;
         $this->logRepository = $logRepository;
         $this->journalRepository = $journalRepository;
+        $this->contactRepository = $contactRepository;
+        $this->accountRepository = $accountRepository;
+        $this->programRepository = $programRepository;
+        $this->projectRepository = $projectRepository;
+        $this->departmentRepository = $departmentRepository;
         $this->now = CarbonImmutable::now();
     }
 
@@ -84,17 +96,9 @@ class CashoutController extends Controller
             'cashOuts' => $cashOuts,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'isApproved' => request('is_approved') == 'true' ? true : false,
-            'projects' => Project::whereOrganizationId($organization['id'])
-                ->select('id', 'name', 'code')
-                ->get(),
-            'programs' => Program::whereIsActive(true)
-                ->whereOrganizationId($organization['id'])
-                ->select('id', 'name', 'code')
-                ->get(),
-            'departments' => Department::whereIsActive(true)
-                ->whereOrganizationId($organization['id'])
-                ->select('id', 'name', 'code')
-                ->get(),
+            'programs' => $this->programRepository->getData($organization['id']),
+            'projects' => $this->projectRepository->getData($organization['id']),
+            'departments' => $this->departmentRepository->getData($organization['id']),
         ]);
     }
 
@@ -110,36 +114,12 @@ class CashoutController extends Controller
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'newRef' => $this->newRef($organization, request('date')),
             'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
-            'accounts' => Account::filter(request(['account']))
-                ->whereIsActive(true)
-                ->whereOrganizationId($organization['id'])
-                ->select('id', 'name', 'code', 'is_cash')
-                ->orderBy('code')
-                ->get(),
-            'cashAccounts' => Account::filter(request(['account']))
-                ->whereIsActive(true)
-                ->whereOrganizationId($organization['id'])
-                ->whereIsCash(true)
-                ->select('id', 'name', 'code', 'is_cash')
-                ->orderBy('code')
-                ->get(),
-            'contacts' => Contact::filter(request(['contact']))
-                ->whereOrganizationId($organization['id'])
-                ->whereIsActive(true)
-                ->with('contactCategories')
-                ->select('id', 'name', 'phone')
-                ->get(),
-            'projects' => Project::whereOrganizationId($organization['id'])
-                ->select('id', 'name', 'code')
-                ->get(),
-            'programs' => Program::whereIsActive(true)
-                ->whereOrganizationId($organization['id'])
-                ->select('id', 'name', 'code')
-                ->get(),
-            'departments' => Department::whereIsActive(true)
-                ->whereOrganizationId($organization['id'])
-                ->select('id', 'name', 'code')
-                ->get(),
+            'accounts' => $this->accountRepository->getDataNonCash($organization['id'], request(['account'])),
+            'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),
+            'contacts' => $this->contactRepository->getData($organization['id'], request(['contact'])),
+            'programs' => $this->programRepository->getData($organization['id']),
+            'projects' => $this->projectRepository->getData($organization['id']),
+            'departments' => $this->departmentRepository->getData($organization['id']),
         ]);
     }
 
@@ -299,7 +279,7 @@ class CashoutController extends Controller
         $cashAccount = null;
         $value = 0;
         foreach ($cashOut->journal->ledgers as $ledger) {
-            if ($ledger['credit'] > 0) {
+            if ($ledger['debit'] > 0) {
                 $account = Account::find($ledger['account_id']);
                 $selectedAccount[$index] = [
                     'id' => $account['id'],
@@ -311,13 +291,13 @@ class CashoutController extends Controller
                     'name' => $account['name'],
                     'code' => $account['code'],
                     'is_cash' => $account['is_cash'],
-                    'value' => $ledger['credit'],
+                    'value' => $ledger['debit'],
 
                 ];
                 $index++;
             } else {
                 $cashAccount = Account::find($ledger['account_id']);
-                $value = $ledger['credit'];
+                $value = $ledger['debit'];
             }
         }
 
@@ -336,33 +316,12 @@ class CashoutController extends Controller
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'newRef' => $this->newRef($organization, request('date')),
             'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
-            'accounts' => Account::filter(request(['account']))
-                ->whereIsActive(true)
-                ->whereOrganizationId($organization['id'])
-                ->select('id', 'name', 'code', 'is_cash')
-                ->get(),
-            'cashAccounts' => Account::filter(request(['account']))
-                ->whereIsActive(true)
-                ->whereOrganizationId($organization['id'])
-                ->whereIsCash(true)
-                ->select('id', 'name', 'code', 'is_cash')
-                ->get(),
-            'contacts' => Contact::filter(request(['contact']))
-                ->whereOrganizationId($organization['id'])
-                ->with('contactCategories')
-                ->select('id', 'name', 'phone')
-                ->get(),
-            'projects' => Project::whereOrganizationId($organization['id'])
-                ->select('id', 'name', 'code')
-                ->get(),
-            'programs' => Program::whereIsActive(true)
-                ->whereOrganizationId($organization['id'])
-                ->select('id', 'name', 'code')
-                ->get(),
-            'departments' => Department::whereIsActive(true)
-                ->whereOrganizationId($organization['id'])
-                ->select('id', 'name', 'code')
-                ->get(),
+            'accounts' => $this->accountRepository->getDataNonCash($organization['id'], request(['account'])),
+            'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),
+            'contacts' => $this->contactRepository->getData($organization['id'], request(['contact'])),
+            'programs' => $this->programRepository->getData($organization['id']),
+            'projects' => $this->projectRepository->getData($organization['id']),
+            'departments' => $this->departmentRepository->getData($organization['id']),
         ]);
     }
 

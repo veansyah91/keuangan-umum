@@ -21,27 +21,35 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use App\Repositories\Log\LogRepository;
 use App\Repositories\User\UserRepository;
+use App\Repositories\Account\AccountRepository;
 use App\Repositories\Contact\ContactRepository;
 use App\Repositories\Journal\JournalRepository;
+use App\Repositories\Program\ProgramRepository;
+use App\Repositories\Project\ProjectRepository;
+use App\Repositories\Department\DepartmentRepository;
 
 class CashinController extends Controller
 {
     protected $userRepository;
-
     protected $logRepository;
-
     protected $journalRepository;
-
     protected $contactRepository;
-
+    protected $accountRepository;
+    protected $programRepository;
+    protected $projectRepository;
+    protected $departmentRepository;
     protected $now;
 
-    public function __construct(UserRepository $userRepository, LogRepository $logRepository, JournalRepository $journalRepository, ContactRepository $contactRepository)
+    public function __construct(UserRepository $userRepository, LogRepository $logRepository, JournalRepository $journalRepository, ContactRepository $contactRepository, AccountRepository $accountRepository, ProgramRepository $programRepository, ProjectRepository $projectRepository, DepartmentRepository $departmentRepository)
     {
         $this->userRepository = $userRepository;
         $this->logRepository = $logRepository;
         $this->journalRepository = $journalRepository;
         $this->contactRepository = $contactRepository;
+        $this->accountRepository = $accountRepository;
+        $this->programRepository = $programRepository;
+        $this->projectRepository = $projectRepository;
+        $this->departmentRepository = $departmentRepository;
         $this->now = CarbonImmutable::now();
     }
 
@@ -88,17 +96,9 @@ class CashinController extends Controller
             'cashIns' => $cashIns,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'isApproved' => request('is_approved') == 'true' ? true : false,
-            'projects' => Project::whereOrganizationId($organization['id'])
-                ->select('id', 'name', 'code')
-                ->get(),
-            'programs' => Program::whereIsActive(true)
-                ->whereOrganizationId($organization['id'])
-                ->select('id', 'name', 'code')
-                ->get(),
-            'departments' => Department::whereIsActive(true)
-                ->whereOrganizationId($organization['id'])
-                ->select('id', 'name', 'code')
-                ->get(),
+            'programs' => $this->programRepository->getData($organization['id']),
+            'projects' => $this->projectRepository->getData($organization['id']),
+            'departments' => $this->departmentRepository->getData($organization['id']),
         ]);
     }
 
@@ -114,33 +114,12 @@ class CashinController extends Controller
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'newRef' => $this->newRef($organization, request('date')),
             'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
-            'accounts' => Account::filter(request(['account']))
-                ->whereIsActive(true)
-                ->where('is_cash', false)
-                ->whereOrganizationId($organization['id'])
-                ->select('id', 'name', 'code', 'is_cash')
-                ->orderBy('code')
-                ->get(),
-            'cashAccounts' => Account::filter(request(['account']))
-                ->whereIsActive(true)
-                ->whereOrganizationId($organization['id'])
-                ->whereIsCash(true)
-                ->select('id', 'name', 'code', 'is_cash')
-                ->orderBy('code')
-                ->get(),
-            'contacts' => $this->contactRepository
-                              ->getData($organization['id'], request(['contact'])),
-            'projects' => Project::whereOrganizationId($organization['id'])
-                ->select('id', 'name', 'code')
-                ->get(),
-            'programs' => Program::whereIsActive(true)
-                ->whereOrganizationId($organization['id'])
-                ->select('id', 'name', 'code')
-                ->get(),
-            'departments' => Department::whereIsActive(true)
-                ->whereOrganizationId($organization['id'])
-                ->select('id', 'name', 'code')
-                ->get(),
+            'accounts' => $this->accountRepository->getDataNonCash($organization['id'], request(['account'])),
+            'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),
+            'contacts' => $this->contactRepository->getData($organization['id'], request(['contact'])),
+            'programs' => $this->programRepository->getData($organization['id']),
+            'projects' => $this->projectRepository->getData($organization['id']),
+            'departments' => $this->departmentRepository->getData($organization['id']),
         ]);
     }
 
@@ -257,7 +236,6 @@ class CashinController extends Controller
         $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menambahkan DATA pada KAS MASUK dengan DATA : '.json_encode($log));
 
         return redirect(route('cashflow.cash-in.create', $organization['id']));
-
     }
 
     /**
@@ -335,33 +313,12 @@ class CashinController extends Controller
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'newRef' => $this->newRef($organization, request('date')),
             'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
-            'accounts' => Account::filter(request(['account']))
-                ->whereIsActive(true)
-                ->whereOrganizationId($organization['id'])
-                ->select('id', 'name', 'code', 'is_cash')
-                ->get(),
-            'cashAccounts' => Account::filter(request(['account']))
-                ->whereIsActive(true)
-                ->whereOrganizationId($organization['id'])
-                ->whereIsCash(true)
-                ->select('id', 'name', 'code', 'is_cash')
-                ->get(),
-            'contacts' => Contact::filter(request(['contact']))
-                ->whereOrganizationId($organization['id'])
-                ->with('contactCategories')
-                ->select('id', 'name', 'phone')
-                ->get(),
-            'projects' => Project::whereOrganizationId($organization['id'])
-                ->select('id', 'name', 'code')
-                ->get(),
-            'programs' => Program::whereIsActive(true)
-                ->whereOrganizationId($organization['id'])
-                ->select('id', 'name', 'code')
-                ->get(),
-            'departments' => Department::whereIsActive(true)
-                ->whereOrganizationId($organization['id'])
-                ->select('id', 'name', 'code')
-                ->get(),
+            'accounts' => $this->accountRepository->getDataNonCash($organization['id'], request(['account'])),
+            'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),
+            'contacts' => $this->contactRepository->getData($organization['id'], request(['contact'])),
+            'programs' => $this->programRepository->getData($organization['id']),
+            'projects' => $this->projectRepository->getData($organization['id']),
+            'departments' => $this->departmentRepository->getData($organization['id']),
         ]);
     }
 
