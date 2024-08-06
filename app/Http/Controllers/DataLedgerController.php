@@ -24,7 +24,7 @@ class DataLedgerController extends Controller
     {
         $user = Auth::user();
 
-        return Inertia::render('Data-Ledger/Index', [
+        return Inertia::render('DataLedger/Index', [
             'organization' => $organization,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
         ]);

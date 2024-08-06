@@ -36,7 +36,7 @@ class AccountCategoryController extends Controller
             ->paginate(50);
         $user = Auth::user();
 
-        return Inertia::render('Account-Category/Index', [
+        return Inertia::render('AccountCategory/Index', [
             'organization' => $organization,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'accountCategories' => $accountCategories,

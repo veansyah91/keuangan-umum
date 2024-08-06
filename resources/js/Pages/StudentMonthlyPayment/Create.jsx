@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -44,7 +44,11 @@ const monthNow = () => {
   return month;
 }
 
-export default function Create({ organization, newRef, contacts, date, categories, studyYears, cashAccounts }) {
+const studyYearUpdate = (month, studyYear) => {
+
+}
+
+export default function Create({ organization, newRef, contacts, date, categories, studyYears, cashAccounts, lastPayment }) {
 
   // state
   const [total, setTotal] = useState(0);
@@ -141,6 +145,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
       level: selected.levels[selected.levels.length - 1].level
     };
     setData(temp);
+    handleReloadLastPayment(selected.id)
   };
 
   const handleDateValueChange = (newValue) => {
@@ -215,6 +220,19 @@ export default function Create({ organization, newRef, contacts, date, categorie
     setData('cash_account_id', selected.id);
     setError('cash_account_id','');
   };
+
+  const handleReloadLastPayment = (contact_id) => {
+    router.reload({
+      only: ['lastPayment'],
+      data: {
+        'contact_id' : contact_id
+      },
+      onSuccess: ({ props }) => {
+        const { lastPayment } = props;
+        
+      }
+    })
+  }
 
   return (
     <>
@@ -498,7 +516,7 @@ Create.layout = (page) => (
             <Link href={route('data-master', page.props.organization.id)}>Data Master</Link>
           </li>
           <li className='font-bold'>
-            <Link href={route('cashflow.student-monthly-payment', page.props.organization.id)}>Pembayaran</Link>
+            <Link href={route('cashflow.student-monthly-payment', page.props.organization.id)}>Pembayaran Iuran Bulanan Siswa</Link>
           </li>
           <li>Tambah Pembayaran</li>
         </ul>

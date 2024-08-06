@@ -24,7 +24,7 @@ class DataMasterController extends Controller
     {
         $user = Auth::user();
 
-        return Inertia::render('Data-Master/Index', [
+        return Inertia::render('DataMaster/Index', [
             'organization' => $organization,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
         ]);

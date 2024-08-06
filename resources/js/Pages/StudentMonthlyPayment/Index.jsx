@@ -107,6 +107,7 @@ export default function Index({ role, organization, payments, searchFilter }) {
                     <AddButtonMobile label={'Tambah'} />
                 </Link>
             )}
+            
             <TitleMobile
                 zIndex={'z-50'}
                 search={search}
@@ -228,10 +229,11 @@ export default function Index({ role, organization, payments, searchFilter }) {
                             <table className='table table-pin-rows table-pin-cols text-base'>
                                 <thead className='text-base text-gray-900'>
                                     <tr className=''>
+                                        <th className='bg-gray-200'>Tanggal</th>
                                         <th className='bg-gray-200'>Nama</th>
-                                        <th className='bg-gray-200'>Kelas (Tahun Ajaran)</th>
-                                        <th className='bg-gray-200'>Alamat</th>
-                                        <th className='bg-gray-200'>Status</th>
+                                        <th className='bg-gray-200'>Bulan</th>
+                                        <th className='bg-gray-200'>Tahun Ajaran</th>
+                                        <th className='bg-gray-200 text-end'>Jumlah Bayar</th>
                                         <th className='bg-gray-200'></th>
                                     </tr>
                                 </thead>
@@ -290,7 +292,7 @@ Index.layout = (page) => (
                     <li className='font-bold'>
                         <Link href={route('data-master', page.props.organization.id)}>Data Master</Link>
                     </li>
-                    <li>Pembayaran Iuran Siswa</li>
+                    <li>Pembayaran Iuran Bulanan Siswa</li>
                 </ul>
             </div>
         }

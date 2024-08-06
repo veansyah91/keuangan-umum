@@ -1,29 +1,28 @@
 import BadgeDanger from '@/Components/Badges/BadgeDanger';
 import BadgeSuccess from '@/Components/Badges/BadgeSuccess';
-import formatNumber from '@/Utils/formatNumber';
+import DropdownAction from '@/Components/DropdownAction';
+import { Link } from '@inertiajs/react';
+import dayjs from 'dayjs';
 import React from 'react';
 import { IoCreateOutline, IoEllipsisVertical, IoSearchOutline, IoTrash } from 'react-icons/io5';
 
-export default function StudentDesktop({ category, className, role, handleDelete, handleEdit }) {
+export default function StudentMobile({ payment, role, handleDelete, handleEdit }) {
     return (
         <>
-            <tr className={className}>
-                <td>{category.name}</td>
-                <td className='text-end'>IDR. { formatNumber(category.value) }</td>
-                <td className='text-center'>
-                {
-                    category.is_active 
-                    ? <BadgeSuccess>Aktif</BadgeSuccess>
-                    : <BadgeDanger>Tidak Aktif</BadgeDanger>
-                }
-                </td>
-                <td className='text-end'>
+            <div className=' text-gray-900 py-2 px-3 border flex gap-5 justify-between'>
+                <div className='text-start my-auto'>
+                    <div className='text-xs'>
+                        {dayjs(payment.date).format('MMMM DD, YYYY')}
+                    </div>
+                    {payment.contact.name}
+                </div>
+                <div className='text-start'>
                     {role !== 'viewer' && (
                         <div className='dropdown dropdown-left'>
                             <div
                                 tabIndex={0}
                                 role='button'
-                                className={`bg-inherit border-none hover:bg-gray-100 -z-50 text-gray-300'`}>
+                                className={`btn bg-white border-none hover:bg-gray-100 -z-50 text-gray-300'`}>
                                 <IoEllipsisVertical />
                             </div>
                             <ul
@@ -44,8 +43,8 @@ export default function StudentDesktop({ category, className, role, handleDelete
                             </ul>
                         </div>
                     )}
-                </td>
-            </tr>
+                </div>
+            </div>
         </>
     );
 }

@@ -28,7 +28,7 @@ class SalaryCategoryController extends Controller
     {
         $user = Auth::user();
 
-        return Inertia::render('Salary-Category/Index', [
+        return Inertia::render('SalaryCategory/Index', [
             'organization' => $organization,
             'salaryCategories' => SalaryCategory::filter(request(['search']))
                                                 ->whereOrganizationId($organization['id'])

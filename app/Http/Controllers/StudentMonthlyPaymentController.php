@@ -69,10 +69,12 @@ class StudentMonthlyPaymentController extends Controller
     {
         $user = Auth::user();
 
-        return Inertia::render('Student-Monthly-Payment/Index',[
+        return Inertia::render('StudentMonthlyPayment/Index',[
             'organization' => $organization,
             'payments' => StudentMonthlyPayment::filter(request(['search']))
+                                        ->with('contact')
                                         ->whereOrganizationId($organization['id'])
+                                        ->orderBy('date', 'desc')
                                         ->paginate(50),
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
         ]);
@@ -90,9 +92,7 @@ class StudentMonthlyPaymentController extends Controller
             return redirect()->back()->withErrors(['message' => 'Silakan Buat Kategori Kontak SISWA terlebih dahulu!']);
         }
 
-        $studyYears = StudentLevel::select('year')->distinct()->take(10)->get();
-
-        return Inertia::render('Student-Monthly-Payment/Create',[
+        return Inertia::render('StudentMonthlyPayment/Create',[
             'organization' => $organization,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'categories' => StudentPaymentCategory::whereOrganizationId($organization['id'])
@@ -100,7 +100,7 @@ class StudentMonthlyPaymentController extends Controller
                                                     ->get(),
             'newRef' => $this->newRef($organization, request('date')),
             'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
-            'studyYears' => $studyYears,
+            'studyYears' => StudentLevel::select('year')->distinct()->take(10)->get(),
             'contacts' => $this->contactRepository
                                 ->getStudent($organization['id'], $contactCategory['id'], request(['contact'])),
             'cashAccounts' => Account::filter(request(['account']))
@@ -110,6 +110,11 @@ class StudentMonthlyPaymentController extends Controller
                                         ->select('id', 'name', 'code', 'is_cash')
                                         ->orderBy('code')
                                         ->get(),
+            'lastPayment' => StudentMonthlyPayment::whereContactId(request('contact_id'))
+                                        ->whereOrganizationId($organization['id'])
+                                        ->orderBy('study_year')
+                                        ->latest()
+                                        ->first()
         ]);
     }
 

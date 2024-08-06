@@ -43,6 +43,7 @@ use App\Http\Controllers\StudentMonthlyPaymentController;
 use App\Http\Controllers\Admin\OrganizationMenuController;
 use App\Http\Controllers\StudentPaymentCategoryController;
 use App\Http\Controllers\Admin\AdminOrganizationController;
+use App\Http\Controllers\StudentMonthlyReceivableController;
 use App\Http\Controllers\StudentEntryPaymentCategoryController;
 use App\Http\Controllers\Admin\AdminOrganizationInvoiceController;
 
@@ -319,6 +320,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/student-monthly-payment', [StudentMonthlyPaymentController::class, 'index'])->name('cashflow.student-monthly-payment');
             Route::get('/student-monthly-payment/create', [StudentMonthlyPaymentController::class, 'create'])->name('cashflow.student-monthly-payment.create');
             Route::post('/student-monthly-payment', [StudentMonthlyPaymentController::class, 'store'])->name('cashflow.student-monthly-payment.post');
+
+            // student receivable
+            Route::get('/student-monthly-receivable', [StudentMonthlyReceivableController::class, 'index'])->name('cashflow.student-monthly-receivable');
+            
             
         });
 

@@ -32,7 +32,7 @@ class StudentMonthlyPayment extends Model
         });
     }
 
-    public function student(): BelongsTo
+    public function contact(): BelongsTo
     {
         return $this->belongsTo(Contact::class);
     }

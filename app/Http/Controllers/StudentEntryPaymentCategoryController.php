@@ -28,7 +28,7 @@ class StudentEntryPaymentCategoryController extends Controller
     {
         $user = Auth::user();
 
-        return Inertia::render('Student-Entry-Payment-Category/Index', [
+        return Inertia::render('StudentEntryPaymentCategory/Index', [
             'organization' => $organization,
             'studentPaymentCategories' => StudentEntryPaymentCategory::filter(request(['search']))
                                                 ->whereOrganizationId($organization['id'])

@@ -8,6 +8,7 @@ import CardMenu from '@/Components/CardMenu';
 import { BsCashCoin } from 'react-icons/bs';
 import { FaMoneyBillTransfer } from 'react-icons/fa6';
 import { IoMdPeople } from 'react-icons/io';
+import { SlNotebook } from "react-icons/sl";
 import { LiaMoneyBillWaveSolid } from 'react-icons/lia';
 
 export default function Index({ organization }) {
@@ -49,6 +50,13 @@ export default function Index({ organization }) {
                                     bgColor={'bg-orange-900'} 
                                     icon={<LiaMoneyBillWaveSolid />} 
                                     title={'Pembayaran Iuran Bulanan'} 
+                                />
+                            </Link>
+                            <Link href={route('cashflow.student-monthly-payment', organization.id)}>
+                                <CardMenu 
+                                    bgColor={'bg-slate-600'} 
+                                    icon={<SlNotebook />} 
+                                    title={'Piutang Iuran Bulanan'} 
                                 />
                             </Link>
                         </div>
