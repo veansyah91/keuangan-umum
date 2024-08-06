@@ -71,9 +71,9 @@ export default function Authenticated({
                     <input id='my-drawer' type='checkbox' className='drawer-toggle' />
                     <div className='drawer-content'>
                         <nav className='bg-white border-[#4f8315] border-b-2 w-full fixed z-10 print:hidden'>
-                            <div className='mx-auto px-2 sm:px-6'>
-                                <div className='flex justify-between sm:h-16 h-12'>
-                                    <div className='sm:flex hidden'>
+                            <div className='mx-auto px-2 md:px-6'>
+                                <div className='flex justify-between md:h-16 h-12'>
+                                    <div className='md:flex hidden'>
                                         <div className='shrink-0 flex items-center'>
                                             <Link href='/'>
                                                 <ApplicationLogo className='block h-9 w-auto fill-current text-gray-800' />
@@ -81,7 +81,7 @@ export default function Authenticated({
                                         </div>
 
                                         {route().current('admin*') ? (
-                                            <div className='hidden space-x-8 sm:-my-px sm:ms-10 sm:flex'>
+                                            <div className='hidden space-x-8 md:-my-px md:ms-10 md:flex'>
                                                 <NavLink
                                                     href={route('admin.dashboard')}
                                                     active={route().current('admin.dashboard*')}>
@@ -107,7 +107,7 @@ export default function Authenticated({
                                                 </NavLink>
                                             </div>
                                         ) : (
-                                            <div className='hidden space-x-8 sm:-my-px sm:ms-10 sm:flex'>
+                                            <div className='hidden space-x-8 md:-my-px md:ms-10 md:flex'>
                                                 <NavLink
                                                     href={route('dashboard', organization?.id)}
                                                     active={route().current('dashboard*')}>
@@ -137,7 +137,7 @@ export default function Authenticated({
                                         )}
                                     </div>
 
-                                    <div className='hidden sm:flex sm:items-center sm:ms-6'>
+                                    <div className='hidden md:flex md:items-center md:ms-6'>
                                         <div className='ms-3 relative'>
                                             <Dropdown>
                                                 <Dropdown.Trigger>
@@ -179,13 +179,13 @@ export default function Authenticated({
                                         </div>
                                     </div>
 
-                                    <div className='my-auto flex sm:hidden space-x-3 text-[#4f8315] px-2 print:hidden'>
+                                    <div className='my-auto flex md:hidden space-x-3 text-[#4f8315] px-2 print:hidden'>
                                         <div className='my-auto'>{backLink}</div>
                                         <div className='font-bold uppercase my-auto'>{title}</div>
                                     </div>
 
                                     {/* Second Nav for Mobile */}
-                                    <div className='-me-2 flex items-center sm:hidden'>
+                                    <div className='-me-2 flex items-center md:hidden'>
                                         <label htmlFor='my-drawer' className='btn bg-white border-none'>
                                             <svg
                                                 className='h-6 w-6'
@@ -207,13 +207,13 @@ export default function Authenticated({
                         </nav>
 
                         {header && (
-                            <header className='bg-white shadow hidden sm:flex sm:justify-between pt-16 print:hidden'>
-                                <div className='max-w-7xl py-3 px-4 sm:px-6 lg:px-8 my-auto'>{header}</div>
+                            <header className='bg-white shadow hidden md:flex md:justify-between pt-16 print:hidden'>
+                                <div className='max-w-7xl py-3 px-4 md:px-6 lg:px-8 my-auto'>{header}</div>
                                 {breadcrumbs && (
-                                    <div className='max-w-7xl py-3 px-4 sm:px-6 lg:px-8'>{breadcrumbs}</div>
+                                    <div className='max-w-7xl py-3 px-4 md:px-6 lg:px-8'>{breadcrumbs}</div>
                                 )}
                                 {showDateFilter && (
-                                    <div className='max-w-7xl py-3 px-4 sm:px-6 lg:px-8'>
+                                    <div className='max-w-7xl py-3 px-4 md:px-6 lg:px-8'>
                                         <Datepicker
                                             value={dateValue}
                                             onChange={handleDateValueChange}

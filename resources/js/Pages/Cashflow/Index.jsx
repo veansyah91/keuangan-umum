@@ -52,7 +52,7 @@ export default function Index({ organization }) {
                                     title={'Pembayaran Iuran Bulanan'} 
                                 />
                             </Link>
-                            <Link href={route('cashflow.student-monthly-payment', organization.id)}>
+                            <Link href={route('cashflow.student-monthly-receivable', organization.id)}>
                                 <CardMenu 
                                     bgColor={'bg-slate-600'} 
                                     icon={<SlNotebook />} 

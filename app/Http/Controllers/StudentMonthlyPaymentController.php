@@ -101,15 +101,8 @@ class StudentMonthlyPaymentController extends Controller
             'newRef' => $this->newRef($organization, request('date')),
             'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
             'studyYears' => StudentLevel::select('year')->distinct()->take(10)->get(),
-            'contacts' => $this->contactRepository
-                                ->getStudent($organization['id'], $contactCategory['id'], request(['contact'])),
-            'cashAccounts' => Account::filter(request(['account']))
-                                        ->whereIsActive(true)
-                                        ->whereOrganizationId($organization['id'])
-                                        ->whereIsCash(true)
-                                        ->select('id', 'name', 'code', 'is_cash')
-                                        ->orderBy('code')
-                                        ->get(),
+            'contacts' => $this->contactRepository->getStudent($organization['id'], $contactCategory['id'], request(['contact'])),
+            'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),
             'lastPayment' => StudentMonthlyPayment::whereContactId(request('contact_id'))
                                         ->whereOrganizationId($organization['id'])
                                         ->orderBy('study_year')

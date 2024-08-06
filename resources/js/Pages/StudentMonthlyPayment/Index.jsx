@@ -23,9 +23,7 @@ import { usePrevious } from 'react-use';
 import StudentMonthlyPaymentMobile from './Components/StudentMonthlyPaymentMobile';
 import StudentMonthlyPaymentDesktop from './Components/StudentMonthlyPaymentDesktop';
 
-export default function Index({ role, organization, payments, searchFilter }) {
-    console.log(payments);
-    
+export default function Index({ role, organization, payments, searchFilter }) {    
     // State
     const { errors } = usePage().props;
 
@@ -276,11 +274,11 @@ export default function Index({ role, organization, payments, searchFilter }) {
 
 Index.layout = (page) => (
     <AuthenticatedLayout
-        header={<Header>Pembayaran Iuran Siswa</Header>}
+        header={<Header>Pembayaran Iuran Agama Siswa</Header>}
         children={page}
         user={page.props.auth.user}
         organization={page.props.organization}
-        title='Pembayaran Iuran Siswa'
+        title='Pembayaran Iuran Agama Siswa'
         backLink={
             <Link href={route('data-master', page.props.organization.id)}>
                 <IoArrowBackOutline />
