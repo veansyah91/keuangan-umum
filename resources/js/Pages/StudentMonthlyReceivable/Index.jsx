@@ -24,7 +24,6 @@ import StudentMonthlyReceivableMobile from './Components/StudentMonthlyReceivabl
 import StudentMonthlyReceivableDesktop from './Components/StudentMonthlyReceivableDesktop';
 
 export default function Index({ role, organization, receivables, searchFilter }) {
-    console.log(receivables);
     
     // State
     const { errors } = usePage().props;

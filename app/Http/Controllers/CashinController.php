@@ -64,8 +64,8 @@ class CashinController extends Controller
         $cashIn = CashIn::whereOrganizationId($organization['id'])
             ->where('no_ref', 'like', $refHeader.'%')
             ->orderBy('no_ref')
-            ->get()
-            ->last();
+            ->latest()
+            ->first();
 
         if ($cashIn) {
             $newRef = NewRef::create('KM-', $cashIn['no_ref']);

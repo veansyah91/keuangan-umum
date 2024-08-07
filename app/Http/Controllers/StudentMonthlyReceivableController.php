@@ -8,7 +8,9 @@ use App\Helpers\NewRef;
 use Carbon\CarbonImmutable;
 use App\Models\Organization;
 use Illuminate\Http\Request;
+use App\Models\ContactCategory;
 use Illuminate\Support\Facades\Auth;
+use App\Models\StudentPaymentCategory;
 use App\Repositories\Log\LogRepository;
 use App\Models\StudentMonthlyReceivable;
 use App\Repositories\User\UserRepository;
@@ -45,11 +47,14 @@ class StudentMonthlyReceivableController extends Controller
       $refHeader = 'PIB-'.$dateRef->isoFormat('YYYY').$dateRef->isoFormat('MM');
       $newRef = $refHeader.'001';
 
-      $cashIn = StudentMonthlyReceivableLedger::whereOrganizationId($organization['id'])
-        ->where('no_ref', 'like', $refHeader.'%')
-        ->orderBy('no_ref')
-        ->get()
-        ->last();
+      $cashIn = StudentMonthlyReceivableLedger::whereHas('receivable', function ($query) use ($organization) {
+                                                  $query->whereOrganizationId($organization['id']);
+                                                })
+                                                // whereOrganizationId($organization['id'])
+                                                ->where('no_ref', 'like', $refHeader.'%')
+                                                ->orderBy('no_ref')
+                                                ->get()
+                                                ->last();
 
       if ($cashIn) {
         $newRef = NewRef::create('PIB-', $cashIn['no_ref']);
@@ -70,6 +75,30 @@ class StudentMonthlyReceivableController extends Controller
                                   ->orderBy('value')
                                   ->paginate(50),
       'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+    ]);
+  }
+
+  public function create(Organization $organization)
+  {
+    $user = Auth::user();
+
+    $contactCategory = ContactCategory::whereOrganizationId($organization['id'])
+                                            ->whereName('SISWA')
+                                            ->first();
+
+    if (!$contactCategory) {
+        return redirect()->back()->withErrors(['message' => 'Silakan Buat Kategori Kontak SISWA terlebih dahulu!']);
+    }
+
+    return Inertia::render('StudentMonthlyReceivable/Create',[
+      'organization' => $organization,
+      'categories' => StudentPaymentCategory::whereOrganizationId($organization['id'])
+                                                    ->whereIsActive(true)
+                                                    ->get(),
+      'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+      'newRef' => $this->newRef($organization, request('date')),
+      'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
+      'contacts' => $this->contactRepository->getStudents($organization['id'], $contactCategory['id'], request(['contact'])),
     ]);
   }
 }

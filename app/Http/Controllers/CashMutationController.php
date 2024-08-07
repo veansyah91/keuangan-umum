@@ -60,8 +60,8 @@ class CashMutationController extends Controller
         $cashMutation = CashMutation::whereOrganizationId($organization['id'])
             ->where('no_ref', 'like', $refHeader.'%')
             ->orderBy('no_ref')
-            ->get()
-            ->last();
+            ->latest()
+            ->first();
 
         if ($cashMutation) {
             $newRef = NewRef::create('MK-', $cashMutation['no_ref']);

@@ -20,6 +20,21 @@ import { NumericFormat } from 'react-number-format';
 import formatNumber from '@/Utils/formatNumber';
 import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 
+const yearList = () => {
+  const now = dayjs().year();
+
+  const start = now - 10;
+
+  let arrayYear = [];
+
+  for (let index = start; index < now + 1; index++) {
+      arrayYear = [
+          ...arrayYear, index
+      ];
+  }
+  return arrayYear;
+}
+
 const monthList = () => {
   let monthListTemp = [];
 
@@ -63,6 +78,9 @@ export default function Create({ organization, newRef, contacts, date, categorie
     details: [],
     account_id: null
   });
+
+  console.log(yearList());
+  
 
   const [selectedContact, setSelectedContact] = useState({ id: null, name: '', phone: '' });
   const [selectedCashAccount, setSelectedCashAccount] = useState({ id: null, name: '', code: '', is_cash: true });
@@ -369,7 +387,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
                     id='study_year'
                   >
                     {
-                      studyYears.map((study_year, index) => 
+                      yearList().map((study_year, index) => 
                         <option 
                           key={index} 
                         >{study_year.year}</option>

@@ -1,4 +1,5 @@
 import BadgeDanger from '@/Components/Badges/BadgeDanger';
+import BadgeSecondary from '@/Components/Badges/BadgeSecondary';
 import BadgeSuccess from '@/Components/Badges/BadgeSuccess';
 import formatMonth from '@/Utils/formatMonth';
 import formatNumber from '@/Utils/formatNumber';
@@ -15,6 +16,17 @@ export default function StudentDesktop({ payment, className, role, handleDelete,
                 <td>{formatMonth(payment.month)} ({payment.month})</td>
                 <td>{payment.study_year}</td>
                 <td className='text-end'>IDR. { formatNumber(payment.value) }</td>
+                <td className='text-start'>
+                    {
+                        payment.type == 'now' && <BadgeSuccess>Lunas</BadgeSuccess>
+                    }
+                    {
+                        payment.type == 'prepaid' && <BadgeSecondary>Bayar Dimuka</BadgeSecondary>
+                    }
+                    {
+                        payment.type == 'receivable' && <BadgeSecondary>Belum Bayar</BadgeSecondary>
+                    }
+                </td>
                 <td className='text-end'>
                     {role !== 'viewer' && (
                         <div className='dropdown dropdown-left'>

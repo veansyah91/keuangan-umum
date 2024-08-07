@@ -17,7 +17,7 @@ class ContactRepository implements ContactRepositoryInterface
                         ->get();
     }
 
-    public function getStudent($organizationId, $contactCategoryId, $request){
+    public function getStudents($organizationId, $contactCategoryId, $request){
         return Contact::filter($request)
                         ->whereOrganizationId($organizationId)
                         ->with(['contactCategories', 'student', 'levels'])

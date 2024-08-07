@@ -43,8 +43,8 @@ class AccountController extends Controller
             $accountCategory = AccountCategory::findOrFail(request('selectedAccountCategory'));
             $account = Account::whereAccountCategoryId(request('selectedAccountCategory'))
                 ->orderBy('code')
-                ->get()
-                ->last();
+                ->latest()
+                ->first();
             $code = $account ? (int) $account['code'] + 1 : (int) $accountCategory['code'];
         }
 

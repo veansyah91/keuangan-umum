@@ -232,6 +232,7 @@ export default function Index({ role, organization, payments, searchFilter }) {
                                         <th className='bg-gray-200'>Bulan</th>
                                         <th className='bg-gray-200'>Tahun Ajaran</th>
                                         <th className='bg-gray-200 text-end'>Jumlah Bayar</th>
+                                        <th className='bg-gray-200'>Tipe</th>
                                         <th className='bg-gray-200'></th>
                                     </tr>
                                 </thead>
@@ -274,11 +275,11 @@ export default function Index({ role, organization, payments, searchFilter }) {
 
 Index.layout = (page) => (
     <AuthenticatedLayout
-        header={<Header>Pembayaran Iuran Agama Siswa</Header>}
+        header={<Header>Pembayaran Iuran Bulanan Siswa</Header>}
         children={page}
         user={page.props.auth.user}
         organization={page.props.organization}
-        title='Pembayaran Iuran Agama Siswa'
+        title='Pembayaran Iuran Bulanan Siswa'
         backLink={
             <Link href={route('data-master', page.props.organization.id)}>
                 <IoArrowBackOutline />

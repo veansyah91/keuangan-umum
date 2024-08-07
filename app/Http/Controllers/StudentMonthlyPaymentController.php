@@ -20,6 +20,7 @@ use App\Models\StudentMonthlyPayment;
 use App\Models\StudentPaymentCategory;
 use App\Repositories\Log\LogRepository;
 use App\Repositories\User\UserRepository;
+use App\Repositories\Account\AccountRepository;
 use App\Repositories\Contact\ContactRepository;
 use App\Repositories\Journal\JournalRepository;
 
@@ -33,14 +34,17 @@ class StudentMonthlyPaymentController extends Controller
 
     protected $contactRepository;
 
+    protected $accountRepository;
+
     protected $now;
 
-    public function __construct(UserRepository $userRepository, LogRepository $logRepository, JournalRepository $journalRepository, ContactRepository $contactRepository)
+    public function __construct(UserRepository $userRepository, LogRepository $logRepository, JournalRepository $journalRepository, ContactRepository $contactRepository, AccountRepository $accountRepository)
     {
         $this->userRepository = $userRepository;
         $this->logRepository = $logRepository;
         $this->journalRepository = $journalRepository;
         $this->contactRepository = $contactRepository;
+        $this->accountRepository = $accountRepository;
         $this->now = CarbonImmutable::now();
     }
 
@@ -55,8 +59,8 @@ class StudentMonthlyPaymentController extends Controller
         $cashIn = StudentMonthlyPayment::whereOrganizationId($organization['id'])
             ->where('no_ref', 'like', $refHeader.'%')
             ->orderBy('no_ref')
-            ->get()
-            ->last();
+            ->latest()
+            ->first();
 
         if ($cashIn) {
             $newRef = NewRef::create('IB-', $cashIn['no_ref']);
@@ -101,7 +105,7 @@ class StudentMonthlyPaymentController extends Controller
             'newRef' => $this->newRef($organization, request('date')),
             'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
             'studyYears' => StudentLevel::select('year')->distinct()->take(10)->get(),
-            'contacts' => $this->contactRepository->getStudent($organization['id'], $contactCategory['id'], request(['contact'])),
+            'contacts' => $this->contactRepository->getStudents($organization['id'], $contactCategory['id'], request(['contact'])),
             'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),
             'lastPayment' => StudentMonthlyPayment::whereContactId(request('contact_id'))
                                         ->whereOrganizationId($organization['id'])
@@ -214,11 +218,18 @@ class StudentMonthlyPaymentController extends Controller
         $schoolAccount = SchoolAccountSetting::whereOrganizationId($organization['id'])->first();
         $creditAccount = Account::find('revenue_student');
 
-        if ($validated['type'] = 'prepaid') {
+        if ($validated['type'] = 'prepaid') 
+        {
             $creditAccount = Account::find($schoolAccount['prepaid_student']);
+
+            // buat penjurnalan pembayaran iuran bulanan dibayar dimuka
+
         } elseif ($validated['type'] = 'receivable')
         {
+            // cek apakah ada piutang siswa di bulan yang akan dilakukan pembayaran
             $creditAccount = Account::find($schoolAccount['receivable_monthly_student']);
+            // jika ada maka credit kan pada piutang
+            // jika tidak ada maka credit kan pada pendapatan
         }
 
         $cashAccount = Account::find($validated['cash_account_id']);

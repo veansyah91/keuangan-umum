@@ -64,8 +64,8 @@ class CashoutController extends Controller
         $cashOut = Cashout::whereOrganizationId($organization['id'])
             ->where('no_ref', 'like', $refHeader.'%')
             ->orderBy('no_ref')
-            ->get()
-            ->last();
+            ->latest()
+            ->first();
 
         if ($cashOut) {
             $newRef = NewRef::create('KK-', $cashOut['no_ref']);
