@@ -281,7 +281,7 @@ Index.layout = (page) => (
         organization={page.props.organization}
         title='Pembayaran Iuran Bulanan Siswa'
         backLink={
-            <Link href={route('data-master', page.props.organization.id)}>
+            <Link href={route('cashflow', page.props.organization.id)}>
                 <IoArrowBackOutline />
             </Link>
         }
@@ -289,7 +289,7 @@ Index.layout = (page) => (
             <div className='text-sm breadcrumbs'>
                 <ul>
                     <li className='font-bold'>
-                        <Link href={route('data-master', page.props.organization.id)}>Data Master</Link>
+                        <Link href={route('cashflow', page.props.organization.id)}>Arus Kas</Link>
                     </li>
                     <li>Pembayaran Iuran Bulanan Siswa</li>
                 </ul>

@@ -22,9 +22,7 @@ import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 
 const yearList = () => {
   const now = dayjs().year();
-
   const start = now - 10;
-
   let arrayYear = [];
 
   for (let index = start; index < now + 1; index++) {
@@ -57,11 +55,8 @@ const monthNow = () => {
   return month;
 }
 
-const studyYearUpdate = (month, studyYear) => {
-  let splitStudyYear = studyYear.split('/');
-}
-
 export default function Create({ organization, newRef, contacts, date, categories, studyYears, cashAccounts, lastPayment }) {
+  
   // state
   const [total, setTotal] = useState(0);
   const { data, setData, processing, post, errors, setError, reset } = useForm({
@@ -71,16 +66,11 @@ export default function Create({ organization, newRef, contacts, date, categorie
     student_id:'',
     no_ref:newRef,
     value:total,
-    type:'now', // set auto
     month:parseInt(monthNow()),
     study_year:studyYear(),
     description:'',
     details: [],
-    account_id: null
-  });
-
-  console.log(yearList());
-  
+  });  
 
   const [selectedContact, setSelectedContact] = useState({ id: null, name: '', phone: '' });
   const [selectedCashAccount, setSelectedCashAccount] = useState({ id: null, name: '', code: '', is_cash: true });
@@ -116,19 +106,39 @@ export default function Create({ organization, newRef, contacts, date, categorie
       level:'',
       student_id:'',
       no_ref:newRef,
-      type:'now', // set auto
       month:parseInt(monthNow()),
       study_year:studyYear(),
       description:'',
-      account_id: null
     }
     
     setData(tempData);
   }
+  
+  const reloadNewRef = (date) => {    
+    router.reload({
+        only: ['newRef'],
+        data: {
+            date: dateValue.startDate,
+        },
+        onSuccess: ({ props }) => {
+          const { newRef } = props;
+          let temp = data;
+          temp = {
+            ...data,
+            no_ref: newRef,
+            date: date
+          }
+          
+          setData(temp);
+        },
+    });
+};
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    post(route('cashflow.student-monthly-payment.post', organization.id), {
+    console.log(data);
+    
+    post(route('cashflow.student-monthly-receivable.store', organization.id), {
       onSuccess: ({ props }) => {
         const { flash } = props;
 
@@ -167,6 +177,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
   const handleDateValueChange = (newValue) => {
     setDateValue(newValue);
     setData('date', newValue.startDate);
+    reloadNewRef(newValue.startDate);
   };
 
   const handleChangeValue = (values, index) => {
@@ -183,77 +194,16 @@ export default function Create({ organization, newRef, contacts, date, categorie
   }
 
   const handleChangeStudyYear = (e) => {
-    let type = 'now';
-    let now = parseInt(dayjs().format('YYYY')) * 100 + parseInt(monthNow());
-
-    let splitYear = e.target.value.split('/');
-    let selectedMonth = parseInt(data.month) < 7 ? parseInt(splitYear[1]) * 100 + parseInt(data.month) : splitYear[0] * 100 + parseInt(data.month);
-
-    if (selectedMonth > now) {
-      type = 'prepaid';
-    } else if (selectedMonth < now) { 
-      type = 'receivable';
-    } 
-
-    let temp = data;
-    temp = {
-      ...temp,
-      study_year : e.target.value,
-      type : type
-    };    
-
-    setData(temp);
+    setData('study_year', e.target.value);
   }
 
   const handleChangeMonth = (e) => {    
-    let type = 'now';
-    let now = parseInt(dayjs().format('YYYY')) * 100 + parseInt(monthNow());
-
-    let splitYear = data.study_year.split('/');
-    let selectedMonth = parseInt(e.target.value) < 7 ? parseInt(splitYear[1]) * 100 + parseInt(e.target.value) : splitYear[0] * 100 + parseInt(e.target.value);
-
-    if (selectedMonth > now) {
-      type = 'prepaid';
-    } else if (selectedMonth < now) { 
-      type = 'receivable';
-    } 
-
-    let temp = data;
-    temp = {
-      ...temp,
-      month : parseInt(e.target.value),
-      type : type
-    };    
-
-    setData(temp);
+    setData('month', parseInt(e.target.value));
   }
-
-  const handleSelectedCashAccount = (selected) => {
-    setSelectedCashAccount({ id: selected.id, name: selected.name, code: selected.code, is_cash: true });
-    setData('cash_account_id', selected.id);
-    setError('cash_account_id','');
-  };
-
-  // const handleReloadLastPayment = (temp, contact_id) => {
-  //   router.reload({
-  //     only: ['lastPayment'],
-  //     data: {
-  //       'contact_id' : contact_id
-  //     },
-  //     onSuccess: ({ props }) => {
-  //       const { lastPayment } = props;        
-
-  //       if (lastPayment) {
-  //         console.log(lastPayment);
-  //       }
-                
-  //     }
-  //   })
-  // }
 
   return (
     <>
-      <Head title='Tambah Pembayaran' />
+      <Head title='Tambah Piutang Iuran Bulanan Siswa' />
       <ToastContainer />
 
       <FormInput onSubmit={handleSubmit}>
@@ -284,7 +234,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
               <div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
                 <div className='w-full sm:w-1/3 my-auto'>
                   <InputLabel
-                    value={'Tanggal'}
+                    value={'Tanggal Input'}
                     htmlFor='date'
                     className=' mx-auto my-auto'
                   />
@@ -390,7 +340,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
                       yearList().map((study_year, index) => 
                         <option 
                           key={index} 
-                        >{study_year.year}</option>
+                        >{study_year.toString()}/{(study_year+1).toString()}</option>
                       )
                     }
                   </select>
@@ -448,7 +398,6 @@ export default function Create({ organization, newRef, contacts, date, categorie
                       prefix={'IDR '}
                       id={`category-${index}`}
                     />
-                    {/* {errors?.level && <span className='text-red-500 text-xs'>{errors.level}</span>} */}
                   </div>
                 </div>
               )
@@ -461,34 +410,6 @@ export default function Create({ organization, newRef, contacts, date, categorie
 
               <div className='w-full sm:w-2/3 text-end'>
                 Rp. {formatNumber(data.value)}
-              </div>
-            </div>
-
-            <div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
-              <div className='w-full sm:w-1/3 my-auto'>
-                <InputLabel
-                  value={'Akun Kas'}
-                  htmlFor='account'
-                  className=' mx-auto my-auto'
-                />
-              </div>
-
-              <div className='w-full sm:w-2/3'>
-                <ClientSelectInput
-                  resources={cashAccounts}
-                  selected={selectedCashAccount}
-                  setSelected={(selected) => handleSelectedCashAccount(selected)}
-                  maxHeight='max-h-40'
-                  placeholder='Cari Akun'
-                  isError={errors.cash_account_id ? true : false}
-                  id='account'
-                  contactFilter={''}
-                />
-                {selectedCashAccount?.code && (
-                  <div className='absolute text-xs'>Kode: {selectedCashAccount.code}</div>
-                )}
-                {errors?.cash_account_id && <span className='text-red-500 text-xs'>{errors.cash_account_id}</span>}
-
               </div>
             </div>
 
@@ -516,13 +437,13 @@ export default function Create({ organization, newRef, contacts, date, categorie
 
 Create.layout = (page) => (
   <AuthenticatedLayout
-    header={<Header>Tambah Pembayaran</Header>}
+    header={<Header>Tambah Piutang Iuran Bulanan Siswa</Header>}
     children={page}
     user={page.props.auth.user}
     organization={page.props.organization}
-    title='Tambah Pembayaran'
+    title='Tambah Piutang Iuran'
     backLink={
-      <Link href={route('cashflow.student-monthly-payment', page.props.organization.id)}>
+      <Link href={route('cashflow.student-monthly-receivable', page.props.organization.id)}>
         <IoArrowBackOutline />
       </Link>
     }
@@ -530,12 +451,12 @@ Create.layout = (page) => (
       <div className='text-sm breadcrumbs'>
         <ul>
           <li className='font-bold'>
-            <Link href={route('data-master', page.props.organization.id)}>Data Master</Link>
+            <Link href={route('cashflow', page.props.organization.id)}>Arus Kas</Link>
           </li>
           <li className='font-bold'>
-            <Link href={route('cashflow.student-monthly-payment', page.props.organization.id)}>Pembayaran Iuran Bulanan Siswa</Link>
+            <Link href={route('cashflow.student-monthly-receivable', page.props.organization.id)}>Pembayaran Iuran Bulanan Siswa</Link>
           </li>
-          <li>Tambah Pembayaran</li>
+          <li>Tambah Piutang Iuran Bulanan Siswa</li>
         </ul>
       </div>
     }

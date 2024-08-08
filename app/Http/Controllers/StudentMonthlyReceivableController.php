@@ -10,6 +10,7 @@ use App\Models\Organization;
 use Illuminate\Http\Request;
 use App\Models\ContactCategory;
 use Illuminate\Support\Facades\Auth;
+use App\Models\StudentMonthlyPayment;
 use App\Models\StudentPaymentCategory;
 use App\Repositories\Log\LogRepository;
 use App\Models\StudentMonthlyReceivable;
@@ -21,47 +22,40 @@ use App\Repositories\Journal\JournalRepository;
 class StudentMonthlyReceivableController extends Controller
 {
   protected $userRepository;
+  protected $logRepository;
+  protected $journalRepository;
+  protected $contactRepository;
+  protected $now;
 
-    protected $logRepository;
+  public function __construct(UserRepository $userRepository, LogRepository $logRepository, JournalRepository $journalRepository, ContactRepository $contactRepository)
+  {
+      $this->userRepository = $userRepository;
+      $this->logRepository = $logRepository;
+      $this->journalRepository = $journalRepository;
+      $this->contactRepository = $contactRepository;
+      $this->now = CarbonImmutable::now();
+  }
 
-    protected $journalRepository;
-
-    protected $contactRepository;
-
-    protected $now;
-
-    public function __construct(UserRepository $userRepository, LogRepository $logRepository, JournalRepository $journalRepository, ContactRepository $contactRepository)
-    {
-        $this->userRepository = $userRepository;
-        $this->logRepository = $logRepository;
-        $this->journalRepository = $journalRepository;
-        $this->contactRepository = $contactRepository;
-        $this->now = CarbonImmutable::now();
-    }
-
-    protected function newRef($organization, $dateRequest = '')
-    {
+  protected function newRef($organization, $dateRequest = '')
+  {
       $now = $this->now;
       $date = $dateRequest ?? $now->isoFormat('YYYY-MM-DD');
       $dateRef = Carbon::create($date);
-      $refHeader = 'PIB-'.$dateRef->isoFormat('YYYY').$dateRef->isoFormat('MM');
+      $refHeader = 'IB-'.$dateRef->isoFormat('YYYY').$dateRef->isoFormat('MM');
       $newRef = $refHeader.'001';
 
-      $cashIn = StudentMonthlyReceivableLedger::whereHas('receivable', function ($query) use ($organization) {
-                                                  $query->whereOrganizationId($organization['id']);
-                                                })
-                                                // whereOrganizationId($organization['id'])
-                                                ->where('no_ref', 'like', $refHeader.'%')
-                                                ->orderBy('no_ref')
-                                                ->get()
-                                                ->last();
+      $cashIn = StudentMonthlyPayment::whereOrganizationId($organization['id'])
+          ->where('no_ref', 'like', $refHeader.'%')
+          ->orderBy('no_ref')
+          ->latest()
+          ->first();
 
       if ($cashIn) {
-        $newRef = NewRef::create('PIB-', $cashIn['no_ref']);
+          $newRef = NewRef::create('IB-', $cashIn['no_ref']);
       }
 
       return $newRef;
-    }
+  }
     
   public function index(Organization $organization)
   {
@@ -100,5 +94,10 @@ class StudentMonthlyReceivableController extends Controller
       'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
       'contacts' => $this->contactRepository->getStudents($organization['id'], $contactCategory['id'], request(['contact'])),
     ]);
+  }
+
+  public function store(Request $request, Organization $organization)
+  {
+    dd($request);
   }
 }

@@ -235,7 +235,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
 
   return (
     <>
-      <Head title='Tambah Pembayaran' />
+      <Head title='Piutang Iuran Bulanan Siswa' />
       <ToastContainer />
 
       <FormInput onSubmit={handleSubmit}>
@@ -512,7 +512,7 @@ Create.layout = (page) => (
       <div className='text-sm breadcrumbs'>
         <ul>
           <li className='font-bold'>
-            <Link href={route('data-master', page.props.organization.id)}>Data Master</Link>
+            <Link href={route('cashflow', page.props.organization.id)}>Arus Kas</Link>
           </li>
           <li className='font-bold'>
             <Link href={route('cashflow.student-monthly-payment', page.props.organization.id)}>Pembayaran Iuran Bulanan Siswa</Link>
