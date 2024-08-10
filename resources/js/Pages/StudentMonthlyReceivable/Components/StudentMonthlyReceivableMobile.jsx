@@ -8,24 +8,23 @@ import dayjs from 'dayjs';
 import React from 'react';
 import { IoCreateOutline, IoEllipsisVertical, IoSearchOutline, IoTrash } from 'react-icons/io5';
 
-export default function StudentMobile({ payment, role, handleDelete, handleEdit }) {
+export default function StudentMobile({ receivable, role, handleDelete, handleEdit }) {
+    console.log();
+    
     return (
         <>
             <div className=' text-gray-900 py-2 px-3 border flex gap-5 justify-between'>
                 <div className='text-start my-auto'>
-                    <div className='text-xs'>
-                        {dayjs(payment.date).format('MMMM DD, YYYY')}
-                    </div>
                     <div>
-                        {payment.contact.name}
+                        {receivable.contact.name}
                     </div>
                     <div className='text-xs'>
-                        <div>Bulan: {formatMonth(payment.month)} ({payment.month})</div>
-                        <div>Tahun Ajaran: {payment.study_year}</div>
+                        <div>No Siswa: {receivable.contact.student.no_ref}</div>
+                        <div>Kelas Terakhir: {receivable.contact.last_level?.level}</div>
                     </div>
                 </div>
                 <div className='text-end my-auto w-5/12'>
-                    <div>IDR {formatNumber(payment.value)}</div>
+                    <div>IDR {formatNumber(receivable.value)}</div>
                 </div>
                 <div className='text-start'>
                     {role !== 'viewer' && (

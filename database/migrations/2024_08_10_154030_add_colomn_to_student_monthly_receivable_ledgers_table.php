@@ -12,9 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('student_monthly_receivable_ledgers', function (Blueprint $table) {
-            $table->unsignedBigInteger('payment_id')->nullable();
-            $table->foreign('payment_id')->references('id')->on('student_monthly_payments');
-
+            $table->string('study_year');
+            $table->dropColumn('year');
         });
     }
 
@@ -23,8 +22,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('student_receivable_ledgers', function (Blueprint $table) {
-            $table->dropForeign('payment_id');
+        Schema::table('student_monthly_receivable_ledgers', function (Blueprint $table) {
+            $table->dropColumn('study_year');
+            $table->integer('year');
         });
     }
 };

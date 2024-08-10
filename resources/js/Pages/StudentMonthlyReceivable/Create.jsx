@@ -83,11 +83,11 @@ export default function Create({ organization, newRef, contacts, date, categorie
 
   // useEffect
   useEffect(() => {
-    setDefault();
+    setDefault(newRef);
   },[]);
 
   // function
-  const setDefault = () => {
+  const setDefault = (newRef) => {
     let tempData = data;
     let temp = categories.map(category => ({
       id: category.id,
@@ -138,18 +138,17 @@ export default function Create({ organization, newRef, contacts, date, categorie
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(data);
-    
+        
     post(route('cashflow.student-monthly-receivable.store', organization.id), {
       onSuccess: ({ props }) => {
-        const { flash } = props;
-
+        const { flash, newRef } = props;
+        
         toast.success(flash.success, {
           position: toast.POSITION.TOP_CENTER,
         });
         setSelectedContact({ id: null, name: '', phone: '' });
         setSelectedAccount({ id: null, name: '', code: '', is_cash: false });
-        setDefault();
+        setDefault(newRef);
 
       },
       onError: errors => {

@@ -6,15 +6,14 @@ import dayjs from 'dayjs';
 import React from 'react';
 import { IoCreateOutline, IoEllipsisVertical, IoSearchOutline, IoTrash } from 'react-icons/io5';
 
-export default function StudentDesktop({ payment, className, role, handleDelete, handleEdit }) {
+export default function StudentDesktop({ receivable, className, role, handleDelete, handleEdit }) {
     return (
         <>
             <tr className={className}>
-                <td>{dayjs(payment.date).locale('id').format('MMMM DD, YYYY')}</td>
-                <td>{payment.contact.name}</td>
-                <td>{formatMonth(payment.month)} ({payment.month})</td>
-                <td>{payment.study_year}</td>
-                <td className='text-end'>IDR. { formatNumber(payment.value) }</td>
+                <td>{receivable.contact.name}</td>
+                <td>{receivable.contact.student.no_ref ?? ''}</td>
+                <td>{receivable.contact.last_level?.level}</td>
+                <td className='text-end'>IDR. { formatNumber(receivable.value) }</td>
                 <td className='text-end'>
                     {role !== 'viewer' && (
                         <div className='dropdown dropdown-left'>

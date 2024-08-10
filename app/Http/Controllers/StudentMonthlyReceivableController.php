@@ -69,7 +69,10 @@ class StudentMonthlyReceivableController extends Controller
     return Inertia::render('StudentMonthlyReceivable/Index',[
       'organization' => $organization,
       'receivables' => StudentMonthlyReceivable::filter(request(['search']))
-                                  ->with('contact')
+                                  ->with('contact', function ($query) {
+                                      $query->with('student', 'lastLevel');
+                                  })
+                                  ->where('value', '>', 0)
                                   ->whereOrganizationId($organization['id'])
                                   ->orderBy('value')
                                   ->paginate(50)->withQueryString(),
@@ -223,9 +226,37 @@ class StudentMonthlyReceivableController extends Controller
           'credit' => $validated['value'],
       ],
     ];
+    
+    // buat data pada table piutang bulanan
+    // cek apakah sudah ada data
+    // jika sudah ada, maka tambahkan lalu update sisa (value) 
+    // jika belum ada maka buat data baru
+    $receivable = StudentMonthlyReceivable::whereOrganizationId($organization['id'])
+                                            ->whereContactId($validated['contact_id'])
+                                            ->first();
 
-    
-    
+    if($receivable)
+    {
+        $temp_receivable = $receivable['value'];
+        $receivable->update([
+            'value' => $temp_receivable + $validated['value']
+        ]);
+    } else {
+        $receivable = StudentMonthlyReceivable::create($validated);
+    }
+
+    $receivableLedger = StudentMonthlyReceivableLedger::create([
+        'receivable_id' => $receivable['id'],
+        'debit' => $validated['value'],
+        'credit' => 0,
+        'no_ref' => $validated['no_ref'],
+        'description' => $validated['description'],
+        'date' => $validated['date'],
+        'study_year' => $validated['study_year'],
+        'month' => $validated['month'],
+        'payment_id' => $payment['id']
+    ]);
+
     $journal = $this->journalRepository->store($validated);
     $validated['journal_id'] = $journal['id'];
 

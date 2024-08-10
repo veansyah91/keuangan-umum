@@ -36,6 +36,11 @@ class Contact extends Model
         return $this->hasMany(StudentLevel::class);
     }
 
+    public function lastLevel(): HasOne
+    {
+        return $this->hasOne(StudentLevel::class)->latestOfMany();
+    }
+
     public function scopeFilter($query, $filters)
     {
         $query->when($filters['search'] ?? false, function ($query, $search) {

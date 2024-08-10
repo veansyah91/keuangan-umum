@@ -19,7 +19,7 @@ class StudentMonthlyReceivableLedger extends Model
         'description',
         'date',
         'month',
-        'year',
+        'study_year',
         'payment_id'
     ];
 
