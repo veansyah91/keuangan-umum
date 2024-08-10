@@ -131,8 +131,8 @@ export default function Show({ organization, contact, student, levels }) {
                                     </thead>
                                     <tbody>
                                         {
-                                            levels.map(level =>
-                                                <tr>
+                                            levels.map((level, index) =>
+                                                <tr key={index}>
                                                     <td>{level.year}</td>
                                                     <td>{level.level}</td>
                                                 </tr>

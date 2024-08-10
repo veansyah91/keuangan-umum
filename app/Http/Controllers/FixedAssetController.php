@@ -43,8 +43,8 @@ class FixedAssetController extends Controller
 
         $account = Account::whereOrganizationId($organizationId)
             ->where('code', 'like', $refCode.'%')
-            ->get()
-            ->last();
+            ->orderBy('code','desc')
+            ->first();
 
         return [
             'organization_id' => $organizationId,
@@ -99,7 +99,7 @@ class FixedAssetController extends Controller
             ->whereOrganizationId($organization['id'])
             ->where('is_disposed', $disposal)
             ->orderBy('date', 'desc')
-            ->paginate(50);
+            ->paginate(50)->withQueryString();
 
         return Inertia::render('FixedAsset/Index', [
             'organization' => $organization,

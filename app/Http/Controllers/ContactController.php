@@ -34,7 +34,7 @@ class ContactController extends Controller
         $contacts = Contact::filter(request(['search']))
                             ->whereOrganizationId($organization['id'])
                             ->with('contactCategories')
-                            ->paginate(50);
+                            ->paginate(50)->withQueryString();
 
         return Inertia::render('Contact/Index', [
             'organization' => $organization,

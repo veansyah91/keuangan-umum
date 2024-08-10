@@ -26,7 +26,8 @@ class AdminUserController extends Controller
                             return $query->has('affilation');
                         })
                         ->whereNot('role', 'super-admin')
-                        ->paginate(50);
+                        ->paginate(50)
+                        ->withQueryString();
 
         $userCollection = $users->map(function ($user) {
             $date = new Carbon($user['created_at']);

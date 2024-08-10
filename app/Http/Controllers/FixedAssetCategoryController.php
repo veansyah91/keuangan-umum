@@ -29,7 +29,7 @@ class FixedAssetCategoryController extends Controller
 
         $fixedAssetCategories = FixedAssetCategory::filter(request(['search', 'status']))
             ->whereOrganizationId($organization['id'])
-            ->paginate(50);
+            ->paginate(50)->withQueryString();
 
         return Inertia::render('FixedAssetCategory/Index', [
             'organization' => $organization,

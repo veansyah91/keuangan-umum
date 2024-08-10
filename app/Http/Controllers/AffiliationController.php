@@ -24,9 +24,8 @@ class AffiliationController extends Controller
         $newRef = $refHeader.'001';
 
         $withdraw = AffiliationWithdraw::where('no_ref', 'like', $refHeader.'%')
-            ->orderBy('no_ref')
-            ->get()
-            ->last();
+							->orderBy('no_ref','desc')
+							->first();
 
         if ($withdraw) {
             $newRef = NewRef::create('AW-', $withdraw['no_ref']);

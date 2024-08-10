@@ -32,7 +32,7 @@ class StudentEntryPaymentCategoryController extends Controller
             'organization' => $organization,
             'studentPaymentCategories' => StudentEntryPaymentCategory::filter(request(['search']))
                                                 ->whereOrganizationId($organization['id'])
-                                                ->paginate(50),
+                                                ->paginate(50)->withQueryString(),
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
         ]);
     }

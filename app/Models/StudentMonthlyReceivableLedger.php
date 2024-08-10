@@ -19,7 +19,8 @@ class StudentMonthlyReceivableLedger extends Model
         'description',
         'date',
         'month',
-        'year'
+        'year',
+        'payment_id'
     ];
 
     public function receivable(): BelongsTo

@@ -58,8 +58,7 @@ class StudentMonthlyPaymentController extends Controller
 
         $cashIn = StudentMonthlyPayment::whereOrganizationId($organization['id'])
             ->where('no_ref', 'like', $refHeader.'%')
-            ->orderBy('no_ref')
-            ->latest()
+            ->orderBy('no_ref','desc')
             ->first();
 
         if ($cashIn) {
@@ -79,7 +78,7 @@ class StudentMonthlyPaymentController extends Controller
                                         ->with('contact')
                                         ->whereOrganizationId($organization['id'])
                                         ->orderBy('date', 'desc')
-                                        ->paginate(50),
+                                        ->paginate(50)->withQueryString(),
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
         ]);
     }
@@ -192,6 +191,7 @@ class StudentMonthlyPaymentController extends Controller
                                           ->whereContactId($validated['contact_id'])
                                           ->where('month', $validated['month'])
                                           ->where('study_year', $validated['study_year'])
+                                          ->whereNot('type', 'receivable')
                                           ->first();
 
         if ($payment) {
@@ -216,7 +216,7 @@ class StudentMonthlyPaymentController extends Controller
         }
 
         $schoolAccount = SchoolAccountSetting::whereOrganizationId($organization['id'])->first();
-        $creditAccount = Account::find('revenue_student');
+        $creditAccount = Account::find($schoolAccount['revenue_student']);
 
         if ($validated['type'] = 'prepaid') 
         {

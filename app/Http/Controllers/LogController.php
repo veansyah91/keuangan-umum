@@ -29,7 +29,7 @@ class LogController extends Controller
         $logs = Log::filter(request(['search', 'start_date', 'end_date']))
             ->whereOrganizationId($organization['id'])
             ->orderBy('id', 'desc')
-            ->paginate(50);
+            ->paginate(50)->withQueryString();
 
         return Inertia::render('Log/Index', [
             'organization' => $organization,

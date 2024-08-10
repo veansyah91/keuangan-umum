@@ -38,7 +38,7 @@ class VillageController extends Controller
                     $query->with('province');
                 });
             })
-            ->paginate(50);
+            ->paginate(50)->withQueryString();
 
         $provinces = Province::filter(request(['searchProvince']))
             ->get()

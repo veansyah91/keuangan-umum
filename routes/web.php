@@ -292,20 +292,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
             // cash in
             Route::get('/cash-in', [CashinController::class, 'index'])->name('cashflow.cash-in');
             Route::get('/cash-in/create', [CashinController::class, 'create'])->name('cashflow.cash-in.create');
+            Route::post('/cash-in', [CashinController::class, 'store'])->name('cashflow.cash-in.post');
             Route::get('/cash-in/{cashIn}/edit', [CashinController::class, 'edit'])->name('cashflow.cash-in.edit');
             Route::get('/cash-in/{cashIn}', [CashinController::class, 'show'])->name('cashflow.cash-in.show');
             Route::patch('/cash-in/{cashIn}', [CashinController::class, 'update'])->name('cashflow.cash-in.update');
             Route::delete('/cash-in/{cashIn}', [CashinController::class, 'destroy'])->name('cashflow.cash-in.delete');
-            Route::post('/cash-in/create', [CashinController::class, 'store'])->name('cashflow.cash-in.post');
 
             //cash out
             Route::get('/cash-out', [CashoutController::class, 'index'])->name('cashflow.cash-out');
             Route::get('/cash-out/create', [CashoutController::class, 'create'])->name('cashflow.cash-out.create');
+            Route::post('/cash-out', [CashoutController::class, 'store'])->name('cashflow.cash-out.post');
             Route::get('/cash-out/{cashOut}/edit', [CashoutController::class, 'edit'])->name('cashflow.cash-out.edit');
             Route::get('/cash-out/{cashOut}', [CashoutController::class, 'show'])->name('cashflow.cash-out.show');
             Route::patch('/cash-out/{cashOut}', [CashoutController::class, 'update'])->name('cashflow.cash-out.update');
             Route::delete('/cash-out/{cashOut}', [CashoutController::class, 'destroy'])->name('cashflow.cash-out.delete');
-            Route::post('/cash-out/create', [CashoutController::class, 'store'])->name('cashflow.cash-out.post');
 
             //cash out
             Route::get('/cash-mutation', [CashMutationController::class, 'index'])->name('cashflow.cash-mutation');

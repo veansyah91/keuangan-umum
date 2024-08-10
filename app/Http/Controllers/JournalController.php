@@ -49,8 +49,7 @@ class JournalController extends Controller
 
         $journal = Journal::whereOrganizationId($organization['id'])
             ->where('no_ref', 'like', $refHeader.'%')
-            ->orderBy('no_ref')
-            ->latest()
+            ->orderBy('no_ref','desc')
             ->first();
 
         if ($journal) {
@@ -66,7 +65,7 @@ class JournalController extends Controller
             ->whereOrganizationId($organization['id'])
             ->orderBy('date', 'desc')
             ->orderBy('no_ref', 'desc')
-            ->paginate(50);
+            ->paginate(50)->withQueryString();
 
         $user = Auth::user();
 

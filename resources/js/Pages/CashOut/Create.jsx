@@ -115,6 +115,8 @@ export default function Create({
             },
             onError: (errors) => {
                 setCashAccountError(errors.cash_account_id);
+                console.log(errors);
+                
 
                 const arrayOfObjects = Object.entries(errors).map(([key, value]) => ({ key, value }));
 

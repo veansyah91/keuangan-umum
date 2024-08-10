@@ -142,11 +142,11 @@ export default function Ledgers({
                 title={`Laporan Buku Besar Periode : ${dayjs(startDate).format('MMMM DD, YYYY')} - ${dayjs(endDate).format('MMMM DD, YYYY')}`}
             />
 
-            <div className='sm:pt-0 pb-16 pt-12'>
-                <div className='bg-white py-2 sm:pt-0 px-5 space-y-2'>
+            <div className='md:pt-0 pb-16 pt-12'>
+                <div className='bg-white py-2 md:pt-0 px-5 space-y-2'>
                     {/* Nav Title */}
-                    <div className='flex sm:flex-row justify-between gap-2 print:hidden'>
-                        <div className='px-3 my-auto flex flex-col sm:flex-row gap-3 w-full sm:w-1/2'>
+                    <div className='flex md:flex-row justify-between gap-2 print:hidden'>
+                        <div className='px-3 my-auto flex flex-col md:flex-row gap-3 w-full md:w-1/2'>
                             <div className='my-auto w-full'>
                                 <Datepicker
                                     value={startDateValue}
@@ -167,7 +167,7 @@ export default function Ledgers({
                                     id='date'
                                 />
                             </div>
-                            <div className='my-auto hidden sm:block'>
+                            <div className='my-auto hidden md:block'>
                                 <PrimaryButton
                                     disabled={!startDate || !endDate || startDate > endDate || isLoading}
                                     onClick={handleReload}>
@@ -175,7 +175,7 @@ export default function Ledgers({
                                 </PrimaryButton>
                             </div>
                         </div>
-                        <div className='text-end px-3 hidden sm:block print:flex print:justify-between'>
+                        <div className='text-end px-3 hidden md:block print:flex print:justify-between'>
                             <SecondaryButton onClick={handlePrint}>
                                 <div className='flex gap-2'>
                                     <div className='my-auto'>
@@ -185,7 +185,7 @@ export default function Ledgers({
                                 </div>
                             </SecondaryButton>
                         </div>
-                        <div className='fixed sm:hidden bottom-2 right-2'>
+                        <div className='fixed md:hidden bottom-2 right-2'>
                             <button
                                 onClick={handlePrint}
                                 className='bg-white border-2 border-slate-900 p-2 rounded-full h-14 w-14'>
@@ -209,9 +209,9 @@ export default function Ledgers({
                                         leaveFrom='transform scale-100 opacity-100'
                                         leaveTo='transform scale-95 opacity-0'>
                                         <Disclosure.Panel>
-                                            <div className='flex flex-col sm:flex-row justify-start gap-3 sm:py-5 mb-3'>
+                                            <div className='flex flex-col md:flex-row justify-start gap-3 md:py-5 mb-3'>
                                                 {programs.length > 0 && (
-                                                    <div className='sm:w-1/3 w-full text-slate-900 space-y-2'>
+                                                    <div className='md:w-1/3 w-full text-slate-900 space-y-2'>
                                                         <div>
                                                             <InputLabel value={'Program Kegiatan'} htmlFor='program' />
                                                         </div>
@@ -248,7 +248,7 @@ export default function Ledgers({
                                                     </div>
                                                 )}
                                                 {projects.length > 0 && (
-                                                    <div className='sm:w-1/3 w-full text-slate-900 space-y-2'>
+                                                    <div className='md:w-1/3 w-full text-slate-900 space-y-2'>
                                                         <div>
                                                             <InputLabel value={'Proyek'} htmlFor='project' />
                                                         </div>
@@ -285,7 +285,7 @@ export default function Ledgers({
                                                     </div>
                                                 )}
                                                 {departments.length > 0 && (
-                                                    <div className='sm:w-1/3 w-full text-slate-900 space-y-2'>
+                                                    <div className='md:w-1/3 w-full text-slate-900 space-y-2'>
                                                         <div>
                                                             <InputLabel value={'Departemen'} htmlFor='department' />
                                                         </div>
@@ -340,7 +340,7 @@ export default function Ledgers({
                     ) : (
                         ''
                     )}
-                    <div className='sm:hidden w-full'>
+                    <div className='md:hidden w-full'>
                         <PrimaryButton
                             disabled={!startDate || !endDate || startDate > endDate || isLoading}
                             onClick={handleReload}
@@ -371,7 +371,7 @@ export default function Ledgers({
 
                     {/* Content */}
                     <div className="my-2 -mx-5 space-y-3 print:font-['Open_Sans'] overflow-auto">
-                        <div className='sm:w-full w-[550px] print:w-full'>
+                        <div className='md:w-full w-[550px] print:w-full'>
                             {dataAccounts.map(
                                 (account, index) =>
                                     account.ledgers.length > 0 && (

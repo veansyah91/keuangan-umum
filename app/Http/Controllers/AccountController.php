@@ -58,7 +58,7 @@ class AccountController extends Controller
                             // })
             ->with('accountCategory')
             ->orderBy('code')
-            ->paginate(50);
+            ->paginate(50)->withQueryString();
 
         $user = Auth::user();
 

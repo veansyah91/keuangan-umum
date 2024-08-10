@@ -33,7 +33,8 @@ class AccountCategoryController extends Controller
         $accountCategories = AccountCategory::filter(request(['search']))
             ->whereOrganizationId($organization['id'])
             ->orderBy('code')
-            ->paginate(50);
+            ->paginate(50)
+            ->withQueryString();
         $user = Auth::user();
 
         return Inertia::render('AccountCategory/Index', [

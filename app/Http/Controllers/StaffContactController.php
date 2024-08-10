@@ -46,7 +46,7 @@ class StaffContactController extends Controller
                                 $query->where('contact_category_id', $contactCategory['id']);
                             })
                             ->orderBy('name')
-                            ->paginate(50);
+                            ->paginate(50)->withQueryString();
         
         return Inertia::render('Staff/Index', [
             'organization' => $organization,

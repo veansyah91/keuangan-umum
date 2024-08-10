@@ -55,7 +55,7 @@ const monthNow = () => {
   return month;
 }
 
-export default function Create({ organization, newRef, contacts, date, categories, studyYears, cashAccounts, lastPayment }) {
+export default function Create({ organization, newRef, contacts, date, categories, studyYears, accounts, lastPayment }) {
   
   // state
   const [total, setTotal] = useState(0);
@@ -69,11 +69,12 @@ export default function Create({ organization, newRef, contacts, date, categorie
     month:parseInt(monthNow()),
     study_year:studyYear(),
     description:'',
+    credit_account: null,
     details: [],
   });  
 
   const [selectedContact, setSelectedContact] = useState({ id: null, name: '', phone: '' });
-  const [selectedCashAccount, setSelectedCashAccount] = useState({ id: null, name: '', code: '', is_cash: true });
+  const [selectedAccount, setSelectedAccount] = useState({ id: null, name: '', code: '', is_cash: false });
 
   const [dateValue, setDateValue] = useState({
     startDate: date,
@@ -109,6 +110,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
       month:parseInt(monthNow()),
       study_year:studyYear(),
       description:'',
+      credit_account: null,
     }
     
     setData(tempData);
@@ -145,12 +147,14 @@ export default function Create({ organization, newRef, contacts, date, categorie
         toast.success(flash.success, {
           position: toast.POSITION.TOP_CENTER,
         });
-        setSelectedCashAccount({ id: null, name: '', code: '', is_cash: true });
         setSelectedContact({ id: null, name: '', phone: '' });
+        setSelectedAccount({ id: null, name: '', code: '', is_cash: false });
         setDefault();
 
       },
       onError: errors => {
+        console.log(errors);
+        
         toast.error(errors.error, {
           position: toast.POSITION.TOP_CENTER,
         });
@@ -165,7 +169,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
     temp = {
       ...temp,
       contact_id: selected.id,
-      description: `Kas Masuk / Pembayaran Iuran Bulanan dari ${selected.name.toUpperCase()}`,
+      description: `Piutang Iuran Bulanan dari ${selected.name.toUpperCase()}`,
       student_id: selected.student.no_ref,
       level: selected.levels[selected.levels.length - 1].level
     };
@@ -201,16 +205,22 @@ export default function Create({ organization, newRef, contacts, date, categorie
     setData('month', parseInt(e.target.value));
   }
 
+  const handleSelectedAccount = (selected) => {
+    setSelectedAccount({ id: selected.id, name: selected.name, code: selected.code, is_cash: false });
+    setData('credit_account', selected.id);
+    setError('credit_account','');
+  };
+
   return (
     <>
       <Head title='Tambah Piutang Iuran Bulanan Siswa' />
       <ToastContainer />
 
       <FormInput onSubmit={handleSubmit}>
-        <div className='w-full sm:mt-2 sm:py-5'>
-          <div className='sm:w-1/2 sm:mx-auto px-3 sm:px-0'>
-              <div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
-                <div className='w-full sm:w-1/3 my-auto'>
+        <div className='w-full md:mt-2 md:py-5'>
+          <div className='md:w-1/2 md:mx-auto px-3 md:px-0'>
+              <div className='flex flex-col md:flex-row justify-between gap-1 mt-5 md:mt-2'>
+                <div className='w-full md:w-1/3 my-auto'>
                   <InputLabel
                     value={'No. Ref'}
                     htmlFor='no_ref'
@@ -218,7 +228,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
                   />
                 </div>
 
-                <div className='w-full sm:w-2/3'>
+                <div className='w-full md:w-2/3'>
                   <TextInput
                     id='no_ref'
                     name='no_ref'
@@ -231,8 +241,8 @@ export default function Create({ organization, newRef, contacts, date, categorie
                   {errors?.no_ref && <span className='text-red-500 text-xs'>{errors.no_ref}</span>}
                 </div>
               </div>
-              <div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
-                <div className='w-full sm:w-1/3 my-auto'>
+              <div className='flex flex-col md:flex-row justify-between gap-1 mt-5 md:mt-2'>
+                <div className='w-full md:w-1/3 my-auto'>
                   <InputLabel
                     value={'Tanggal Input'}
                     htmlFor='date'
@@ -240,7 +250,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
                   />
                 </div>
 
-                <div className='w-full sm:w-2/3'>
+                <div className='w-full md:w-2/3'>
                   <div>
                     <Datepicker
                       value={dateValue}
@@ -256,12 +266,12 @@ export default function Create({ organization, newRef, contacts, date, categorie
                   {errors?.date && <span className='text-red-500 text-xs'>{errors.date}</span>}
                 </div>
               </div>
-              <div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
-                <div className='w-full sm:w-1/3 my-auto'>
+              <div className='flex flex-col md:flex-row justify-between gap-1 mt-5 md:mt-2'>
+                <div className='w-full md:w-1/3 my-auto'>
                   <InputLabel value={'Nama Siswa'} htmlFor='name' className=' mx-auto my-auto' />
                 </div>
 
-                <div className='w-full sm:w-2/3'>
+                <div className='w-full md:w-2/3'>
                   <StudentSelectInput
                       resources={contacts}
                       selected={selectedContact}
@@ -274,8 +284,8 @@ export default function Create({ organization, newRef, contacts, date, categorie
                   {errors?.name && <span className='text-red-500 text-xs'>{errors.name}</span>}
                 </div>
               </div>
-              <div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
-                <div className='w-full sm:w-1/3 my-auto'>
+              <div className='flex flex-col md:flex-row justify-between gap-1 mt-5 md:mt-2'>
+                <div className='w-full md:w-1/3 my-auto'>
                   <InputLabel
                     value={'No. Siswa'}
                     htmlFor='student_id'
@@ -283,7 +293,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
                   />
                 </div>
 
-                <div className='w-full sm:w-2/3'>
+                <div className='w-full md:w-2/3'>
                   <TextInput
                     id='student_id'
                     name='student_id'
@@ -297,8 +307,8 @@ export default function Create({ organization, newRef, contacts, date, categorie
                 </div>
               </div>
 
-              <div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
-                <div className='w-full sm:w-1/3 my-auto'>
+              <div className='flex flex-col md:flex-row justify-between gap-1 mt-5 md:mt-2'>
+                <div className='w-full md:w-1/3 my-auto'>
                   <InputLabel
                     value={'Kelas'}
                     htmlFor='level'
@@ -306,7 +316,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
                   />
                 </div>
 
-                <div className='w-full sm:w-2/3'>
+                <div className='w-full md:w-2/3'>
                   <TextInput
                     id='level'
                     name='level'
@@ -320,8 +330,8 @@ export default function Create({ organization, newRef, contacts, date, categorie
                 </div>
               </div>
 
-              <div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
-                <div className='w-full sm:w-1/3 my-auto'>
+              <div className='flex flex-col md:flex-row justify-between gap-1 mt-5 md:mt-2'>
+                <div className='w-full md:w-1/3 my-auto'>
                   <InputLabel
                     value={'Tahun Ajaran'}
                     htmlFor='study_year'
@@ -329,7 +339,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
                   />
                 </div>
 
-                <div className='w-full sm:w-2/3'>
+                <div className='w-full md:w-2/3'>
                   <select 
                     className="select select-bordered w-full" 
                     defaultValue={data.study_year} 
@@ -348,8 +358,8 @@ export default function Create({ organization, newRef, contacts, date, categorie
               </div>
             </div>
 
-            <div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
-                <div className='w-full sm:w-1/3 my-auto'>
+            <div className='flex flex-col md:flex-row justify-between gap-1 mt-5 md:mt-2'>
+                <div className='w-full md:w-1/3 my-auto'>
                   <InputLabel
                     value={'Bulan'}
                     htmlFor='month'
@@ -357,7 +367,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
                   />
                 </div>
 
-                <div className='w-full sm:w-2/3'>
+                <div className='w-full md:w-2/3'>
                   <select 
                     className="select select-bordered w-full" 
                     defaultValue={data.month} 
@@ -379,8 +389,8 @@ export default function Create({ organization, newRef, contacts, date, categorie
             <div className='text-center mt-5 font-bold'>Rincian Pembayaran</div>
             {
               data.details.map((category, index) => 
-                <div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2' key={index}>
-                  <div className='w-full sm:w-1/3 my-auto'>
+                <div className='flex flex-col md:flex-row justify-between gap-1 mt-5 md:mt-2' key={index}>
+                  <div className='w-full md:w-1/3 my-auto'>
                     <InputLabel
                       value={category.name}
                       htmlFor={`category-${index}`}
@@ -388,7 +398,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
                     />
                   </div>
 
-                  <div className='w-full sm:w-2/3'>
+                  <div className='w-full md:w-2/3'>
                     <NumericFormat
                       value={category.value}
                       customInput={TextInput}
@@ -403,18 +413,46 @@ export default function Create({ organization, newRef, contacts, date, categorie
               )
             }
 
-            <div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 pt-5 sm:mt-2 font-bold text-xl'>
-              <div className='w-full sm:w-1/3 my-auto'>
+            <div className='flex flex-col md:flex-row justify-between gap-1 mt-5 pt-5 md:mt-2 font-bold text-xl'>
+              <div className='w-full md:w-1/3 my-auto'>
                 TOTAL
               </div>
 
-              <div className='w-full sm:w-2/3 text-end'>
+              <div className='w-full md:w-2/3 text-end'>
                 Rp. {formatNumber(data.value)}
               </div>
             </div>
 
-            <div className='flex justify-end flex-col-reverse sm:flex-row gap-2 mt-5'>
-              <div className='w-full sm:w-1/6 my-auto text-center'>
+            <div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
+              <div className='w-full sm:w-1/3 my-auto'>
+                <InputLabel
+                  value={'Akun Kredit'}
+                  htmlFor='account'
+                  className=' mx-auto my-auto'
+                />
+              </div>
+
+              <div className='w-full sm:w-2/3'>
+                <ClientSelectInput
+                  resources={accounts}
+                  selected={selectedAccount}
+                  setSelected={(selected) => handleSelectedAccount(selected)}
+                  maxHeight='max-h-40'
+                  placeholder='Cari Akun'
+                  isError={errors.cash_account_id ? true : false}
+                  id='account'
+                  contactFilter={''}
+                />
+                {selectedAccount?.code && (
+                  <div className='absolute text-xs'>Kode: {selectedAccount.code}</div>
+                )}
+                {errors?.cash_account_id && <span className='text-red-500 text-xs'>{errors.cash_account_id}</span>}
+
+              </div>
+            </div>
+
+            <div className='flex justify-end flex-col-reverse md:flex-row gap-2 mt-5'>
+              <div className='w-full md:w-1/6 my-auto text-center'>
                 <Link href={route('cashflow.student-monthly-payment', organization.id)}>
                   <SecondaryButton className='w-full'>
                     <div className='text-center w-full'>Kembali</div>
@@ -422,7 +460,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
                 </Link>
               </div>
 
-              <div className='w-full sm:w-1/6 text-center'>
+              <div className='w-full md:w-1/6 text-center'>
                 <PrimaryButton className='w-full' disabled={processing}>
                   <div className='text-center w-full'>Simpan</div>
                 </PrimaryButton>

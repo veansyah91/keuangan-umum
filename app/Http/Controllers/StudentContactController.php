@@ -54,7 +54,7 @@ class StudentContactController extends Controller
                                     })
                                     ->with(['contactCategories', 'student', 'levels'])
                                     ->orderBy('name')
-                                    ->paginate(50),
+                                    ->paginate(50)->withQueryString(),
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'searchFilter' => request('search'),
         ]);

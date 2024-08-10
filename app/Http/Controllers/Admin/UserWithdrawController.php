@@ -24,7 +24,8 @@ class UserWithdrawController extends Controller
                                             })
                                             ->with('user')
                                             ->orderBy('created_at','desc')
-                                            ->paginate(50);
+                                            ->paginate(50)
+                                            ->withQueryString();
 
         $affiliators = User::whereHas('affiliation')
                             ->when(request('user') ?? false, function ($query, $user) {
