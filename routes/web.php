@@ -325,7 +325,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/student-monthly-receivable', [StudentMonthlyReceivableController::class, 'index'])->name('cashflow.student-monthly-receivable');
             Route::get('/student-monthly-receivable/create', [StudentMonthlyReceivableController::class, 'create'])->name('cashflow.student-monthly-receivable.create');
             Route::post('/student-monthly-receivable', [StudentMonthlyReceivableController::class, 'store'])->name('cashflow.student-monthly-receivable.store');
-            
+            Route::get('/student-monthly-receivable/{receivable}', [StudentMonthlyReceivableController::class, 'show'])->name('cashflow.student-monthly-receivable.show');
             
         });
 

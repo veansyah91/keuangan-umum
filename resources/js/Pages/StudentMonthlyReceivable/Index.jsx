@@ -278,7 +278,7 @@ Index.layout = (page) => (
         children={page}
         user={page.props.auth.user}
         organization={page.props.organization}
-        title='Piutang Iuran Bulanan Siswa'
+        title='Piutang Iuran Bulanan'
         backLink={
             <Link href={route('cashflow', page.props.organization.id)}>
                 <IoArrowBackOutline />

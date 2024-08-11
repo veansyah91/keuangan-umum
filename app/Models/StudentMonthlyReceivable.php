@@ -24,8 +24,12 @@ class StudentMonthlyReceivable extends Model
     public function scopeFilter($query, $filters)
     {
         $query->when($filters['search'] ?? false, function ($query, $search) {
-            return $query->where('name', 'like', '%'.$search.'%')
-                        ->orWhere('no_ref', 'like', '%'.$search.'%');
+            return $query->whereHas('contact', function ($query) use ($search){
+                return $query->where('name', 'like', '%'.$search.'%')
+                            ->orWhereHas('student', function ($query) use ($search){
+                                return $query->where('no_ref', 'like', '%'.$search.'%');
+                            });
+            });
         });
     }
 }

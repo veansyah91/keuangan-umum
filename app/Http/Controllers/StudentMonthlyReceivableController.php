@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Inertia\Inertia;
 use App\Helpers\NewRef;
 use App\Models\Account;
+use App\Models\Contact;
 use Carbon\CarbonImmutable;
 use App\Models\Organization;
 use Illuminate\Http\Request;
@@ -270,5 +271,10 @@ class StudentMonthlyReceivableController extends Controller
     $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menambahkan DATA pada PIUTANG IURAN BULANAN dengan DATA : '.json_encode($log));
 
     return redirect(route('cashflow.student-monthly-receivable.create', $organization['id']))->with('success', 'Piutang Iuran Bulanan Berhasil Ditambahkan');
+  }
+
+  public function show(Organization $organization, Contact $contact)
+  {
+    dd($contact);
   }
 }
