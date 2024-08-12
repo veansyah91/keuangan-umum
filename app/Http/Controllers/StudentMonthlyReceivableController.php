@@ -273,8 +273,12 @@ class StudentMonthlyReceivableController extends Controller
     return redirect(route('cashflow.student-monthly-receivable.create', $organization['id']))->with('success', 'Piutang Iuran Bulanan Berhasil Ditambahkan');
   }
 
-  public function show(Organization $organization, Contact $contact)
+  public function show(Organization $organization, StudentMonthlyReceivable $receivable)
   {
-    dd($contact);
+    $receivableDetails = StudentMonthlyReceivableLedger::where('receivable_id', $receivable['id'])
+                                                    ->with('receivable')
+                                                    ->get();
+
+                                                    dd($receivableDetails);
   }
 }

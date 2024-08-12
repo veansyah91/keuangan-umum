@@ -491,7 +491,7 @@ Create.layout = (page) => (
             <Link href={route('cashflow', page.props.organization.id)}>Arus Kas</Link>
           </li>
           <li className='font-bold'>
-            <Link href={route('cashflow.student-monthly-receivable', page.props.organization.id)}>Pembayaran Iuran Bulanan Siswa</Link>
+            <Link href={route('cashflow.student-monthly-receivable', page.props.organization.id)}>Piutang Iuran Bulanan Siswa</Link>
           </li>
           <li>Tambah Piutang Iuran Bulanan Siswa</li>
         </ul>
