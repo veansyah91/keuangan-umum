@@ -279,6 +279,12 @@ class StudentMonthlyReceivableController extends Controller
                                                     ->with('receivable')
                                                     ->get();
 
-                                                    dd($receivableDetails);
+		return Inertia::render('StudentMonthlyReceivable/Show',[
+			'organization' => $organization,
+			'receivables' => StudentMonthlyReceivableLedger::where('receivable_id', $receivable['id'])
+												->with('receivable')
+												->paginate(50),
+			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+		]);
   }
 }
