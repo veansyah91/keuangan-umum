@@ -231,7 +231,7 @@ export default function Index({ role, organization, receivables, searchFilter })
                                         <th className='bg-gray-200'>Nama</th>
                                         <th className='bg-gray-200'>No Siswa</th>
                                         <th className='bg-gray-200'>Kelas Terakhir</th>
-                                        <th className='bg-gray-200'>Sisa</th>
+                                        <th className='bg-gray-200 text-end'>Sisa</th>
                                         <th className='bg-gray-200'></th>
                                     </tr>
                                 </thead>

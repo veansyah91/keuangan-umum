@@ -23,7 +23,8 @@ import { usePrevious } from 'react-use';
 import StudentMonthlyReceivableMobile from './Components/StudentMonthlyReceivableMobile';
 import StudentMonthlyReceivableDesktop from './Components/StudentMonthlyReceivableDesktop';
 
-export default function Show({ role, organization, receivables, searchFilter }) {
+export default function Show({ role, organization, receivables, searchFilter, contact }) {
+    console.log(contact.name);
     
     // State
     const { errors } = usePage().props;
@@ -147,14 +148,14 @@ export default function Show({ role, organization, receivables, searchFilter }) 
                 data={receivables}
             />
             <ContentMobile>
-                {receivables.data.map((receivable) => (
+                {/* {receivables.data.map((receivable) => (
                     <StudentMonthlyReceivableMobile
                         receivable={receivable}
                         key={receivable.id}
                         handleDelete={() => handleDelete(receivable)}
                         role={role}
                     />
-                ))}
+                ))} */}
             </ContentMobile>
             {/* Mobile */}
 
@@ -236,7 +237,7 @@ export default function Show({ role, organization, receivables, searchFilter }) 
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {receivables.data.map((receivable, index) => (
+                                    {/* {receivables.data.map((receivable, index) => (
                                         <StudentMonthlyReceivableDesktop
                                             key={index}
                                             receivable={receivable}
@@ -244,7 +245,7 @@ export default function Show({ role, organization, receivables, searchFilter }) 
                                             handleDelete={() => handleDelete(receivable)}
                                             role={role}
                                         />
-                                    ))}
+                                    ))} */}
                                 </tbody>
                             </table>
                         </ContentDesktop>
@@ -274,11 +275,11 @@ export default function Show({ role, organization, receivables, searchFilter }) 
 
 Show.layout = (page) => (
 	<AuthenticatedLayout
-		header={<Header>Piutang Iuran Bulanan Siswa</Header>}
+		header={<Header>Piutang Iuran Bulanan Siswa {page.props.contact.name}</Header>}
 		children={page}
 		user={page.props.auth.user}
 		organization={page.props.organization}
-		title='Piutang Iuran Bulanan'
+		title={`Piutang Iuran Bulanan`}
 		backLink={
 			<Link href={route('cashflow', page.props.organization.id)}>
 				<IoArrowBackOutline />
@@ -290,7 +291,10 @@ Show.layout = (page) => (
 					<li className='font-bold'>
 						<Link href={route('cashflow', page.props.organization.id)}>Arus Kas</Link>
 					</li>
-					<li>Piutang Iuran Bulanan Siswa</li>
+                    <li className='font-bold'>
+						<Link href={route('cashflow.student-monthly-receivable', page.props.organization.id)}>Piutang Iuran Bulanan Siswa</Link>
+					</li>
+					<li>Detail Piutang Iuran Bulanan Siswa</li>
 				</ul>
 			</div>
 		}

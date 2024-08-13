@@ -275,16 +275,21 @@ class StudentMonthlyReceivableController extends Controller
 
   public function show(Organization $organization, StudentMonthlyReceivable $receivable)
   {
-    $receivableDetails = StudentMonthlyReceivableLedger::where('receivable_id', $receivable['id'])
-                                                    ->with('receivable')
-                                                    ->get();
+    $user = Auth::user();
+
+    // $receivableDetails = StudentMonthlyReceivableLedger::where('receivable_id', $receivable['id'])
+		// 																								->whereNull('paid_date')
+    //                                                 ->with('receivable')
+    //                                                 ->get();
 
 		return Inertia::render('StudentMonthlyReceivable/Show',[
 			'organization' => $organization,
 			'receivables' => StudentMonthlyReceivableLedger::where('receivable_id', $receivable['id'])
+												->whereNull('paid_date')
 												->with('receivable')
 												->paginate(50),
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+			'contact' => Contact::find($receivable['contact_id'])
 		]);
   }
 }
