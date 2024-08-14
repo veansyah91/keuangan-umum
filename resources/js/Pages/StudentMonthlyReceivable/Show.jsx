@@ -21,10 +21,10 @@ import ContentDesktop from '@/Components/Desktop/ContentDesktop';
 import DangerButton from '@/Components/DangerButton';
 import { usePrevious } from 'react-use';
 import StudentMonthlyReceivableMobile from './Components/StudentMonthlyReceivableMobile';
-import StudentMonthlyReceivableDesktop from './Components/StudentMonthlyReceivableDesktop';
+import StudentMonthlyReceivableDetailDesktop from './Components/StudentMonthlyReceivableDetailDesktop';
 
 export default function Show({ role, organization, receivables, searchFilter, contact }) {
-    console.log(contact.name);
+    console.log(receivables);
     
     // State
     const { errors } = usePage().props;
@@ -229,23 +229,25 @@ export default function Show({ role, organization, receivables, searchFilter, co
                             <table className='table table-pin-rows table-pin-cols text-base'>
                                 <thead className='text-base text-gray-900'>
                                     <tr className=''>
-                                        <th className='bg-gray-200'>Nama</th>
-                                        <th className='bg-gray-200'>No Siswa</th>
-                                        <th className='bg-gray-200'>Kelas Terakhir</th>
-                                        <th className='bg-gray-200'>Sisa</th>
+                                        <th className='bg-gray-200'>No Ref</th>
+                                        <th className='bg-gray-200'>Tanggal Input</th>
+                                        <th className='bg-gray-200'>Bulan</th>
+                                        <th className='bg-gray-200'>Tahun Ajaran</th>
+                                        <th className='bg-gray-200 text-end'>Jumlah</th>
+                                        <th className='bg-gray-200'>Status</th>
                                         <th className='bg-gray-200'></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {/* {receivables.data.map((receivable, index) => (
-                                        <StudentMonthlyReceivableDesktop
+                                    {receivables.data.map((receivable, index) => (
+                                        <StudentMonthlyReceivableDetailDesktop
                                             key={index}
                                             receivable={receivable}
                                             className={`${index % 2 == 0 && 'bg-gray-100'}`}
                                             handleDelete={() => handleDelete(receivable)}
                                             role={role}
                                         />
-                                    ))} */}
+                                    ))}
                                 </tbody>
                             </table>
                         </ContentDesktop>
