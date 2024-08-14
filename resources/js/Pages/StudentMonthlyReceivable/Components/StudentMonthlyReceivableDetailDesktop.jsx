@@ -4,9 +4,9 @@ import formatNumber from '@/Utils/formatNumber';
 import { Link } from '@inertiajs/react';
 import dayjs from 'dayjs';
 import React from 'react';
-import { IoEllipsisVertical, IoSearchOutline } from 'react-icons/io5';
+import { IoCreateOutline, IoEllipsisVertical, IoSearchOutline, IoTrash } from 'react-icons/io5';
 
-export default function StudentDesktop({ receivable, className, role }) {
+export default function StudentDesktop({ receivable, className, role, handleEdit, handleDelete }) {
 	return (
 		<>
 			<tr className={className}>
@@ -15,7 +15,7 @@ export default function StudentDesktop({ receivable, className, role }) {
 				<td>{receivable.month}</td>
 				<td>{receivable.study_year}</td>
 				<td className='text-end'>IDR. { formatNumber(receivable.debit) }</td>
-        <td>
+				<td>
 					{
 						receivable.paid_date 
 						? <BadgeSuccess>Lunas</BadgeSuccess>
@@ -35,12 +35,22 @@ export default function StudentDesktop({ receivable, className, role }) {
 								tabIndex={0}
 								className='dropdown-content z-[50] menu p-2 shadow bg-base-100 rounded-box w-56'>
 								<li>
-									{/* <Link
-										href={route('cashflow.student-monthly-receivable.show', {organization: receivable.organization_id, receivable: receivable.id})}
+									<Link 
+										href={route('cashflow.student-monthly-receivable.edit', {organization: receivable.receivable.organization_id, receivable: receivable.receivable_id,ledger:receivable.id})}
 									>
-										<IoSearchOutline />
-										Detail
-									</Link> */}
+										<IoCreateOutline />
+										Ubah
+									</Link>
+									{/* <button onClick={handleEdit}>
+										<IoCreateOutline />
+										Ubah
+									</button> */}
+								</li>
+								<li>
+									<button onClick={handleDelete}>
+										<IoTrash />
+										Hapus
+									</button>
 								</li>
 							</ul>
 						</div>

@@ -45,7 +45,7 @@ class JournalController extends Controller
         $date = $dateRequest ?? $now->isoFormat('YYYY-MM-DD');
         $dateRef = Carbon::create($date);
         $refHeader = 'JU-'.$dateRef->isoFormat('YYYY').$dateRef->isoFormat('MM');
-        $newRef = $refHeader.'001';
+        $newRef = $refHeader.'0001';
 
         $journal = Journal::whereOrganizationId($organization['id'])
             ->where('no_ref', 'like', $refHeader.'%')

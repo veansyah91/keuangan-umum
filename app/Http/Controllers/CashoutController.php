@@ -59,7 +59,7 @@ class CashoutController extends Controller
         $date = $dateRequest ?? $now->isoFormat('YYYY-MM-DD');
         $dateRef = Carbon::create($date);
         $refHeader = 'KK-'.$dateRef->isoFormat('YYYY').$dateRef->isoFormat('MM');
-        $newRef = $refHeader.'001';
+        $newRef = $refHeader.'0001';
 
         $cashOut = Cashout::whereOrganizationId($organization['id'])
             ->where('no_ref', 'like', $refHeader.'%')

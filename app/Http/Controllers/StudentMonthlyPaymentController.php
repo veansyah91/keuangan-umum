@@ -54,7 +54,7 @@ class StudentMonthlyPaymentController extends Controller
         $date = $dateRequest ?? $now->isoFormat('YYYY-MM-DD');
         $dateRef = Carbon::create($date);
         $refHeader = 'IB-'.$dateRef->isoFormat('YYYY').$dateRef->isoFormat('MM');
-        $newRef = $refHeader.'001';
+        $newRef = $refHeader.'0001';
 
         $cashIn = StudentMonthlyPayment::whereOrganizationId($organization['id'])
             ->where('no_ref', 'like', $refHeader.'%')

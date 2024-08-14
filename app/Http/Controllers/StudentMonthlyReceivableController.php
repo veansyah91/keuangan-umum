@@ -9,6 +9,7 @@ use App\Models\Account;
 use App\Models\Contact;
 use Carbon\CarbonImmutable;
 use App\Models\Organization;
+use App\Models\StudentLevel;
 use Illuminate\Http\Request;
 use App\Models\ContactCategory;
 use Illuminate\Validation\Rule;
@@ -49,7 +50,7 @@ class StudentMonthlyReceivableController extends Controller
       $date = $dateRequest ?? $now->isoFormat('YYYY-MM-DD');
       $dateRef = Carbon::create($date);
       $refHeader = 'IB-'.$dateRef->isoFormat('YYYY').$dateRef->isoFormat('MM');
-      $newRef = $refHeader.'001';
+      $newRef = $refHeader.'0001';
 
       $cashIn = StudentMonthlyPayment::whereOrganizationId($organization['id'])
           ->where('no_ref', 'like', $refHeader.'%')
@@ -276,20 +277,49 @@ class StudentMonthlyReceivableController extends Controller
   public function show(Organization $organization, StudentMonthlyReceivable $receivable)
   {
     $user = Auth::user();
-
-    // $receivableDetails = StudentMonthlyReceivableLedger::where('receivable_id', $receivable['id'])
-		// 																								->whereNull('paid_date')
-    //                                                 ->with('receivable')
-    //                                                 ->get();
-
 		return Inertia::render('StudentMonthlyReceivable/Show',[
 			'organization' => $organization,
 			'receivables' => StudentMonthlyReceivableLedger::where('receivable_id', $receivable['id'])
 												->whereNull('paid_date')
 												->with('receivable')
+												->orderBy('study_year', 'desc')
+												->orderBy('month', 'desc')
 												->paginate(50),
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'contact' => Contact::find($receivable['contact_id'])
 		]);
   }
+
+	public function edit(Organization $organization, StudentMonthlyReceivable $receivable, StudentMonthlyReceivableLedger $ledger)
+	{
+		$user = Auth::user();
+
+		$contactCategory = ContactCategory::whereOrganizationId($organization['id'])
+                                            ->whereName('SISWA')
+                                            ->first();
+
+		$payment =  StudentMonthlyPayment::find($ledger['payment_id']);
+
+
+
+		return Inertia::render('StudentMonthlyReceivable/Edit', [
+			'organization' => $organization,
+      'categories' => StudentPaymentCategory::whereOrganizationId($organization['id'])
+                                                    ->whereIsActive(true)
+                                                    ->get(),
+      'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+      'date' => request('date') ?? $ledger['date'],
+      'contacts' => $this->contactRepository->getStudents($organization['id'], $contactCategory['id'], request(['contact'])),
+      'accounts' => $this->accountRepository->getDataNonCash($organization['id'], request(['account'])),
+			'ledger' => $ledger,
+			'receivable' => StudentMonthlyReceivable::find($ledger['receivable_id']),
+			'payment' => $payment,
+			'details' => DB::table('s_monthly_payment_details')->where('payment_id', $payment['id'])->get(),
+      'newRef' => request('date') ? $this->newRef($organization, request('date')) : $ledger['no_ref'],
+			'contact' => Contact::with('student')->find($payment['contact_id']),
+			'lastLevel' => StudentLevel::whereContactId($payment['contact_id'])->latest()->first(),
+			// 'debitAccount' => 
+		]);
+
+	}
 }

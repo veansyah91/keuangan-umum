@@ -326,6 +326,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/student-monthly-receivable/create', [StudentMonthlyReceivableController::class, 'create'])->name('cashflow.student-monthly-receivable.create');
             Route::post('/student-monthly-receivable', [StudentMonthlyReceivableController::class, 'store'])->name('cashflow.student-monthly-receivable.store');
             Route::get('/student-monthly-receivable/{receivable}', [StudentMonthlyReceivableController::class, 'show'])->name('cashflow.student-monthly-receivable.show');
+            Route::get('/student-monthly-receivable/{receivable}/edit/{ledger}', [StudentMonthlyReceivableController::class, 'edit'])->name('cashflow.student-monthly-receivable.edit');
             
         });
 
