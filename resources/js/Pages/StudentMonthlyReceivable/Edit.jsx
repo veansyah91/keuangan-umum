@@ -55,28 +55,27 @@ const monthNow = () => {
   return month;
 }
 
-export default function Edit({ organization, newRef, contacts, date, categories, accounts, payment, receivable, ledger, contact, lastLevel, details }) {
-  console.log(details);
+export default function Edit({ organization, newRef, contacts, date, categories, accounts, payment, receivable, ledger, contact, lastLevel, details, creditAccount }) {
   
   // state
   const [total, setTotal] = useState(0);
-  const { data, setData, processing, post, errors, setError, reset } = useForm({
+  const { data, setData, processing, patch, errors, setError } = useForm({
     contact_id:receivable.contact_id,
     date:date,
     level:lastLevel.level,
     student_id:contact.student.no_ref,
     no_ref:newRef,
     value:total,
-    month:receivable.month,
-    study_year:receivable.study_year,
+    month:ledger.month,
+    study_year:ledger.study_year,
     description:ledger.description,
-    credit_account: null,
+    credit_account: creditAccount.id,
     details: [],
     id: ledger.id
   });  
 
   const [selectedContact, setSelectedContact] = useState({ id: contact.id, name: contact.name, phone: contact.phone });
-  const [selectedAccount, setSelectedAccount] = useState({ id: null, name: '', code: '', is_cash: false });
+  const [selectedAccount, setSelectedAccount] = useState({ id: creditAccount.id, name: creditAccount.name, code: creditAccount.code, is_cash: false });
 
   const [dateValue, setDateValue] = useState({
     startDate: date,
@@ -85,17 +84,27 @@ export default function Edit({ organization, newRef, contacts, date, categories,
 
   // useEffect
   useEffect(() => {
-    setDefault(newRef);
+    setDefault();
   },[]);
 
   // function
-  const setDefault = (newRef) => {
+  const setDefault = () => {
     let tempData = data;
-    let temp = categories.map(category => ({
-      id: category.id,
-      name: category.name,
-      value: category.value,
-    }));
+
+    let temp = [];
+
+    categories.filter((category, index) => {
+      let filtered = details.filter(detail => detail.student_payment_category_id == category.id);
+
+      temp = [
+        ...temp,
+        {
+          id:category.id,
+          name:category.name,
+          value: filtered.length > 0 ? filtered[0].value : category.value
+        }
+      ]
+    });
 
     let tempTotal = temp.reduce((total, item) => total + item.value, 0);
     setTotal(tempTotal);
@@ -103,6 +112,7 @@ export default function Edit({ organization, newRef, contacts, date, categories,
     tempData = {
       ...tempData,
       details: temp,
+      value: tempTotal
     }
     
     setData(tempData);
@@ -130,8 +140,8 @@ export default function Edit({ organization, newRef, contacts, date, categories,
 
   const handleSubmit = (e) => {
     e.preventDefault();
-        
-    post(route('cashflow.student-monthly-receivable.store', organization.id), {
+
+    patch(route('cashflow.student-monthly-receivable.update', {organization: organization.id, receivable: receivable.id, ledger: ledger.id}), {
       onSuccess: ({ props }) => {
         const { flash, newRef } = props;
         
@@ -444,7 +454,7 @@ export default function Edit({ organization, newRef, contacts, date, categories,
 
             <div className='flex justify-end flex-col-reverse md:flex-row gap-2 mt-5'>
               <div className='w-full md:w-1/6 my-auto text-center'>
-                <Link href={route('cashflow.student-monthly-payment', organization.id)}>
+               <Link href={route('cashflow.student-monthly-receivable.show', {organization:organization.id, receivable: receivable.id})}>
                   <SecondaryButton className='w-full'>
                     <div className='text-center w-full'>Kembali</div>
                   </SecondaryButton>
@@ -453,7 +463,7 @@ export default function Edit({ organization, newRef, contacts, date, categories,
 
               <div className='w-full md:w-1/6 text-center'>
                 <PrimaryButton className='w-full' disabled={processing}>
-                  <div className='text-center w-full'>Simpan</div>
+                  <div className='text-center w-full'>Ubah</div>
                 </PrimaryButton>
               </div>
             </div>
@@ -472,7 +482,7 @@ Edit.layout = (page) => (
     organization={page.props.organization}
     title='Ubah Piutang Iuran'
     backLink={
-      <Link href={route('cashflow.student-monthly-receivable', page.props.organization.id)}>
+      <Link href={route('cashflow.student-monthly-receivable.show', {organization:page.props.organization.id, receivable: page.props.receivable.id})}>
         <IoArrowBackOutline />
       </Link>
     }
@@ -483,7 +493,7 @@ Edit.layout = (page) => (
             <Link href={route('cashflow', page.props.organization.id)}>Arus Kas</Link>
           </li>
           <li className='font-bold'>
-            <Link href={route('cashflow.student-monthly-receivable', page.props.organization.id)}>Piutang Iuran Bulanan Siswa</Link>
+            <Link href={route('cashflow.student-monthly-receivable.show', {organization:page.props.organization.id, receivable: page.props.receivable.id})}>Piutang Iuran Bulanan Siswa</Link>
           </li>
           <li>Ubah Piutang Iuran Bulanan Siswa</li>
         </ul>

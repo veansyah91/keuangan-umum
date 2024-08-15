@@ -452,7 +452,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
 
             <div className='flex justify-end flex-col-reverse md:flex-row gap-2 mt-5'>
               <div className='w-full md:w-1/6 my-auto text-center'>
-                <Link href={route('cashflow.student-monthly-payment', organization.id)}>
+                <Link href={route('cashflow.student-monthly-receivable', organization.id)}>
                   <SecondaryButton className='w-full'>
                     <div className='text-center w-full'>Kembali</div>
                   </SecondaryButton>

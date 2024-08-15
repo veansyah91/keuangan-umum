@@ -59,6 +59,7 @@ export default function ContactSelectInput({
                 placeholder={placeholder}
                 type='search'
                 id={id}
+                autoComplete='false'
               />
               <Combobox.Button
                 className='absolute inset-y-0 right-0 flex items-center pr-3 text-gray-600 text-lg'

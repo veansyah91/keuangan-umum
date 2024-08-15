@@ -327,6 +327,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/student-monthly-receivable', [StudentMonthlyReceivableController::class, 'store'])->name('cashflow.student-monthly-receivable.store');
             Route::get('/student-monthly-receivable/{receivable}', [StudentMonthlyReceivableController::class, 'show'])->name('cashflow.student-monthly-receivable.show');
             Route::get('/student-monthly-receivable/{receivable}/edit/{ledger}', [StudentMonthlyReceivableController::class, 'edit'])->name('cashflow.student-monthly-receivable.edit');
+            Route::patch('/student-monthly-receivable/{receivable}/edit/{ledger}', [StudentMonthlyReceivableController::class, 'update'])->name('cashflow.student-monthly-receivable.update');
             
         });
 

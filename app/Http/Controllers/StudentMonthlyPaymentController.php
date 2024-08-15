@@ -77,6 +77,8 @@ class StudentMonthlyPaymentController extends Controller
             'payments' => StudentMonthlyPayment::filter(request(['search']))
                                         ->with('contact')
                                         ->whereOrganizationId($organization['id'])
+                                        ->orderBy('study_year', 'desc')
+                                        ->orderBy('month', 'desc')
                                         ->orderBy('date', 'desc')
                                         ->paginate(50)->withQueryString(),
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),

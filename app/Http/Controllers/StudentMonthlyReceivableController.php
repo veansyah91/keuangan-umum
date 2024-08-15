@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use Inertia\Inertia;
+use App\Models\Ledger;
 use App\Helpers\NewRef;
 use App\Models\Account;
 use App\Models\Contact;
@@ -247,6 +248,9 @@ class StudentMonthlyReceivableController extends Controller
         $receivable = StudentMonthlyReceivable::create($validated);
     }
 
+    $journal = $this->journalRepository->store($validated);
+    $validated['journal_id'] = $journal['id'];
+
     $receivableLedger = StudentMonthlyReceivableLedger::create([
         'receivable_id' => $receivable['id'],
         'debit' => $validated['value'],
@@ -256,11 +260,9 @@ class StudentMonthlyReceivableController extends Controller
         'date' => $validated['date'],
         'study_year' => $validated['study_year'],
         'month' => $validated['month'],
-        'payment_id' => $payment['id']
+        'journal_id' => $validated['journal_id'],
+        'payment_id' => $payment['id'],
     ]);
-
-    $journal = $this->journalRepository->store($validated);
-    $validated['journal_id'] = $journal['id'];
 
     $log = [
         'description' => $validated['description'],
@@ -300,7 +302,7 @@ class StudentMonthlyReceivableController extends Controller
 
 		$payment =  StudentMonthlyPayment::find($ledger['payment_id']);
 
-
+		$ledgerJournal = Ledger::whereJournalId($ledger['journal_id'])->where('credit', '>', 0)->first();
 
 		return Inertia::render('StudentMonthlyReceivable/Edit', [
 			'organization' => $organization,
@@ -318,8 +320,12 @@ class StudentMonthlyReceivableController extends Controller
       'newRef' => request('date') ? $this->newRef($organization, request('date')) : $ledger['no_ref'],
 			'contact' => Contact::with('student')->find($payment['contact_id']),
 			'lastLevel' => StudentLevel::whereContactId($payment['contact_id'])->latest()->first(),
-			// 'debitAccount' => 
+			'creditAccount' => Account::find($ledgerJournal['account_id'])
 		]);
+	}
 
+	public function update(Request $request, Organization $organization, StudentMonthlyReceivable $receivable, StudentMonthlyReceivableLedger $ledger)
+	{
+		dd($request);
 	}
 }
