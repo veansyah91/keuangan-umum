@@ -149,7 +149,6 @@ export default function Create({ organization, newRef, contacts, date, categorie
         setSelectedContact({ id: null, name: '', phone: '' });
         setSelectedAccount({ id: null, name: '', code: '', is_cash: false });
         setDefault(newRef);
-
       },
       onError: errors => {
         console.log(errors);
@@ -377,6 +376,8 @@ export default function Create({ organization, newRef, contacts, date, categorie
                       monthList().map((month, index) => 
                         <option 
                           key={index} 
+                          selected={month == data.month}
+                          value={month}
                         >{month}</option>
                       )
                     }

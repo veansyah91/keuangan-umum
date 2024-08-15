@@ -182,8 +182,10 @@ class StudentMonthlyReceivableController extends Controller
                                       ->whereContactId($validated['contact_id'])
                                       ->where('month', $validated['month'])
                                       ->where('study_year', $validated['study_year'])
-                                      ->whereNot('type', 'receivable')
+                                      // ->whereNot('type', 'receivable')
                                       ->first();
+
+																			// dd($validated);
 
     if ($payment) {
         return redirect()->back()->withErrors(['error' => 'Data is existed']);
@@ -326,6 +328,68 @@ class StudentMonthlyReceivableController extends Controller
 
 	public function update(Request $request, Organization $organization, StudentMonthlyReceivable $receivable, StudentMonthlyReceivableLedger $ledger)
 	{
+        dd($ledger);
+        $validated = $request->validate([
+            'contact_id' => [
+                'required',
+                'exists:contacts,id',
+            ],
+            'date' => [
+                'required',
+                'date',
+            ],
+            'level' => [
+                'required',
+                'numeric',
+            ],
+            'student_id' => [
+                'string',
+                'nullable',
+            ],
+            'no_ref' => [
+                'required',
+                'string',
+                Rule::unique('student_monthly_payments')->where(function ($query) use ($organization) {
+                    return $query->where('organization_id', $organization['id']);
+                })->ignore($ledger['payment_id']),
+            ],
+            'value' => [
+                'required',
+                'numeric',
+            ],
+            'month' => [
+                'required',
+                'numeric',
+            ],
+            'study_year' => [
+                'string',
+                'required',
+            ],
+            'details' => [
+                'required',
+            ],
+            'details.*.id' => [
+                'required',
+                'exists:student_payment_categories,id'
+            ],
+            'details.*.name' => [
+                'required',
+                'string'
+            ],
+            'details.*.value' => [
+                'required',
+                'numeric',
+                'min:0',
+            ],
+            'description' => [
+                'string',
+                'nullable'
+            ],
+            'credit_account' => [
+                'required',
+                'exists:accounts,id'
+            ],
+          ]);
 		dd($request);
 	}
 }
