@@ -21,7 +21,8 @@ class StudentMonthlyPayment extends Model
         'type',
         'date',
         'month',
-        'study_year'
+        'study_year',
+        'created_by_id'
     ];
 
     public function scopeFilter($query, $filters)
