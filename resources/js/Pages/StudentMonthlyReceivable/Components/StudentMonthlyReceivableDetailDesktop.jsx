@@ -41,10 +41,6 @@ export default function StudentDesktop({ receivable, className, role, handleEdit
 										<IoCreateOutline />
 										Ubah
 									</Link>
-									{/* <button onClick={handleEdit}>
-										<IoCreateOutline />
-										Ubah
-									</button> */}
 								</li>
 								<li>
 									<button onClick={handleDelete}>

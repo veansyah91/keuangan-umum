@@ -37,4 +37,11 @@ class StudentMonthlyReceivableLedger extends Model
         return $this->belongsTo(Journal::class);
     }
 
+    public function scopeFilter($query, $filters)
+    {
+			$query->when($filters['search'] ?? false, function ($query, $search) {
+				return $query->where('no_ref', 'like', '%'.$search.'%');
+			});
+    }
+
 }

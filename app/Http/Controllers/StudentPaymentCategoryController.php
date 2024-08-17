@@ -5,12 +5,13 @@ namespace App\Http\Controllers;
 use Inertia\Inertia;
 use App\Models\Organization;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use App\Models\StudentPaymentCategory;
 use App\Repositories\Log\LogRepository;
 use App\Repositories\User\UserRepository;
+use Illuminate\Support\Facades\Validator;
 
 class StudentPaymentCategoryController extends Controller
 {
@@ -27,7 +28,7 @@ class StudentPaymentCategoryController extends Controller
     {
         $user = Auth::user();
 
-        return Inertia::render('Student-Payment-Category/Index', [
+        return Inertia::render('StudentPaymentCategory/Index', [
             'organization' => $organization,
             'studentPaymentCategories' => StudentPaymentCategory::filter(request(['search']))
                                                 ->whereOrganizationId($organization['id'])
@@ -104,6 +105,13 @@ class StudentPaymentCategoryController extends Controller
     public function destroy(Organization $organization, StudentPaymentCategory $studentPaymentCategory)
     {
         // cek penggunaan
+        $data = DB::table('s_monthly_payment_details')
+                    ->where('student_payment_category_id', $studentPaymentCategory['id'])
+                    ->first();
+
+        if ($data) {
+            return redirect()->back()->withErrors(['message' => 'Tidak Dapat Menghapus Data']);
+        }
 
         $studentPaymentCategory->delete();
         return redirect()->back()->with('success', 'Kategori Berhasil Dihapus');

@@ -137,7 +137,7 @@ export default function Index({ role, organization, studentPaymentCategories, se
                 });
                 reset();
             },
-            onError: (error) => {
+            onError: (error) => {                
                 setShowDeleteConfirmation(false);
                 toast.error(error.message, {
                     position: toast.POSITION.TOP_CENTER,

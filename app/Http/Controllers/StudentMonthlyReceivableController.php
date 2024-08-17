@@ -8,6 +8,7 @@ use App\Models\Ledger;
 use App\Helpers\NewRef;
 use App\Models\Account;
 use App\Models\Contact;
+use App\Models\Journal;
 use Carbon\CarbonImmutable;
 use App\Models\Organization;
 use App\Models\StudentLevel;
@@ -277,10 +278,13 @@ class StudentMonthlyReceivableController extends Controller
   public function show(Organization $organization, StudentMonthlyReceivable $receivable)
   {
     $user = Auth::user();
+		
 		return Inertia::render('StudentMonthlyReceivable/Show',[
 			'organization' => $organization,
+			'receivable' => $receivable,
 			'receivables' => StudentMonthlyReceivableLedger::where('receivable_id', $receivable['id'])
-												->whereNull('paid_date')
+												->filter(request(['search']))
+												// ->whereNull('paid_date')
 												->with('receivable')
 												->orderBy('study_year', 'desc')
 												->orderBy('month', 'desc')
@@ -467,9 +471,52 @@ class StudentMonthlyReceivableController extends Controller
 			'date' => $validated['date'],
 			'no_ref' => $validated['no_ref'],
 			'value' => $validated['value'],
-	];
+		];
 
 		$this->logRepository->store($organization['id'], strtoupper($user['name']).' telah mengubah DATA pada PIUTANG IURAN BULANAN dengan DATA : '.json_encode($log));
+
+		return redirect()->back()->with('success', 'Piutang Iuran Bulanan Berhasil Diubah');
+	}
+
+	public function destroy(Request $request, Organization $organization, StudentMonthlyReceivable $receivable, StudentMonthlyReceivableLedger $ledger)
+	{
+		// cek pada payment
+		// jika sudah dilakukan pembayaran, maka tampilkan error
+
+		if ($ledger['paid_date']) {
+			return redirect()->back()->withErrors(['message' => 'Piutang Tidak Dapat Dihapus']);
+		}
+
+		// hapus data pada journal 
+		$journal = Journal::find($ledger('journal_id'));
+		$journal->delete();
+		
+		// cek kurangi jumlah piutang
+		$value = $receivable['value'];
+		$receivable->update([
+			'update' => $value - $ledger['debit']
+		]);
+
+		// hapus data pada table student_monthly_receivable_ledgers
+		$ledger->delete();
+
+		$payment = StudentMonthlyPayment::find($ledger['payment_id']);
+
+		// hapus data pada tabel s_monthly_payment_details
+		DB::table('s_monthly_payment_details')
+		->where('payment_id', $payment['id'])
+		->delete();
+
+		// hapus data pada tabel student_monthly_payments
+		$payment->delete();
+
+		$log = [
+			'date' => $validated['date'],
+			'no_ref' => $validated['no_ref'],
+			'value' => $validated['value'],
+		];
+
+		$this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menghapus DATA pada PIUTANG IURAN BULANAN dengan DATA : '.json_encode($log));
 
 		return redirect()->back()->with('success', 'Piutang Iuran Bulanan Berhasil Diubah');
 	}

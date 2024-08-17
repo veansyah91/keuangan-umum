@@ -23,8 +23,7 @@ import { usePrevious } from 'react-use';
 import StudentMonthlyReceivableMobile from './Components/StudentMonthlyReceivableMobile';
 import StudentMonthlyReceivableDetailDesktop from './Components/StudentMonthlyReceivableDetailDesktop';
 
-export default function Show({ role, organization, receivables, searchFilter, contact }) {
-    
+export default function Show({ role, organization, receivables, searchFilter, receivable }) {
     // State
     const { errors } = usePage().props;
 
@@ -40,7 +39,8 @@ export default function Show({ role, organization, receivables, searchFilter, co
         processing,
         reset,
     } = useForm({
-        id: 0,
+        id: null,
+        receivable_id: null
     });
 
     const prevSearch = usePrevious(search);
@@ -48,16 +48,16 @@ export default function Show({ role, organization, receivables, searchFilter, co
 
     // useState
     useEffect(() => {
-        if (prevSearch !== undefined) {
-            handleReloadPage();
-        }
+			if (prevSearch !== undefined) {
+				handleReloadPage();
+			}
     }, [debounceValue]);
 
     useEffect(() => {
-        errors && 
-        toast.error(errors.message, {
-            position: toast.POSITION.TOP_CENTER,
-        });
+			errors && 
+			toast.error(errors.message, {
+				position: toast.POSITION.TOP_CENTER,
+			});
     },[]);
 
     //function
@@ -70,15 +70,20 @@ export default function Show({ role, organization, receivables, searchFilter, co
         });
     };
     const handleDelete = (receivable) => {
-        setTitleDeleteModal(`Hapus Siswa ${receivable.name}`);
+        console.log(receivable);
+        
+        setTitleDeleteModal(`Hapus Piutang ${receivable.no_ref}`);
         setShowDeleteConfirmation(true);
-        setData('id', receivable.id);
+        setData({
+            id: receivable.id,
+            receivable: receivable.receivable_id
+        });
     };
 
     const handleSubmitDelete = (e) => {
         e.preventDefault();
 
-        destroy(route('data-master.students.destroy', { organization: organization.id, receivable: data.id }), {
+        destroy(route('cashflow.student-monthly-receivable.delete', { organization: organization.id, receivable: data.receivable ,ledger: data.id }), {
             onSuccess: () => {
                 setShowDeleteConfirmation(false);
                 toast.success(`Siswa Berhasil Dihapus`, {
@@ -102,9 +107,9 @@ export default function Show({ role, organization, receivables, searchFilter, co
             <ToastContainer />
 
             {role !== 'viewer' && (
-                <Link href={route('cashflow.student-monthly-receivable.create', organization.id)}>
-                    <AddButtonMobile label={'Tambah'} />
-                </Link>
+							<Link href={route('cashflow.student-monthly-receivable.create', organization.id)}>
+								<AddButtonMobile label={'Tambah'} />
+							</Link>
             )}
             
             <TitleMobile
@@ -114,35 +119,47 @@ export default function Show({ role, organization, receivables, searchFilter, co
                 pageBefore={
                     receivables.links[0].url ? (
                         <Link
-                            href={`/data-ledger/${organization.id}/receivables?page=${receivables.current_page - 1}&search=${search}`}
+													href={route('cashflow.student-monthly-receivable.show', {
+														organization: organization.id,
+														receivable: receivable.id,
+														page: receivables.current_page - 1,
+														search: search
+													})}
+                            // href={`/data-ledger/${organization.id}/receivables?page=${receivables.current_page - 1}&search=${search}`}
                             preserveState
                             only={['receivables']}>
                             <IoPlayBack />
                         </Link>
                     ) : (
                         <div className='text-gray-300'>
-                            <IoPlayBack />
+													<IoPlayBack />
                         </div>
                     )
                 }
                 pageAfter={
-                    receivables.links[receivables.links.length - 1].url ? (
-                        <Link
-                            href={`/data-ledger/${organization.id}/receivables?page=${receivables.current_page + 1}&search=${search}`}
-                            only={['receivables']}
-                            preserveState>
-                            <IoPlayForward />
-                        </Link>
-                    ) : (
-                        <div className='text-gray-300'>
-                            <IoPlayForward />
-                        </div>
-                    )
+									receivables.links[receivables.links.length - 1].url ? (
+										<Link
+											href={route('cashflow.student-monthly-receivable.show', {
+												organization: organization.id,
+												receivable: receivable.id,
+												page: receivables.current_page + 1,
+												search: search
+											})}
+											// href={`/data-ledger/${organization.id}/receivables?page=${receivables.current_page + 1}&search=${search}`}
+											only={['receivables']}
+											preserveState>
+											<IoPlayForward />
+										</Link>
+									) : (
+										<div className='text-gray-300'>
+											<IoPlayForward />
+										</div>
+									)
                 }
                 page={
-                    <>
-                        {receivables.current_page}/{receivables.last_page}
-                    </>
+									<>
+										{receivables.current_page}/{receivables.last_page}
+									</>
                 }
                 data={receivables}
             />
@@ -162,62 +179,72 @@ export default function Show({ role, organization, receivables, searchFilter, co
             <ContainerDesktop>
                 <TitleDesktop>
                     <div className='my-auto w-7/12'>
-                        {role !== 'viewer' && (
-                            <div className='space-x-2'>
-                                <Link href={route('cashflow.student-monthly-receivable.create', organization.id)}>
-                                    <PrimaryButton className='py-3'>Tambah Data</PrimaryButton>
-                                </Link>
-                            </div>
-                        )}
+											{role !== 'viewer' && (
+												<div className='space-x-2'>
+													<Link href={route('cashflow.student-monthly-receivable.create', organization.id)}>
+														<PrimaryButton className='py-3'>Tambah Data</PrimaryButton>
+													</Link>
+												</div>
+											)}
                     </div>
                     <div className='w-3/12 border flex rounded-lg'>
-                        <label htmlFor='search-input' className='my-auto ml-2'>
-                            <IoSearchSharp />
-                        </label>
-                        <input
-                            id='search-input'
-                            name='search-input'
-                            type='search'
-                            placeholder='Cari Siswa'
-                            className='w-full border-none focus:outline-none focus:ring-0'
-                            value={search || ''}
-                            onChange={(e) => setSearch(e.target.value)}
-                        />
+											<label htmlFor='search-input' className='my-auto ml-2'>
+												<IoSearchSharp />
+											</label>
+											<input
+												id='search-input'
+												name='search-input'
+												type='search'
+												placeholder='Cari No Ref'
+												className='w-full border-none focus:outline-none focus:ring-0'
+												value={search || ''}
+												onChange={(e) => setSearch(e.target.value)}
+											/>
                     </div>
                     <div className='italic text-xs my-auto w-1/12 text-center'>
-                        <PageNumber data={receivables} />
+											<PageNumber data={receivables} />
                     </div>
                     <div className='my-auto flex space-x-2 w-1/12'>
                         <div className='my-auto'>
-                            {receivables.links[0].url ? (
-                                <Link
-                                    href={`/admin/data-ledger/${organization.id}/receivables?page=${receivables.current_page - 1}&search=${search}`}
-                                    preserveState
-                                    only={['receivables']}>
-                                    <IoPlayBack />
-                                </Link>
-                            ) : (
-                                <div className='text-gray-300'>
-                                    <IoPlayBack />
-                                </div>
-                            )}
+													{receivables.links[0].url ? (
+														<Link
+															href={route('cashflow.student-monthly-receivable.show', {
+																organization: organization.id,
+																receivable: receivable.id,
+																page: receivables.current_page - 1,
+																search: search
+															})}
+															preserveState
+															only={['receivables']}>
+															<IoPlayBack />
+														</Link>
+													) : (
+														<div className='text-gray-300'>
+															<IoPlayBack />
+														</div>
+													)}
                         </div>
                         <div className='my-auto'>
-                            {receivables.current_page}/{receivables.last_page}
+													{receivables.current_page}/{receivables.last_page}
                         </div>
                         <div className='my-auto'>
-                            {receivables.links[receivables.links.length - 1].url ? (
-                                <Link
-                                    href={`/admin/data-ledger/${organization.id}/receivables?page=${receivables.current_page + 1}&search=${search}`}
-                                    only={['receivables']}
-                                    preserveState>
-                                    <IoPlayForward />
-                                </Link>
-                            ) : (
-                                <div className='text-gray-300'>
-                                    <IoPlayForward />
-                                </div>
-                            )}
+													{receivables.links[receivables.links.length - 1].url ? (
+														<Link
+															href={route('cashflow.student-monthly-receivable.show', {
+																organization: organization.id,
+																receivable: receivable.id,
+																page: receivables.current_page + 1,
+																search: search
+															})}
+															only={['receivables']}
+															preserveState>
+															<IoPlayForward />
+														</Link>
+													) : (
+														<div className='text-gray-300'>
+															<IoPlayForward />
+														</div>
+													)}
                         </div>
                     </div>
                 </TitleDesktop>
@@ -240,11 +267,11 @@ export default function Show({ role, organization, receivables, searchFilter, co
                                 <tbody>
                                     {receivables.data.map((receivable, index) => (
                                         <StudentMonthlyReceivableDetailDesktop
-                                            key={index}
-                                            receivable={receivable}
-                                            className={`${index % 2 == 0 && 'bg-gray-100'}`}
-                                            handleDelete={() => handleDelete(receivable)}
-                                            role={role}
+																					key={index}
+																					receivable={receivable}
+																					className={`${index % 2 == 0 && 'bg-gray-100'}`}
+																					handleDelete={() => handleDelete(receivable)}
+																					role={role}
                                         />
                                     ))}
                                 </tbody>
