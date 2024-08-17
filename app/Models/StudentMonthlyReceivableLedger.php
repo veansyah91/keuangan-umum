@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Journal;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\StudentMonthlyReceivable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -30,4 +31,10 @@ class StudentMonthlyReceivableLedger extends Model
     {
         return $this->belongsTo(StudentMonthlyReceivable::class);
     }
+
+    public function journal(): BelongsTo
+    {
+        return $this->belongsTo(Journal::class);
+    }
+
 }

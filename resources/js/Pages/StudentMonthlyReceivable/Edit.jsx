@@ -148,10 +148,6 @@ export default function Edit({ organization, newRef, contacts, date, categories,
         toast.success(flash.success, {
           position: toast.POSITION.TOP_CENTER,
         });
-        setSelectedContact({ id: null, name: '', phone: '' });
-        setSelectedAccount({ id: null, name: '', code: '', is_cash: false });
-        setDefault(newRef);
-
       },
       onError: errors => {
         console.log(errors);
@@ -351,6 +347,7 @@ export default function Edit({ organization, newRef, contacts, date, categories,
                       yearList().map((study_year, index) => 
                         <option 
                           key={index} 
+                          value={`${study_year.toString()}/${(study_year+1).toString()}`}
                         >{study_year.toString()}/{(study_year+1).toString()}</option>
                       )
                     }

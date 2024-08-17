@@ -77,7 +77,7 @@ class StudentMonthlyReceivableController extends Controller
                                   })
                                   ->where('value', '>', 0)
                                   ->whereOrganizationId($organization['id'])
-                                  ->orderBy('value')
+                                  ->orderBy('value', 'desc')
                                   ->paginate(50)->withQueryString(),
       'role' => $this->userRepository->getRole($user['id'], $organization['id']),
     ]);
@@ -196,8 +196,6 @@ class StudentMonthlyReceivableController extends Controller
                 'payment_id' => $payment['id'],
                 'student_payment_category_id' => $detail['id'],
                 'value' => $detail['value'],
-                'created_at' => $this->now,
-                'updated_at' => $this->now,
             ];
 
             DB::table('s_monthly_payment_details')
@@ -248,6 +246,7 @@ class StudentMonthlyReceivableController extends Controller
     }
 
     $journal = $this->journalRepository->store($validated);
+
     $validated['journal_id'] = $journal['id'];
 
     $receivableLedger = StudentMonthlyReceivableLedger::create([
@@ -325,6 +324,7 @@ class StudentMonthlyReceivableController extends Controller
 
 	public function update(Request $request, Organization $organization, StudentMonthlyReceivable $receivable, StudentMonthlyReceivableLedger $ledger)
 	{
+
 		$validated = $request->validate([
 				'contact_id' => [
 						'required',
@@ -386,21 +386,91 @@ class StudentMonthlyReceivableController extends Controller
 						'exists:accounts,id'
 				],
 			]);
-		// dd($validated);
+
+		$user = Auth::user();
+    $validated['type'] = 'receivable';
+    $validated['organization_id'] = $organization['id'];
+    $validated['user_id'] = $user['id'];
+
+		// Jika telah dilakukan pembayaran paid_date not null
+		// maka tampilkan error
+
 		$payment = StudentMonthlyPayment::find($ledger['payment_id']);
-		// $payment->update([
-		// 	'no_ref' => $validated['no_ref'],
-		// 	'contact_id' => $validated['contact_id'],
-		// 	'value' => $validated['value'],
-		// 	'month' => $validated['month'],
-		// 	'study_year' => $validated['study_year'],
-		// 	'date' => $validated['date'],
-		// ]);
+		$payment->update([
+			'no_ref' => $validated['no_ref'],
+			'contact_id' => $validated['contact_id'],
+			'value' => $validated['value'],
+			'month' => $validated['month'],
+			'study_year' => $validated['study_year'],
+			'date' => $validated['date'],
+		]);
 
 		$details = DB::table('s_monthly_payment_details')
-									->where('payment_id', $payment['id'])
-									->get();
+																->where('payment_id', $payment['id'])
+																->delete();
+		
+		foreach ($validated['details'] as $detail) {
+			if ($detail['value'] > 0) {
+				$data = [
+					'payment_id' => $payment['id'],
+					'student_payment_category_id' => $detail['id'],
+					'value' => $detail['value'],
+				];
 
-									dd($details);
+				DB::table('s_monthly_payment_details')->insert($data);
+			}
+		}
+		$schoolAccount = SchoolAccountSetting::whereOrganizationId($organization['id'])->first();
+    $debitAccount = Account::find($schoolAccount['receivable_monthly_student']);
+    $creditAccount = Account::find($validated['credit_account']);
+
+		$validated['accounts'] = [
+      [
+          'id' => $debitAccount['id'],
+          'name' => $debitAccount['name'],
+          'code' => $debitAccount['code'],
+          'is_cash' => 0,
+          'debit' => $validated['value'],
+          'credit' => 0,
+      ],
+      [
+          'id' => $creditAccount['id'],
+          'name' => $creditAccount['name'],
+          'code' => $creditAccount['code'],
+          'is_cash' => 0,
+          'debit' => 0,
+          'credit' => $validated['value'],
+      ],
+    ];
+		
+		$temReceivableValue = $receivable['value'] - $ledger['debit'];
+
+		$receivable->update([
+			'contact_id' => $validated['contact_id'],
+			'value' => $validated['value'] + $temReceivableValue
+		]);
+
+		$this->journalRepository->update($validated, $ledger->journal);
+
+		$ledger->update([
+			'debit' => $validated['value'],
+			'credit' => 0,
+			'no_ref' => $validated['no_ref'],
+			'description' => $validated['description'],
+			'date' => $validated['date'],
+			'study_year' => $validated['study_year'],
+			'month' => $validated['month'],
+		]);
+
+		$log = [
+			'description' => $validated['description'],
+			'date' => $validated['date'],
+			'no_ref' => $validated['no_ref'],
+			'value' => $validated['value'],
+	];
+
+		$this->logRepository->store($organization['id'], strtoupper($user['name']).' telah mengubah DATA pada PIUTANG IURAN BULANAN dengan DATA : '.json_encode($log));
+
+		return redirect()->back()->with('success', 'Piutang Iuran Bulanan Berhasil Diubah');
 	}
 }

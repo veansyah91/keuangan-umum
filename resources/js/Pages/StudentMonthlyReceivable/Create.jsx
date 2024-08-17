@@ -340,7 +340,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
                 <div className='w-full md:w-2/3'>
                   <select 
                     className="select select-bordered w-full" 
-                    defaultValue={data.study_year} 
+                    value={data.study_year} 
                     onChange={handleChangeStudyYear} 
                     id='study_year'
                   >
@@ -348,6 +348,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
                       yearList().map((study_year, index) => 
                         <option 
                           key={index} 
+                          value={`${study_year.toString()}/${(study_year+1).toString()}`}
                         >{study_year.toString()}/{(study_year+1).toString()}</option>
                       )
                     }
@@ -368,7 +369,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
                 <div className='w-full md:w-2/3'>
                   <select 
                     className="select select-bordered w-full" 
-                    defaultValue={data.month} 
+                    value={data.month} 
                     onChange={handleChangeMonth} 
                     id='month'
                   >
@@ -376,7 +377,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
                       monthList().map((month, index) => 
                         <option 
                           key={index} 
-                          selected={month == data.month}
+                          // selected={month == data.month}
                           value={month}
                         >{month}</option>
                       )

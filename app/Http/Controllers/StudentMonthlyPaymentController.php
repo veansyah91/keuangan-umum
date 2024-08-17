@@ -208,8 +208,6 @@ class StudentMonthlyPaymentController extends Controller
                     'payment_id' => $payment['id'],
                     'student_payment_category_id' => $detail['id'],
                     'value' => $detail['value'],
-                    'created_at' => $this->now,
-                    'updated_at' => $this->now,
                 ];
 
                 DB::table('s_monthly_payment_details')
