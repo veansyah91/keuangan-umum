@@ -56,7 +56,6 @@ const monthNow = () => {
 }
 
 export default function Create({ organization, newRef, contacts, date, categories, studyYears, accounts, lastPayment }) {
-  
   // state
   const [total, setTotal] = useState(0);
   const { data, setData, processing, post, errors, setError, reset } = useForm({

@@ -177,6 +177,7 @@ class StudentMonthlyReceivableController extends Controller
     $validated['type'] = 'receivable';
     $validated['organization_id'] = $organization['id'];
     $validated['user_id'] = $user['id'];
+    $validated['created_by_id'] = $user['id'];
 
     // cek apakah pembayaran sudah dilakukan
     $payment = StudentMonthlyPayment::whereOrganizationId($organization['id'])
@@ -260,6 +261,7 @@ class StudentMonthlyReceivableController extends Controller
         'study_year' => $validated['study_year'],
         'month' => $validated['month'],
         'journal_id' => $validated['journal_id'],
+        'created_by_id' => $validated['created_by_id'],
         'payment_id' => $payment['id'],
     ]);
 
@@ -284,7 +286,7 @@ class StudentMonthlyReceivableController extends Controller
 			'receivable' => $receivable,
 			'receivables' => StudentMonthlyReceivableLedger::where('receivable_id', $receivable['id'])
 												->filter(request(['search']))
-												// ->whereNull('paid_date')
+												->whereNull('paid_date')
 												->with('receivable')
 												->orderBy('study_year', 'desc')
 												->orderBy('month', 'desc')
@@ -392,9 +394,9 @@ class StudentMonthlyReceivableController extends Controller
 			]);
 
 		$user = Auth::user();
-    $validated['type'] = 'receivable';
-    $validated['organization_id'] = $organization['id'];
-    $validated['user_id'] = $user['id'];
+		$validated['type'] = 'receivable';
+		$validated['organization_id'] = $organization['id'];
+		$validated['user_id'] = $user['id'];
 
 		// Jika telah dilakukan pembayaran paid_date not null
 		// maka tampilkan error
@@ -487,18 +489,17 @@ class StudentMonthlyReceivableController extends Controller
 			return redirect()->back()->withErrors(['message' => 'Piutang Tidak Dapat Dihapus']);
 		}
 
+    $user = Auth::user();
+
 		// hapus data pada journal 
-		$journal = Journal::find($ledger('journal_id'));
+		$journal = Journal::find($ledger['journal_id']);
 		$journal->delete();
 		
 		// cek kurangi jumlah piutang
 		$value = $receivable['value'];
 		$receivable->update([
-			'update' => $value - $ledger['debit']
+			'value' => $value - $ledger['debit']
 		]);
-
-		// hapus data pada table student_monthly_receivable_ledgers
-		$ledger->delete();
 
 		$payment = StudentMonthlyPayment::find($ledger['payment_id']);
 
@@ -510,14 +511,36 @@ class StudentMonthlyReceivableController extends Controller
 		// hapus data pada tabel student_monthly_payments
 		$payment->delete();
 
+        // hapus data pada table student_monthly_receivable_ledgers
+		$ledger->delete();
+
 		$log = [
-			'date' => $validated['date'],
-			'no_ref' => $validated['no_ref'],
-			'value' => $validated['value'],
+			'date' => $ledger['date'],
+			'no_ref' => $ledger['no_ref'],
+			'value' => $ledger['value'],
 		];
 
 		$this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menghapus DATA pada PIUTANG IURAN BULANAN dengan DATA : '.json_encode($log));
 
 		return redirect()->back()->with('success', 'Piutang Iuran Bulanan Berhasil Diubah');
+	}
+
+	public function print(Organization $organization, StudentMonthlyReceivable $receivable)
+	{
+		$user = Auth::user();
+
+		return Inertia::render('StudentMonthlyReceivable/Print', [
+			'organization' => $organization,
+			'receivable' => $receivable,
+			'receivables' => StudentMonthlyReceivableLedger::where('receivable_id', $receivable['id'])
+												->whereNull('paid_date')
+												->with('receivable')
+												->orderBy('study_year', 'desc')
+												->orderBy('month', 'desc')
+												->get(),
+			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+			'contact' => Contact::with(['student', 'lastLevel'])->find($receivable['contact_id']),
+            'user' => $user
+		]);
 	}
 }
