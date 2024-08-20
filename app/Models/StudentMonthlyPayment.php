@@ -28,9 +28,13 @@ class StudentMonthlyPayment extends Model
     public function scopeFilter($query, $filters)
     {
         $query->when($filters['search'] ?? false, function ($query, $search) {
-            return $query->where('name', 'like', '%'.$search.'%')
-                        ->orWhere('no_ref', 'like', '%'.$search.'%');
+            return $query->where('no_ref', 'like', '%'.$search.'%')
+                         ->orWhereHas('contact', function ($query){
+                                            $query->where('name', 'like', '%'.request('search').'%'
+                        );
+            });
         });
+        
     }
 
     public function contact(): BelongsTo

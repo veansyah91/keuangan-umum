@@ -72,9 +72,16 @@ class StudentMonthlyPaymentController extends Controller
     {
         $user = Auth::user();
 
+        $type = request('type') ?? 'now' ;
+
+        $search = request(['search']);
+
         return Inertia::render('StudentMonthlyPayment/Index',[
             'organization' => $organization,
-            'payments' => StudentMonthlyPayment::filter(request(['search']))
+            'payments' => StudentMonthlyPayment::filter(request(['search']))  
+                                        ->when($type !== 'all' ?? false, function ($query) use ($type){
+                                            $query->where('type', $type);
+                                        } )
                                         ->with('contact')
                                         ->whereOrganizationId($organization['id'])
                                         ->orderBy('study_year', 'desc')
@@ -82,6 +89,7 @@ class StudentMonthlyPaymentController extends Controller
                                         ->orderBy('date', 'desc')
                                         ->paginate(50)->withQueryString(),
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+            'type' => request('type') ?? 'now'
         ]);
     }
 
@@ -97,6 +105,22 @@ class StudentMonthlyPaymentController extends Controller
             return redirect()->back()->withErrors(['message' => 'Silakan Buat Kategori Kontak SISWA terlebih dahulu!']);
         }
 
+        $historyCategories = [];
+        if (request('selectedContact')) {
+            // cek piutang
+            $payment = StudentMonthlyPayment::whereContactId(request('selectedContact'))
+                                        ->where('month', request('month'))
+                                        ->where('study_year', request('studyYear'))
+                                        ->where('type', 'receivable')
+                                        ->first();
+            if ($payment) {
+                $historyCategories = DB::table('s_monthly_payment_details')
+                                        ->where('payment_id', $payment['id'])
+                                        ->get();
+            }
+        }
+
+
         return Inertia::render('StudentMonthlyPayment/Create',[
             'organization' => $organization,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
@@ -108,11 +132,12 @@ class StudentMonthlyPaymentController extends Controller
             'studyYears' => StudentLevel::select('year')->distinct()->take(10)->get(),
             'contacts' => $this->contactRepository->getStudents($organization['id'], $contactCategory['id'], request(['contact'])),
             'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),
-            'lastPayment' => StudentMonthlyPayment::whereContactId(request('contact_id'))
-                                        ->whereOrganizationId($organization['id'])
-                                        ->orderBy('study_year')
-                                        ->latest()
-                                        ->first()
+            // 'lastPayment' => StudentMonthlyPayment::whereContactId(request('contact_id'))
+            //                             ->whereOrganizationId($organization['id'])
+            //                             ->orderBy('study_year')
+            //                             ->latest()
+            //                             ->first(),
+            'historyCategories' => Inertia::lazy(fn () => $historyCategories),
         ]);
     }
 

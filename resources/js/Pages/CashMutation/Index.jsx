@@ -377,7 +377,7 @@ export default function Index({
             {/* Filter  */}
             <Modal show={showModalFilter} onClose={() => setShowModalFilter(false)}>
                 <form onSubmit={handleFilter} className='p-6' id='filter' name='filter'>
-                    <h2 className='text-lg font-medium text-gray-900'>Filter Jurnal Umum</h2>
+                    <h2 className='text-lg font-medium text-gray-900'>Filter Mutasi Kas</h2>
 
                     <div className='mt-6 '>
                         <div className='flex w-full gap-1'>

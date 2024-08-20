@@ -46,7 +46,10 @@ const studyYearUpdate = (month, studyYear) => {
   let splitStudyYear = studyYear.split('/');
 }
 
-export default function Create({ organization, newRef, contacts, date, categories, studyYears, cashAccounts, lastPayment }) {
+export default function Create({ organization, newRef, contacts, date, categories, studyYears, cashAccounts, historyCategories }) {
+
+  console.log(historyCategories);
+  
   // state
   const [total, setTotal] = useState(0);
   const { data, setData, processing, post, errors, setError, reset } = useForm({
@@ -141,9 +144,17 @@ export default function Create({ organization, newRef, contacts, date, categorie
       student_id: selected.student.no_ref,
       level: selected.levels[selected.levels.length - 1].level
     };
-    // handleReloadLastPayment(temp, selected.id)
 
     setData(temp);
+
+    router.reload({
+      only: ['historyCategories'],
+      data: {
+        selectedContact: selected.id,
+        month: data.month,
+        studyYear: data.study_year
+      }
+    })
   };
 
   const handleDateValueChange = (newValue) => {

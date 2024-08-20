@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
@@ -7,17 +7,43 @@ import dayjs from 'dayjs';
 import { FaPrint, FaWhatsapp } from 'react-icons/fa';
 import SecondaryButton from '@/Components/SecondaryButton';
 import formatNumber from '@/Utils/formatNumber';
+import { toast, ToastContainer } from 'react-toastify';
 
 export default function Print({ organization, receivable, receivables, role, contact, user }) {	
+	const [waLink] = useState('https://web.whatsapp.com/send');
+
 	const handlePrint = () => {
 		window.print();
 	};	
 
 	const handleSendWA = () => {
+		// cek format contact phone
+		let phone = contact.phone;		
+
+		if (!phone) {
+			toast.error(`No Handphone ${contact.name} tidak ditemukan`, {
+				position: toast.POSITION.TOP_CENTER,
+			});
+			return
+		}
+
+		if (phone[0] !== '6' && phone[1] !== '2') {
+			phone = '62' + phone;
+		}
+
 		let detail = '';
 
+		receivables.forEach(r => {
+			detail += `%0ANo Ref: ${r.no_ref}%0ABulan: ${r.month}%0ATahun Ajaran: ${r.study_year}%0AJumlah: IDR ${formatNumber(r.debit)}%0A`;
+		});
+
+		detail += `%0A*Total: ${ formatNumber(receivable.value) }*`
 		
-		let message = `*TAGIHAN IURAN BULANAN*%0A-------------------------------------------------------%0A*Nama*`;
+		let message = `*TAGIHAN IURAN BULANAN*%0A-------------------------------------------------------%0A*Nama*: ${contact.name}%0A*No. Siswa*: ${contact.student.no_ref ?? '-'}%0A*Tahun Masuk*: ${contact.student.entry_year}%0A*Kelas Sekarang*: ${contact.last_level.level}%0A${detail}%0A%0A%0ATtd,%0A%0A%0A*${organization.name}*`;
+
+		let whatsapp = `${waLink}?phone=${phone}&text=${message}`
+
+		window.open(whatsapp, '_blank');
 	}
 	
   return (
@@ -25,6 +51,8 @@ export default function Print({ organization, receivable, receivables, role, con
 			<Head
 				title={`Tagihan Iuran Bulanan ${contact.name} (${contact.student.no_ref})`}
 			/>
+
+			<ToastContainer />
 
 			<div className='sm:pt-0 pb-16 pt-12'>
 				<div className='bg-white py-2 sm:pt-0 px-5'>
