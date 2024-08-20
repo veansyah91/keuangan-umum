@@ -213,17 +213,22 @@ class StudentMonthlyPaymentController extends Controller
         $validated['organization_id'] = $organization['id'];
         $validated['user_id'] = $user['id'];
 
+
         // cek apakah pembayaran sudah dilakukan
         $payment = StudentMonthlyPayment::whereOrganizationId($organization['id'])
                                           ->whereContactId($validated['contact_id'])
                                           ->where('month', $validated['month'])
                                           ->where('study_year', $validated['study_year'])
-                                          ->whereNot('type', 'receivable')
+                                        //   ->whereNot('type', 'receivable')
                                           ->first();
 
+
         if ($payment) {
-            return redirect()->back()->withErrors(['error' => 'Data is existed']);
+            if ($payment['type'] !== 'receivable') {
+                return redirect()->back()->withErrors(['error' => 'Data is existed']);
+            }
         }
+        dd($payment);       
         
         $payment = StudentMonthlyPayment::create($validated);
 

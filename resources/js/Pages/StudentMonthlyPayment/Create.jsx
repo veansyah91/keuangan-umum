@@ -48,7 +48,7 @@ const studyYearUpdate = (month, studyYear) => {
 
 export default function Create({ organization, newRef, contacts, date, categories, studyYears, cashAccounts, historyCategories }) {
 
-  console.log(historyCategories);
+  // console.log(historyCategories);
   
   // state
   const [total, setTotal] = useState(0);
@@ -81,6 +81,42 @@ export default function Create({ organization, newRef, contacts, date, categorie
   },[]);
 
   // function
+  const handleHistoryCategoryReload = (temp, contactId = null) => {
+    router.reload({
+      only: ['historyCategories'],
+      data: {
+        selectedContact: contactId ?? selectedContact.id,
+        month: temp.month,
+        studyYear: temp.study_year
+      },
+      onSuccess: ({ props }) => {
+        const { historyCategories } = props;
+        
+        let tempCategories = [];
+
+        categories.filter((category, index) => {
+          let filtered = historyCategories.filter(detail => detail.student_payment_category_id == category.id);
+    
+          tempCategories = [
+            ...tempCategories,
+            {
+              id:category.id,
+              name:category.name,
+              value: filtered.length > 0 ? filtered[0].value : category.value
+            }
+          ]
+        });
+
+        temp = {
+          ...temp,
+          details: tempCategories
+        }       
+         
+        setData(temp);
+      }
+    })
+  }
+
   const setDefault = () => {
     let tempData = data;
     let temp = categories.map(category => ({
@@ -145,16 +181,9 @@ export default function Create({ organization, newRef, contacts, date, categorie
       level: selected.levels[selected.levels.length - 1].level
     };
 
-    setData(temp);
+    // setData(temp);
 
-    router.reload({
-      only: ['historyCategories'],
-      data: {
-        selectedContact: selected.id,
-        month: data.month,
-        studyYear: data.study_year
-      }
-    })
+    handleHistoryCategoryReload(temp, selected.id);
   };
 
   const handleDateValueChange = (newValue) => {
@@ -195,7 +224,8 @@ export default function Create({ organization, newRef, contacts, date, categorie
       type : type
     };    
 
-    setData(temp);
+    // setData(temp);
+    handleHistoryCategoryReload(temp);
   }
 
   const handleChangeMonth = (e) => {    
@@ -218,7 +248,8 @@ export default function Create({ organization, newRef, contacts, date, categorie
       type : type
     };    
 
-    setData(temp);
+    // setData(temp);
+    handleHistoryCategoryReload(temp);
   }
 
   const handleSelectedCashAccount = (selected) => {
@@ -440,6 +471,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
                       className='text-end w-full border'
                       prefix={'IDR '}
                       id={`category-${index}`}
+                      disabled={historyCategories?.length > 0}
                     />
                     {/* {errors?.level && <span className='text-red-500 text-xs'>{errors.level}</span>} */}
                   </div>
