@@ -106,16 +106,19 @@ class StudentMonthlyPaymentController extends Controller
         }
 
         $historyCategories = [];
+        $historyPayment = null;
+
         if (request('selectedContact')) {
             // cek piutang
-            $payment = StudentMonthlyPayment::whereContactId(request('selectedContact'))
+            $historyPayment = StudentMonthlyPayment::whereContactId(request('selectedContact'))
                                         ->where('month', request('month'))
                                         ->where('study_year', request('studyYear'))
                                         ->where('type', 'receivable')
                                         ->first();
-            if ($payment) {
+
+            if ($historyPayment) {
                 $historyCategories = DB::table('s_monthly_payment_details')
-                                        ->where('payment_id', $payment['id'])
+                                        ->where('payment_id', $historyPayment['id'])
                                         ->get();
             }
         }
@@ -132,11 +135,7 @@ class StudentMonthlyPaymentController extends Controller
             'studyYears' => StudentLevel::select('year')->distinct()->take(10)->get(),
             'contacts' => $this->contactRepository->getStudents($organization['id'], $contactCategory['id'], request(['contact'])),
             'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),
-            // 'lastPayment' => StudentMonthlyPayment::whereContactId(request('contact_id'))
-            //                             ->whereOrganizationId($organization['id'])
-            //                             ->orderBy('study_year')
-            //                             ->latest()
-            //                             ->first(),
+            'historyPayment' => Inertia::lazy(fn () => $historyPayment),
             'historyCategories' => Inertia::lazy(fn () => $historyCategories),
         ]);
     }

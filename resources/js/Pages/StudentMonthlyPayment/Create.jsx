@@ -47,8 +47,6 @@ const studyYearUpdate = (month, studyYear) => {
 }
 
 export default function Create({ organization, newRef, contacts, date, categories, studyYears, cashAccounts, historyCategories }) {
-
-  // console.log(historyCategories);
   
   // state
   const [total, setTotal] = useState(0);
@@ -83,17 +81,17 @@ export default function Create({ organization, newRef, contacts, date, categorie
   // function
   const handleHistoryCategoryReload = (temp, contactId = null) => {
     router.reload({
-      only: ['historyCategories'],
+      only: ['historyCategories', 'historyPayment'],
       data: {
         selectedContact: contactId ?? selectedContact.id,
         month: temp.month,
         studyYear: temp.study_year
       },
       onSuccess: ({ props }) => {
-        const { historyCategories } = props;
+        const { historyCategories, historyPayment } = props;
         
         let tempCategories = [];
-
+        
         categories.filter((category, index) => {
           let filtered = historyCategories.filter(detail => detail.student_payment_category_id == category.id);
     
@@ -109,6 +107,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
 
         temp = {
           ...temp,
+          no_ref: historyPayment ? historyPayment.no_ref : newRef,
           details: tempCategories
         }       
          
@@ -180,8 +179,6 @@ export default function Create({ organization, newRef, contacts, date, categorie
       student_id: selected.student.no_ref,
       level: selected.levels[selected.levels.length - 1].level
     };
-
-    // setData(temp);
 
     handleHistoryCategoryReload(temp, selected.id);
   };
