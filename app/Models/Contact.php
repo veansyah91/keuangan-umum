@@ -51,8 +51,11 @@ class Contact extends Model
                 });
         });
 
-        $query->when($filters['contact'] ?? false, function ($query, $search) {
-            return $query->where('name', 'like', '%'.$search.'%');
+        $query->when($filters['contact'] ?? false, function ($query, $contact) {
+            return $query->where('name', 'like', '%'.$contact.'%')
+                            ->orWhereHas('student', function ($query) use ($contact){
+                                $query->where('no_ref', 'like', '%'.$contact.'%');
+                            });
         });
     }
 }

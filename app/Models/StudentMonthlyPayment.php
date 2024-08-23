@@ -30,7 +30,7 @@ class StudentMonthlyPayment extends Model
         $query->when($filters['search'] ?? false, function ($query, $search) {
             return $query->where('no_ref', 'like', '%'.$search.'%')
                          ->orWhereHas('contact', function ($query){
-                                            $query->where('name', 'like', '%'.request('search').'%'
+                            $query->where('name', 'like', '%'.request('search').'%'
                         );
             });
         });

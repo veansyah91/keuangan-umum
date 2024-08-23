@@ -94,12 +94,22 @@ export default function ContactSelectInput({
                           className={`block truncate ${
                             selected ? 'font-medium' : 'font-normal'
                           }`}>
-                          <div className='text-xs space-x-2'>
-                            Kelas : <span>
-                            {
-                              d.levels[d.levels.length - 1].level
-                            }
-                            </span>
+                          <div className='text-xs space-x-2 flex gap-1'>
+                            <div>
+                              No. Siswa : <span>
+                              {
+                                d.student.no_ref
+                              }
+                              </span>
+                            </div>
+                            <div>
+                              Kelas : <span>
+                              {
+                                d.levels[d.levels.length - 1].level
+                              }
+                              </span>
+                            </div>
+                            
                           </div>
                           <div className='text-base'>{d.name.toUpperCase()}</div>
                         </div>

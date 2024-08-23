@@ -123,7 +123,6 @@ class StudentMonthlyPaymentController extends Controller
             }
         }
 
-
         return Inertia::render('StudentMonthlyPayment/Create',[
             'organization' => $organization,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
@@ -212,37 +211,36 @@ class StudentMonthlyPaymentController extends Controller
         $validated['organization_id'] = $organization['id'];
         $validated['user_id'] = $user['id'];
 
-
         // cek apakah pembayaran sudah dilakukan
         $payment = StudentMonthlyPayment::whereOrganizationId($organization['id'])
                                           ->whereContactId($validated['contact_id'])
                                           ->where('month', $validated['month'])
                                           ->where('study_year', $validated['study_year'])
-                                        //   ->whereNot('type', 'receivable')
                                           ->first();
-
 
         if ($payment) {
             if ($payment['type'] !== 'receivable') {
                 return redirect()->back()->withErrors(['error' => 'Data is existed']);
             }
         }
-        dd($payment);       
-        
-        $payment = StudentMonthlyPayment::create($validated);
+    
+        // jika belum ada data payment buat data payment baru        
+        if (!$payment) {
+            $payment = StudentMonthlyPayment::create($validated);
 
-        foreach ($validated['details'] as $detail) {
-            if ($detail['value'] > 0) {
-                $data = [
-                    'payment_id' => $payment['id'],
-                    'student_payment_category_id' => $detail['id'],
-                    'value' => $detail['value'],
-                ];
-
-                DB::table('s_monthly_payment_details')
-                    ->insert($data);
+            foreach ($validated['details'] as $detail) {
+                if ($detail['value'] > 0) {
+                    $data = [
+                        'payment_id' => $payment['id'],
+                        'student_payment_category_id' => $detail['id'],
+                        'value' => $detail['value'],
+                    ];
+    
+                    DB::table('s_monthly_payment_details')
+                        ->insert($data);
+                }
             }
-        }
+        }      
 
         $schoolAccount = SchoolAccountSetting::whereOrganizationId($organization['id'])->first();
         $creditAccount = Account::find($schoolAccount['revenue_student']);
