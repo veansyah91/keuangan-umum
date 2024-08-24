@@ -11,43 +11,41 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class StudentMonthlyPayment extends Model
 {
-    use HasFactory;
+	use HasFactory;
 
-    protected $fillable = [
-        'organization_id',
-        'contact_id',
-        'no_ref',
-        'value',
-        'type',
-        'date',
-        'month',
-        'study_year',
-        'created_by_id'
-    ];
+	protected $fillable = [
+		'organization_id',
+		'contact_id',
+		'no_ref',
+		'value',
+		'type',
+		'date',
+		'month',
+		'study_year',
+		'created_by_id',
+		'journal_id'
+	];
 
-    public function scopeFilter($query, $filters)
-    {
-        $query->when($filters['search'] ?? false, function ($query, $search) {
-            return $query->where('no_ref', 'like', '%'.$search.'%')
-                         ->orWhereHas('contact', function ($query) use ($search){
-                            $query->where('name', 'like', '%'. $search .'%')
-                                  ->orWhereHas('student', function ($query) use ($search){
-                                    $query->where('no_ref', 'like', '%'. $search .'%');
-                                  });
-            });
-        });
+	public function scopeFilter($query, $filters)
+	{
+		$query->when($filters['search'] ?? false, function ($query, $search) {
+			return $query->where('no_ref', 'like', '%'.$search.'%')
+										->orWhereHas('contact', function ($query) use ($search){
+											$query->where('name', 'like', '%'. $search .'%')
+														->orWhereHas('student', function ($query) use ($search){
+															$query->where('no_ref', 'like', '%'. $search .'%');
+														});
+			});
+		});
+	}
 
-        
-        
-    }
+	public function contact(): BelongsTo
+	{
+		return $this->belongsTo(Contact::class);
+	}
 
-    public function contact(): BelongsTo
-    {
-        return $this->belongsTo(Contact::class);
-    }
-
-    public function details(): HasMany
-    {
-        return $this->hasMany(StudentPaymentCategory::class, 's_monthly_payment_details');
-    }
+	public function details(): HasMany
+	{
+		return $this->hasMany(StudentPaymentCategory::class, 's_monthly_payment_details');
+	}
 }

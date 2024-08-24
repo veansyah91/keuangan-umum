@@ -320,7 +320,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
                       useRange={false}
                       asSingle={true}
                       placeholder='Tanggal'
-                      id='date'
+                      inputId='date'
                       displayFormat='MMMM DD, YYYY'
                     />
                   </div>
@@ -403,7 +403,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
                 <div className='w-full sm:w-2/3'>
                   <select 
                     className="select select-bordered w-full" 
-                    defaultValue={data.study_year} 
+                    value={data.study_year} 
                     onChange={handleChangeStudyYear} 
                     id='study_year'
                   >
@@ -431,7 +431,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
                 <div className='w-full sm:w-2/3'>
                   <select 
                     className="select select-bordered w-full" 
-                    defaultValue={data.month} 
+                    value={data.month} 
                     onChange={handleChangeMonth} 
                     id='month'
                   >

@@ -80,7 +80,6 @@ export default function Index({ role, organization, payments, searchFilter, type
 
 	const handleFilter = (e) => {
 		e.preventDefault();
-		console.log(dataFilter);
 		
 		handleReloadPage();
 		setShowModalFilter(false);
