@@ -193,6 +193,9 @@ export default function Ledger({
                                     isError={accountError ? true : false}
                                     id='account'
                                 />
+                                {selectedAccount?.code && (
+                                    <div className='absolute text-xs'>Kode: {selectedAccount.code}</div>
+                                )}
                             </div>
                             <div className='my-auto w-full'>
                                 <Datepicker
@@ -397,7 +400,7 @@ export default function Ledger({
                         ''
                     )}
 
-                    <div className='md:hidden w-full'>
+                    <div className='md:hidden w-full print:hidden'>
                         <PrimaryButton
                             disabled={!selectedAccount.id || !startDate || !endDate || startDate > endDate || isLoading}
                             onClick={handleReload}
@@ -407,7 +410,7 @@ export default function Ledger({
                     </div>
 
                     {/* Title Print*/}
-                    <div className='uppercase pt-9 pb-3 border-b hidden print:flex print:justify-between'>
+                    <div className='uppercase pb-3 border-b hidden print:flex print:justify-between'>
                         <div className='w-1/2 text-2xl my-auto'>Laporan Buku Besar</div>
                         <div className='w-1/2 text-end mt-auto'>
                             <div>{organization.name}</div>

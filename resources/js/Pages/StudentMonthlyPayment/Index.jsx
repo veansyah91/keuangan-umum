@@ -161,6 +161,7 @@ export default function Index({ role, organization, payments, searchFilter, type
 					</>
 				}
 				data={payments}
+				hasFilter={true}
 				showFilter={() => setShowModalFilter(true)}
 			/>
 			<ContentMobile>

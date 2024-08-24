@@ -340,7 +340,7 @@ export default function Ledgers({
                     ) : (
                         ''
                     )}
-                    <div className='md:hidden w-full'>
+                    <div className='md:hidden w-full print:hidden'>
                         <PrimaryButton
                             disabled={!startDate || !endDate || startDate > endDate || isLoading}
                             onClick={handleReload}
@@ -350,7 +350,7 @@ export default function Ledgers({
                     </div>
 
                     {/* Title Print*/}
-                    <div className='uppercase pt-9 pb-3 border-b hidden print:flex print:justify-between'>
+                    <div className='uppercase pb-3 border-b hidden print:flex print:justify-between'>
                         <div className='w-1/2 text-2xl my-auto'>Laporan Buku Besar</div>
                         <div className='w-1/2 text-end mt-auto'>
                             <div>{organization.name}</div>

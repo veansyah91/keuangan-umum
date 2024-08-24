@@ -1,4 +1,4 @@
-import BadgeDanger from '@/Components/Badges/BadgeDanger';
+import BadgePrimary from '@/Components/Badges/BadgePrimary';
 import BadgeSecondary from '@/Components/Badges/BadgeSecondary';
 import BadgeSuccess from '@/Components/Badges/BadgeSuccess';
 import formatMonth from '@/Utils/formatMonth';
@@ -28,14 +28,14 @@ export default function StudentDesktop({ payment, className, role, handleDelete,
                         payment.type == 'now' && <BadgeSuccess>Lunas</BadgeSuccess>
                     }
                     {
-                        payment.type == 'prepaid' && <BadgeSecondary>Bayar Dimuka</BadgeSecondary>
+                        payment.type == 'prepaid' && <BadgePrimary>Bayar Dimuka</BadgePrimary>
                     }
                     {
                         payment.type == 'receivable' && <BadgeSecondary>Belum Bayar</BadgeSecondary>
                     }
                 </td>
                 <td className='text-end'>
-                    {role !== 'viewer' && (
+                    {(role !== 'viewer' && payment.type !== 'receivable') && (
                         <div className='dropdown dropdown-left'>
                             <div
                                 tabIndex={0}

@@ -1,4 +1,6 @@
 import BadgeDanger from '@/Components/Badges/BadgeDanger';
+import BadgePrimary from '@/Components/Badges/BadgePrimary';
+import BadgeSecondary from '@/Components/Badges/BadgeSecondary';
 import BadgeSuccess from '@/Components/Badges/BadgeSuccess';
 import DropdownAction from '@/Components/DropdownAction';
 import formatMonth from '@/Utils/formatMonth';
@@ -12,7 +14,7 @@ export default function StudentMobile({ payment, role, handleDelete, handleEdit 
     return (
         <>
             <div className=' text-gray-900 py-2 px-3 border flex gap-5 justify-between'>
-                <div className='text-start my-auto'>
+                <div className='text-start my-auto w-6/12'>
                     <div className='text-xs'>
                         {dayjs(payment.date).format('MMMM DD, YYYY')}
                     </div>
@@ -26,9 +28,20 @@ export default function StudentMobile({ payment, role, handleDelete, handleEdit 
                 </div>
                 <div className='text-end my-auto w-5/12'>
                     <div>IDR {formatNumber(payment.value)}</div>
+                    <div>
+                    {
+                        payment.type == 'now' && <BadgeSuccess>Lunas</BadgeSuccess>
+                    }
+                    {
+                        payment.type == 'prepaid' && <BadgePrimary>Bayar Dimuka</BadgePrimary>
+                    }
+                    {
+                        payment.type == 'receivable' && <BadgeSecondary>Belum Bayar</BadgeSecondary>
+                    }
+                    </div>
                 </div>
-                <div className='text-start'>
-                    {role !== 'viewer' && (
+                <div className='text-start w-1/12'>
+                    {(role !== 'viewer' && payment.type !== 'receivable') && (
                         <div className='dropdown dropdown-left'>
                             <div
                                 tabIndex={0}

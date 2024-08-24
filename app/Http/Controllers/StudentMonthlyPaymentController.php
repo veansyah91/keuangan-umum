@@ -220,12 +220,12 @@ class StudentMonthlyPaymentController extends Controller
 		$schoolAccount = SchoolAccountSetting::whereOrganizationId($organization['id'])->first();
 		$creditAccount = Account::find($schoolAccount['revenue_student']);
 
-		if ($validated['type'] = 'prepaid') 
+		if ($validated['type'] == 'prepaid') 
 		{
 			// buat penjurnalan pembayaran iuran bulanan dibayar dimuka
 			$creditAccount = Account::find($schoolAccount['prepaid_student']);
 
-		} elseif ($validated['type'] = 'receivable')
+		} elseif ($validated['type'] == 'receivable')
 		{
 			// cek apakah ada piutang siswa di bulan yang akan dilakukan pembayaran
 			$creditAccount = Account::find($schoolAccount['receivable_monthly_student']);
