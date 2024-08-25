@@ -71,8 +71,6 @@ export default function Create({
 
     const [value, setValue] = useState(0);
 
-    console.log(date);
-
     const { data, setData, post, reset, errors, setError, processing } = useForm({
         date: date,
         contact_id: null,

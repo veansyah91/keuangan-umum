@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use App\Helpers\NewRef;
 use App\Models\Account;
 use App\Models\Contact;
+use App\Models\Journal;
 use Carbon\CarbonImmutable;
 use App\Models\Organization;
 use App\Models\StudentLevel;
@@ -252,9 +253,6 @@ class StudentMonthlyPaymentController extends Controller
 			],
 		];
 
-		$journal = $this->journalRepository->store($validated);
-		$validated['journal_id'] = $journal['id'];
-
 		// cek apakah pembayaran sudah dilakukan
 		$payment = StudentMonthlyPayment::whereOrganizationId($organization['id'])
 																			->whereContactId($validated['contact_id'])
@@ -267,31 +265,37 @@ class StudentMonthlyPaymentController extends Controller
 				return redirect()->back()->withErrors(['error' => 'Data is existed']);
 			}
 
-			$payment->update([
-				'journal_id' => $validated['journal_id'],
-				'type' => 'now',
-				'date' => $validated['date']
-			]);
+			DB::transaction(function() use ($organization, $payment, $validated){				
+				$journal = $this->journalRepository->store($validated);
+				$validated['journal_id'] = $journal['id'];
+				
+				$payment->update([
+					'journal_id' => $validated['journal_id'],
+					'type' => 'now',
+					'date' => $validated['date']
+				]);
+	
+				$receivable = StudentMonthlyReceivable::whereOrganizationId($organization['id'])
+																								->whereContactId($validated['contact_id'])
+																								->first();
 
-			$receivable = StudentMonthlyReceivable::whereOrganizationId($organization['id'])
-																							->whereContactId($validated['contact_id'])
-																							->first();
+				$newValue = $receivable['value'] - $validated['value'];
+				$receivable->update([
+					'value' => $newValue
+				]);
 
-			$newValue = $receivable['value'] - $validated['value'];
-			$receivable->update([
-				'value' => $newValue
-			]);
+				$receivableLedger = StudentMonthlyReceivableLedger::wherePaymentId($payment['id'])->first();
 
-			$receivableLedger = StudentMonthlyReceivableLedger::wherePaymentId($payment['id'])->first();
-
-			$receivableLedger->update([
-				'credit' => $validated['value'],
-				'paid_date' => $validated['date']
-			]);
+				$receivableLedger->update([
+					'credit' => $validated['value'],
+					'paid_date' => $validated['date']
+				]);
+			});			
 		}
 
 		// jika belum ada data payment buat data payment baru        
 		if (!$payment) {
+			// validasi input no_ref
 			$payment = StudentMonthlyPayment::whereOrganizationId($organization['id'])
 																				->where('no_ref', $validated['no_ref'])
 																				->first();
@@ -300,20 +304,28 @@ class StudentMonthlyPaymentController extends Controller
 				return redirect()->back()->withErrors(['no_ref' => 'Data is existed']);
 			}
 
-			$payment = StudentMonthlyPayment::create($validated);
-
-			foreach ($validated['details'] as $detail) {
-				if ($detail['value'] > 0) {
-					$data = [
-						'payment_id' => $payment['id'],
-						'student_payment_category_id' => $detail['id'],
-						'value' => $detail['value'],
-					];
-
-					DB::table('s_monthly_payment_details')
-						->insert($data);
+			DB::transaction(function() use ($organization, $payment, $validated){
+				$journal = $this->journalRepository->store($validated);
+				$validated['journal_id'] = $journal['id'];
+				$validated['type'] = 'now';
+	
+				$payment = StudentMonthlyPayment::create($validated);
+	
+				foreach ($validated['details'] as $detail) {
+					if ($detail['value'] > 0) {
+						$data = [
+							'payment_id' => $payment['id'],
+							'student_payment_category_id' => $detail['id'],
+							'value' => $detail['value'],
+						];
+	
+						DB::table('s_monthly_payment_details')
+							->insert($data);
+					}
 				}
-			}
+
+				throw new \Exception('Something went wrong');
+			});			
 		}      
 
 		$log = [
@@ -332,7 +344,55 @@ class StudentMonthlyPaymentController extends Controller
 	public function destroy(Organization $organization, StudentMonthlyPayment $payment)
 	{
 		// cek pada receivable ledger
-		$ledger = StudentMonthlyReceivableLedger::find($payment);
-		dd($ledger);
+		$ledger = StudentMonthlyReceivableLedger::where('payment_id', $payment['id'])->first();
+
+		// jika bersumber dari piutang maka update piutang
+		if ($ledger) {
+			DB::transaction(function() use ($ledger, $organization, $payment) {
+				$value = $ledger['credit'];
+
+				// update ledger
+				$ledger->update([
+					'credit' => 0,
+					'paid_date' => null
+				]);
+
+				// update student monthly receivable
+				$receivable = StudentMonthlyReceivable::where('organization_id', $organization['id'])
+																							->where('contact_id', $payment['contact_id'])
+																							->first();
+
+				$value += $receivable['value'];
+				$receivable->update([
+					'value' => $value
+				]);
+
+				$journal = Journal::find($payment['journal_id']);
+
+				// update payment
+				$payment->update([
+					'journal_id' => null,
+					'type' => 'receivable',
+					'date' => $ledger['date']
+				]);
+
+				// hapus jurnal
+				$journal->delete();
+
+				throw new \Exception('Something went wrong');
+
+				return redirect()->back()->with('success', 'Data Pembayaran Berhasil Dihapus');
+			});
+		}
+
+		if (!$ledger) {
+			DB::transaction(function () use ($payment, $organization) {
+				$journal = Journal::find($payment['journal_id']);
+
+				$payment->delete();
+				$journal->delete();
+			});
+
+		}
 	}
 }
