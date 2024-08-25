@@ -12,6 +12,7 @@ export default function StudentDesktop({ payment, className, role, handleDelete,
         <>
             <tr className={className}>
                 <td>{dayjs(payment.date).locale('id').format('MMMM DD, YYYY')}</td>
+                <td>{ payment.no_ref }</td>
                 <td>
                     <div className='text-xs'>
                         No. Siswa: {payment.contact.student.no_ref}

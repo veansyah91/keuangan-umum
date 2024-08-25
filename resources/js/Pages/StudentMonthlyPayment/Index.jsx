@@ -86,7 +86,9 @@ export default function Index({ role, organization, payments, searchFilter, type
 	};
 
 	const handleDelete = (payment) => {
-		setTitleDeleteModal(`Hapus Siswa ${payment.name}`);
+		console.log(payment);
+		
+		setTitleDeleteModal(`Hapus Pembayaran No Ref ${payment.no_ref}`);
 		setShowDeleteConfirmation(true);
 		setData('id', payment.id);
 	};
@@ -94,10 +96,10 @@ export default function Index({ role, organization, payments, searchFilter, type
 	const handleSubmitDelete = (e) => {
 		e.preventDefault();
 
-		destroy(route('data-master.students.destroy', { organization: organization.id, payment: data.id }), {
+		destroy(route('cashflow.student-monthly-payment.delete', { organization: organization.id, payment: data.id }), {
 			onSuccess: () => {
 				setShowDeleteConfirmation(false);
-				toast.success(`Siswa Berhasil Dihapus`, {
+				toast.success(`Pembayaran Berhasil Dihapus`, {
 					position: toast.POSITION.TOP_CENTER,
 				});
 				reset();
@@ -253,6 +255,7 @@ export default function Index({ role, organization, payments, searchFilter, type
 								<thead className='text-base text-gray-900'>
 									<tr className=''>
 										<th className='bg-gray-200'>Tanggal</th>
+										<th className='bg-gray-200'>No Ref</th>
 										<th className='bg-gray-200'>Nama</th>
 										<th className='bg-gray-200'>Bulan</th>
 										<th className='bg-gray-200'>Tahun Ajaran</th>
@@ -266,7 +269,7 @@ export default function Index({ role, organization, payments, searchFilter, type
 										<StudentMonthlyPaymentDesktop
 											key={index}
 											payment={payment}
-											className={`${index % 2 == 0 && 'bg-gray-100'}`}
+											className={`${index % 2 == 0 && 'bg-gray-100'} text-sm`}
 											handleDelete={() => handleDelete(payment)}
 											role={role}
 										/>

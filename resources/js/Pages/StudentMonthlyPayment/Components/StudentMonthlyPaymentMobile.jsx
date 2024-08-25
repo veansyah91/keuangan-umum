@@ -18,6 +18,9 @@ export default function StudentMobile({ payment, role, handleDelete, handleEdit 
                     <div className='text-xs'>
                         {dayjs(payment.date).format('MMMM DD, YYYY')}
                     </div>
+                    <div className='text-xs'>
+                        { payment.no_ref }
+                    </div>
                     <div>
                         {payment.contact.name}
                     </div>

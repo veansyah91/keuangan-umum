@@ -328,4 +328,11 @@ class StudentMonthlyPaymentController extends Controller
 		return redirect(route('cashflow.student-monthly-payment.create', $organization['id']))->with('success', 'Pembayaran Iuran Bulanan Berhasil Ditambahkan');
 
 	}
+
+	public function destroy(Organization $organization, StudentMonthlyPayment $payment)
+	{
+		// cek pada receivable ledger
+		$ledger = StudentMonthlyReceivableLedger::find($payment);
+		dd($ledger);
+	}
 }
