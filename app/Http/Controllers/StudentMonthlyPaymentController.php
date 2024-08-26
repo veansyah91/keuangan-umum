@@ -389,6 +389,10 @@ class StudentMonthlyPaymentController extends Controller
 			DB::transaction(function () use ($payment, $organization) {
 				$journal = Journal::find($payment['journal_id']);
 
+				DB::table('s_monthly_payment_details')
+					->where('payment_id', $payment['id'])
+					->delete();
+					
 				$payment->delete();
 				$journal->delete();
 			});
