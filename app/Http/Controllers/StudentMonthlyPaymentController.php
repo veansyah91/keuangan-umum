@@ -304,8 +304,9 @@ class StudentMonthlyPaymentController extends Controller
 				return redirect()->back()->withErrors(['no_ref' => 'Data is existed']);
 			}
 
-			DB::transaction(function() use ($organization, $payment, $validated){
+			DB::transaction(function() use ($organization, $validated){
 				$journal = $this->journalRepository->store($validated);
+
 				$validated['journal_id'] = $journal['id'];
 				$validated['type'] = 'now';
 	
