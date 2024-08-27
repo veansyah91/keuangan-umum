@@ -340,10 +340,55 @@ class StudentMonthlyPaymentController extends Controller
 	}
 
 	public function edit(Organization $organization, StudentMonthlyPayment $payment)
-	{
-		dd($payment);
-		return Inertia::render('StudentMonthlyPayment/Create',[
-			
+	{		
+		$user = Auth::user();
+
+		// cek apakah data berasal dari piutang
+		$ledger = StudentMonthlyReceivableLedger::where('payment_id', $payment['id'])->first();
+
+		if ($ledger) {
+			return redirect()->back()->withErrors(['message' => "Data can't be deleted"]);
+		}
+
+		$contactCategory = ContactCategory::whereOrganizationId($organization['id'])
+																				->whereName('SISWA')
+																				->first();
+
+		if (!$contactCategory) {
+			return redirect()->back()->withErrors(['message' => 'Silakan Buat Kategori Kontak SISWA terlebih dahulu!']);
+		}
+
+		$historyCategories = [];
+		$historyPayment = null;
+
+		if (request('selectedContact')) {
+			// cek piutang
+			$historyPayment = StudentMonthlyPayment::whereContactId(request('selectedContact'))
+																	->where('month', request('month'))
+																	->where('study_year', request('studyYear'))
+																	->where('type', 'receivable')
+																	->first();
+
+			if ($historyPayment) {
+					$historyCategories = DB::table('s_monthly_payment_details')
+																	->where('payment_id', $historyPayment['id'])
+																	->get();
+			}
+		}
+
+		return Inertia::render('StudentMonthlyPayment/Edit',[
+			'organization' => $organization,
+			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+			'categories' => StudentPaymentCategory::whereOrganizationId($organization['id'])
+																							->whereIsActive(true)
+																							->get(),
+			'newRef' => $this->newRef($organization, request('date')),
+			'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
+			'studyYears' => StudentLevel::select('year')->distinct()->take(10)->get(),
+			'contacts' => $this->contactRepository->getStudents($organization['id'], $contactCategory['id'], request(['contact'])),
+			'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),
+			'historyPayment' => Inertia::lazy(fn () => $historyPayment),
+			'historyCategories' => Inertia::lazy(fn () => $historyCategories),
 		]);
 	}
 
