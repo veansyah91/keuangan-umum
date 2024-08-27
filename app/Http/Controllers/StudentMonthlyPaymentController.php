@@ -88,6 +88,7 @@ class StudentMonthlyPaymentController extends Controller
 																	->with('contact', function ($query) {
 																			$query->with('student');
 																	})
+																	->with('receivableLedger')
 																	->whereOrganizationId($organization['id'])
 																	->orderBy('study_year', 'desc')
 																	->orderBy('month', 'desc')
@@ -163,13 +164,6 @@ class StudentMonthlyPaymentController extends Controller
 				'string',
 				'nullable',
 			],
-			// 'no_ref' => [
-			// 	'required',
-			// 	'string',
-			// 	Rule::unique('student_monthly_payments')->where(function ($query) use ($organization) {
-			// 			return $query->where('organization_id', $organization['id']);
-			// 	}),
-			// ],
 			'value' => [
 				'required',
 				'numeric',
@@ -304,11 +298,14 @@ class StudentMonthlyPaymentController extends Controller
 				return redirect()->back()->withErrors(['no_ref' => 'Data is existed']);
 			}
 
-			DB::transaction(function() use ($organization, $validated){
+			DB::transaction(function() use ($validated){
 				$journal = $this->journalRepository->store($validated);
 
 				$validated['journal_id'] = $journal['id'];
-				$validated['type'] = 'now';
+
+				if ($validated['type'] == 'receivable') {
+					$validated['type'] = 'now';
+				}
 	
 				$payment = StudentMonthlyPayment::create($validated);
 	
@@ -325,7 +322,7 @@ class StudentMonthlyPaymentController extends Controller
 					}
 				}
 
-				throw new \Exception('Something went wrong');
+				// throw new \Exception('Something went wrong');
 			});			
 		}      
 
@@ -340,6 +337,14 @@ class StudentMonthlyPaymentController extends Controller
 
 		return redirect(route('cashflow.student-monthly-payment.create', $organization['id']))->with('success', 'Pembayaran Iuran Bulanan Berhasil Ditambahkan');
 
+	}
+
+	public function edit(Organization $organization, StudentMonthlyPayment $payment)
+	{
+		dd($payment);
+		return Inertia::render('StudentMonthlyPayment/Create',[
+			
+		]);
 	}
 
 	public function destroy(Organization $organization, StudentMonthlyPayment $payment)
@@ -379,8 +384,6 @@ class StudentMonthlyPaymentController extends Controller
 
 				// hapus jurnal
 				$journal->delete();
-
-				throw new \Exception('Something went wrong');
 
 				return redirect()->back()->with('success', 'Data Pembayaran Berhasil Dihapus');
 			});

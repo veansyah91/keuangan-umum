@@ -5,9 +5,12 @@ namespace App\Models;
 use App\Models\Contact;
 use App\Models\StudentPaymentCategory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\StudentMonthlyReceivableLedger;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class StudentMonthlyPayment extends Model
 {
@@ -44,8 +47,13 @@ class StudentMonthlyPayment extends Model
 		return $this->belongsTo(Contact::class);
 	}
 
-	public function details(): HasMany
+	public function details(): BelongsToMany
 	{
-		return $this->hasMany(StudentPaymentCategory::class, 's_monthly_payment_details');
+		return $this->belongsToMany(StudentPaymentCategory::class, 's_monthly_payment_details', 'payment_id', 'student_payment_category_id');
+	}
+
+	public function receivableLedger(): HasOne
+	{
+		return $this->hasOne(StudentMonthlyReceivableLedger::class, 'payment_id');
 	}
 }

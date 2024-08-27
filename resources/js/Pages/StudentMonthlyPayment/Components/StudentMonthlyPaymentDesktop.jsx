@@ -3,6 +3,7 @@ import BadgeSecondary from '@/Components/Badges/BadgeSecondary';
 import BadgeSuccess from '@/Components/Badges/BadgeSuccess';
 import formatMonth from '@/Utils/formatMonth';
 import formatNumber from '@/Utils/formatNumber';
+import { Link } from '@inertiajs/react';
 import dayjs from 'dayjs';
 import React from 'react';
 import { IoCreateOutline, IoEllipsisVertical, IoSearchOutline, IoTrash } from 'react-icons/io5';
@@ -47,12 +48,15 @@ export default function StudentDesktop({ payment, className, role, handleDelete,
                             <ul
                                 tabIndex={0}
                                 className='dropdown-content z-[50] menu p-2 shadow bg-base-100 rounded-box w-56'>
-                                <li>
-                                    <button onClick={handleEdit}>
-                                        <IoCreateOutline />
-                                        Ubah
-                                    </button>
-                                </li>
+                                {
+                                    !payment.receivable_ledger && 
+                                    <li>
+                                        <Link href={route('cashflow.student-monthly-payment.edit', { organization: payment.organization_id, payment: payment.id })}>
+                                            <IoCreateOutline />
+                                            Ubah
+                                        </Link>
+                                    </li>
+                                }                                
                                 <li>
                                     <button onClick={handleDelete}>
                                         <IoTrash />

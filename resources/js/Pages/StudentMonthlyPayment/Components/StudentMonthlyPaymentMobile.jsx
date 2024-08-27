@@ -55,12 +55,15 @@ export default function StudentMobile({ payment, role, handleDelete, handleEdit 
                             <ul
                                 tabIndex={0}
                                 className='dropdown-content z-[50] menu p-2 shadow bg-base-100 rounded-box w-56'>
-                                <li>
-                                    <button onClick={handleEdit}>
-                                        <IoCreateOutline />
-                                        Ubah
-                                    </button>
-                                </li>
+                                {
+                                    !payment.receivable_ledger && 
+                                    <li>
+                                        <button onClick={handleEdit}>
+                                            <IoCreateOutline />
+                                            Ubah
+                                        </button>
+                                    </li>
+                                }    
                                 <li>
                                     <button onClick={handleDelete}>
                                         <IoTrash />

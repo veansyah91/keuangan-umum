@@ -485,7 +485,8 @@ class StudentMonthlyReceivableController extends Controller
 		// cek pada payment
 		// jika sudah dilakukan pembayaran, maka tampilkan error
 
-		if ($ledger['paid_date']) {
+		if ($ledger['paid_date']) 
+		{
 			return redirect()->back()->withErrors(['message' => 'Piutang Tidak Dapat Dihapus']);
 		}
 

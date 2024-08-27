@@ -148,6 +148,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
     post(route('cashflow.student-monthly-payment.post', organization.id), {
       onSuccess: ({ props }) => {
         const { flash } = props;
@@ -221,7 +222,6 @@ export default function Create({ organization, newRef, contacts, date, categorie
       type : type
     };    
 
-    // setData(temp);
     handleHistoryCategoryReload(temp);
   }
 

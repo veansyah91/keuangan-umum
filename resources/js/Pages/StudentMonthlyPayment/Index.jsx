@@ -86,8 +86,6 @@ export default function Index({ role, organization, payments, searchFilter, type
 	};
 
 	const handleDelete = (payment) => {
-		console.log(payment);
-		
 		setTitleDeleteModal(`Hapus Pembayaran No Ref ${payment.no_ref}`);
 		setShowDeleteConfirmation(true);
 		setData('id', payment.id);
