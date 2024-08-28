@@ -381,8 +381,6 @@ class StudentMonthlyPaymentController extends Controller
 
 		$ledger = Ledger::whereJournalId($payment['journal_id'])->where('debit', '>', 0)->first();
 
-		dd($payment);
-
 		return Inertia::render('StudentMonthlyPayment/Edit',[
 			'organization' => $organization,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),

@@ -43,8 +43,6 @@ const monthNow = () => {
 }
 
 export default function Edit({ organization, newRef, contacts, date, categories, studyYears, cashAccounts, historyCategories, payment, contact, details, debitAccount }) {
-  console.log(debitAccount);
-  
   // state
   const [total, setTotal] = useState(payment.value);
   const { data, setData, processing, post, errors, setError, reset } = useForm({
@@ -63,7 +61,7 @@ export default function Edit({ organization, newRef, contacts, date, categories,
   });
 
   const [selectedContact, setSelectedContact] = useState({ id: contact.id, name: contact.name, phone: contact.phone });
-  const [selectedCashAccount, setSelectedCashAccount] = useState({ id: null, name: '', code: '', is_cash: true });
+  const [selectedCashAccount, setSelectedCashAccount] = useState({ id: debitAccount.id, name: debitAccount.name, code: debitAccount.code, is_cash: debitAccount.is_cash });
 
   const [dateValue, setDateValue] = useState({
     startDate: payment.date,
