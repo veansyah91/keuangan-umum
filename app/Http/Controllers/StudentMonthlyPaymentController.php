@@ -370,9 +370,9 @@ class StudentMonthlyPaymentController extends Controller
 																	->first();
 
 			if ($historyPayment) {
-					$historyCategories = DB::table('s_monthly_payment_details')
-																	->where('payment_id', $historyPayment['id'])
-																	->get();
+				$historyCategories = DB::table('s_monthly_payment_details')
+																->where('payment_id', $historyPayment['id'])
+																->get();
 			}
 		}
 
@@ -389,6 +389,7 @@ class StudentMonthlyPaymentController extends Controller
 			'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),
 			'historyPayment' => Inertia::lazy(fn () => $historyPayment),
 			'historyCategories' => Inertia::lazy(fn () => $historyCategories),
+			'payment' => $payment
 		]);
 	}
 

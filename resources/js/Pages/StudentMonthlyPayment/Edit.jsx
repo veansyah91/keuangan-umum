@@ -42,19 +42,20 @@ const monthNow = () => {
   return month;
 }
 
-export default function Edit({ organization, newRef, contacts, date, categories, studyYears, cashAccounts, historyCategories }) {
+export default function Edit({ organization, newRef, contacts, date, categories, studyYears, cashAccounts, historyCategories, payment }) {
+  console.log(payment);
   
   // state
-  const [total, setTotal] = useState(0);
+  const [total, setTotal] = useState(payment.value);
   const { data, setData, processing, post, errors, setError, reset } = useForm({
-    contact_id:null,
-    date:date,
+    contact_id:payment.contact_id,
+    date:payment.date,
     level:'',
     student_id:'',
-    no_ref:newRef,
-    value:total,
-    type:'now', // set auto
-    month:parseInt(monthNow()),
+    no_ref:payment.no_ref,
+    value:payment.value,
+    type:payment.type, // set auto
+    month:payment.month,
     study_year:studyYear(),
     description:'',
     details: [],
@@ -120,23 +121,9 @@ export default function Edit({ organization, newRef, contacts, date, categories,
       value: category.value,
     }));
 
-    let tempTotal = temp.reduce((total, item) => total + item.value, 0);
-    setTotal(tempTotal);
-
     tempData = {
       ...tempData,
-      value: tempTotal,
       details: temp,
-      contact_id:null,
-      date:date,
-      level:'',
-      student_id:'',
-      no_ref:newRef,
-      type:'now', // set auto
-      month:parseInt(monthNow()),
-      study_year:studyYear(),
-      description:'',
-      account_id: null
     }
     
     setData(tempData);
