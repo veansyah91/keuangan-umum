@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use Inertia\Inertia;
+use App\Models\Ledger;
 use App\Helpers\NewRef;
 use App\Models\Account;
 use App\Models\Contact;
@@ -343,6 +344,8 @@ class StudentMonthlyPaymentController extends Controller
 	{		
 		$user = Auth::user();
 
+		$payment->with('details');
+
 		// cek apakah data berasal dari piutang
 		$ledger = StudentMonthlyReceivableLedger::where('payment_id', $payment['id'])->first();
 
@@ -376,6 +379,10 @@ class StudentMonthlyPaymentController extends Controller
 			}
 		}
 
+		$ledger = Ledger::whereJournalId($payment['journal_id'])->where('debit', '>', 0)->first();
+
+		dd($payment);
+
 		return Inertia::render('StudentMonthlyPayment/Edit',[
 			'organization' => $organization,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
@@ -389,7 +396,10 @@ class StudentMonthlyPaymentController extends Controller
 			'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),
 			'historyPayment' => Inertia::lazy(fn () => $historyPayment),
 			'historyCategories' => Inertia::lazy(fn () => $historyCategories),
-			'payment' => $payment
+			'payment' => $payment,
+			'contact' => Contact::with(['student', 'lastLevel'])->find($payment['contact_id']),
+			'details' => DB::table('s_monthly_payment_details')->where('payment_id', $payment['id'])->get(),
+			'debitAccount' => Account::find($ledger['account_id'])
 		]);
 	}
 

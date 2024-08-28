@@ -42,32 +42,32 @@ const monthNow = () => {
   return month;
 }
 
-export default function Edit({ organization, newRef, contacts, date, categories, studyYears, cashAccounts, historyCategories, payment }) {
-  console.log(payment);
+export default function Edit({ organization, newRef, contacts, date, categories, studyYears, cashAccounts, historyCategories, payment, contact, details, debitAccount }) {
+  console.log(debitAccount);
   
   // state
   const [total, setTotal] = useState(payment.value);
   const { data, setData, processing, post, errors, setError, reset } = useForm({
     contact_id:payment.contact_id,
     date:payment.date,
-    level:'',
-    student_id:'',
+    level:contact.last_level.level,
+    student_id:contact.student.no_ref,
     no_ref:payment.no_ref,
     value:payment.value,
     type:payment.type, // set auto
     month:payment.month,
-    study_year:studyYear(),
+    study_year:payment.study_year,
     description:'',
     details: [],
     account_id: null
   });
 
-  const [selectedContact, setSelectedContact] = useState({ id: null, name: '', phone: '' });
+  const [selectedContact, setSelectedContact] = useState({ id: contact.id, name: contact.name, phone: contact.phone });
   const [selectedCashAccount, setSelectedCashAccount] = useState({ id: null, name: '', code: '', is_cash: true });
 
   const [dateValue, setDateValue] = useState({
-    startDate: date,
-    endDate: date,
+    startDate: payment.date,
+    endDate: payment.date,
   });
 
   // useEffect
@@ -115,15 +115,24 @@ export default function Edit({ organization, newRef, contacts, date, categories,
 
   const setDefault = () => {
     let tempData = data;
-    let temp = categories.map(category => ({
-      id: category.id,
-      name: category.name,
-      value: category.value,
-    }));
+    let tempCategories = [];
+        
+    categories.filter((category, index) => {
+      let filtered = details.filter(detail => detail.student_payment_category_id == category.id);
+
+      tempCategories = [
+        ...tempCategories,
+        {
+          id:category.id,
+          name:category.name,
+          value: filtered.length > 0 ? filtered[0].value : category.value
+        }
+      ]
+    });
 
     tempData = {
       ...tempData,
-      details: temp,
+      details: tempCategories,
     }
     
     setData(tempData);
