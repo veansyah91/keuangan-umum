@@ -321,6 +321,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/student-monthly-payment/create', [StudentMonthlyPaymentController::class, 'create'])->name('cashflow.student-monthly-payment.create');
             Route::get('/student-monthly-payment/{payment}/edit', [StudentMonthlyPaymentController::class, 'edit'])->name('cashflow.student-monthly-payment.edit');
             Route::post('/student-monthly-payment', [StudentMonthlyPaymentController::class, 'store'])->name('cashflow.student-monthly-payment.post');
+            Route::patch('/student-monthly-payment/{payment}', [StudentMonthlyPaymentController::class, 'update'])->name('cashflow.student-monthly-payment.update');
             Route::delete('/student-monthly-payment/{payment}', [StudentMonthlyPaymentController::class, 'destroy'])->name('cashflow.student-monthly-payment.delete');
 
             // student receivable

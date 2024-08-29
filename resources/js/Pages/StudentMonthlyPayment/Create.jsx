@@ -62,7 +62,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
     study_year:studyYear(),
     description:'',
     details: [],
-    account_id: null
+    cash_account_id: null
   });
 
   const [selectedContact, setSelectedContact] = useState({ id: null, name: '', phone: '' });
@@ -176,7 +176,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
     temp = {
       ...temp,
       contact_id: selected.id,
-      description: `Kas Masuk / Pembayaran Iuran Bulanan dari ${selected.name.toUpperCase()}`,
+      description:`Kas Masuk / Pembayaran Iuran Bulanan dari ${selected.name.toUpperCase()} Bulan ${data.month}, Tahun Ajaran ${data.study_year}`,
       student_id: selected.student.no_ref,
       level: selected.levels[selected.levels.length - 1].level
     };
@@ -219,6 +219,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
     temp = {
       ...temp,
       study_year : e.target.value,
+      description:`Kas Masuk / Pembayaran Iuran Bulanan dari ${selectedContact?.name?.toUpperCase()} Bulan ${data.month}, Tahun Ajaran ${e.target.value}`,
       type : type
     };    
 
@@ -242,6 +243,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
     temp = {
       ...temp,
       month : parseInt(e.target.value),
+      description:`Kas Masuk / Pembayaran Iuran Bulanan dari ${selectedContact?.name?.toUpperCase()} Bulan ${parseInt(e.target.value)}, Tahun Ajaran ${data.study_year}`,
       type : type
     };    
 

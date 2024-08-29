@@ -213,6 +213,19 @@ class StudentMonthlyPaymentController extends Controller
 		$validated['created_by_id'] = $user['id'];
 		$validated['no_ref'] = $request['no_ref'];
 
+		// cek apakah pembayaran sudah dilakukan
+		$payment = StudentMonthlyPayment::whereOrganizationId($organization['id'])
+																			->whereContactId($validated['contact_id'])
+																			->where('month', $validated['month'])
+																			->where('study_year', $validated['study_year'])
+																			->first();
+
+		if ($payment) {
+			if ($payment['type'] !== 'receivable') {
+				return redirect()->back()->withErrors(['error' => 'Data is existed']);
+			}
+		}
+
 		$schoolAccount = SchoolAccountSetting::whereOrganizationId($organization['id'])->first();
 		$creditAccount = Account::find($schoolAccount['revenue_student']);
 
@@ -246,14 +259,7 @@ class StudentMonthlyPaymentController extends Controller
 				'debit' => 0,
 				'credit' => $validated['value'],
 			],
-		];
-
-		// cek apakah pembayaran sudah dilakukan
-		$payment = StudentMonthlyPayment::whereOrganizationId($organization['id'])
-																			->whereContactId($validated['contact_id'])
-																			->where('month', $validated['month'])
-																			->where('study_year', $validated['study_year'])
-																			->first();
+		];		
 
 		if ($payment) {
 			if ($payment['type'] !== 'receivable') {
@@ -399,6 +405,87 @@ class StudentMonthlyPaymentController extends Controller
 			'details' => DB::table('s_monthly_payment_details')->where('payment_id', $payment['id'])->get(),
 			'debitAccount' => Account::find($ledger['account_id'])
 		]);
+	}
+
+	public function update(Request $request, Organization $organization, StudentMonthlyPayment $payment)
+	{
+		$validated = $request->validate([
+			'contact_id' => [
+				'required',
+				'exists:contacts,id',
+			],
+			'date' => [
+				'required',
+				'date',
+			],
+			'level' => [
+				'required',
+				'numeric',
+			],
+			'student_id' => [
+				'string',
+				'nullable',
+			],
+			'value' => [
+				'required',
+				'numeric',
+			],
+			'type' => [
+				'required',
+				'in:now,prepaid,receivable',
+			],
+			'month' => [
+				'required',
+				'numeric',
+			],
+			'study_year' => [
+				'string',
+				'required',
+			],
+			'details' => [
+				'required',
+			],
+			'details.*.id' => [
+				'required',
+				'exists:student_payment_categories,id'
+			],
+			'details.*.name' => [
+				'required',
+				'string'
+			],
+			'details.*.value' => [
+				'required',
+				'numeric',
+				'min:0',
+			],
+			'cash_account_id' => [
+				'required',
+				'exists:accounts,id'
+			],
+			'description' => [
+				'string',
+				'nullable'
+			]
+		]);
+
+		$user = Auth::user();
+
+		// cek apakah pembayaran sudah dilakukan
+		$tempPayment = StudentMonthlyPayment::whereOrganizationId($organization['id'])
+																			->whereContactId($validated['contact_id'])
+																			->where('month', $validated['month'])
+																			->where('study_year', $validated['study_year'])
+																			->first();
+		
+		if ($tempPayment) {
+			if (($tempPayment['id'] !== $payment['id'])) {
+				if ($payment['type'] !== 'receivable') {
+					return redirect()->back()->withErrors(['error' => 'Data is existed']);
+				}
+			}
+		}
+		
+		dd($tempPayment);
 	}
 
 	public function destroy(Organization $organization, StudentMonthlyPayment $payment)

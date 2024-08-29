@@ -45,7 +45,7 @@ const monthNow = () => {
 export default function Edit({ organization, newRef, contacts, date, categories, studyYears, cashAccounts, historyCategories, payment, contact, details, debitAccount }) {
   // state
   const [total, setTotal] = useState(payment.value);
-  const { data, setData, processing, post, errors, setError, reset } = useForm({
+  const { data, setData, processing, patch, errors, setError, reset } = useForm({
     contact_id:payment.contact_id,
     date:payment.date,
     level:contact.last_level.level,
@@ -55,9 +55,9 @@ export default function Edit({ organization, newRef, contacts, date, categories,
     type:payment.type, // set auto
     month:payment.month,
     study_year:payment.study_year,
-    description:'',
+    description:`Kas Masuk / Pembayaran Iuran Bulanan dari ${contact.name.toUpperCase()} Bulan ${payment.month}, Tahun Ajaran ${payment.study_year}`,
     details: [],
-    account_id: null
+    cash_account_id: debitAccount.id
   });
 
   const [selectedContact, setSelectedContact] = useState({ id: contact.id, name: contact.name, phone: contact.phone });
@@ -87,8 +87,9 @@ export default function Edit({ organization, newRef, contacts, date, categories,
         
         let tempCategories = [];
         
-        categories.filter((category, index) => {
-          let filtered = historyCategories.filter(detail => detail.student_payment_category_id == category.id);
+        categories.filter((category) => {
+          let tempCategory = historyCategories.length > 0 ? [...historyCategories] : [...details];
+          let filtered = tempCategory.filter(detail => detail.student_payment_category_id == category.id);
     
           tempCategories = [
             ...tempCategories,
@@ -138,17 +139,17 @@ export default function Edit({ organization, newRef, contacts, date, categories,
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    console.log(data);
     
-    post(route('cashflow.student-monthly-payment.post', organization.id), {
+    
+    patch(route('cashflow.student-monthly-payment.update', {organization:organization.id, payment: payment.id}), {
       onSuccess: ({ props }) => {
         const { flash } = props;
 
         toast.success(flash.success, {
           position: toast.POSITION.TOP_CENTER,
         });
-        setSelectedCashAccount({ id: null, name: '', code: '', is_cash: true });
-        setSelectedContact({ id: null, name: '', phone: '' });
-        setDefault();
 
       },
       onError: errors => {
@@ -166,7 +167,7 @@ export default function Edit({ organization, newRef, contacts, date, categories,
     temp = {
       ...temp,
       contact_id: selected.id,
-      description: `Kas Masuk / Pembayaran Iuran Bulanan dari ${selected.name.toUpperCase()}`,
+      description:`Kas Masuk / Pembayaran Iuran Bulanan dari ${selectedContact.name.toUpperCase()} Bulan ${data.month}, Tahun Ajaran ${data.study_year}`,
       student_id: selected.student.no_ref,
       level: selected.levels[selected.levels.length - 1].level
     };
@@ -209,6 +210,7 @@ export default function Edit({ organization, newRef, contacts, date, categories,
     temp = {
       ...temp,
       study_year : e.target.value,
+      description:`Kas Masuk / Pembayaran Iuran Bulanan dari ${selectedContact.name.toUpperCase()} Bulan ${data.month}, Tahun Ajaran ${e.target.value}`,
       type : type
     };    
 
@@ -232,6 +234,7 @@ export default function Edit({ organization, newRef, contacts, date, categories,
     temp = {
       ...temp,
       month : parseInt(e.target.value),
+      description:`Kas Masuk / Pembayaran Iuran Bulanan dari ${selectedContact.name.toUpperCase()} Bulan ${parseInt(e.target.value)}, Tahun Ajaran ${data.study_year}`,
       type : type
     };    
 
