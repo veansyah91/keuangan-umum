@@ -262,9 +262,9 @@ class StudentMonthlyPaymentController extends Controller
 		];		
 
 		if ($payment) {
-			if ($payment['type'] !== 'receivable') {
-				return redirect()->back()->withErrors(['error' => 'Data is existed']);
-			}
+			// if ($payment['type'] !== 'receivable') {
+			// 	return redirect()->back()->withErrors(['error' => 'Data is existed']);
+			// }
 
 			DB::transaction(function() use ($organization, $payment, $validated){				
 				$journal = $this->journalRepository->store($validated);
@@ -479,11 +479,41 @@ class StudentMonthlyPaymentController extends Controller
 		
 		if ($tempPayment) {
 			if (($tempPayment['id'] !== $payment['id'])) {
-				if ($payment['type'] !== 'receivable') {
-					return redirect()->back()->withErrors(['error' => 'Data is existed']);
-				}
+				return redirect()->back()->withErrors(['error' => 'Data is existed']);
 			}
 		}
+
+		$schoolAccount = SchoolAccountSetting::whereOrganizationId($organization['id'])->first();
+		$creditAccount = Account::find($schoolAccount['revenue_student']);
+
+		if ($validated['type'] == 'receivable')
+		{
+			// cek apakah ada piutang siswa di bulan yang akan dilakukan pembayaran
+			$creditAccount = Account::find($schoolAccount['receivable_monthly_student']);
+		}
+
+		dd($validated);
+
+		$cashAccount = Account::find($validated['cash_account_id']);
+
+		$validated['accounts'] = [
+			[
+				'id' => $cashAccount['id'],
+				'name' => $cashAccount['name'],
+				'code' => $cashAccount['code'],
+				'is_cash' => 1,
+				'debit' => $validated['value'],
+				'credit' => 0,
+			],
+			[
+				'id' => $creditAccount['id'],
+				'name' => $creditAccount['name'],
+				'code' => $creditAccount['code'],
+				'is_cash' => 0,
+				'debit' => 0,
+				'credit' => $validated['value'],
+			],
+		];		
 		
 		dd($tempPayment);
 	}

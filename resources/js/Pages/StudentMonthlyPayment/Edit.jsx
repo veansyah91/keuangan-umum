@@ -202,9 +202,7 @@ export default function Edit({ organization, newRef, contacts, date, categories,
 
     if (selectedMonth > now) {
       type = 'prepaid';
-    } else if (selectedMonth < now) { 
-      type = 'receivable';
-    } 
+    }
 
     let temp = data;
     temp = {
