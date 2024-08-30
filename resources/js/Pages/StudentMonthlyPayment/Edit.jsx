@@ -140,13 +140,9 @@ export default function Edit({ organization, newRef, contacts, date, categories,
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    console.log(data);
-    
-    
     patch(route('cashflow.student-monthly-payment.update', {organization:organization.id, payment: payment.id}), {
       onSuccess: ({ props }) => {
         const { flash } = props;
-
         toast.success(flash.success, {
           position: toast.POSITION.TOP_CENTER,
         });
@@ -157,7 +153,7 @@ export default function Edit({ organization, newRef, contacts, date, categories,
           position: toast.POSITION.TOP_CENTER,
         });
       },
-      preserveScroll: false,
+      preserveScroll: true,
     });
   };
 
@@ -224,9 +220,7 @@ export default function Edit({ organization, newRef, contacts, date, categories,
 
     if (selectedMonth > now) {
       type = 'prepaid';
-    } else if (selectedMonth < now) { 
-      type = 'receivable';
-    } 
+    }  
 
     let temp = data;
     temp = {

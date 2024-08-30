@@ -465,7 +465,14 @@ class StudentMonthlyPaymentController extends Controller
 			'description' => [
 				'string',
 				'nullable'
-			]
+			],
+			'no_ref' => [
+						'required',
+						'string',
+						Rule::unique('student_monthly_payments')->where(function ($query) use ($organization) {
+								return $query->where('organization_id', $organization['id']);
+						})->ignore($payment['id']),
+				],
 		]);
 
 		$user = Auth::user();
@@ -486,13 +493,11 @@ class StudentMonthlyPaymentController extends Controller
 		$schoolAccount = SchoolAccountSetting::whereOrganizationId($organization['id'])->first();
 		$creditAccount = Account::find($schoolAccount['revenue_student']);
 
-		if ($validated['type'] == 'receivable')
+		if ($validated['type'] == 'prepaid')
 		{
 			// cek apakah ada piutang siswa di bulan yang akan dilakukan pembayaran
-			$creditAccount = Account::find($schoolAccount['receivable_monthly_student']);
+			$creditAccount = Account::find($schoolAccount['prepaid_student']);
 		}
-
-		dd($validated);
 
 		$cashAccount = Account::find($validated['cash_account_id']);
 
@@ -514,8 +519,62 @@ class StudentMonthlyPaymentController extends Controller
 				'credit' => $validated['value'],
 			],
 		];		
-		
-		dd($tempPayment);
+
+		$validated['debit_id'] = $cashAccount['id'];
+		$validated['credit_id'] = $creditAccount['id'];
+
+		DB::transaction(function() use ($validated, $payment){
+			// update journal
+			$journal = Journal::find($payment['journal_id']);
+			$journal->update($validated);
+
+			// update ledger
+			$ledgers = Ledger::whereJournalId($payment['journal_id'])->get();
+
+			foreach ($ledgers as $ledger) {
+				$ledgerUpdate = [
+					'debit' => $ledger['debit'] > 0 ? $ledger['debit'] : 0,
+					'credit' => $ledger['credit'] > 0 ? $ledger['credit'] : 0,
+					'no_ref' => $validated['no_ref'],
+					'account_id' => $ledger['debit'] > 0 ? $validated['debit_id'] : $validated['credit_id'] 
+				];
+
+				$ledger->update($ledgerUpdate);
+			}		
+
+			// update payment
+			$payment->update($validated);
+
+			// update detail
+			$details = DB::table('s_monthly_payment_details')
+										->where('payment_id', $payment['id'])
+										->delete();
+
+			foreach ($validated['details'] as $detail) {
+				if ($detail['value'] > 0) {
+					$data = [
+						'payment_id' => $payment['id'],
+						'student_payment_category_id' => $detail['id'],
+						'value' => $detail['value'],
+					];
+
+					DB::table('s_monthly_payment_details')
+						->insert($data);
+				}
+			}			
+		});
+
+		$log = [
+			'description' => $validated['description'],
+			'date' => $validated['date'],
+			'no_ref' => $validated['no_ref'],
+			'value' => $validated['value'],
+		];
+
+		$this->logRepository->store($organization['id'], strtoupper($user['name']).' telah mengubah DATA pada PEMBAYARAN IURAN BULANAN dengan DATA : '.json_encode($log));
+
+		return redirect()->back()->with('success', 'Pembayaran Iuran Bulanan Berhasil Diubah');
+
 	}
 
 	public function destroy(Organization $organization, StudentMonthlyPayment $payment)
