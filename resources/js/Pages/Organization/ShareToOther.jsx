@@ -20,6 +20,7 @@ const roles = [
 ];
 
 export default function ShareToOther({ organization, users, userFilter, userOrganization }) {
+    // console.log(users);
     const [showAdd, setShowAdd] = useState(false);
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const [user] = useState(userFilter || '');
@@ -114,7 +115,7 @@ export default function ShareToOther({ organization, users, userFilter, userOrga
         router.reload({
             only: ['users'],
             data: {
-                user: queryUser,
+              user: queryUser,
             },
         });
     };

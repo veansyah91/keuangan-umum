@@ -8,6 +8,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use App\Models\Account;
 use App\Models\Contact;
+use App\Models\Village;
 use App\Models\Affiliation;
 use Illuminate\Support\Str;
 use App\Models\Organization;
@@ -24,6 +25,7 @@ use App\Repositories\AccountCategory\AccountCategoryRepositoryInterface;
 
 class OrganizationController extends Controller
 {
+    protected $village;
     protected $fixedAssetCategory = [
         [
             'lifetime' => 0,
@@ -399,10 +401,11 @@ class OrganizationController extends Controller
 
     private $account;
 
-    public function __construct(AccountRepositoryInterface $account, AccountCategoryRepositoryInterface $accountCategory)
+    public function __construct(AccountRepositoryInterface $account, AccountCategoryRepositoryInterface $accountCategory, VillageRepository $village)
     {
         $this->account = $account;
         $this->accountCategory = $accountCategory;
+        $this->village = $village;
     }
 
     public function index(): Response
@@ -444,14 +447,13 @@ class OrganizationController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(): Response
+    public function create()
     {
-        $villages = new VillageRepository;
-
         return Inertia::render('Organization/Create', [
-            'villages' => $villages->getFullAddress(request(['village'])),
+            'villages' => $this->village->getFullAddress(request(['village'])),
             'villageFilter' => request('village'),
         ]);
+        
     }
 
     /**

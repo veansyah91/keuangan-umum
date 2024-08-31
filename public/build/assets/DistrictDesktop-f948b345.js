@@ -1,0 +1,1 @@
+import{j as e}from"./app-aa96f04a.js";function t({district:n,className:r}){return e.jsx(e.Fragment,{children:e.jsxs("tr",{className:r,children:[e.jsx("td",{children:n.id}),e.jsx("td",{children:n.name}),e.jsx("td",{children:n.regency.name}),e.jsx("td",{children:n.regency.province.name}),e.jsx("td",{})]})})}export{t as default};

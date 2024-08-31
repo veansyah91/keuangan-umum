@@ -15,8 +15,8 @@ class VillageRepository implements VillageRepositoryInterface
                     $query->with('province');
                 });
             })
-            ->get()
-            ->take(10);
+            ->take(10)
+            ->get();
 
         return $village;
     }
