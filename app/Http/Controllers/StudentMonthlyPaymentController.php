@@ -476,6 +476,8 @@ class StudentMonthlyPaymentController extends Controller
 		]);
 
 		$user = Auth::user();
+		$validated['organization_id'] = $organization['id'];
+		$validated['user_id'] = $user['id'];
 
 		// cek apakah pembayaran sudah dilakukan
 		$tempPayment = StudentMonthlyPayment::whereOrganizationId($organization['id'])
@@ -523,24 +525,40 @@ class StudentMonthlyPaymentController extends Controller
 		$validated['debit_id'] = $cashAccount['id'];
 		$validated['credit_id'] = $creditAccount['id'];
 
-		DB::transaction(function() use ($validated, $payment){
-			// update journal
-			$journal = Journal::find($payment['journal_id']);
-			$journal->update($validated);
+		DB::transaction(function() use ($validated, $payment, $creditAccount){
+			//cek apakah telah dilakukan penjurnalan otomatis apakah pendapatan iuran adalah pendapatan dibayar dimuka atau tidak
+			$ledger = Ledger::whereJournalId($payment['journal_id'])->where('credit', '>', 0)->count();
 
-			// update ledger
-			$ledgers = Ledger::whereJournalId($payment['journal_id'])->get();
+			// jika ledger > 1, berarti telah terjadi  pendapatan dari pembayaran di muka
+			// journal
+			$this->journalRepository->update($validated, $payment->journal);
 
-			foreach ($ledgers as $ledger) {
-				$ledgerUpdate = [
-					'debit' => $ledger['debit'] > 0 ? $ledger['debit'] : 0,
-					'credit' => $ledger['credit'] > 0 ? $ledger['credit'] : 0,
-					'no_ref' => $validated['no_ref'],
-					'account_id' => $ledger['debit'] > 0 ? $validated['debit_id'] : $validated['credit_id'] 
+			if ($ledger > 1) {
+				$paymentAccount = Account::find($schoolAccount['revenue_student']);
+
+				$accounts = [
+					[
+						'id' => $creditAccount['id'],
+						'name' => $creditAccount['name'],
+						'code' => $creditAccount['code'],
+						'is_cash' => 0,
+						'debit' => $validated['value'],
+						'credit' => 0,
+					],
+					[
+						'id' => $paymentAccount['id'],
+						'name' => $paymentAccount['name'],
+						'code' => $paymentAccount['code'],
+						'is_cash' => 0,
+						'debit' => 0,
+						'credit' => $validated['value'],
+					]
 				];
 
-				$ledger->update($ledgerUpdate);
-			}		
+				foreach ($accounts as $account) {
+					Ledger::create($account);
+				}
+			}
 
 			// update payment
 			$payment->update($validated);

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Contact;
+use App\Models\Journal;
 use App\Models\StudentPaymentCategory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\StudentMonthlyReceivableLedger;
@@ -56,4 +57,9 @@ class StudentMonthlyPayment extends Model
 	{
 		return $this->hasOne(StudentMonthlyReceivableLedger::class, 'payment_id');
 	}
+
+	public function journal(): BelongsTo
+    {
+        return $this->belongsTo(Journal::class);
+    }
 }
