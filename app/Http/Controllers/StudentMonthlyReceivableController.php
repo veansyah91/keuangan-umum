@@ -490,7 +490,7 @@ class StudentMonthlyReceivableController extends Controller
 			return redirect()->back()->withErrors(['message' => 'Piutang Tidak Dapat Dihapus']);
 		}
 
-    $user = Auth::user();
+        $user = Auth::user();
 
 		// hapus data pada journal 
 		$journal = Journal::find($ledger['journal_id']);

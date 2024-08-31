@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { IoArrowBackOutline, IoPlayBack, IoPlayForward, IoSearchSharp } from 'react-icons/io5';
+import { Head, Link, } from '@inertiajs/react';
+import { IoArrowBackOutline } from 'react-icons/io5';
 import dayjs from 'dayjs';
 import { FaPrint, FaWhatsapp } from 'react-icons/fa';
 import SecondaryButton from '@/Components/SecondaryButton';
