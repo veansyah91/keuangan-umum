@@ -595,6 +595,20 @@ class StudentMonthlyPaymentController extends Controller
 
 	}
 
+	public function show(Organization $organization, $id)
+	{
+		$user = Auth::user();
+
+		$payment = StudentMonthlyPayment::with('details')->find($id);
+
+		return Inertia::render('StudentMonthlyPayment/Show',[
+			'organization' => $organization,
+			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+			'payment' => $payment,
+			'contact' => Contact::with(['student', 'lastLevel'])->find($payment['contact_id']),
+		]);
+	}
+
 	public function destroy(Organization $organization, StudentMonthlyPayment $payment)
 	{
 		// cek pada receivable ledger
