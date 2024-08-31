@@ -604,6 +604,7 @@ class StudentMonthlyPaymentController extends Controller
 		return Inertia::render('StudentMonthlyPayment/Show',[
 			'organization' => $organization,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+			'user' => $user,
 			'payment' => $payment,
 			'contact' => Contact::with(['student', 'lastLevel'])->find($payment['contact_id']),
 		]);

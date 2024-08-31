@@ -50,7 +50,7 @@ class StudentMonthlyPayment extends Model
 
 	public function details(): BelongsToMany
 	{
-		return $this->belongsToMany(StudentPaymentCategory::class, 's_monthly_payment_details', 'payment_id', 'student_payment_category_id');
+		return $this->belongsToMany(StudentPaymentCategory::class, 's_monthly_payment_details', 'payment_id', 'student_payment_category_id')->withPivot('value');
 	}
 
 	public function receivableLedger(): HasOne
