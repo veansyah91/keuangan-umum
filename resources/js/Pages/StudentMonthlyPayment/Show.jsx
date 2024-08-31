@@ -9,10 +9,7 @@ import SecondaryButton from '@/Components/SecondaryButton';
 import formatNumber from '@/Utils/formatNumber';
 import { toast, ToastContainer } from 'react-toastify';
 
-export default function Show({ contact, organization, role, payment, user }) {
-	// console.log(contact);
-	// console.log(payment);
-	
+export default function Show({ contact, organization, role, payment, user }) {	
 	const [waLink] = useState('https://web.whatsapp.com/send');
 
 	const handlePrint = () => {
