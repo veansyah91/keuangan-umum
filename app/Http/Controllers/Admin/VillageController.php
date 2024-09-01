@@ -71,6 +71,7 @@ class VillageController extends Controller
         try {
             Excel::queueImport(new VillageImport, $file);
         } catch (Throwable $th) {
+            \Log::info($th);
             abort(503, 'Something Wrong');
         }
 
