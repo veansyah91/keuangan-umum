@@ -111,7 +111,7 @@ export default function Index({ regencies, provinces, provinceFilter, searchFilt
 
     return (
         <>
-            <Head title='Data Provinsi' />
+            <Head title='Data Kota / Kabupaten' />
             <ToastContainer />
 
             {/* Mobile */}

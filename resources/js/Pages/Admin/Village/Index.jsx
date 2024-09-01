@@ -108,6 +108,9 @@ export default function Index({
             },
             onError: (errors) => {
                 console.log(errors);
+                toast.error(errors, {
+                    position: toast.POSITION.TOP_CENTER,
+                });
             },
         });
     };
@@ -179,7 +182,7 @@ export default function Index({
 
     return (
         <>
-            <Head title='Data Kecamatan' />
+            <Head title='Data Desa / Kelurahan' />
             <ToastContainer />
 
             {/* Mobile */}
