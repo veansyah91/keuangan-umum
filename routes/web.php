@@ -24,6 +24,7 @@ use App\Http\Controllers\AffiliationController;
 use App\Http\Controllers\CashMutationController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\StaffContactController;
+use App\Http\Controllers\AccountSchoolController;
 use App\Http\Controllers\Admin\RegencyController;
 use App\Http\Controllers\Admin\VillageController;
 use App\Http\Controllers\Admin\DistrictController;
@@ -191,57 +192,57 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             // Fixed Asset Category
             Route::get('/fixed-asset-categories', [FixedAssetCategoryController::class, 'index'])->name('data-master.fixed-asset-category');
-            Route::post('/fixed-asset-categories', [FixedAssetCategoryController::class, 'store'])->name('data-master.fixed-asset-category.post');
-            Route::patch('/fixed-asset-categories/{fixedAssetCategory}', [FixedAssetCategoryController::class, 'update'])->name('data-master.fixed-asset-category.update');
-            Route::delete('/fixed-asset-categories/{fixedAssetCategory}', [FixedAssetCategoryController::class, 'destroy'])->name('data-master.fixed-asset-category.destroy');
+            Route::post('/fixed-asset-categories', [FixedAssetCategoryController::class, 'store'])->name('data-master.fixed-asset-category.post')->middleware('is.not.viewer');
+            Route::patch('/fixed-asset-categories/{fixedAssetCategory}', [FixedAssetCategoryController::class, 'update'])->name('data-master.fixed-asset-category.update')->middleware('is.not.viewer');
+            Route::delete('/fixed-asset-categories/{fixedAssetCategory}', [FixedAssetCategoryController::class, 'destroy'])->name('data-master.fixed-asset-category.destroy')->middleware('is.not.viewer');
 
             // Fixed Asset
             Route::get('fixed-assets', [FixedAssetController::class, 'index'])->name('data-master.fixed-asset');
             Route::post('fixed-assets', [FixedAssetController::class, 'store'])->name('data-master.fixed-asset.post');
             Route::get('fixed-assets/create', [FixedAssetController::class, 'create'])->name('data-master.fixed-asset.create');
-            Route::get('fixed-assets/{fixedAsset}/edit', [FixedAssetController::class, 'edit'])->name('data-master.fixed-asset.edit');
+            Route::get('fixed-assets/{fixedAsset}/edit', [FixedAssetController::class, 'edit'])->name('data-master.fixed-asset.edit')->middleware('is.not.viewer');
             Route::get('fixed-assets/{fixedAsset}', [FixedAssetController::class, 'show'])->name('data-master.fixed-asset.show');
-            Route::patch('fixed-assets/{fixedAsset}', [FixedAssetController::class, 'update'])->name('data-master.fixed-asset.update');
-            Route::delete('fixed-assets/{fixedAsset}', [FixedAssetController::class, 'destroy'])->name('data-master.fixed-asset.destroy');
-            Route::patch('fixed-assets/{fixedAsset}/disposal', [FixedAssetController::class, 'disposal'])->name('data-master.fixed-asset.disposal');
+            Route::patch('fixed-assets/{fixedAsset}', [FixedAssetController::class, 'update'])->name('data-master.fixed-asset.update')->middleware('is.not.viewer');
+            Route::delete('fixed-assets/{fixedAsset}', [FixedAssetController::class, 'destroy'])->name('data-master.fixed-asset.destroy')->middleware('is.not.viewer');
+            Route::patch('fixed-assets/{fixedAsset}/disposal', [FixedAssetController::class, 'disposal'])->name('data-master.fixed-asset.disposal')->middleware('is.not.viewer');
 
             // Student
             Route::get('/students', [StudentContactController::class, 'index'])->name('data-master.students');
             Route::get('/students/create', [StudentContactController::class, 'create'])->name('data-master.students.create');
-            Route::get('/students/import', [StudentContactController::class, 'importStudent'])->name('data-master.students.import');
-            Route::post('/students/import', [StudentContactController::class, 'storeImportStudent'])->name('data-master.students.import.post');
-            Route::get('/students/download-template', [StudentContactController::class, 'downloadTemplate'])->name('data-master.students.download-template');
-            Route::get('/students/{contact}', [StudentContactController::class, 'show'])->name('data-master.students.show');
-            Route::get('/students/{contact}/edit', [StudentContactController::class, 'edit'])->name('data-master.students.edit');
-            Route::post('/students', [StudentContactController::class, 'store'])->name('data-master.students.post');
-            Route::patch('/students/{contact}', [StudentContactController::class, 'update'])->name('data-master.students.update');
-            Route::delete('/students/{contact}', [StudentContactController::class, 'destroy'])->name('data-master.students.destroy');
+            Route::get('/students/import', [StudentContactController::class, 'importStudent'])->name('data-master.students.import')->middleware('is.not.viewer');
+            Route::post('/students/import', [StudentContactController::class, 'storeImportStudent'])->name('data-master.students.import.post')->middleware('is.not.viewer');
+            Route::get('/students/download-template', [StudentContactController::class, 'downloadTemplate'])->name('data-master.students.download-template')->middleware('is.not.viewer');
+            Route::get('/students/{contact}', [StudentContactController::class, 'show'])->name('data-master.students.show')->middleware('is.not.viewer');
+            Route::get('/students/{contact}/edit', [StudentContactController::class, 'edit'])->name('data-master.students.edit')->middleware('is.not.viewer');
+            Route::post('/students', [StudentContactController::class, 'store'])->name('data-master.students.post')->middleware('is.not.viewer');
+            Route::patch('/students/{contact}', [StudentContactController::class, 'update'])->name('data-master.students.update')->middleware('is.not.viewer');
+            Route::delete('/students/{contact}', [StudentContactController::class, 'destroy'])->name('data-master.students.destroy')->middleware('is.not.viewer');
 
             // Student Payment Category
             Route::get('/student-payment-category', [StudentPaymentCategoryController::class, 'index'])->name('data-master.student-payment-category');
-            Route::post('/student-payment-category', [StudentPaymentCategoryController::class, 'store'])->name('data-master.student-payment-category.store');
-            Route::patch('/student-payment-category/{studentPaymentCategory}', [StudentPaymentCategoryController::class, 'update'])->name('data-master.student-payment-category.update');
-            Route::delete('/student-payment-category/{studentPaymentCategory}', [StudentPaymentCategoryController::class, 'destroy'])->name('data-master.student-payment-category.destroy');
+            Route::post('/student-payment-category', [StudentPaymentCategoryController::class, 'store'])->name('data-master.student-payment-category.store')->middleware('is.not.viewer');
+            Route::patch('/student-payment-category/{studentPaymentCategory}', [StudentPaymentCategoryController::class, 'update'])->name('data-master.student-payment-category.update')->middleware('is.not.viewer');
+            Route::delete('/student-payment-category/{studentPaymentCategory}', [StudentPaymentCategoryController::class, 'destroy'])->name('data-master.student-payment-category.destroy')->middleware('is.not.viewer');
 
             // Student Entry Payment Category
             Route::get('/student-entry-payment-category', [StudentEntryPaymentCategoryController::class, 'index'])->name('data-master.student-entry-payment-category');
-            Route::post('/student-entry-payment-category', [StudentEntryPaymentCategoryController::class, 'store'])->name('data-master.student-entry-payment-category.store');
-            Route::patch('/student-entry-payment-category/{studentEntryPaymentCategory}', [StudentEntryPaymentCategoryController::class, 'update'])->name('data-master.student-entry-payment-category.update');
-            Route::delete('/student-entry-payment-category/{studentEntryPaymentCategory}', [StudentEntryPaymentCategoryController::class, 'destroy'])->name('data-master.student-entry-payment-category.destroy');
+            Route::post('/student-entry-payment-category', [StudentEntryPaymentCategoryController::class, 'store'])->name('data-master.student-entry-payment-category.store')->middleware('is.not.viewer');
+            Route::patch('/student-entry-payment-category/{studentEntryPaymentCategory}', [StudentEntryPaymentCategoryController::class, 'update'])->name('data-master.student-entry-payment-category.update')->middleware('is.not.viewer');
+            Route::delete('/student-entry-payment-category/{studentEntryPaymentCategory}', [StudentEntryPaymentCategoryController::class, 'destroy'])->name('data-master.student-entry-payment-category.destroy')->middleware('is.not.viewer');
 
             // Staff Contact
             Route::get('/staff', [StaffContactController::class, 'index'])->name('data-master.staff');
             Route::get('/staff/import', [StaffContactController::class, 'importStaff'])->name('data-master.staff.import');
-            Route::post('/staff/import', [StaffContactController::class, 'storeImportStaff'])->name('data-master.staff.import.post');
-            Route::post('/staff', [StaffContactController::class, 'store'])->name('data-master.staff.store');
-            Route::patch('/staff/{contact}', [StaffContactController::class, 'update'])->name('data-master.staff.update');
-            Route::delete('/staff/{contact}', [StaffContactController::class, 'destroy'])->name('data-master.staff.destroy');
+            Route::post('/staff/import', [StaffContactController::class, 'storeImportStaff'])->name('data-master.staff.import.post')->middleware('is.not.viewer');
+            Route::post('/staff', [StaffContactController::class, 'store'])->name('data-master.staff.store')->middleware('is.not.viewer');
+            Route::patch('/staff/{contact}', [StaffContactController::class, 'update'])->name('data-master.staff.update')->middleware('is.not.viewer');
+            Route::delete('/staff/{contact}', [StaffContactController::class, 'destroy'])->name('data-master.staff.destroy')->middleware('is.not.viewer');
 
             // Salary Category
             Route::get('/salary-category', [SalaryCategoryController::class, 'index'])->name('data-master.salary-category');
-            Route::post('/salary-category', [SalaryCategoryController::class, 'store'])->name('data-master.salary-category.store');
-            Route::patch('/salary-category/{salaryCategory}', [SalaryCategoryController::class, 'update'])->name('data-master.salary-category.update');
-            Route::delete('/salary-category/{salaryCategory}', [SalaryCategoryController::class, 'destroy'])->name('data-master.salary-category.destroy');
+            Route::post('/salary-category', [SalaryCategoryController::class, 'store'])->name('data-master.salary-category.store')->middleware('is.not.viewer');
+            Route::patch('/salary-category/{salaryCategory}', [SalaryCategoryController::class, 'update'])->name('data-master.salary-category.update')->middleware('is.not.viewer');
+            Route::delete('/salary-category/{salaryCategory}', [SalaryCategoryController::class, 'destroy'])->name('data-master.salary-category.destroy')->middleware('is.not.viewer');
 
 
         });
@@ -261,6 +262,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/accounts', [AccountController::class, 'store'])->name('data-ledger.account.post')->middleware('is.not.viewer');
             Route::patch('/accounts/{account}', [AccountController::class, 'update'])->name('data-ledger.account.update')->middleware('is.not.viewer');
             Route::delete('/accounts/{account}', [AccountController::class, 'destroy'])->name('data-ledger.account.delete')->middleware('is.not.viewer');
+
+            // Account School
+            Route::get('/account-scholl', [AccountSchoolController::class, 'index'])->name('data-ledger.account-school');
 
             // Journal
             Route::get('/journals', [JournalController::class, 'index'])->name('data-ledger.journal');

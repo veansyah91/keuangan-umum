@@ -9,44 +9,59 @@ import { LiaClipboardListSolid } from 'react-icons/lia';
 import { RiBookletLine } from 'react-icons/ri';
 
 export default function Index({ organization }) {
-    return (
-        <>
-            <Head title='Data Akun' />
-            {/* Desktop */}
-            <ContainerDesktop>
-                <div className='flex justify-center pt-5 pb-10 gap-5'>
-                    <Link href={route('data-ledger.account-category', organization.id)}>
-                        <CardMenu
-                            bgColor={'bg-cyan-500'}
-                            icon={<LiaClipboardListSolid />}
-                            title={'Data Kategori Akun'}
-                        />
-                    </Link>
-                    <Link href={route('data-ledger.account', organization.id)}>
-                        <CardMenu bgColor={'bg-orange-500'} icon={<PiNotebook />} title={'Data Akun'} />
-                    </Link>
-                    <Link href={route('data-ledger.journal', organization.id)}>
-                        <CardMenu bgColor={'bg-emerald-500'} icon={<RiBookletLine />} title={'Jurnal Umum'} />
-                    </Link>
-                </div>
-            </ContainerDesktop>
-            {/* Desktop */}
+	return (
+		<>
+			<Head title='Data Akun' />
+			{/* Desktop */}
+			<ContainerDesktop>
+				<div className='mx-auto w-full text-center font-bold'>Akun-Akun</div>
+				<div className='flex justify-center pt-5 pb-10 gap-5'>
+					<Link href={route('data-ledger.account-category', organization.id)}>
+						<CardMenu
+							bgColor={'bg-cyan-500'}
+							icon={<LiaClipboardListSolid />}
+							title={'Data Kategori Akun'}
+						/>
+					</Link>
+					<Link href={route('data-ledger.account', organization.id)}>
+						<CardMenu bgColor={'bg-orange-500'} icon={<PiNotebook />} title={'Daftar Akun'} />
+					</Link>			
+					<Link href={route('data-ledger.account-school', organization.id)}>
+						<CardMenu bgColor={'bg-slate-500'} icon={<PiNotebook />} title={'Daftar Akun Sekolah'} />
+					</Link>					
+				</div>
+				<div className='flex justify-center pt-5 pb-10 gap-5'>
+					<Link href={route('data-ledger.journal', organization.id)}>
+						<CardMenu bgColor={'bg-emerald-500'} icon={<RiBookletLine />} title={'Jurnal Umum'} />
+					</Link>
+				</div>
+			</ContainerDesktop>
+			{/* Desktop */}
 
-            {/* Mobile */}
-            <div className='sm:hidden flex flex-wrap pt-14 pb-5 px-2 mx-auto bg-white gap-2 w-full justify-center'>
-                <Link href={route('data-ledger.account-category', organization.id)}>
-                    <CardMenu bgColor={'bg-cyan-500'} icon={<LiaClipboardListSolid />} title={'Data Kategori Akun'} />
-                </Link>
-                <Link href={route('data-ledger.account', organization.id)}>
-                    <CardMenu bgColor={'bg-orange-500'} icon={<PiNotebook />} title={'Data Akun'} />
-                </Link>
-                <Link href={route('data-ledger.journal', organization.id)}>
-                    <CardMenu bgColor={'bg-emerald-500'} icon={<RiBookletLine />} title={'Jurnal Umum'} />
-                </Link>
-            </div>
-            {/* Mobile */}
-        </>
-    );
+			{/* Mobile */}
+			<div className='sm:hidden pt-14 pb-5 px-2 mx-auto bg-white '>
+				<div className='mx-auto w-full text-center font-bold'>Akun-Akun</div>
+				<div className='flex flex-wrap gap-2 w-full justify-center'>
+					<Link href={route('data-ledger.account-category', organization.id)}>
+						<CardMenu bgColor={'bg-cyan-500'} icon={<LiaClipboardListSolid />} title={'Data Kategori Akun'} />
+					</Link>
+					<Link href={route('data-ledger.account', organization.id)}>
+						<CardMenu bgColor={'bg-orange-500'} icon={<PiNotebook />} title={'Data Akun'} />
+					</Link>
+					<Link href={route('data-ledger.account-school', organization.id)}>
+						<CardMenu bgColor={'bg-slate-500'} icon={<PiNotebook />} title={'Daftar Akun Sekolah'} />
+					</Link>	
+				</div>
+				<div className='flex flex-wrap gap-2 w-full justify-center mt-5'>
+					<Link href={route('data-ledger.journal', organization.id)}>
+						<CardMenu bgColor={'bg-emerald-500'} icon={<RiBookletLine />} title={'Jurnal Umum'} />
+					</Link>
+				</div>
+				
+			</div>
+			{/* Mobile */}
+		</>
+	);
 }
 
 Index.layout = (page) => (
