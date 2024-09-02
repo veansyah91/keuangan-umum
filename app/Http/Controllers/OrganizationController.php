@@ -422,7 +422,10 @@ class OrganizationController extends Controller
                 $query->where('user_id', $user['id']);
             })
             ->whereNot('status', 'deactive')
+            ->orderBy('created_at', 'desc')
+            ->orderBy('expired', 'desc')
             ->get();
+            
 
         if (config('app.env') === 'local') {
             $organizations = Organization::filter(request(['search']))
@@ -432,6 +435,8 @@ class OrganizationController extends Controller
             ->with('users', function ($query) use ($user) {
                 $query->where('user_id', $user['id']);
             })
+            ->orderBy('created_at', 'desc')
+            ->orderBy('expired', 'desc')
             ->get();
         }
 

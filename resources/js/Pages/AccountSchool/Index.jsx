@@ -9,7 +9,7 @@ import AccountSchoolData from './Components/AccountSchoolData';
 
 export const AccountSchool = createContext();
 
-export default function Index({ organization, accountSchool }) {
+export default function Index({ organization, accountSchool, accounts }) {
 	const [isEdit, setIsEdit] = useState(false);
 
   return (
@@ -21,7 +21,7 @@ export default function Index({ organization, accountSchool }) {
 				<div className='bg-white py-2 sm:pt-0 md:px-10 px-2 space-4'>
 					{
 						isEdit
-						? <AccountSchoolEdit accountSchool={accountSchool} />
+						? <AccountSchoolEdit accountSchool={accountSchool} accounts={accounts} />
 						: <AccountSchoolData accountSchool={accountSchool}/>
 					}
 				</div>
