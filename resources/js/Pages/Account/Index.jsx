@@ -125,7 +125,7 @@ export default function Index({
                             ? tempData.code
                             : page.props.code.toString(),
                     account_category_id: selectedAccountCategory.id,
-                    is_cash: parseInt(page.props.code) < 120000000 ? true : false,
+                    is_cash: !isEdit && parseInt(page.props.code) < 120000000 ? true : false,
                 });
             },
             preserveState: true,
@@ -141,7 +141,7 @@ export default function Index({
         });
     };
 
-    const handleEdit = (account) => {
+    const handleEdit = (account) => {        
         setSelectedAccountCategory({
             id: account.account_category_id,
             name: account.account_category.name,

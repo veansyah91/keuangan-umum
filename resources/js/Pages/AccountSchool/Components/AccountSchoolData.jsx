@@ -1,9 +1,9 @@
 import PrimaryButton from '@/Components/PrimaryButton'
 import React, { useContext } from 'react'
-import { AccountSchool } from '../Index'
+import { AccountSchoolState } from '../Index'
 
 export default function AccountSchoolData({ accountSchool }) {
-	const { isEdit, setIsEdit } = useContext(AccountSchool);
+	const { setIsEdit } = useContext(AccountSchoolState);
 
   return (
     <div className='w-full space-y-3'>						
@@ -39,6 +39,14 @@ export default function AccountSchoolData({ accountSchool }) {
 				</div>
 				<div className='w-full md:w-7/12 my-auto'>
 					<span className='hidden md:inline'>: </span>{ accountSchool?.revenue_student?.code } - { accountSchool?.revenue_student?.name }
+				</div>
+			</div>
+			<div className='md:flex gap-2'>
+				<div className='w-full md:w-3/12 font-bold md:font-normal'>
+					Akun Pendapatan Uang Masuk Siswa <span className='md:hidden'>:</span>
+				</div>
+				<div className='w-full md:w-7/12 my-auto'>
+					<span className='hidden md:inline'>: </span>{ accountSchool?.entry_student?.code } - { accountSchool?.entry_student?.name }
 				</div>
 			</div>
 			<div className='md:flex gap-2'>

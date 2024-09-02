@@ -336,14 +336,15 @@ export default function Create({ organization, newRef, contacts, date, categorie
 
                 <div className='w-full sm:w-2/3'>
                   <StudentSelectInput
-                      resources={contacts}
-                      selected={selectedContact}
-                      setSelected={(selected) => handleSelectedContact(selected)}
-                      maxHeight='max-h-40'
-                      placeholder='Cari Kontak'
-                      isError={errors.contact_id ? true : false}
-                      id='name'
-                    />
+                    resources={contacts}
+                    selected={selectedContact}
+                    setSelected={(selected) => handleSelectedContact(selected)}
+                    maxHeight='max-h-40'
+                    placeholder='Cari Kontak'
+                    isError={errors.contact_id ? true : false}
+                    id='name'
+                    notFound={<span>Tidak Ada Data. <Link className='font-bold text-blue-600' href={route('data-master.students.create', {organization:organization.id})}>Buat Baru ?</Link></span>}
+                  />
                   {errors?.name && <span className='text-red-500 text-xs'>{errors.name}</span>}
                 </div>
               </div>

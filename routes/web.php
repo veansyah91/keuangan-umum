@@ -264,7 +264,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::delete('/accounts/{account}', [AccountController::class, 'destroy'])->name('data-ledger.account.delete')->middleware('is.not.viewer');
 
             // Account School
-            Route::get('/account-scholl', [AccountSchoolController::class, 'index'])->name('data-ledger.account-school');
+            Route::get('/account-school', [AccountSchoolController::class, 'index'])->name('data-ledger.account-school');
+            Route::patch('/account-school', [AccountSchoolController::class, 'update'])->name('data-ledger.account-school.update');
 
             // Journal
             Route::get('/journals', [JournalController::class, 'index'])->name('data-ledger.journal');

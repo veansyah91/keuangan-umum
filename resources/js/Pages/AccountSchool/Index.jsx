@@ -2,18 +2,18 @@ import React, { useEffect, useState, createContext } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
 import { Head, Link, router, useForm } from '@inertiajs/react';
-import { IoArrowBackOutline, IoPlayBack, IoPlayForward, IoSearchSharp } from 'react-icons/io5';
+import { IoArrowBackOutline } from 'react-icons/io5';
 import { ToastContainer } from 'react-toastify';
 import AccountSchoolEdit from './Components/AccountSchoolEdit';
 import AccountSchoolData from './Components/AccountSchoolData';
 
-export const AccountSchool = createContext();
+export const AccountSchoolState = createContext();
 
 export default function Index({ organization, accountSchool, accounts }) {
 	const [isEdit, setIsEdit] = useState(false);
 
   return (
-    <AccountSchool.Provider value={{ isEdit, setIsEdit }}>
+    <AccountSchoolState.Provider value={{ isEdit, setIsEdit }}>
 			<Head title='Data Akun' />
 			<ToastContainer />
 
@@ -21,12 +21,12 @@ export default function Index({ organization, accountSchool, accounts }) {
 				<div className='bg-white py-2 sm:pt-0 md:px-10 px-2 space-4'>
 					{
 						isEdit
-						? <AccountSchoolEdit accountSchool={accountSchool} accounts={accounts} />
+						? <AccountSchoolEdit accountSchool={accountSchool} accounts={accounts} organization={organization} />
 						: <AccountSchoolData accountSchool={accountSchool}/>
 					}
 				</div>
 			</div>
-			</AccountSchool.Provider>
+			</AccountSchoolState.Provider>
   )
 }
 

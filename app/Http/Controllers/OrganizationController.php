@@ -499,8 +499,9 @@ class OrganizationController extends Controller
         $validated['district_id'] = $validated['addressDetail']['district_id'];
         $validated['village'] = $validated['addressDetail']['village'];
         $validated['village_id'] = $validated['addressDetail']['village_id'];
-        $organization = Organization::create($validated);
         $organization['role'] = 'admin';
+
+        $organization = Organization::create($validated);
 
         $request->user()->organizations()->attach($organization);
 
@@ -542,8 +543,9 @@ class OrganizationController extends Controller
                 $account = Account::create([
                     'code' => $filteredAccount['code'],
                     'name' => $filteredAccount['name'],
+                    'is_cash' => $filteredAccount['is_cash'] ?? false,
                     'account_category_id' => $accountCategory['id'],
-                    'organization_id' => $organization['id']
+                    'organization_id' => $organization['id'],
                 ]);				
             
                 // akun pendapatan iuran bulanan siswa

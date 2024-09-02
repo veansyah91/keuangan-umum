@@ -14,7 +14,8 @@ export default function ContactSelectInput({
     onCLick,
     isError = true,
     id = '',
-    contactFilter = ''
+    contactFilter = '',
+    notFound
 }) {
     const [query, setQuery] = useState(contactFilter);
     const [data, setData] = useState(resources);
@@ -75,7 +76,9 @@ export default function ContactSelectInput({
               className={`absolute mt-1 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm ${maxHeight} z-10`}>
               {data.length === 0 && query !== '' ? (
                 <div className='relative cursor-default select-none px-4 py-2 text-gray-700'>
-                  Nothing found.
+                  {
+                    notFound ?? 'Tidak Ada Data'
+                  }
                 </div>
               ) : (
                 data.map((d) => (

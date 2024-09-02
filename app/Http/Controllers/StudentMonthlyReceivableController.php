@@ -412,8 +412,8 @@ class StudentMonthlyReceivableController extends Controller
 		]);
 
 		$details = DB::table('s_monthly_payment_details')
-																->where('payment_id', $payment['id'])
-																->delete();
+									->where('payment_id', $payment['id'])
+									->delete();
 		
 		foreach ($validated['details'] as $detail) {
 			if ($detail['value'] > 0) {

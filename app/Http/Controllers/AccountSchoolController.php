@@ -35,4 +35,47 @@ class AccountSchoolController extends Controller
 			'accounts' => $this->accountRepository->getDataNonCash($organization['id'], request(['account'])),
 		]);
 	}
+
+	public function update(Request $request, Organization $organization, SchoolAccountSetting $accounts)
+	{
+		$validated = $request->validate([
+			'revenue_student' => [
+				'required',
+				'exists:accounts,id',
+			],
+			'receivable_monthly_student' => [
+				'required',
+				'exists:accounts,id',
+			],
+			'receivable_entry_student' => [
+				'required',
+				'exists:accounts,id',
+			],
+			'prepaid_student' => [
+				'required',
+				'exists:accounts,id',
+			],			
+			'entry_student' => [
+				'required',
+				'exists:accounts,id',
+			],	
+			'staff_salary_expense' => [
+				'required',
+				'exists:accounts,id',
+			],			
+		]);
+		
+		// cek apakah sudah ada data atau tidak
+		$account = SchoolAccountSetting::find($request->id);
+
+		if ($account) {
+			$account->update($validated);
+			return redirect()->back()->with('success', 'Tautan Akun Berhasil Diperbarui');
+		}
+		
+		$validated['organization_id'] = $organization['id'];
+		SchoolAccountSetting::create($validated);
+
+		return redirect()->back()->with('success', 'Tautan Akun Berhasil Ditambahkan');
+	}
 }

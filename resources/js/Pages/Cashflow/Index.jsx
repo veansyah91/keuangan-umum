@@ -9,9 +9,7 @@ import { FaMoneyBillTransfer } from 'react-icons/fa6';
 import { SlNotebook } from "react-icons/sl";
 import { LiaMoneyBillWaveSolid } from 'react-icons/lia';
 
-export default function Index({ organization }) {
-	console.log('arus kas');
-	
+export default function Index({ organization }) {	
 	return (
 		<>
 			<Head title='Arus Kas' />

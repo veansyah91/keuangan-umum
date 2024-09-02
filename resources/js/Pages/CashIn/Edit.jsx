@@ -268,6 +268,7 @@ export default function Edit({
                                         placeholder='Cari Kontak'
                                         isError={errors.contact_id ? true : false}
                                         id='contact'
+                                        notFound={<span>Tidak Ada Data. <Link className='font-bold text-blue-600' href={route('data-master.contact.create', {organization:organization.id})}>Buat Baru ?</Link></span>}
                                     />
                                 </div>
                             </div>
