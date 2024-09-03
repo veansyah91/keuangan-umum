@@ -88,6 +88,12 @@ class StudentMonthlyReceivableController extends Controller
   {
     $user = Auth::user();
 
+    $schoolAccount = SchoolAccountSetting::whereOrganizationId($organization['id'])->first();
+
+    if (!$schoolAccount) {
+        return redirect()->back()->withErrors(['message' => 'Silakan Tautkan Akun-Akun yang Dibutuhkan!']);
+    }
+
     $contactCategory = ContactCategory::whereOrganizationId($organization['id'])
                                             ->whereName('SISWA')
                                             ->first();

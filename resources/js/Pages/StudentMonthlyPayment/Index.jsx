@@ -59,9 +59,9 @@ export default function Index({ role, organization, payments, searchFilter, type
 		}
 	}, [debounceValue]);
 
-	useEffect(() => {
-		errors && 
-		toast.error(errors.message, {
+	useEffect(() => {		
+		errors && errors.message &&
+		toast.error(<>{errors.message} <Link href={route('data-ledger.account-school', {organization: organization.id})} className='text-blue-600 font-bold'>Tambahkan</Link></>, {
 			position: toast.POSITION.TOP_CENTER,
 		});
 	},[]);
@@ -187,7 +187,7 @@ export default function Index({ role, organization, payments, searchFilter, type
 								</Link>
 							</div>
 						)}
-					</div>
+					</div>	
 					<div className='my-auto w-4/12 flex gap-5 justify-end'>
 						<button className='py-3 px-3 border rounded-lg h-full' onClick={() => setShowModalFilter(true)}>
 								<IoFilter />

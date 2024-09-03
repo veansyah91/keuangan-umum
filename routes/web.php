@@ -244,7 +244,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::patch('/salary-category/{salaryCategory}', [SalaryCategoryController::class, 'update'])->name('data-master.salary-category.update')->middleware('is.not.viewer');
             Route::delete('/salary-category/{salaryCategory}', [SalaryCategoryController::class, 'destroy'])->name('data-master.salary-category.destroy')->middleware('is.not.viewer');
 
-
         });
 
         // Accountancy

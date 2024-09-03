@@ -319,6 +319,7 @@ export default function Create({
                                         placeholder='Cari Akun'
                                         isError={errors.cash_account_id ? true : false}
                                         id='cash_account'
+                                        notFound={<span>Tidak Ada Data. <Link className='font-bold text-blue-600' href={route('data-ledger.account', {organization:organization.id})}>Buat Baru ?</Link></span>}
                                     />
                                     {selectedCashAccount?.code && (
                                         <div className='absolute text-xs'>Kode: {selectedCashAccount.code}</div>
@@ -545,6 +546,7 @@ export default function Create({
                                                 maxHeight='max-h-40'
                                                 placeholder='Cari Akun'
                                                 isError={accountErrors[index] ? true : false}
+                                                notFound={<span>Tidak Ada Data. <Link className='font-bold text-blue-600' href={route('data-ledger.account', {organization:organization.id})}>Buat Baru ?</Link></span>}
                                             />
                                             {selectedAccount[index]?.code && (
                                                 <div className='absolute text-xs'>

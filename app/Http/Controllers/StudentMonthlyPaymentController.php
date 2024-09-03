@@ -95,14 +95,20 @@ class StudentMonthlyPaymentController extends Controller
 																	->orderBy('month', 'desc')
 																	->orderBy('date', 'desc')
 																	->paginate(50)->withQueryString(),
-			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
-			'type' => request('type') ?? 'now'
+				'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+				'type' => request('type') ?? 'now'
 		]);
 	}
 
 	public function create(Organization $organization)
 	{
 		$user = Auth::user();
+
+		$schoolAccount = SchoolAccountSetting::whereOrganizationId($organization['id'])->first();
+
+		if (!$schoolAccount) {
+			return redirect()->back()->withErrors(['message' => 'Silakan Tautkan Akun-Akun yang Dibutuhkan!']);
+		}
 
 		$contactCategory = ContactCategory::whereOrganizationId($organization['id'])
 																				->whereName('SISWA')

@@ -54,8 +54,8 @@ export default function Index({ role, organization, receivables, searchFilter })
 	}, [debounceValue]);
 
 	useEffect(() => {
-		errors && 
-		toast.error(errors.message, {
+		errors && errors.message &&
+		toast.error(<>{errors.message} <Link href={route('data-ledger.account-school', {organization: organization.id})} className='text-blue-600 font-bold'>Tambahkan</Link></>, {
 			position: toast.POSITION.TOP_CENTER,
 		});
 	},[]);

@@ -415,6 +415,7 @@ export default function Edit({
                                         placeholder='Cari Akun'
                                         isError={errors.accountCredit ? true : false}
                                         id='credit_account'
+                                        notFound={<span>Tidak Ada Data. <Link className='font-bold text-blue-600' href={route('data-ledger.account', {organization:organization.id})}>Buat Baru ?</Link></span>}
                                     />
                                     {selectedDebitAccount?.code && (
                                         <div className='absolute text-xs'>Kode: {selectedDebitAccount.code}</div>
@@ -434,6 +435,7 @@ export default function Edit({
                                         placeholder='Cari Akun'
                                         isError={errors.accountCredit ? true : false}
                                         id='debit_account'
+                                        notFound={<span>Tidak Ada Data. <Link className='font-bold text-blue-600' href={route('data-ledger.account', {organization:organization.id})}>Buat Baru ?</Link></span>}
                                     />
                                     {selectedDebitAccount?.code && (
                                         <div className='absolute text-xs'>Kode: {selectedDebitAccount.code}</div>
