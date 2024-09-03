@@ -172,7 +172,11 @@ export default function Index({ organization, accountCategories, role, searchFil
                 pageBefore={
                     accountCategories.links[0].url ? (
                         <Link
-                            href={`/data-ledger/${organization.id}/account-categories?page=${accountCategories.current_page - 1}&search=${search}`}
+                            href={route('data-ledger.account-category', {
+                                organization: organization.id,
+                                page: accountCategories.current_page - 1,
+                                search: search,
+                            })}
                             preserveState
                             only={['accountCategories']}>
                             <IoPlayBack />
@@ -186,7 +190,11 @@ export default function Index({ organization, accountCategories, role, searchFil
                 pageAfter={
                     accountCategories.links[accountCategories.links.length - 1].url ? (
                         <Link
-                            href={`/data-ledger/${organization.id}/account-categories?page=${accountCategories.current_page + 1}&search=${search}`}
+                            href={route('data-ledger.account-category', {
+                                organization: organization.id,
+                                page: accountCategories.current_page + 1,
+                                search: search,
+                            })}
                             only={['accountCategories']}
                             preserveState>
                             <IoPlayForward />

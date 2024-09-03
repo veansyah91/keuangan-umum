@@ -292,56 +292,57 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Cashflow
         Route::prefix('cashflows/{organization}')->group(function () {
-            Route::get('/', CashflowController::class)->name('cashflow');
+					Route::get('/', CashflowController::class)->name('cashflow');
 
-            // cash in
-            Route::get('/cash-in', [CashinController::class, 'index'])->name('cashflow.cash-in');
-            Route::get('/cash-in/create', [CashinController::class, 'create'])->name('cashflow.cash-in.create');
-            Route::post('/cash-in', [CashinController::class, 'store'])->name('cashflow.cash-in.post');
-            Route::get('/cash-in/{cashIn}/edit', [CashinController::class, 'edit'])->name('cashflow.cash-in.edit');
-            Route::get('/cash-in/{cashIn}', [CashinController::class, 'show'])->name('cashflow.cash-in.show');
-            Route::patch('/cash-in/{cashIn}', [CashinController::class, 'update'])->name('cashflow.cash-in.update');
-            Route::delete('/cash-in/{cashIn}', [CashinController::class, 'destroy'])->name('cashflow.cash-in.delete');
+					// cash in
+					Route::get('/cash-in', [CashinController::class, 'index'])->name('cashflow.cash-in');
+					Route::get('/cash-in/create', [CashinController::class, 'create'])->name('cashflow.cash-in.create');
+					Route::post('/cash-in', [CashinController::class, 'store'])->name('cashflow.cash-in.post');
+					Route::get('/cash-in/{cashIn}/edit', [CashinController::class, 'edit'])->name('cashflow.cash-in.edit');
+					Route::get('/cash-in/{cashIn}', [CashinController::class, 'show'])->name('cashflow.cash-in.show');
+					Route::patch('/cash-in/{cashIn}', [CashinController::class, 'update'])->name('cashflow.cash-in.update');
+					Route::delete('/cash-in/{cashIn}', [CashinController::class, 'destroy'])->name('cashflow.cash-in.delete');
 
-            //cash out
-            Route::get('/cash-out', [CashoutController::class, 'index'])->name('cashflow.cash-out');
-            Route::get('/cash-out/create', [CashoutController::class, 'create'])->name('cashflow.cash-out.create');
-            Route::post('/cash-out', [CashoutController::class, 'store'])->name('cashflow.cash-out.post');
-            Route::get('/cash-out/{cashOut}/edit', [CashoutController::class, 'edit'])->name('cashflow.cash-out.edit');
-            Route::get('/cash-out/{cashOut}', [CashoutController::class, 'show'])->name('cashflow.cash-out.show');
-            Route::patch('/cash-out/{cashOut}', [CashoutController::class, 'update'])->name('cashflow.cash-out.update');
-            Route::delete('/cash-out/{cashOut}', [CashoutController::class, 'destroy'])->name('cashflow.cash-out.delete');
+					//cash out
+					Route::get('/cash-out', [CashoutController::class, 'index'])->name('cashflow.cash-out');
+					Route::get('/cash-out/create', [CashoutController::class, 'create'])->name('cashflow.cash-out.create');
+					Route::post('/cash-out', [CashoutController::class, 'store'])->name('cashflow.cash-out.post');
+					Route::get('/cash-out/{cashOut}/edit', [CashoutController::class, 'edit'])->name('cashflow.cash-out.edit');
+					Route::get('/cash-out/{cashOut}', [CashoutController::class, 'show'])->name('cashflow.cash-out.show');
+					Route::patch('/cash-out/{cashOut}', [CashoutController::class, 'update'])->name('cashflow.cash-out.update');
+					Route::delete('/cash-out/{cashOut}', [CashoutController::class, 'destroy'])->name('cashflow.cash-out.delete');
 
-            //cash out
-            Route::get('/cash-mutation', [CashMutationController::class, 'index'])->name('cashflow.cash-mutation');
-            Route::get('/cash-mutation/create', [CashMutationController::class, 'create'])->name('cashflow.cash-mutation.create');
-            Route::get('/cash-mutation/{cashMutation}/edit', [CashMutationController::class, 'edit'])->name('cashflow.cash-mutation.edit');
-            Route::get('/cash-mutation/{cashMutation}', [CashMutationController::class, 'show'])->name('cashflow.cash-mutation.show');
-            Route::patch('/cash-mutation/{cashMutation}', [CashMutationController::class, 'update'])->name('cashflow.cash-mutation.update');
-            Route::delete('/cash-mutation/{cashMutation}', [CashMutationController::class, 'destroy'])->name('cashflow.cash-mutation.delete');
-            Route::post('/cash-mutation/create', [CashMutationController::class, 'store'])->name('cashflow.cash-mutation.post');
+					//cash out
+					Route::get('/cash-mutation', [CashMutationController::class, 'index'])->name('cashflow.cash-mutation');
+					Route::get('/cash-mutation/create', [CashMutationController::class, 'create'])->name('cashflow.cash-mutation.create');
+					Route::get('/cash-mutation/{cashMutation}/edit', [CashMutationController::class, 'edit'])->name('cashflow.cash-mutation.edit');
+					Route::get('/cash-mutation/{cashMutation}', [CashMutationController::class, 'show'])->name('cashflow.cash-mutation.show');
+					Route::patch('/cash-mutation/{cashMutation}', [CashMutationController::class, 'update'])->name('cashflow.cash-mutation.update');
+					Route::delete('/cash-mutation/{cashMutation}', [CashMutationController::class, 'destroy'])->name('cashflow.cash-mutation.delete');
+					Route::post('/cash-mutation/create', [CashMutationController::class, 'store'])->name('cashflow.cash-mutation.post');
 
-            // student monthly payment
-            Route::get('/student-monthly-payment', [StudentMonthlyPaymentController::class, 'index'])->name('cashflow.student-monthly-payment');
-            Route::get('/student-monthly-payment/create', [StudentMonthlyPaymentController::class, 'create'])->name('cashflow.student-monthly-payment.create');
-            Route::get('/student-monthly-payment/{payment}/edit', [StudentMonthlyPaymentController::class, 'edit'])->name('cashflow.student-monthly-payment.edit');
-            Route::get('/student-monthly-payment/{id}/show', [StudentMonthlyPaymentController::class, 'show'])->name('cashflow.student-monthly-payment.show');
-            Route::post('/student-monthly-payment', [StudentMonthlyPaymentController::class, 'store'])->name('cashflow.student-monthly-payment.post');
-            Route::patch('/student-monthly-payment/{payment}', [StudentMonthlyPaymentController::class, 'update'])->name('cashflow.student-monthly-payment.update');
-            Route::delete('/student-monthly-payment/{payment}', [StudentMonthlyPaymentController::class, 'destroy'])->name('cashflow.student-monthly-payment.delete');
+					// student monthly payment
+					Route::get('/student-monthly-payment', [StudentMonthlyPaymentController::class, 'index'])->name('cashflow.student-monthly-payment');
+					Route::get('/student-monthly-payment/create', [StudentMonthlyPaymentController::class, 'create'])->name('cashflow.student-monthly-payment.create');
+					Route::get('/student-monthly-payment/{payment}/edit', [StudentMonthlyPaymentController::class, 'edit'])->name('cashflow.student-monthly-payment.edit');
+					Route::get('/student-monthly-payment/{id}/show', [StudentMonthlyPaymentController::class, 'show'])->name('cashflow.student-monthly-payment.show');
+					Route::post('/student-monthly-payment', [StudentMonthlyPaymentController::class, 'store'])->name('cashflow.student-monthly-payment.post');
+					Route::patch('/student-monthly-payment/{payment}', [StudentMonthlyPaymentController::class, 'update'])->name('cashflow.student-monthly-payment.update');
+					Route::delete('/student-monthly-payment/{payment}', [StudentMonthlyPaymentController::class, 'destroy'])->name('cashflow.student-monthly-payment.delete');
 
-            // student receivable
-            Route::get('/student-monthly-receivable', [StudentMonthlyReceivableController::class, 'index'])->name('cashflow.student-monthly-receivable');
-            Route::get('/student-monthly-receivable/create', [StudentMonthlyReceivableController::class, 'create'])->name('cashflow.student-monthly-receivable.create');
-            Route::post('/student-monthly-receivable', [StudentMonthlyReceivableController::class, 'store'])->name('cashflow.student-monthly-receivable.store');
-            Route::get('/student-monthly-receivable/{receivable}', [StudentMonthlyReceivableController::class, 'show'])->name('cashflow.student-monthly-receivable.show');
-            Route::get('/student-monthly-receivable/{receivable}/edit/{ledger}', [StudentMonthlyReceivableController::class, 'edit'])->name('cashflow.student-monthly-receivable.edit');
-            Route::get('/student-monthly-receivable/{receivable}/print', [StudentMonthlyReceivableController::class, 'print'])->name('cashflow.student-monthly-receivable.print');
-            Route::patch('/student-monthly-receivable/{receivable}/edit/{ledger}', [StudentMonthlyReceivableController::class, 'update'])->name('cashflow.student-monthly-receivable.update');
-            Route::delete('/student-monthly-receivable/{receivable}/edit/{ledger}', [StudentMonthlyReceivableController::class, 'destroy'])->name('cashflow.student-monthly-receivable.delete');
-            
-						// student entry payment
-            Route::get('/student-entry-payment', [StudentEntryPaymentController::class, 'index'])->name('cashflow.student-entry-payment');
+					// student receivable
+					Route::get('/student-monthly-receivable', [StudentMonthlyReceivableController::class, 'index'])->name('cashflow.student-monthly-receivable');
+					Route::get('/student-monthly-receivable/create', [StudentMonthlyReceivableController::class, 'create'])->name('cashflow.student-monthly-receivable.create');
+					Route::post('/student-monthly-receivable', [StudentMonthlyReceivableController::class, 'store'])->name('cashflow.student-monthly-receivable.store');
+					Route::get('/student-monthly-receivable/{receivable}', [StudentMonthlyReceivableController::class, 'show'])->name('cashflow.student-monthly-receivable.show');
+					Route::get('/student-monthly-receivable/{receivable}/edit/{ledger}', [StudentMonthlyReceivableController::class, 'edit'])->name('cashflow.student-monthly-receivable.edit');
+					Route::get('/student-monthly-receivable/{receivable}/print', [StudentMonthlyReceivableController::class, 'print'])->name('cashflow.student-monthly-receivable.print');
+					Route::patch('/student-monthly-receivable/{receivable}/edit/{ledger}', [StudentMonthlyReceivableController::class, 'update'])->name('cashflow.student-monthly-receivable.update');
+					Route::delete('/student-monthly-receivable/{receivable}/edit/{ledger}', [StudentMonthlyReceivableController::class, 'destroy'])->name('cashflow.student-monthly-receivable.delete');
+					
+					// student entry payment
+					Route::get('/student-entry-payment', [StudentEntryPaymentController::class, 'index'])->name('cashflow.student-entry-payment');
+					Route::get('/student-entry-payment/create', [StudentEntryPaymentController::class, 'create'])->name('cashflow.student-entry-payment.create');
 
         });
 
