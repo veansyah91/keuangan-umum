@@ -60,13 +60,13 @@ class StudentMonthlyPaymentController extends Controller
 		$refHeader = 'IB-'.$dateRef->isoFormat('YYYY').$dateRef->isoFormat('MM');
 		$newRef = $refHeader.'0001';
 
-		$cashIn = StudentMonthlyPayment::whereOrganizationId($organization['id'])
+		$payment = StudentMonthlyPayment::whereOrganizationId($organization['id'])
 				->where('no_ref', 'like', $refHeader.'%')
 				->orderBy('no_ref','desc')
 				->first();
 
-		if ($cashIn) {
-			$newRef = NewRef::create('IB-', $cashIn['no_ref']);
+		if ($payment) {
+			$newRef = NewRef::create('IB-', $payment['no_ref']);
 		}
 
 		return $newRef;

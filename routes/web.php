@@ -39,6 +39,7 @@ use App\Http\Controllers\Admin\AdminMasterController;
 use App\Http\Controllers\Admin\UserWithdrawController;
 use App\Http\Controllers\FixedAssetCategoryController;
 use App\Http\Controllers\OrganizationInvoiceController;
+use App\Http\Controllers\StudentEntryPaymentController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\StudentMonthlyPaymentController;
 use App\Http\Controllers\Admin\OrganizationMenuController;
@@ -320,7 +321,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::delete('/cash-mutation/{cashMutation}', [CashMutationController::class, 'destroy'])->name('cashflow.cash-mutation.delete');
             Route::post('/cash-mutation/create', [CashMutationController::class, 'store'])->name('cashflow.cash-mutation.post');
 
-            // student
+            // student monthly payment
             Route::get('/student-monthly-payment', [StudentMonthlyPaymentController::class, 'index'])->name('cashflow.student-monthly-payment');
             Route::get('/student-monthly-payment/create', [StudentMonthlyPaymentController::class, 'create'])->name('cashflow.student-monthly-payment.create');
             Route::get('/student-monthly-payment/{payment}/edit', [StudentMonthlyPaymentController::class, 'edit'])->name('cashflow.student-monthly-payment.edit');
@@ -339,6 +340,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::patch('/student-monthly-receivable/{receivable}/edit/{ledger}', [StudentMonthlyReceivableController::class, 'update'])->name('cashflow.student-monthly-receivable.update');
             Route::delete('/student-monthly-receivable/{receivable}/edit/{ledger}', [StudentMonthlyReceivableController::class, 'destroy'])->name('cashflow.student-monthly-receivable.delete');
             
+						// student entry payment
+            Route::get('/student-entry-payment', [StudentEntryPaymentController::class, 'index'])->name('cashflow.student-entry-payment');
+
         });
 
     });
