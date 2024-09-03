@@ -9,7 +9,7 @@ export default function AccountSchoolData({ accountSchool }) {
     <div className='w-full space-y-3'>						
 			<div className='md:flex gap-2'>
 				<div className='w-full md:w-3/12 font-bold md:font-normal'>
-					Akun Piutang Uang Masuk Siswa <span className='md:hidden'>:</span>
+					Akun Piutang Uang Masuk / Tahunan Siswa <span className='md:hidden'>:</span>
 				</div>
 				<div className='w-full md:w-7/12 my-auto'>
 					<span className='hidden md:inline'>: </span>
@@ -43,7 +43,7 @@ export default function AccountSchoolData({ accountSchool }) {
 			</div>
 			<div className='md:flex gap-2'>
 				<div className='w-full md:w-3/12 font-bold md:font-normal'>
-					Akun Pendapatan Uang Masuk Siswa <span className='md:hidden'>:</span>
+					Akun Pendapatan Uang Masuk / Tahunan Siswa <span className='md:hidden'>:</span>
 				</div>
 				<div className='w-full md:w-7/12 my-auto'>
 					<span className='hidden md:inline'>: </span>{ accountSchool?.entry_student?.code } - { accountSchool?.entry_student?.name }

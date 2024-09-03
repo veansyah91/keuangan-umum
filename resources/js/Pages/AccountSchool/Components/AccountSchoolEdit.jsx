@@ -126,7 +126,7 @@ export default function AccountSchoolEdit({ organization, accountSchool, account
 			<div className='w-full space-y-5'>
 				<div className='md:flex gap-2'>
 					<div className='w-full md:w-3/12 font-bold md:font-normal my-auto'>
-						<InputLabel value={'Akun Piutang Uang Masuk Siswa'} htmlFor='revenue_student' />
+						<InputLabel value={'Akun Piutang Uang Masuk / Tahunan Siswa'} htmlFor='revenue_student' />
 					</div>
 					<div className='w-full md:w-7/12 my-auto'>
 						<ClientSelectInput
@@ -203,7 +203,7 @@ export default function AccountSchoolEdit({ organization, accountSchool, account
 				</div>
 				<div className='md:flex gap-2'>
 					<div className='w-full md:w-3/12 font-bold md:font-normal my-auto'>
-						<InputLabel value={'Akun Pendapatan Uang Masuk Siswa'} htmlFor='entry_student' />
+						<InputLabel value={'Akun Pendapatan Uang Masuk / Tahunan Siswa'} htmlFor='entry_student' />
 					</div>
 					<div className='w-full md:w-7/12 my-auto'>
 						<ClientSelectInput
