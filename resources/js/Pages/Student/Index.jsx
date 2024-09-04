@@ -104,7 +104,11 @@ export default function Index({ role, organization, contacts, searchFilter }) {
                 pageBefore={
                     contacts.links[0].url ? (
                         <Link
-                            href={`/data-ledger/${organization.id}/contacts?page=${contacts.current_page - 1}&search=${search}`}
+														href={route('data-master.students', {
+															organization: organization.id,
+															page: contacts.current_page - 1,
+															search: search,
+														})}
                             preserveState
                             only={['contacts']}>
                             <IoPlayBack />
@@ -118,7 +122,11 @@ export default function Index({ role, organization, contacts, searchFilter }) {
                 pageAfter={
                     contacts.links[contacts.links.length - 1].url ? (
                         <Link
-                            href={`/data-ledger/${organization.id}/contacts?page=${contacts.current_page + 1}&search=${search}`}
+														href={route('data-master.students', {
+															organization: organization.id,
+															page: contacts.current_page + 1,
+															search: search,
+														})}
                             only={['contacts']}
                             preserveState>
                             <IoPlayForward />
@@ -184,7 +192,11 @@ export default function Index({ role, organization, contacts, searchFilter }) {
                         <div className='my-auto'>
                             {contacts.links[0].url ? (
                                 <Link
-                                    href={`/admin/data-ledger/${organization.id}/contacts?page=${contacts.current_page - 1}&search=${search}`}
+																		href={route('data-master.students', {
+																			organization: organization.id,
+																			page: contacts.current_page - 1,
+																			search: search,
+																		})}
                                     preserveState
                                     only={['contacts']}>
                                     <IoPlayBack />
@@ -201,7 +213,11 @@ export default function Index({ role, organization, contacts, searchFilter }) {
                         <div className='my-auto'>
                             {contacts.links[contacts.links.length - 1].url ? (
                                 <Link
-                                    href={`/admin/data-ledger/${organization.id}/contacts?page=${contacts.current_page + 1}&search=${search}`}
+                                    href={route('data-master.students', {
+																			organization: organization.id,
+																			page: contacts.current_page + 1,
+																			search: search,
+																		})}
                                     only={['contacts']}
                                     preserveState>
                                     <IoPlayForward />

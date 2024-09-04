@@ -188,7 +188,11 @@ export default function Index({ role, organization, fixedAssetCategories, status
                 pageBefore={
                     fixedAssetCategories.links[0].url ? (
                         <Link
-                            href={`/data-master/${organization.id}/fixed-asset-categories?page=${fixedAssetCategories.current_page - 1}&search=${search}`}
+                            href={route('data-master.fixed-asset-category', {
+                                organization: organization.id,
+                                page: fixedAssetCategories.current_page - 1,
+                                search: search,
+                            })}
                             preserveState
                             only={['fixedAssetCategories']}>
                             <IoPlayBack />
@@ -202,7 +206,11 @@ export default function Index({ role, organization, fixedAssetCategories, status
                 pageAfter={
                     fixedAssetCategories.links[fixedAssetCategories.links.length - 1].url ? (
                         <Link
-                            href={`/data-master/${organization.id}/fixed-asset-categories?page=${fixedAssetCategories.current_page + 1}&search=${search}`}
+                            href={route('data-master.fixed-asset-category', {
+                                organization: organization.id,
+                                page: fixedAssetCategories.current_page + 1,
+                                search: search,
+                            })}
                             only={['fixedAssetCategories']}
                             preserveState>
                             <IoPlayForward />
@@ -266,7 +274,11 @@ export default function Index({ role, organization, fixedAssetCategories, status
                         <div className='my-auto'>
                             {fixedAssetCategories.links[0].url ? (
                                 <Link
-                                    href={`/data-master/${organization.id}/fixed-asset-categories?page=${fixedAssetCategories.current_page - 1}&search=${search}`}
+                                    href={route('data-master.fixed-asset-category', {
+                                        organization: organization.id,
+                                        page: fixedAssetCategories.current_page - 1,
+                                        search: search,
+                                    })}
                                     preserveState
                                     only={['fixedAssetCategories']}>
                                     <IoPlayBack />
@@ -283,7 +295,11 @@ export default function Index({ role, organization, fixedAssetCategories, status
                         <div className='my-auto'>
                             {fixedAssetCategories.links[fixedAssetCategories.links.length - 1].url ? (
                                 <Link
-                                    href={`/data-master/${organization.id}/fixed-asset-categories?page=${fixedAssetCategories.current_page + 1}&search=${search}`}
+                                    href={route('data-master.fixed-asset-category', {
+                                        organization: organization.id,
+                                        page: fixedAssetCategories.current_page + 1,
+                                        search: search,
+                                    })}
                                     only={['fixedAssetCategories']}
                                     preserveState>
                                     <IoPlayForward />
