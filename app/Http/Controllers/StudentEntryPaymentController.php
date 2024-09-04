@@ -61,6 +61,8 @@ class StudentEntryPaymentController extends Controller
 	public function index(Organization $organization)
 	{
 		$user = Auth::user();
+		$search = request(['search']);
+
 		return Inertia::render('StudentEntryPayment/Index', [
 			'organization' => $organization,
 			'payments' => StudentMonthlyPayment::filter(request(['search']))
@@ -72,6 +74,7 @@ class StudentEntryPaymentController extends Controller
 																	->orderBy('date', 'desc')
 																	->paginate(50)->withQueryString(),
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+			'searchFilter' => $search
 		]);
 	}
 }

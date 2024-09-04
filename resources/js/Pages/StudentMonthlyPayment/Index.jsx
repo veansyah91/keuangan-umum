@@ -130,7 +130,11 @@ export default function Index({ role, organization, payments, searchFilter, type
 				pageBefore={
 					payments.links[0].url ? (
 						<Link
-							href={`/data-ledger/${organization.id}/payments?page=${payments.current_page - 1}&search=${search}`}
+							href={route('cashflow.student-monthly-payment', {
+								organization: organization.id,
+								page: payments.current_page - 1,
+								search: search,
+							})}
 							preserveState
 							only={['payments']}>
 							<IoPlayBack />
@@ -144,7 +148,11 @@ export default function Index({ role, organization, payments, searchFilter, type
 				pageAfter={
 					payments.links[payments.links.length - 1].url ? (
 						<Link
-							href={`/data-ledger/${organization.id}/payments?page=${payments.current_page + 1}&search=${search}`}
+							href={route('cashflow.student-monthly-payment', {
+								organization: organization.id,
+								page: payments.current_page + 1,
+								search: search,
+							})}
 							only={['payments']}
 							preserveState>
 							<IoPlayForward />
@@ -215,7 +223,11 @@ export default function Index({ role, organization, payments, searchFilter, type
 						<div className='my-auto'>
 							{payments.links[0].url ? (
 								<Link
-									href={`/admin/data-ledger/${organization.id}/payments?page=${payments.current_page - 1}&search=${search}`}
+									href={route('cashflow.student-monthly-payment', {
+										organization: organization.id,
+										page: payments.current_page - 1,
+										search: search,
+									})}
 									preserveState
 									only={['payments']}>
 									<IoPlayBack />
@@ -232,7 +244,11 @@ export default function Index({ role, organization, payments, searchFilter, type
 						<div className='my-auto'>
 							{payments.links[payments.links.length - 1].url ? (
 								<Link
-									href={`/admin/data-ledger/${organization.id}/payments?page=${payments.current_page + 1}&search=${search}`}
+									href={route('cashflow.student-monthly-payment', {
+										organization: organization.id,
+										page: payments.current_page + 1,
+										search: search,
+									})}
 									only={['payments']}
 									preserveState>
 									<IoPlayForward />

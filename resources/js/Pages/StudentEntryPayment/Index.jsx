@@ -21,7 +21,9 @@ import ContentDesktop from '@/Components/Desktop/ContentDesktop';
 import DangerButton from '@/Components/DangerButton';
 import { usePrevious } from 'react-use';
 
-export default function Index({ organization, role, payments }) {
+export default function Index({ organization, role, payments, searchFilter }) {
+	const [search, setSearch] = useState(searchFilter || '');
+
   return (
     <>
 			{/* Mobile */}

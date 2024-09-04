@@ -96,7 +96,8 @@ class StudentMonthlyPaymentController extends Controller
 																	->orderBy('date', 'desc')
 																	->paginate(50)->withQueryString(),
 				'role' => $this->userRepository->getRole($user['id'], $organization['id']),
-				'type' => request('type') ?? 'now'
+				'type' => request('type') ?? 'now',
+				'searchFilter' => $search
 		]);
 	}
 

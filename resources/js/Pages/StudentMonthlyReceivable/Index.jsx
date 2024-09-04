@@ -114,7 +114,11 @@ export default function Index({ role, organization, receivables, searchFilter })
 				pageBefore={
 					receivables.links[0].url ? (
 						<Link
-							href={`/data-ledger/${organization.id}/receivables?page=${receivables.current_page - 1}&search=${search}`}
+							href={route('cashflow.student-monthly-receivable', {
+								organization: organization.id,
+								page: receivables.current_page - 1,
+								search: search,
+							})}
 							preserveState
 							only={['receivables']}>
 							<IoPlayBack />
@@ -128,7 +132,11 @@ export default function Index({ role, organization, receivables, searchFilter })
 				pageAfter={
 					receivables.links[receivables.links.length - 1].url ? (
 						<Link
-							href={`/data-ledger/${organization.id}/receivables?page=${receivables.current_page + 1}&search=${search}`}
+							href={route('cashflow.student-monthly-receivable', {
+								organization: organization.id,
+								page: receivables.current_page + 1,
+								search: search,
+							})}
 							only={['receivables']}
 							preserveState>
 							<IoPlayForward />
@@ -191,7 +199,11 @@ export default function Index({ role, organization, receivables, searchFilter })
 						<div className='my-auto'>
 							{receivables.links[0].url ? (
 								<Link
-									href={`/admin/data-ledger/${organization.id}/receivables?page=${receivables.current_page - 1}&search=${search}`}
+									href={route('cashflow.student-monthly-receivable', {
+										organization: organization.id,
+										page: receivables.current_page - 1,
+										search: search,
+									})}
 									preserveState
 									only={['receivables']}>
 									<IoPlayBack />
@@ -208,7 +220,11 @@ export default function Index({ role, organization, receivables, searchFilter })
 						<div className='my-auto'>
 							{receivables.links[receivables.links.length - 1].url ? (
 								<Link
-									href={`/admin/data-ledger/${organization.id}/receivables?page=${receivables.current_page + 1}&search=${search}`}
+									href={route('cashflow.student-monthly-receivable', {
+										organization: organization.id,
+										page: receivables.current_page + 1,
+										search: search,
+									})}
 									only={['receivables']}
 									preserveState>
 									<IoPlayForward />

@@ -16,6 +16,7 @@ export default function UserSelectInput({
     
     const [query, setQuery] = useState('');
     const [data, setData] = useState(resources);
+    
 
     useEffect(() => {
         const tempData =
@@ -26,6 +27,7 @@ export default function UserSelectInput({
                   );
 
         setData(tempData);
+        
     }, [query]);
 
     useEffect(() => {
