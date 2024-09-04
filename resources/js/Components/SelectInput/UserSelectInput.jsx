@@ -12,27 +12,37 @@ export default function UserSelectInput({
   maxHeight = 'max-h-60',
   placeholder,
   className = 'border-gray-300 border',
-}) {
-    
+}) {    
     const [query, setQuery] = useState('');
     const [data, setData] = useState(resources);
-    
+
+		const prevQuery = usePrevious(query);
+    const [debounceValue] = useDebounce(query, 500);
 
     useEffect(() => {
-        const tempData =
-            query === ''
-                ? resources
-                : resources.filter((account) =>
-                      account.name.toLowerCase().replace(/\s+/g, '').includes(query?.toLowerCase().replace(/\s+/g, ''))
-                  );
-
-        setData(tempData);
-        
-    }, [query]);
+			if (prevQuery !== undefined) {
+				handleReloadUser();
+			}
+	}, [debounceValue]);
 
     useEffect(() => {
-        setQuery(selected?.name);
+			setQuery(selected?.name);
     }, [selected]);
+
+		const handleReloadUser = () => {
+			router.reload({
+				only: ['users'],
+				data: {
+					user: query,
+				},
+				onSuccess: ({ props }) => {
+					const { users } = props;
+
+					setData(users);
+					
+				}
+			});
+		};
     return (
         <Combobox value={selected} onChange={setSelected}>
             <div className='relative mt-1'>
