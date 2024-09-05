@@ -30,11 +30,11 @@ export default function Create({
     student_id:'',
     no_ref:newRef,
     value:0,
+    paidValue: 0,
     study_year:studyYear(),
     description:'',
     details: [],
     cash_account_id: null,
-    is_paid: null
   });
 
   const [selectedContact, setSelectedContact] = useState({ id: null, name: '', phone: '' });
@@ -63,6 +63,7 @@ export default function Create({
     tempData = {
       ...tempData,
       value: tempTotal,
+      paidValue: 0,
       details: temp,
       contact_id:null,
       date:date,
@@ -71,7 +72,7 @@ export default function Create({
       no_ref:newRef,
       study_year:studyYear(),
       description:'',
-      account_id: null
+      cash_account_id: null
     }
     
     setData(tempData);
@@ -93,6 +94,8 @@ export default function Create({
 
       },
       onError: errors => {
+        console.log(errors);
+        
         toast.error(errors.error, {
           position: toast.POSITION.TOP_CENTER,
         });
@@ -113,6 +116,7 @@ export default function Create({
       study_year : e.target.value,
       description:`Kas Masuk / Pembayaran Iuran Tahunan dari ${selectedContact?.name?.toUpperCase()}  Tahun Ajaran ${e.target.value}`,
     };    
+    setData(temp);
   }
 
   const handleSelectedContact = (selected) => {    
@@ -133,6 +137,25 @@ export default function Create({
     setData('cash_account_id', selected.id);
     setError('cash_account_id','');
   };
+
+  const handleChangeValue = (values, index) => {
+    const { value } = values;
+    let tempData = [...data.details];
+    tempData[index] = { ...tempData[index], value: parseInt(value) };
+    let tempTotal = tempData.reduce((total, item) => total + item.value, 0);
+    setTotal(tempTotal);
+    setData({
+      ...data,
+      details: tempData,
+      value: tempTotal
+    })
+  }
+
+  const handleChangePaidValue = (values) => {
+    const { value } = values;
+    setData('paidValue', value ?? 0);
+    
+  }
 
   return (
     <>
@@ -159,7 +182,6 @@ export default function Create({
                     placeholder='No. Ref'
                     value={data.no_ref || ''}
                     onChange={(e) => setData('no_ref', e.target.value.toUpperCase())}
-                    disabled
                   />
                   {errors?.no_ref && <span className='text-red-500 text-xs'>{errors.no_ref}</span>}
                 </div>
@@ -323,6 +345,39 @@ export default function Create({
             <div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
               <div className='w-full sm:w-1/3 my-auto'>
                 <InputLabel
+                  value={"Jumlah Bayar"}
+                  htmlFor={`paid-value`}
+                  className=' mx-auto my-auto'
+                />
+              </div>
+
+              <div className='w-full sm:w-2/3'>
+                <NumericFormat
+                  value={data.paidValue}
+                  customInput={TextInput}
+                  onValueChange={(values) => handleChangePaidValue(values)}
+                  thousandSeparator={true}
+                  className='text-end w-full border'
+                  prefix={'IDR '}
+                  id={`paid-value`}
+                />
+                {/* {errors?.level && <span className='text-red-500 text-xs'>{errors.level}</span>} */}
+              </div>
+            </div>
+            <div className='flex flex-col sm:flex-row justify-between gap-1 sm:mt-2'>
+              <div className='w-full sm:w-1/3 my-auto'>
+                Sisa
+              </div>
+
+              <div className='w-full sm:w-2/3 text-end'>
+                Rp. {formatNumber(data.value - data.paidValue)}
+              </div>
+            </div>
+
+            {
+              data.paidValue > 0 && <div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
+              <div className='w-full sm:w-1/3 my-auto'>
+                <InputLabel
                   value={'Akun Kas'}
                   htmlFor='account'
                   className=' mx-auto my-auto'
@@ -347,6 +402,8 @@ export default function Create({
 
               </div>
             </div>
+            }
+            
 
             <div className='flex justify-end flex-col-reverse sm:flex-row gap-2 mt-5'>
               <div className='w-full sm:w-1/6 my-auto text-center'>
@@ -357,11 +414,13 @@ export default function Create({
                 </Link>
               </div>
 
-              <div className='w-full sm:w-1/6 text-center'>
-                <PrimaryButton className='w-full' disabled={processing}>
-                  <div className='text-center w-full'>Simpan</div>
-                </PrimaryButton>
-              </div>
+              {
+                (data.value - data.paidValue) >= 0 && <div className='w-full sm:w-1/6 text-center'>
+                  <PrimaryButton className='w-full' disabled={processing}>
+                    <div className='text-center w-full'>Simpan</div>
+                  </PrimaryButton>
+                </div>
+              }
             </div>
           </div>
         </div>

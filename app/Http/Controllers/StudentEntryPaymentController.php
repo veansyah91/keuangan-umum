@@ -9,6 +9,7 @@ use App\Models\Organization;
 use App\Models\StudentLevel;
 use Illuminate\Http\Request;
 use App\Models\ContactCategory;
+use Illuminate\Validation\Rule;
 use App\Models\StudentEntryPayment;
 use App\Models\SchoolAccountSetting;
 use Illuminate\Support\Facades\Auth;
@@ -119,6 +120,77 @@ class StudentEntryPaymentController extends Controller
 
 	public function store(Request $request, Organization $organization)
 	{
-		dd($request);
+		$validated = $request->validate([
+			'contact_id' => [
+				'required',
+				'exists:contacts,id',
+			],
+			'date' => [
+				'required',
+				'date',
+			],
+			'level' => [
+				'required',
+				'numeric',
+			],
+			'student_id' => [
+				'string',
+				'nullable',
+			],
+			'value' => [
+				'required',
+				'numeric',
+			],
+			'type' => [
+				'required',
+				'in:now,prepaid,receivable',
+			],
+			'month' => [
+				'required',
+				'numeric',
+			],
+			'study_year' => [
+				'string',
+				'required',
+			],
+			'details' => [
+				'required',
+			],
+			'details.*.id' => [
+				'required',
+				'exists:student_payment_categories,id'
+			],
+			'details.*.name' => [
+				'required',
+				'string'
+			],
+			'details.*.value' => [
+				'required',
+				'numeric',
+				'min:0',
+			],
+			'cash_account_id' => [
+				'required',
+				'exists:accounts,id'
+			],
+			'description' => [
+				'string',
+				'nullable'
+			],
+			'paidValue' => [
+				'required',
+				'numeric',
+				'min:0',
+			],
+			'no_ref' => [
+				'required',
+				'string',
+				Rule::unique('student_entry_payments')->where(function ($query) use ($organization) {
+					return $query->where('organization_id', $organization['id']);
+				}),
+			],
+		]);
+		dd($validated);
+
 	}
 }
