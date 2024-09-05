@@ -101,6 +101,8 @@ class StudentEntryPaymentController extends Controller
 			return redirect()->back()->withErrors(['message' => 'Silakan Buat Kategori Kontak SISWA terlebih dahulu!']);
 		}
 
+		// dd($this->contactRepository->getStudents($organization['id'], $contactCategory['id'], request(['contact'])));
+
 		return Inertia::render('StudentEntryPayment/Create',[
 			'organization' => $organization,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),

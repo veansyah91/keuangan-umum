@@ -20,7 +20,7 @@ class ContactRepository implements ContactRepositoryInterface
     public function getStudents($organizationId, $contactCategoryId, $request){
         return Contact::filter($request)
                         ->whereOrganizationId($organizationId)
-                        ->with(['contactCategories', 'student', 'levels'])
+                        ->with(['contactCategories', 'student', 'lastLevel'])
                         ->whereHas('contactCategories', function ($query) use ($contactCategoryId){
                             $query->where('contact_category_id', $contactCategoryId);
                         })

@@ -33,7 +33,8 @@ export default function Create({
     study_year:studyYear(),
     description:'',
     details: [],
-    cash_account_id: null
+    cash_account_id: null,
+    is_paid: null
   });
 
   const [selectedContact, setSelectedContact] = useState({ id: null, name: '', phone: '' });
@@ -114,7 +115,7 @@ export default function Create({
     };    
   }
 
-  const handleSelectedContact = (selected) => {
+  const handleSelectedContact = (selected) => {    
     setSelectedContact({ id: selected.id, name: selected.name, phone: selected.phone });
     let temp = data;
     temp = {
@@ -122,8 +123,15 @@ export default function Create({
       contact_id: selected.id,
       description:`Kas Masuk / Pembayaran Iuran Bulanan dari ${selected.name.toUpperCase()} Tahun Ajaran ${data.study_year}`,
       student_id: selected.student.no_ref,
-      level: selected.levels[selected.levels.length - 1].level
+      level: selected.last_level.level
     };
+    setData(temp);
+  };
+
+  const handleSelectedCashAccount = (selected) => {
+    setSelectedCashAccount({ id: selected.id, name: selected.name, code: selected.code, is_cash: true });
+    setData('cash_account_id', selected.id);
+    setError('cash_account_id','');
   };
 
   return (
@@ -342,7 +350,7 @@ export default function Create({
 
             <div className='flex justify-end flex-col-reverse sm:flex-row gap-2 mt-5'>
               <div className='w-full sm:w-1/6 my-auto text-center'>
-                <Link href={route('cashflow.student-monthly-payment', organization.id)}>
+                <Link href={route('cashflow.student-entry-payment', organization.id)}>
                   <SecondaryButton className='w-full'>
                     <div className='text-center w-full'>Kembali</div>
                   </SecondaryButton>
@@ -370,7 +378,7 @@ Create.layout = (page) => (
     organization={page.props.organization}
     title='Tambah Pembayaran'
     backLink={
-      <Link href={route('cashflow.student-monthly-payment', page.props.organization.id)}>
+      <Link href={route('cashflow.student-entry-payment', page.props.organization.id)}>
         <IoArrowBackOutline />
       </Link>
     }
@@ -381,7 +389,7 @@ Create.layout = (page) => (
             <Link href={route('cashflow', page.props.organization.id)}>Arus Kas</Link>
           </li>
           <li className='font-bold'>
-            <Link href={route('cashflow.student-monthly-payment', page.props.organization.id)}>Pembayaran Iuran Tahunan Siswa</Link>
+            <Link href={route('cashflow.student-entry-payment', page.props.organization.id)}>Pembayaran Iuran Tahunan Siswa</Link>
           </li>
           <li>Tambah Pembayaran</li>
         </ul>

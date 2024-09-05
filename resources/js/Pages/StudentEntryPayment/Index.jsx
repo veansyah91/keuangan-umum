@@ -23,10 +23,7 @@ import { usePrevious } from 'react-use';
 import StudentEntryPaymentMobile from './Components/StudentEntryPaymentMobile';
 import StudentEntryPaymentDesktop from './Components/StudentEntryPaymentDesktop';
 
-
 export default function Index({ organization, role, payments, searchFilter }) {
-	console.log(payments);
-	
 	const [search, setSearch] = useState(searchFilter || '');
 
   return (
@@ -194,7 +191,7 @@ export default function Index({ organization, role, payments, searchFilter }) {
 								</thead>
 								<tbody>
 									{payments.data.map((payment, index) => (
-										<StudentEntryDesktop
+										<StudentEntryPaymentDesktop
 											key={index}
 											payment={payment}
 											className={`${index % 2 == 0 && 'bg-gray-100'} text-sm`}

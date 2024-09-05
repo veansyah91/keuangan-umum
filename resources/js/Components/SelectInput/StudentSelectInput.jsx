@@ -108,7 +108,7 @@ export default function ContactSelectInput({
                             <div>
                               Kelas : <span>
                               {
-                                d.levels[d.levels.length - 1].level
+                                d.last_level.level
                               }
                               </span>
                             </div>
