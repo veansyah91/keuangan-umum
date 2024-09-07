@@ -101,14 +101,14 @@ export default function ContactSelectInput({
                             <div>
                               No. Siswa : <span>
                               {
-                                d.student.no_ref
+                                d.student?.no_ref
                               }
                               </span>
                             </div>
                             <div>
                               Kelas : <span>
                               {
-                                d.last_level.level
+                                d.last_level?.level
                               }
                               </span>
                             </div>

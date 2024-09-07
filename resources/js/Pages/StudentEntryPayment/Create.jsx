@@ -23,6 +23,8 @@ import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 export default function Create({
   organization, newRef, contacts, date, categories, studyYears, cashAccounts,
 }) {
+  // console.log(contacts);
+  
   const { data, setData, processing, post, errors, setError, reset } = useForm({
     contact_id:null,
     date:date,
@@ -80,6 +82,9 @@ export default function Create({
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    console.log(data);
+    
     
     post(route('cashflow.student-entry-payment.store', organization.id), {
       onSuccess: ({ props }) => {

@@ -93,9 +93,11 @@ class StudentEntryPaymentController extends Controller
 		// 																			->whereNot('role', 'viewer')->first();
 
 		// $organizationUser = Organization::with('users')->find($organization['id']);
-		$organizationUser = $user->organizations()->wherePivot('role', "<>", 'viewer')->get();
-		dd($organizationUser);
-
+		$organizationUser = $user->organizations()->where('organization_id', $organization['id'])->wherePivot('role', "<>", 'viewer')->first();
+		
+		if (!$organizationUser) {
+			return redirect()->back()->withErrors(['message' => 'Pengguna Tidak Memiliki Hak Akses!']);
+		}
 
 		$schoolAccount = SchoolAccountSetting::whereOrganizationId($organization['id'])->first();
 
@@ -159,7 +161,7 @@ class StudentEntryPaymentController extends Controller
 			],
 			'details.*.id' => [
 				'required',
-				'exists:student_payment_categories,id'
+				'exists:student_entry_payment_categories,id'
 			],
 			'details.*.name' => [
 				'required',
@@ -196,11 +198,25 @@ class StudentEntryPaymentController extends Controller
 
 		$validated = $validator->validated();
 
-		dd($validated);
+		$accounts = SchoolAccountSetting::where('organization_id', $organization['id'])->first();
 
 		// buat akun-akun
-
+		$validated['accounts'] = [
+			// akun credit (pendapatan)
+			[
+				'id' => $accounts['entry_student'],
+				'is_cash' => 0,
+				'debit' => 0,
+				'credit' => $validated['value'],
+			]
+		];
 		// jika tidak dilakukan pembayaran maka debit kan pada akun piutang saja
+		if ($validated['paidValue'] === 0) {
+			dd('paid value == 0');
+		}
+
+dd($validated);
+
 
 		// jika dilakukan pembayaran lunas $validated['value'] === $validated['paidValue'] maka debitkan pada akun kas
 
