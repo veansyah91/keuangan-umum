@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\StudentMonthlyPayment;
 use App\Repositories\Log\LogRepository;
 use App\Repositories\User\UserRepository;
+use Illuminate\Support\Facades\Validator;
 use App\Models\StudentEntryPaymentCategory;
 use App\Repositories\Account\AccountRepository;
 use App\Repositories\Contact\ContactRepository;
@@ -87,6 +88,14 @@ class StudentEntryPaymentController extends Controller
 	public function create(Organization $organization)
 	{
 		$user = Auth::user();
+		// $organizationUser = OrganizationUser::where('organization_id', $organization['id'])
+		// 																			->where('user_id', $user['id'])
+		// 																			->whereNot('role', 'viewer')->first();
+
+		// $organizationUser = Organization::with('users')->find($organization['id']);
+		$organizationUser = $user->organizations()->wherePivot('role', "<>", 'viewer')->get();
+		dd($organizationUser);
+
 
 		$schoolAccount = SchoolAccountSetting::whereOrganizationId($organization['id'])->first();
 
@@ -120,7 +129,7 @@ class StudentEntryPaymentController extends Controller
 
 	public function store(Request $request, Organization $organization)
 	{
-		$validated = $request->validate([
+		$rules = [
 			'contact_id' => [
 				'required',
 				'exists:contacts,id',
@@ -138,14 +147,6 @@ class StudentEntryPaymentController extends Controller
 				'nullable',
 			],
 			'value' => [
-				'required',
-				'numeric',
-			],
-			'type' => [
-				'required',
-				'in:now,prepaid,receivable',
-			],
-			'month' => [
 				'required',
 				'numeric',
 			],
@@ -169,10 +170,6 @@ class StudentEntryPaymentController extends Controller
 				'numeric',
 				'min:0',
 			],
-			'cash_account_id' => [
-				'required',
-				'exists:accounts,id'
-			],
 			'description' => [
 				'string',
 				'nullable'
@@ -189,8 +186,32 @@ class StudentEntryPaymentController extends Controller
 					return $query->where('organization_id', $organization['id']);
 				}),
 			],
-		]);
+		];
+
+		$validator = Validator::make($request->all(), $rules);
+
+		$validator->sometimes('cash_account_id', 'required|exists:accounts,id', function ($input) {
+			return $input->paidValue > 0;  // Hanya validasi 'cash_account_id' jika 'paidValue' bernilai > 0
+		});
+
+		$validated = $validator->validated();
+
 		dd($validated);
 
+		// buat akun-akun
+
+		// jika tidak dilakukan pembayaran maka debit kan pada akun piutang saja
+
+		// jika dilakukan pembayaran lunas $validated['value'] === $validated['paidValue'] maka debitkan pada akun kas
+
+		// jika dilakukan pembayaran sebagian atau ada sisa $validated['value'] > $validated['paidValue'] maka lakukan debit pada akun kas dan akun piutang
+
+		// buat data pada table entry payments
+
+		// jika ada piutang maka buat data pada piutang
+			
+		// buat jurnal
+
+		// buat log
 	}
 }
