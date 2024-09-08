@@ -158,7 +158,7 @@ export default function Create({
 
   const handleChangePaidValue = (values) => {
     const { value } = values;
-    setData('paidValue', value ?? 0);
+    setData('paidValue', parseInt(value) ?? 0);
     
   }
 

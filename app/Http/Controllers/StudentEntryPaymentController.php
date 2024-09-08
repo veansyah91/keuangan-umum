@@ -88,11 +88,6 @@ class StudentEntryPaymentController extends Controller
 	public function create(Organization $organization)
 	{
 		$user = Auth::user();
-		// $organizationUser = OrganizationUser::where('organization_id', $organization['id'])
-		// 																			->where('user_id', $user['id'])
-		// 																			->whereNot('role', 'viewer')->first();
-
-		// $organizationUser = Organization::with('users')->find($organization['id']);
 		$organizationUser = $user->organizations()->where('organization_id', $organization['id'])->wherePivot('role', "<>", 'viewer')->first();
 		
 		if (!$organizationUser) {
@@ -112,8 +107,6 @@ class StudentEntryPaymentController extends Controller
 		if (!$contactCategory) {
 			return redirect()->back()->withErrors(['message' => 'Silakan Buat Kategori Kontak SISWA terlebih dahulu!']);
 		}
-
-		// dd($this->contactRepository->getStudents($organization['id'], $contactCategory['id'], request(['contact'])));
 
 		return Inertia::render('StudentEntryPayment/Create',[
 			'organization' => $organization,
@@ -210,24 +203,58 @@ class StudentEntryPaymentController extends Controller
 				'credit' => $validated['value'],
 			]
 		];
+
 		// jika tidak dilakukan pembayaran maka debit kan pada akun piutang saja
 		if ($validated['paidValue'] === 0) {
-			dd('paid value == 0');
+			$validated['accounts'][] = [
+				'id' => $accounts['receivable_entry_student'],
+				'is_cash' => 0,
+				'debit' => $validated['value'],
+				'credit' => 0,
+			];
 		}
 
-dd($validated);
-
-
 		// jika dilakukan pembayaran lunas $validated['value'] === $validated['paidValue'] maka debitkan pada akun kas
+		if ($validated['paidValue'] === $validated['value']) {
+			$validated['accounts'][] = [
+				'id' => $validated['cash_account_id'],
+				'is_cash' => 1,
+				'debit' => $validated['value'],
+				'credit' => 0,
+			];
+		}
 
 		// jika dilakukan pembayaran sebagian atau ada sisa $validated['value'] > $validated['paidValue'] maka lakukan debit pada akun kas dan akun piutang
+		if ($validated['paidValue'] > 0 && ($validated['value'] - $validated['paidValue']) > 0) {
+			$validated['accounts'][] = [
+				'id' => $validated['cash_account_id'],
+				'is_cash' => 1,
+				'debit' => $validated['paidValue'],
+				'credit' => 0,
+			];
+			$validated['accounts'][] = [
+				'id' => $accounts['receivable_entry_student'],
+				'is_cash' => 0,
+				'debit' => $validated['value'] - $validated['paidValue'],
+				'credit' => 0,
+			];
 
-		// buat data pada table entry payments
+		}
+		dd($validated);
 
-		// jika ada piutang maka buat data pada piutang
+		DB::transaction(function () use ($validated){
+			// buat data pada table entry payments
+			$payment = StudentEntryPayment::create($validated);
+
+			// jika ada piutang maka buat data pada piutang
 			
-		// buat jurnal
+				
+			// buat jurnal
 
-		// buat log
+			// buat log
+		});
+
+
+		
 	}
 }
