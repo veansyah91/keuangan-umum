@@ -243,13 +243,17 @@ class StudentEntryPaymentController extends Controller
 		dd($validated);
 
 		DB::transaction(function () use ($validated){
+			// buat jurnal
+				$journal = $this->journalRepository->store($validated);
+				$validated['journal_id'] = $journal['id'];
 			// buat data pada table entry payments
 			$payment = StudentEntryPayment::create($validated);
 
 			// jika ada piutang maka buat data pada piutang
-			
+			if (condition) {
+				# code...
+			}
 				
-			// buat jurnal
 
 			// buat log
 		});
