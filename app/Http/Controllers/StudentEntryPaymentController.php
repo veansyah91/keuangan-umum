@@ -4,20 +4,25 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use Inertia\Inertia;
+use App\Helpers\NewRef;
+use App\Models\Account;
 use Carbon\CarbonImmutable;
 use App\Models\Organization;
 use App\Models\StudentLevel;
 use Illuminate\Http\Request;
 use App\Models\ContactCategory;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 use App\Models\StudentEntryPayment;
 use App\Models\SchoolAccountSetting;
 use Illuminate\Support\Facades\Auth;
 use App\Models\StudentMonthlyPayment;
+use App\Models\StudentEntryReceivable;
 use App\Repositories\Log\LogRepository;
 use App\Repositories\User\UserRepository;
 use Illuminate\Support\Facades\Validator;
 use App\Models\StudentEntryPaymentCategory;
+use App\Models\StudentEntryReceivableLedger;
 use App\Repositories\Account\AccountRepository;
 use App\Repositories\Contact\ContactRepository;
 use App\Repositories\Journal\JournalRepository;
@@ -190,14 +195,20 @@ class StudentEntryPaymentController extends Controller
 		});
 
 		$validated = $validator->validated();
+		$user = Auth::user();
+		$validated['organization_id'] = $organization['id'];
+		$validated['user_id'] = $user['id'];
+		$validated['created_by_id'] = $user['id'];
 
 		$accounts = SchoolAccountSetting::where('organization_id', $organization['id'])->first();
-
+		$entryStudentAccount = Account::find($accounts['entry_student']);
 		// buat akun-akun
 		$validated['accounts'] = [
 			// akun credit (pendapatan)
 			[
-				'id' => $accounts['entry_student'],
+				'id' => $entryStudentAccount['id'],
+				'name' => $entryStudentAccount['name'],
+				'code' => $entryStudentAccount['code'],
 				'is_cash' => 0,
 				'debit' => 0,
 				'credit' => $validated['value'],
@@ -206,8 +217,11 @@ class StudentEntryPaymentController extends Controller
 
 		// jika tidak dilakukan pembayaran maka debit kan pada akun piutang saja
 		if ($validated['paidValue'] === 0) {
+			$receivableEntryStudentAccount = Account::find($accounts['receivable_entry_student']);
 			$validated['accounts'][] = [
 				'id' => $accounts['receivable_entry_student'],
+				'name' => $receivableEntryStudentAccount['name'],
+				'code' => $receivableEntryStudentAccount['code'],
 				'is_cash' => 0,
 				'debit' => $validated['value'],
 				'credit' => 0,
@@ -216,8 +230,11 @@ class StudentEntryPaymentController extends Controller
 
 		// jika dilakukan pembayaran lunas $validated['value'] === $validated['paidValue'] maka debitkan pada akun kas
 		if ($validated['paidValue'] === $validated['value']) {
+			$cashAccount = Account::find($validated['cash_account_id']);
 			$validated['accounts'][] = [
 				'id' => $validated['cash_account_id'],
+				'name' => $cashAccount['name'],
+				'code' => $cashAccount['code'],
 				'is_cash' => 1,
 				'debit' => $validated['value'],
 				'credit' => 0,
@@ -226,40 +243,85 @@ class StudentEntryPaymentController extends Controller
 
 		// jika dilakukan pembayaran sebagian atau ada sisa $validated['value'] > $validated['paidValue'] maka lakukan debit pada akun kas dan akun piutang
 		if ($validated['paidValue'] > 0 && ($validated['value'] - $validated['paidValue']) > 0) {
+			$cashAccount = Account::find($validated['cash_account_id']);
 			$validated['accounts'][] = [
 				'id' => $validated['cash_account_id'],
+				'name' => $cashAccount['name'],
+				'code' => $cashAccount['code'],
 				'is_cash' => 1,
 				'debit' => $validated['paidValue'],
 				'credit' => 0,
 			];
+
+			$receivableEntryStudentAccount = Account::find($accounts['receivable_entry_student']);
 			$validated['accounts'][] = [
 				'id' => $accounts['receivable_entry_student'],
+				'name' => $receivableEntryStudentAccount['name'],
+				'code' => $receivableEntryStudentAccount['code'],
 				'is_cash' => 0,
 				'debit' => $validated['value'] - $validated['paidValue'],
 				'credit' => 0,
 			];
 
 		}
-		dd($validated);
 
-		DB::transaction(function () use ($validated){
+		DB::transaction(function () use ($validated, $organization, $user){
 			// buat jurnal
 				$journal = $this->journalRepository->store($validated);
 				$validated['journal_id'] = $journal['id'];
 					
 				// buat data pada table entry payments
 				$payment = StudentEntryPayment::create($validated);
+				
+				// Buat detail pembayaran
 
 			// jika ada piutang maka buat data pada piutang
-			if (condition) {
-				# code...
-			}
-				
+			if ($validated['value'] > $validated['paidValue']) {
+				// cek piutang 
+				$receivable = StudentEntryReceivable::where('organization_id', $organization['id'])
+																							->where('contact_id', $validated['contact_id'])
+																							->first();
+
+				$receivableValue = $validated['value'] - $validated['paidValue'];
+				if ($receivable) {
+					// jika sudah ada data, maka update
+					$newValue = $receivable['value'] + $receivableValue;
+					$receivable->update([
+						'value' => $newValue
+					]);
+
+				} else {
+					// jika belum, maka buat baru
+					$receivable = StudentEntryReceivable::create($validated);
+				}
+
+				// ledger
+				$detail = StudentEntryReceivableLedger::create([
+					'receivable_id' => $receivable['id'],
+					'created_by_id' => $validated['created_by_id'],
+					'payment_id' => $payment['id'],
+					'journal_id' => $journal['id'],
+					'debit' => $receivableValue,
+					'credit' => 0,
+					'no_ref' => $validated['no_ref'],
+					'description' => $validated['description'],
+					'date' => $validated['date'],
+					'study_year' => $validated['study_year'],
+				]);
+			}				
 
 			// buat log
+			$log = [
+				'description' => $validated['description'],
+				'date' => $validated['date'],
+				'no_ref' => $validated['no_ref'],
+				'value' => $validated['value'],
+			];
+	
+			$this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menambahkan DATA pada PEMBAYARAN IURAN TAHUNAN dengan DATA : '.json_encode($log));
 		});
 
-
+		return redirect()->back()->with('success', 'Pembayaran Iuran Tahunan Berhasil Ditambahkan');
 		
 	}
 }

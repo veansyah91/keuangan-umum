@@ -49,10 +49,10 @@ export default function Create({
 
   // useEffect
   useEffect(() => {
-    setDefault();
+    setDefault(newRef);
   },[]);
 
-  const setDefault = () => {
+  const setDefault = (newRef) => {
     let tempData = data;
     let temp = categories.map(category => ({
       id: category.id,
@@ -83,24 +83,21 @@ export default function Create({
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    console.log(data);
-    
-    
     post(route('cashflow.student-entry-payment.store', organization.id), {
-      onSuccess: ({ props }) => {
-        const { flash } = props;
+      only:['newRef'],
+      onSuccess: ({ props  }) => {
+        const { flash, newRef } = props;
+        console.log(props);
+        
 
         toast.success(flash.success, {
           position: toast.POSITION.TOP_CENTER,
         });
         setSelectedCashAccount({ id: null, name: '', code: '', is_cash: true });
         setSelectedContact({ id: null, name: '', phone: '' });
-        setDefault();
-
+        setDefault(newRef);
       },
-      onError: errors => {
-        console.log(errors);
-        
+      onError: errors => {        
         toast.error(errors.error, {
           position: toast.POSITION.TOP_CENTER,
         });
@@ -119,7 +116,7 @@ export default function Create({
     temp = {
       ...temp,
       study_year : e.target.value,
-      description:`Kas Masuk / Pembayaran Iuran Tahunan dari ${selectedContact?.name?.toUpperCase()}  Tahun Ajaran ${e.target.value}`,
+      description:`Pembayaran Iuran Tahunan dari ${selectedContact?.name?.toUpperCase()}  Tahun Ajaran ${e.target.value}`,
     };    
     setData(temp);
   }
@@ -130,7 +127,7 @@ export default function Create({
     temp = {
       ...temp,
       contact_id: selected.id,
-      description:`Kas Masuk / Pembayaran Iuran Bulanan dari ${selected.name.toUpperCase()} Tahun Ajaran ${data.study_year}`,
+      description:`Pembayaran Iuran Tahunan dari ${selected.name.toUpperCase()} Tahun Ajaran ${data.study_year}`,
       student_id: selected.student.no_ref,
       level: selected.last_level.level
     };
@@ -159,7 +156,6 @@ export default function Create({
   const handleChangePaidValue = (values) => {
     const { value } = values;
     setData('paidValue', parseInt(value) ?? 0);
-    
   }
 
   return (
