@@ -274,6 +274,18 @@ class StudentEntryPaymentController extends Controller
 				$payment = StudentEntryPayment::create($validated);
 				
 				// Buat detail pembayaran
+				foreach ($validated['details'] as $detail) {
+					if ($detail['value'] > 0) {
+						$data = [
+							'payment_id' => $payment['id'],
+							'student_payment_category_id' => $detail['id'],
+							'value' => $detail['value'],
+						];
+	
+						DB::table('s_yearly_payment_details')
+							->insert($data);
+					}
+				}
 
 			// jika ada piutang maka buat data pada piutang
 			if ($validated['value'] > $validated['paidValue']) {
