@@ -89,7 +89,6 @@ export default function Create({
         const { flash, newRef } = props;
         console.log(props);
         
-
         toast.success(flash.success, {
           position: toast.POSITION.TOP_CENTER,
         });
