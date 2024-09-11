@@ -344,6 +344,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 					Route::get('/student-entry-payment', [StudentEntryPaymentController::class, 'index'])->name('cashflow.student-entry-payment');
 					Route::get('/student-entry-payment/create', [StudentEntryPaymentController::class, 'create'])->name('cashflow.student-entry-payment.create');
 					Route::post('/student-entry-payment', [StudentEntryPaymentController::class, 'store'])->name('cashflow.student-entry-payment.store');
+					Route::get('/student-entry-payment/{id}', [StudentEntryPaymentController::class, 'show'])->name('cashflow.student-entry-payment.show');
+					Route::get('/student-entry-payment/{id}/edit', [StudentEntryPaymentController::class, 'edit'])->name('cashflow.student-entry-payment.edit');
 
         });
 

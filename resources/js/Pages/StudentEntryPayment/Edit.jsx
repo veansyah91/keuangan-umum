@@ -20,8 +20,8 @@ import { NumericFormat } from 'react-number-format';
 import formatNumber from '@/Utils/formatNumber';
 import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 
-export default function Create({
-  organization, newRef, contacts, date, categories, studyYears, cashAccounts,
+export default function Edit({
+  organization, newRef, contacts, date, categories, studyYears, cashAccounts, payment
 }) {
   // console.log(contacts);
   
@@ -224,7 +224,7 @@ export default function Create({
                     placeholder='Cari Kontak'
                     isError={errors.contact_id ? true : false}
                     id='name'
-                    notFound={<span>Tidak Ada Data. <Link className='font-bold text-blue-600' href={route('data-master.students.create', {organization:organization.id})}>Buat Baru ?</Link></span>}
+                    notFound={<span>Tidak Ada Data. <Link className='font-bold text-blue-600' href={route('data-master.students.Edit', {organization:organization.id})}>Buat Baru ?</Link></span>}
                   />
                   {errors?.name && <span className='text-red-500 text-xs'>{errors.name}</span>}
                 </div>
@@ -428,13 +428,13 @@ export default function Create({
   )
 }
 
-Create.layout = (page) => (
+Edit.layout = (page) => (
   <AuthenticatedLayout
-    header={<Header>Tambah Pembayaran</Header>}
+    header={<Header>Ubah Pembayaran</Header>}
     children={page}
     user={page.props.auth.user}
     organization={page.props.organization}
-    title='Tambah Pembayaran'
+    title='Ubah Pembayaran'
     backLink={
       <Link href={route('cashflow.student-entry-payment', page.props.organization.id)}>
         <IoArrowBackOutline />
@@ -449,7 +449,7 @@ Create.layout = (page) => (
           <li className='font-bold'>
             <Link href={route('cashflow.student-entry-payment', page.props.organization.id)}>Pembayaran Iuran Tahunan Siswa</Link>
           </li>
-          <li>Tambah Pembayaran</li>
+          <li>Ubah Pembayaran</li>
         </ul>
       </div>
     }

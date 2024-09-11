@@ -195,6 +195,16 @@ class StudentEntryPaymentController extends Controller
 		});
 
 		$validated = $validator->validated();
+
+		// cek apakah sudah ada transaksi pembayaran antara siswa dan tahun ajaran
+		$payment = StudentEntryPayment::where('organization_id', $organization['id'])->where('contact_id', $validated['contact_id'])
+																		->where('study_year', $validated['study_year'])
+																		->first();
+
+		if ($payment) {
+			return redirect()->back()->withErrors(['error' => 'Data is existed']);
+		}
+
 		$user = Auth::user();
 		$validated['organization_id'] = $organization['id'];
 		$validated['user_id'] = $user['id'];
@@ -334,6 +344,12 @@ class StudentEntryPaymentController extends Controller
 		});
 
 		return redirect()->back()->with('success', 'Pembayaran Iuran Tahunan Berhasil Ditambahkan');
-		
+	}
+
+	public function edit(Organization $organization, $id)
+	{
+		$payment = StudentEntryPayment::with('details')->find($id);
+
+		dd($payment);
 	}
 }
