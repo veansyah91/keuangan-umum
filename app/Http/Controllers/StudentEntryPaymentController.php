@@ -209,6 +209,7 @@ class StudentEntryPaymentController extends Controller
 		$validated['organization_id'] = $organization['id'];
 		$validated['user_id'] = $user['id'];
 		$validated['created_by_id'] = $user['id'];
+		$validated['receivable_value'] = $validated['value'] - $validated['paidValue'];
 
 		$accounts = SchoolAccountSetting::where('organization_id', $organization['id'])->first();
 		$entryStudentAccount = Account::find($accounts['entry_student']);
@@ -348,10 +349,15 @@ class StudentEntryPaymentController extends Controller
 
 	public function edit(Organization $organization, $id)
 	{
-		$payment = StudentEntryPayment::with('details')
+		$payment = StudentEntryPayment::with('details', 'receivables')
 																	->with('contact', function ($query) {
 																		return $query->with('student', 'lastLevel');
-																	})					
+																	})
+																	->with('journal', function ($query) {
+																		return $query->with('ledgers', function ($query){
+																			return $query->with('account');
+																		});
+																	})						
 																	->find($id);
 
 		$user = Auth::user();
@@ -388,5 +394,156 @@ class StudentEntryPaymentController extends Controller
 			'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),
 			'payment' => $payment
 		]);
+	}
+
+	public function update(Request $request, Organization $organization, $id)
+	{
+		$rules = [
+			'contact_id' => [
+				'required',
+				'exists:contacts,id',
+			],
+			'date' => [
+				'required',
+				'date',
+			],
+			'level' => [
+				'required',
+				'numeric',
+			],
+			'student_id' => [
+				'string',
+				'nullable',
+			],
+			'value' => [
+				'required',
+				'numeric',
+			],
+			'study_year' => [
+				'string',
+				'required',
+			],
+			'details' => [
+				'required',
+			],
+			'details.*.id' => [
+				'required',
+				'exists:student_entry_payment_categories,id'
+			],
+			'details.*.name' => [
+				'required',
+				'string'
+			],
+			'details.*.value' => [
+				'required',
+				'numeric',
+				'min:0',
+			],
+			'description' => [
+				'string',
+				'nullable'
+			],
+			'paidValue' => [
+				'required',
+				'numeric',
+				'min:0',
+			],
+			'no_ref' => [
+				'required',
+				'string',
+				Rule::unique('student_entry_payments')->where(function ($query) use ($organization) {
+					return $query->where('organization_id', $organization['id']);
+				})->ignore($id),
+			],
+		];
+
+		$validator = Validator::make($request->all(), $rules);
+
+		$validator->sometimes('cash_account_id', 'required|exists:accounts,id', function ($input) {
+			return $input->paidValue > 0;  // Hanya validasi 'cash_account_id' jika 'paidValue' bernilai > 0
+		});
+
+		$validated = $validator->validated();
+
+		// cek apakah sudah ada transaksi pembayaran antara siswa dan tahun ajaran
+		$payment = StudentEntryPayment::where('organization_id', $organization['id'])->where('contact_id', $validated['contact_id'])
+																		->where('study_year', $validated['study_year'])
+																		->first();
+
+		if ($payment && ($payment['id'] !== (int)$id)) {
+			return redirect()->back()->withErrors(['error' => 'Data is existed']);
+		}
+		
+		$validated['receivable_value'] = $validated['value'] - $validated['paidValue'];
+
+		$accounts = SchoolAccountSetting::where('organization_id', $organization['id'])->first();
+		$entryStudentAccount = Account::find($accounts['entry_student']);
+		// buat akun-akun
+		$validated['accounts'] = [
+			// akun credit (pendapatan)
+			[
+				'id' => $entryStudentAccount['id'],
+				'name' => $entryStudentAccount['name'],
+				'code' => $entryStudentAccount['code'],
+				'is_cash' => 0,
+				'debit' => 0,
+				'credit' => $validated['value'],
+			]
+		];
+
+		// jika tidak dilakukan pembayaran maka debit kan pada akun piutang saja
+		if ($validated['paidValue'] === 0) {
+			$receivableEntryStudentAccount = Account::find($accounts['receivable_entry_student']);
+			$validated['accounts'][] = [
+				'id' => $accounts['receivable_entry_student'],
+				'name' => $receivableEntryStudentAccount['name'],
+				'code' => $receivableEntryStudentAccount['code'],
+				'is_cash' => 0,
+				'debit' => $validated['value'],
+				'credit' => 0,
+			];
+		}
+
+		// jika dilakukan pembayaran lunas $validated['value'] === $validated['paidValue'] maka debitkan pada akun kas
+		if ($validated['paidValue'] === $validated['value']) {
+			$cashAccount = Account::find($validated['cash_account_id']);
+			$validated['accounts'][] = [
+				'id' => $validated['cash_account_id'],
+				'name' => $cashAccount['name'],
+				'code' => $cashAccount['code'],
+				'is_cash' => 1,
+				'debit' => $validated['value'],
+				'credit' => 0,
+			];
+		}
+
+		// jika dilakukan pembayaran sebagian atau ada sisa $validated['value'] > $validated['paidValue'] maka lakukan debit pada akun kas dan akun piutang
+		if ($validated['paidValue'] > 0 && ($validated['value'] - $validated['paidValue']) > 0) {
+			$cashAccount = Account::find($validated['cash_account_id']);
+			$validated['accounts'][] = [
+				'id' => $validated['cash_account_id'],
+				'name' => $cashAccount['name'],
+				'code' => $cashAccount['code'],
+				'is_cash' => 1,
+				'debit' => $validated['paidValue'],
+				'credit' => 0,
+			];
+
+			$receivableEntryStudentAccount = Account::find($accounts['receivable_entry_student']);
+			$validated['accounts'][] = [
+				'id' => $accounts['receivable_entry_student'],
+				'name' => $receivableEntryStudentAccount['name'],
+				'code' => $receivableEntryStudentAccount['code'],
+				'is_cash' => 0,
+				'debit' => $validated['value'] - $validated['paidValue'],
+				'credit' => 0,
+			];
+		}
+
+		DB::transaction(function () use ($validated, $organization, $user){
+			// cek apakah sudah dibuatkan piutang
+			// jika sudah ada
+		});
+		dd($validated);
 	}
 }

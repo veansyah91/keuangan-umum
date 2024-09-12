@@ -143,12 +143,12 @@ export default function Create({
     let tempData = [...data.details];
     tempData[index] = { ...tempData[index], value: parseInt(value) };
     let tempTotal = tempData.reduce((total, item) => total + item.value, 0);
-    setTotal(tempTotal);
     setData({
       ...data,
       details: tempData,
       value: tempTotal
     })
+    
   }
 
   const handleChangePaidValue = (values) => {

@@ -23,7 +23,7 @@ import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 export default function Edit({
   organization, newRef, contacts, date, categories, studyYears, cashAccounts, payment
 }) {
-  console.log(payment);
+  
   
   const { data, setData, processing, patch, errors, setError, reset } = useForm({
     contact_id:payment.contact_id,
@@ -32,7 +32,7 @@ export default function Edit({
     student_id:payment.contact.student.no_ref,
     no_ref:payment.no_ref,
     value:payment.value,
-    paidValue: 0,
+    paidValue: payment.value - payment.receivable_value,
     study_year:payment.study_year,
     description:payment.description,
     details: [],
@@ -54,39 +54,48 @@ export default function Edit({
 
   const setDefault = () => {
     let tempData = data;
-    let temp = categories.map(category => ({
-      id: category.id,
-      name: category.name,
-      value: category.value,
-    }));
+    let tempCategories = [];
 
-    let tempTotal = temp.reduce((total, item) => total + item.value, 0);
+    categories.filter((category) => {
+      let filtered = payment.details.filter(detail => detail.id == category.id);
 
-    // tempData = {
-    //   ...tempData,
-    //   value: tempTotal,
-    //   paidValue: 0,
-    //   details: temp,
-    //   contact_id:null,
-    //   date:date,
-    //   level:'',
-    //   student_id:'',
-    //   no_ref:newRef,
-    //   study_year:studyYear(),
-    //   description:'',
-    //   cash_account_id: null
-    // }
+      tempCategories = [
+        ...tempCategories,
+        {
+          id:category.id,
+          name:category.name,
+          value: filtered.length > 0 ? filtered[0].pivot.value : 0
+        }
+      ]
+    });
+
+    payment.journal.ledgers.map(ledger => {
+      if (ledger.debit > 0 && ledger.account.is_cash) {
+        tempData = {
+          ...tempData,
+          cash_account_id : ledger.account_id
+        }
+
+        setSelectedCashAccount({
+          id: ledger.account.id, name: ledger.account.name, code: ledger.account.code, is_cash: true
+        })
+      }
+    })
+
+    tempData = {
+      ...tempData,
+      details: tempCategories,
+    }
     
-    // setData(tempData);
+    setData(tempData);
   }
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    post(route('cashflow.student-entry-payment.store', organization.id), {
-      only:['newRef', 'flash'],
+    patch(route('cashflow.student-entry-payment.update', {organization: organization.id, id: payment.id}), {
       onSuccess: ({ props  }) => {
-        const { flash, newRef } = props;
+        const { flash } = props;
         
         toast.success(flash.success, {
           position: toast.POSITION.TOP_CENTER,
@@ -140,7 +149,7 @@ export default function Edit({
     let tempData = [...data.details];
     tempData[index] = { ...tempData[index], value: parseInt(value) };
     let tempTotal = tempData.reduce((total, item) => total + item.value, 0);
-    setTotal(tempTotal);
+    
     setData({
       ...data,
       details: tempData,
