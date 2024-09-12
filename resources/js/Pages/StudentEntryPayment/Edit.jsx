@@ -23,36 +23,36 @@ import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 export default function Edit({
   organization, newRef, contacts, date, categories, studyYears, cashAccounts, payment
 }) {
-  // console.log(contacts);
+  console.log(payment);
   
-  const { data, setData, processing, post, errors, setError, reset } = useForm({
-    contact_id:null,
-    date:date,
-    level:'',
-    student_id:'',
-    no_ref:newRef,
-    value:0,
+  const { data, setData, processing, patch, errors, setError, reset } = useForm({
+    contact_id:payment.contact_id,
+    date:payment.date,
+    level:payment.contact.last_level.level,
+    student_id:payment.contact.student.no_ref,
+    no_ref:payment.no_ref,
+    value:payment.value,
     paidValue: 0,
-    study_year:studyYear(),
-    description:'',
+    study_year:payment.study_year,
+    description:payment.description,
     details: [],
     cash_account_id: null,
   });
 
-  const [selectedContact, setSelectedContact] = useState({ id: null, name: '', phone: '' });
+  const [selectedContact, setSelectedContact] = useState({ id: payment.contact.id, name: payment.contact.name, phone: payment.contact.phone });
   const [selectedCashAccount, setSelectedCashAccount] = useState({ id: null, name: '', code: '', is_cash: true });
 
   const [dateValue, setDateValue] = useState({
-    startDate: date,
-    endDate: date,
+    startDate: payment.date,
+    endDate: payment.date,
   });
 
   // useEffect
   useEffect(() => {
-    setDefault(newRef);
+    setDefault();
   },[]);
 
-  const setDefault = (newRef) => {
+  const setDefault = () => {
     let tempData = data;
     let temp = categories.map(category => ({
       id: category.id,
@@ -62,22 +62,22 @@ export default function Edit({
 
     let tempTotal = temp.reduce((total, item) => total + item.value, 0);
 
-    tempData = {
-      ...tempData,
-      value: tempTotal,
-      paidValue: 0,
-      details: temp,
-      contact_id:null,
-      date:date,
-      level:'',
-      student_id:'',
-      no_ref:newRef,
-      study_year:studyYear(),
-      description:'',
-      cash_account_id: null
-    }
+    // tempData = {
+    //   ...tempData,
+    //   value: tempTotal,
+    //   paidValue: 0,
+    //   details: temp,
+    //   contact_id:null,
+    //   date:date,
+    //   level:'',
+    //   student_id:'',
+    //   no_ref:newRef,
+    //   study_year:studyYear(),
+    //   description:'',
+    //   cash_account_id: null
+    // }
     
-    setData(tempData);
+    // setData(tempData);
   }
 
   const handleSubmit = (e) => {
@@ -91,9 +91,6 @@ export default function Edit({
         toast.success(flash.success, {
           position: toast.POSITION.TOP_CENTER,
         });
-        setSelectedCashAccount({ id: null, name: '', code: '', is_cash: true });
-        setSelectedContact({ id: null, name: '', phone: '' });
-        setDefault(newRef);
       },
       onError: errors => {        
         toast.error(errors.error, {
@@ -224,7 +221,7 @@ export default function Edit({
                     placeholder='Cari Kontak'
                     isError={errors.contact_id ? true : false}
                     id='name'
-                    notFound={<span>Tidak Ada Data. <Link className='font-bold text-blue-600' href={route('data-master.students.Edit', {organization:organization.id})}>Buat Baru ?</Link></span>}
+                    notFound={<span>Tidak Ada Data. <Link className='font-bold text-blue-600' href={route('data-master.students.create', {organization:organization.id})}>Buat Baru ?</Link></span>}
                   />
                   {errors?.name && <span className='text-red-500 text-xs'>{errors.name}</span>}
                 </div>

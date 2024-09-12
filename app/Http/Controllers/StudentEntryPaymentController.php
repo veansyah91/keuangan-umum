@@ -348,8 +348,45 @@ class StudentEntryPaymentController extends Controller
 
 	public function edit(Organization $organization, $id)
 	{
-		$payment = StudentEntryPayment::with('details')->find($id);
+		$payment = StudentEntryPayment::with('details')
+																	->with('contact', function ($query) {
+																		return $query->with('student', 'lastLevel');
+																	})					
+																	->find($id);
 
-		dd($payment);
+		$user = Auth::user();
+		$organizationUser = $user->organizations()->where('organization_id', $organization['id'])->wherePivot('role', "<>", 'viewer')->first();
+		
+		if (!$organizationUser) {
+			return redirect()->back()->withErrors(['message' => 'Pengguna Tidak Memiliki Hak Akses!']);
+		}
+
+		$schoolAccount = SchoolAccountSetting::whereOrganizationId($organization['id'])->first();
+
+		if (!$schoolAccount) {
+			return redirect()->back()->withErrors(['message' => 'Silakan Tautkan Akun-Akun yang Dibutuhkan!']);
+		}
+
+		$contactCategory = ContactCategory::whereOrganizationId($organization['id'])
+																				->whereName('SISWA')
+																				->first();
+
+		if (!$contactCategory) {
+			return redirect()->back()->withErrors(['message' => 'Silakan Buat Kategori Kontak SISWA terlebih dahulu!']);
+		}
+		
+		return Inertia::render('StudentEntryPayment/Edit',[
+			'organization' => $organization,
+			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+			'categories' => StudentEntryPaymentCategory::whereOrganizationId($organization['id'])
+																							->whereIsActive(true)
+																							->get(),
+			'newRef' => $this->newRef($organization, request('date')),
+			'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
+			'studyYears' => StudentLevel::select('year')->distinct()->take(10)->get(),
+			'contacts' => $this->contactRepository->getStudents($organization['id'], $contactCategory['id'], request(['contact'])),
+			'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),
+			'payment' => $payment
+		]);
 	}
 }
