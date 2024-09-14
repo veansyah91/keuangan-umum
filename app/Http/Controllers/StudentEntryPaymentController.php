@@ -458,6 +458,7 @@ class StudentEntryPaymentController extends Controller
 		];
 
 		$validator = Validator::make($request->all(), $rules);
+		$user = Auth::user();
 
 		$validator->sometimes('cash_account_id', 'required|exists:accounts,id', function ($input) {
 			return $input->paidValue > 0;  // Hanya validasi 'cash_account_id' jika 'paidValue' bernilai > 0
@@ -540,10 +541,89 @@ class StudentEntryPaymentController extends Controller
 			];
 		}
 
-		DB::transaction(function () use ($validated, $organization, $user){
+		DB::transaction(function () use ($validated, $organization, $user, $id){
 			// cek apakah sudah dibuatkan piutang
-			// jika sudah ada
+			// jika sudah ada maka kurangi piutang
+			$studentReceivable = StudentEntryPayment::where('organization_id', $organization['id'])
+																							->where('contact_id', $validated['contact_id'])
+																							->first();
+
+			$payment = StudentEntryPayment::find($id);
+
+			$tempStudentReceivableValue = 0;
+			if ($studentReceivable) {
+				// cek apakah jika piutang baru lebih kecil dari jumlah yang telah dibayarkan, maka kirimkan pesan error
+				$receivableDetails = DB::table('student_entry_receivable_ledgers')
+																->where('payment_id', $id);
+
+				$sumCredit = $receivableDetails->sum('credit');
+
+				if ($validated['receivable_value'] < $sumCredit) {
+					return redirect()->back()->withErrors(['paidValue' => 'Error']);
+				}
+
+				$tempStudentReceivableValue = $studentReceivable['value'] - $payment['value'] + $validated['value'];
+
+				$studentReceivable->update([
+					'value' => $tempStudentReceivableValue
+				]);
+
+				$debitData = $receivableDetails->where('debit', '>', 0)->first();
+
+				$receivableDetail = DB::table('student_entry_receivable_ledgers')
+																->where('payment_id', $id)
+																->where('debit', '>', 0)->first();
+
+				$receivableDetail->update([
+					'no_ref' => $validated['no_ref'],
+					'description' => $validated['description'],
+					'date' => $validated['date'],
+					'study_year' => $valistudy_yeard['date'],
+				]);
+			}
+
+			// hapus detail pembayaran
+			DB::table('s_yearly_payment_details')
+					->where('payment_id', $id)
+					->delete();
+
+			$payment->update($validated);
+
+			// Buat detail pembayaran
+			foreach ($validated['details'] as $detail) {
+				if ($detail['value'] > 0) {
+					$data = [
+						'payment_id' => $payment['id'],
+						'student_payment_category_id' => $detail['id'],
+						'value' => $detail['value'],
+					];
+
+					DB::table('s_yearly_payment_details')
+						->insert($data);
+				}
+			}
+
+			// jika ada piutang maka buat data pada piutang
+			if (($validated['value'] > $validated['paidValue']) && !$studentReceivable) {
+				$receivable = StudentEntryReceivable::create($validated);
+
+				// ledger
+				$detail = StudentEntryReceivableLedger::create([
+					'receivable_id' => $receivable['id'],
+					'created_by_id' => $validated['created_by_id'],
+					'payment_id' => $payment['id'],
+					'journal_id' => $journal['id'],
+					'debit' => $receivableValue,
+					'credit' => 0,
+					'no_ref' => $validated['no_ref'],
+					'description' => $validated['description'],
+					'date' => $validated['date'],
+					'study_year' => $validated['study_year'],
+				]);
+			}		
+
+			// journal
+			$this->journalRepository->update($validated, $payment->journal);
 		});
-		dd($validated);
 	}
 }

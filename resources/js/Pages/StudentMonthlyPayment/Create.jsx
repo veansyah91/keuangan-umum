@@ -89,7 +89,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
       },
       onSuccess: ({ props }) => {
         const { historyCategories, historyPayment } = props;
-        
+
         let tempCategories = [];
         
         categories.filter((category, index) => {
@@ -172,13 +172,14 @@ export default function Create({ organization, newRef, contacts, date, categorie
 
   const handleSelectedContact = (selected) => {
     setSelectedContact({ id: selected.id, name: selected.name, phone: selected.phone });
+    
     let temp = data;
     temp = {
       ...temp,
       contact_id: selected.id,
       description:`Kas Masuk / Pembayaran Iuran Bulanan dari ${selected.name.toUpperCase()} Bulan ${data.month}, Tahun Ajaran ${data.study_year}`,
       student_id: selected.student.no_ref,
-      level: selected.levels[selected.levels.length - 1].level
+      level: selected.last_level.level
     };
 
     handleHistoryCategoryReload(temp, selected.id);

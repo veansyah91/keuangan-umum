@@ -165,7 +165,7 @@ export default function Edit({ organization, newRef, contacts, date, categories,
       contact_id: selected.id,
       description:`Kas Masuk / Pembayaran Iuran Bulanan dari ${selectedContact.name.toUpperCase()} Bulan ${data.month}, Tahun Ajaran ${data.study_year}`,
       student_id: selected.student.no_ref,
-      level: selected.levels[selected.levels.length - 1].level
+      level: selected.last_level.level
     };
 
     handleHistoryCategoryReload(temp, selected.id);
