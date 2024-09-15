@@ -651,7 +651,6 @@ class StudentMonthlyPaymentController extends Controller
 				// hapus jurnal
 				$journal->delete();
 
-				return redirect()->back()->with('success', 'Data Pembayaran Berhasil Dihapus');
 			});
 		}
 
@@ -668,5 +667,7 @@ class StudentMonthlyPaymentController extends Controller
 			});
 
 		}
+
+		return redirect()->back()->with('success', 'Data Pembayaran Berhasil Dihapus');
 	}
 }

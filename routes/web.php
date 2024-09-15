@@ -347,6 +347,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 					Route::get('/student-entry-payment/{id}', [StudentEntryPaymentController::class, 'show'])->name('cashflow.student-entry-payment.show');
 					Route::get('/student-entry-payment/{id}/edit', [StudentEntryPaymentController::class, 'edit'])->name('cashflow.student-entry-payment.edit');
 					Route::patch('/student-entry-payment/{id}', [StudentEntryPaymentController::class, 'update'])->name('cashflow.student-entry-payment.update');
+					Route::delete('/student-entry-payment/{payment}', [StudentEntryPaymentController::class, 'destroy'])->name('cashflow.student-entry-payment.delete');
 
         });
 

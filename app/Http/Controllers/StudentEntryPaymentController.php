@@ -625,4 +625,9 @@ class StudentEntryPaymentController extends Controller
 			$this->journalRepository->update($validated, $payment->journal);
 		});
 	}
+
+	public function destroy(Organization $organization, StudentEntryPayment $payment)
+	{
+		dd($payment);
+	}
 }

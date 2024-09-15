@@ -25,6 +25,55 @@ import StudentEntryPaymentDesktop from './Components/StudentEntryPaymentDesktop'
 
 export default function Index({ organization, role, payments, searchFilter }) {
 	const [search, setSearch] = useState(searchFilter || '');
+	const [titleDeleteModal, setTitleDeleteModal] = useState('');
+	const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+	const [showModalFilter, setShowModalFilter] = useState(false);
+	const {
+		data,
+		setData,
+		delete: destroy,
+		processing,
+		reset,
+	} = useForm({
+		id: 0,
+	});
+
+	const [dataFilter, setDataFilter] = useState({
+		entryYear: null,
+	});
+
+	const handleDelete = (payment) => {
+		setTitleDeleteModal(`Hapus Pembayaran No Ref ${payment.no_ref}`);
+		setShowDeleteConfirmation(true);
+		setData('id', payment.id);
+	};
+
+	const handleFilter = (e) => {
+		e.preventDefault();
+		
+		handleReloadPage();
+		setShowModalFilter(false);
+	};
+
+	const handleSubmitDelete = (e) => {
+		e.preventDefault();
+
+		destroy(route('cashflow.student-entry-payment.delete', { organization: organization.id, payment: data.id }), {
+			onSuccess: () => {
+				setShowDeleteConfirmation(false);
+				toast.success(`Pembayaran Berhasil Dihapus`, {
+					position: toast.POSITION.TOP_CENTER,
+				});
+				reset();
+			},
+			onError: (error) => {
+				setShowDeleteConfirmation(false);
+				toast.error(error.message, {
+					position: toast.POSITION.TOP_CENTER,
+				});
+			},
+		});
+	};
 
   return (
     <>
@@ -206,6 +255,53 @@ export default function Index({ organization, role, payments, searchFilter }) {
 				</div>
 			</ContainerDesktop>
 			{/* Desktop */}
+
+			{/* Modal */}
+			{/* Filter  */}
+			<Modal show={showModalFilter} onClose={() => setShowModalFilter(false)}>
+				<form onSubmit={handleFilter} className='p-6' id='filter' name='filter'>
+					<h2 className='text-lg font-medium text-gray-900'>Filter Pembayaran Iuran Bulanan</h2>
+
+					<div className='mt-6 '>
+						<div className='flex flex-col sm:flex-row w-full gap-1'>
+								<div className='sm:w-1/4 w-full my-auto font-bold'>Tipe</div>
+								<div className='sm:w-3/4 w-full flex'>
+									<select 
+                    className="select select-bordered w-full" 
+                    value={dataFilter.type} 
+                    onChange={e => setDataFilter({...dataFilter, type: e.target.value})} 
+                    id='study_year'
+                  >
+                    <option value={'all'}>Semua</option>
+                    <option value={'now'}>Lunas</option>
+                    <option value={'receivable'}>Belum Bayar</option>
+                    <option value={'prepaid'}>Bayar Dimuka</option>
+                  </select>
+								</div>
+						</div>
+					</div>
+
+					<div className='mt-6 flex justify-end'>
+						<SecondaryButton onClick={() => setShowModalFilter(false)}>Batal</SecondaryButton>
+
+						<PrimaryButton className='ms-3'>Filter</PrimaryButton>
+					</div>
+				</form>
+			</Modal>
+			<Modal show={showDeleteConfirmation} onClose={() => setShowDeleteConfirmation(false)}>
+				<form onSubmit={handleSubmitDelete} className='p-6'>
+					<h2 className='text-lg font-medium text-gray-900 text-center'>{titleDeleteModal}</h2>
+
+					<div className='mt-6 flex justify-end'>
+						<SecondaryButton onClick={() => setShowDeleteConfirmation(false)}>Batal</SecondaryButton>
+
+						<DangerButton className='ms-3' disabled={processing}>
+							Hapus
+						</DangerButton>
+					</div>
+				</form>
+			</Modal>
+			{/* Modal */}
 		</>
   )
 }
