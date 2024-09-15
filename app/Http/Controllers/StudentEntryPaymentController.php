@@ -628,6 +628,9 @@ class StudentEntryPaymentController extends Controller
 
 	public function destroy(Organization $organization, StudentEntryPayment $payment)
 	{
+		// cek apakah sudah dilakukan pembayaran piutang
+		$receivableLedger = StudentEntryReceivableLedger::where('payment_id');
 		dd($payment);
+
 	}
 }
