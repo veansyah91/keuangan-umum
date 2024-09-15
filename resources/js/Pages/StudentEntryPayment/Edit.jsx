@@ -24,7 +24,6 @@ export default function Edit({
   organization, newRef, contacts, date, categories, studyYears, cashAccounts, payment
 }) {
   
-  
   const { data, setData, processing, patch, errors, setError, reset } = useForm({
     contact_id:payment.contact_id,
     date:payment.date,
@@ -34,7 +33,7 @@ export default function Edit({
     value:payment.value,
     paidValue: payment.value - payment.receivable_value,
     study_year:payment.study_year,
-    description:payment.description,
+    description:payment.journal.description,
     details: [],
     cash_account_id: null,
   });
@@ -92,6 +91,9 @@ export default function Edit({
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    console.log(data);
+    
 
     patch(route('cashflow.student-entry-payment.update', {organization: organization.id, id: payment.id}), {
       onSuccess: ({ props  }) => {

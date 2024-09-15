@@ -475,6 +475,9 @@ class StudentEntryPaymentController extends Controller
 			return redirect()->back()->withErrors(['error' => 'Data is existed']);
 		}
 		
+		$validated['organization_id'] = $organization['id'];
+		$validated['user_id'] = $user['id'];
+		$validated['created_by_id'] = $user['id'];
 		$validated['receivable_value'] = $validated['value'] - $validated['paidValue'];
 
 		$accounts = SchoolAccountSetting::where('organization_id', $organization['id'])->first();
@@ -553,8 +556,7 @@ class StudentEntryPaymentController extends Controller
 			$tempStudentReceivableValue = 0;
 			if ($studentReceivable) {
 				// cek apakah jika piutang baru lebih kecil dari jumlah yang telah dibayarkan, maka kirimkan pesan error
-				$receivableDetails = DB::table('student_entry_receivable_ledgers')
-																->where('payment_id', $id);
+				$receivableDetails = StudentEntryReceivableLedger::where('payment_id', $id);
 
 				$sumCredit = $receivableDetails->sum('credit');
 
@@ -570,15 +572,12 @@ class StudentEntryPaymentController extends Controller
 
 				$debitData = $receivableDetails->where('debit', '>', 0)->first();
 
-				$receivableDetail = DB::table('student_entry_receivable_ledgers')
-																->where('payment_id', $id)
-																->where('debit', '>', 0)->first();
-
-				$receivableDetail->update([
+				$debitData->update([
 					'no_ref' => $validated['no_ref'],
 					'description' => $validated['description'],
 					'date' => $validated['date'],
-					'study_year' => $valistudy_yeard['date'],
+					'study_year' => $validated['study_year'],
+					'debit' => $validated['receivable_value'],
 				]);
 			}
 
@@ -613,7 +612,7 @@ class StudentEntryPaymentController extends Controller
 					'created_by_id' => $validated['created_by_id'],
 					'payment_id' => $payment['id'],
 					'journal_id' => $journal['id'],
-					'debit' => $receivableValue,
+					'debit' => $validated['receivable_value'],
 					'credit' => 0,
 					'no_ref' => $validated['no_ref'],
 					'description' => $validated['description'],
