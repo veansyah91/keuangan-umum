@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Inertia\Inertia;
 use App\Helpers\NewRef;
 use App\Models\Account;
+use App\Models\Journal;
 use Carbon\CarbonImmutable;
 use App\Models\Organization;
 use App\Models\StudentLevel;
@@ -84,6 +85,7 @@ class StudentEntryPaymentController extends Controller
 																	->whereOrganizationId($organization['id'])
 																	->orderBy('study_year', 'desc')
 																	->orderBy('date', 'desc')
+																	->orderBy('no_ref', 'desc')
 																	->paginate(50)->withQueryString(),
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'searchFilter' => $search
@@ -623,14 +625,74 @@ class StudentEntryPaymentController extends Controller
 
 			// journal
 			$this->journalRepository->update($validated, $payment->journal);
+
+			// buat log
+			$log = [
+				'description' => $validated['description'],
+				'date' => $validated['date'],
+				'no_ref' => $validated['no_ref'],
+				'value' => $validated['value'],
+			];
+
+			$this->logRepository->store($organization['id'], strtoupper($user['name']).' telah mengubah DATA pada PEMBAYARAN IURAN TAHUNAN dengan DATA : '.json_encode($log));
 		});
+
+		return redirect()->back()->with('success', 'Pembayaran Iuran Tahunan Berhasil Diubah');
 	}
 
 	public function destroy(Organization $organization, StudentEntryPayment $payment)
 	{
 		// cek apakah sudah dilakukan pembayaran piutang
-		$receivableLedger = StudentEntryReceivableLedger::where('payment_id');
-		dd($payment);
+		$receivableLedger = StudentEntryReceivableLedger::where('payment_id', $payment['id']);
+
+		if ($receivableLedger->where('credit', '>', 0)->count() > 0) {
+			return redirect()->back()->withErrors(['error' => "Can't deleted"]);
+		}
+
+		DB::transaction(function () use ($receivableLedger, $payment){
+			// hapus detail pembayaran
+			DB::table('s_yearly_payment_details')
+					->where('payment_id', $payment['id'])
+					->delete();
+
+			// hapus detail piutang
+			$receivableDetail = $receivableLedger->where('debit', '>', 0)->first();
+
+			if ($receivableDetail) {
+				$receivableDetail->delete();
+
+				// kurangi piutang siswa
+				$studentReceivable = StudentEntryReceivable::where('contact_id', $payment['contact_id'])
+																										->first();
+
+				$newStudentReceivableValue = $studentReceivable['value'] - $payment['receivable_value'];
+
+				$studentReceivable->update([
+					'value' => $newStudentReceivableValue
+				]);
+			}
+			
+			DB::table('s_yearly_payment_details')
+					->where('payment_id', $payment['id'])
+					->delete();
+
+			$journal = Journal::find($payment['journal_id']);
+			$payment->delete();
+
+			$journal->delete();
+
+			// buat log
+			$log = [
+				'description' => $validated['description'],
+				'date' => $validated['date'],
+				'no_ref' => $validated['no_ref'],
+				'value' => $validated['value'],
+			];
+	
+			$this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menghapus DATA pada PEMBAYARAN IURAN TAHUNAN dengan DATA : '.json_encode($log));
+		});
+
+		return redirect()->back()->with('success', 'Pembayaran Iuran Tahunan Berhasil Dihapus');
 
 	}
 }
