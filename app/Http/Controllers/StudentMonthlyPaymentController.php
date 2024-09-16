@@ -650,7 +650,6 @@ class StudentMonthlyPaymentController extends Controller
 
 				// hapus jurnal
 				$journal->delete();
-
 			});
 		}
 

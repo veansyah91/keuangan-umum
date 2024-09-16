@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Inertia\Inertia;
 use App\Helpers\NewRef;
 use App\Models\Account;
+use App\Models\Contact;
 use App\Models\Journal;
 use Carbon\CarbonImmutable;
 use App\Models\Organization;
@@ -640,6 +641,21 @@ class StudentEntryPaymentController extends Controller
 		return redirect()->back()->with('success', 'Pembayaran Iuran Tahunan Berhasil Diubah');
 	}
 
+	public function show(Organization $organization, $id)
+	{
+		$user = Auth::user();
+
+		$payment = StudentEntryPayment::with('details')->find($id);
+
+		return Inertia::render('StudentEntryPayment/Show',[
+			'organization' => $organization,
+			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+			'user' => $user,
+			'payment' => $payment,
+			'contact' => Contact::with(['student', 'lastLevel'])->find($payment['contact_id']),
+		]);
+	}
+
 	public function destroy(Organization $organization, StudentEntryPayment $payment)
 	{
 		// cek apakah sudah dilakukan pembayaran piutang
@@ -649,7 +665,10 @@ class StudentEntryPaymentController extends Controller
 			return redirect()->back()->withErrors(['error' => "Can't deleted"]);
 		}
 
-		DB::transaction(function () use ($receivableLedger, $payment){
+		$user = Auth::user();
+
+		DB::transaction(function () use ($receivableLedger, $payment, $user){
+
 			// hapus detail pembayaran
 			DB::table('s_yearly_payment_details')
 					->where('payment_id', $payment['id'])
@@ -683,13 +702,13 @@ class StudentEntryPaymentController extends Controller
 
 			// buat log
 			$log = [
-				'description' => $validated['description'],
-				'date' => $validated['date'],
-				'no_ref' => $validated['no_ref'],
-				'value' => $validated['value'],
+				'description' => $journal['description'],
+				'date' => $journal['date'],
+				'no_ref' => $journal['no_ref'],
+				'value' => $journal['value'],
 			];
 	
-			$this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menghapus DATA pada PEMBAYARAN IURAN TAHUNAN dengan DATA : '.json_encode($log));
+			$this->logRepository->store($payment['organization_id'], strtoupper($user['name']).' telah menghapus DATA pada PEMBAYARAN IURAN TAHUNAN dengan DATA : '.json_encode($log));
 		});
 
 		return redirect()->back()->with('success', 'Pembayaran Iuran Tahunan Berhasil Dihapus');
