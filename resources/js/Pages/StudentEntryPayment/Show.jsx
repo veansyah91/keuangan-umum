@@ -10,7 +10,6 @@ import formatNumber from '@/Utils/formatNumber';
 import { toast, ToastContainer } from 'react-toastify';
 
 export default function Show({ contact, organization, role, payment, user }) {	
-  console.log(contact);
   
 	const [waLink] = useState('https://web.whatsapp.com/send');
 
@@ -30,10 +29,8 @@ export default function Show({ contact, organization, role, payment, user }) {
 		}
 
 		if (phone[0] !== '6' && phone[1] !== '2') {
-			phone = '62' + phone;
+			phone = "62" + phone.slice(1);
 		}
-
-    console.log(phone);
 
 
 		let detail = '';
@@ -42,9 +39,9 @@ export default function Show({ contact, organization, role, payment, user }) {
 			detail += `%0A${index+1}. ${r.name} : IDR ${formatNumber(r.pivot.value)}`;
 		});
 
-		detail += `%0A*Total: ${ formatNumber(payment.value) }*`
+		detail += `%0A*Total: IDR. ${ formatNumber(payment.value) }*%0A*Jumlah Bayar: IDR. ${ formatNumber(payment.value - payment.receivable_value) }*%0A*Sisa: IDR. ${ formatNumber(payment.receivable_value) }*`
 		
-		let message = `*PEMBAYARAN IURAN TAHUNAN*%0A-------------------------------------------------------%0A*Nama*: ${contact.name}%0A*No. Siswa*: ${contact.student.no_ref ?? '-'}%0A*Tahun Masuk*: ${contact.student.entry_year}%0A*Kelas Sekarang*: ${contact.last_level.level}%0A-------------------------------------------------------%0A*No Ref*: ${payment.no_ref}%0A*Tanggal*: ${dayjs(payment.date).locale('id').format('DD MMMM YYYY')}%0A*Bulan*: ${payment.month} (${payment.study_year})%0A*Total*: IDR. ${formatNumber(payment.value)}%0A%0A*DETAIL:*${detail}%0A%0A%0ATtd,%0A%0A%0A*${organization.name}*`;
+		let message = `*PEMBAYARAN IURAN TAHUNAN*%0A-------------------------------------------------------%0A*Nama*: ${contact.name}%0A*No. Siswa*: ${contact.student.no_ref ?? '-'}%0A*Tahun Masuk*: ${contact.student.entry_year}%0A*Kelas Sekarang*: ${contact.last_level.level}%0A-------------------------------------------------------%0A*No Ref*: ${payment.no_ref}%0A*Tanggal*: ${dayjs(payment.date).locale('id').format('DD MMMM YYYY')}%0A*Tahun Ajaran*: ${payment.study_year}%0A%0A*DETAIL:*${detail}%0A%0A%0ATtd,%0A%0A%0A*${organization.name}*`;
 
 		let whatsapp = `${waLink}?phone=${phone}&text=${message}`
 

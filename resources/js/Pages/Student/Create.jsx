@@ -121,7 +121,7 @@ export default function Create({ organization, category }) {
                                     id='phone'
                                     name='phone'
                                     className={`w-full ${errors?.phone && 'border-red-500'}`}
-                                    placeholder='No. Handphone'
+                                    placeholder='08xxxxx / 62xxxxx'
                                     value={data.phone}
                                     onChange={(e) => setData('phone', e.target.value.toUpperCase())}
                                 />

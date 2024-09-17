@@ -675,7 +675,7 @@ class StudentEntryPaymentController extends Controller
 					->delete();
 
 			// hapus detail piutang
-			$receivableDetail = $receivableLedger->where('debit', '>', 0)->first();
+			$receivableDetail = StudentEntryReceivableLedger::where('payment_id', $payment['id'])->first();
 
 			if ($receivableDetail) {
 				$receivableDetail->delete();
