@@ -22,8 +22,10 @@ import DangerButton from '@/Components/DangerButton';
 import { usePrevious } from 'react-use';
 import StudentMonthlyPaymentMobile from './Components/StudentMonthlyPaymentMobile';
 import StudentMonthlyPaymentDesktop from './Components/StudentMonthlyPaymentDesktop';
+import Datepicker from 'react-tailwindcss-datepicker';
 
-export default function Index({ role, organization, payments, searchFilter, type }) {   
+export default function Index({ role, organization, payments, searchFilter, type, startDate,
+	endDate }) {   
 	// State
 	const { errors } = usePage().props;
 
@@ -52,12 +54,18 @@ export default function Index({ role, organization, payments, searchFilter, type
 	const prevSearch = usePrevious(search);
 	const [debounceValue] = useDebounce(search, 500);
 
+	const [dateValue, setDateValue] = useState({
+		startDate: startDate || '',
+		endDate: endDate || '',
+	});
+	const [debounceDateValue] = useDebounce(dateValue, 500);
+
 	// useState
 	useEffect(() => {
 		if (prevSearch !== undefined) {
 			handleReloadPage();
 		}
-	}, [debounceValue]);
+	}, [debounceValue, debounceDateValue]);
 
 	useEffect(() => {		
 		errors && errors.message &&
@@ -72,6 +80,8 @@ export default function Index({ role, organization, payments, searchFilter, type
 			only: ['payments'],
 			data: {
 				search,
+				start_date: dateValue.startDate,
+				end_date: dateValue.endDate,
 				type: dataFilter.type
 			},
 			preserveState: true,
@@ -109,6 +119,10 @@ export default function Index({ role, organization, payments, searchFilter, type
 				});
 			},
 		});
+	};
+
+	const handleDateValueChange = (newValue) => {
+		setDateValue(newValue);
 	};
 
 	return (
@@ -171,6 +185,9 @@ export default function Index({ role, organization, payments, searchFilter, type
 				data={payments}
 				hasFilter={true}
 				showFilter={() => setShowModalFilter(true)}
+				hasDate={true}
+				dateValue={dateValue}
+				onChangeDate={handleDateValueChange}
 			/>
 			<ContentMobile>
 				{payments.data.map((payment) => (
@@ -187,7 +204,7 @@ export default function Index({ role, organization, payments, searchFilter, type
 			{/* Desktop */}
 			<ContainerDesktop>
 				<TitleDesktop>
-					<div className='my-auto w-7/12'>
+					<div className='my-auto w-5/12'>
 						{role !== 'viewer' && (
 							<div className='space-x-2'>
 								<Link href={route('cashflow.student-monthly-payment.create', organization.id)}>
@@ -198,8 +215,24 @@ export default function Index({ role, organization, payments, searchFilter, type
 					</div>	
 					<div className='my-auto w-4/12 flex gap-5 justify-end'>
 						<button className='py-3 px-3 border rounded-lg h-full' onClick={() => setShowModalFilter(true)}>
-								<IoFilter />
+							<IoFilter />
 						</button>
+						<Datepicker
+							value={dateValue}
+							onChange={handleDateValueChange}
+							showShortcuts={true}
+							configs={{
+								shortcuts: {
+									today: 'Hari Ini',
+									yesterday: 'Kemarin',
+									past: (period) => `${period} Hari Terakhir`,
+									currentMonth: 'Bulan Ini',
+									pastMonth: 'Bulan Lalu',
+									currentYear: 'Tahun Ini',
+								},
+							}}
+							separator={'s.d'}
+						/>
 						
 				</div>
 					<div className='w-3/12 border flex rounded-lg'>

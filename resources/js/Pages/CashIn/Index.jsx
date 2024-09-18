@@ -274,7 +274,7 @@ export default function Index({
                         )}
                     </div>
 
-                    <div className='my-auto w-4/12 flex gap-5'>
+                    <div className='my-auto w-4/12 flex gap-5 justify-end'>
                         <button className='py-2 px-3 border rounded-lg' onClick={() => setShowModalFilter(true)}>
                             <IoFilter />
                         </button>

@@ -82,7 +82,7 @@ class StudentMonthlyPaymentController extends Controller
 
 		return Inertia::render('StudentMonthlyPayment/Index',[
 			'organization' => $organization,
-			'payments' => StudentMonthlyPayment::filter(request(['search']))  
+			'payments' => StudentMonthlyPayment::filter(request(['search', 'start_date', 'end_date']))  
 																	->when($type !== 'all' ?? false, function ($query) use ($type){
 																			$query->where('type', $type);
 																	} )
@@ -97,7 +97,9 @@ class StudentMonthlyPaymentController extends Controller
 																	->paginate(50)->withQueryString(),
 				'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 				'type' => request('type') ?? 'now',
-				'searchFilter' => $search
+				'searchFilter' => $search,
+				'startDate' => request('start_date'),
+				'endDate' => request('end_date'),
 		]);
 	}
 

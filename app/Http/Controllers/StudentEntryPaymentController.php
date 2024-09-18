@@ -77,9 +77,11 @@ class StudentEntryPaymentController extends Controller
 		$user = Auth::user();
 		$search = request(['search']);
 
+		// dd(request('studyYear'));
+
 		return Inertia::render('StudentEntryPayment/Index', [
 			'organization' => $organization,
-			'payments' => StudentEntryPayment::filter(request(['search']))
+			'payments' => StudentEntryPayment::filter(request(['search','studyYear','start_date', 'end_date']))
 																	->with('contact', function ($query) {
 																			$query->with('student');
 																	})
@@ -90,7 +92,10 @@ class StudentEntryPaymentController extends Controller
 																	->paginate(50)->withQueryString(),
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'searchFilter' => $search,
-			'studyYears' => StudentLevel::select('year')->distinct()->take(10)->get(),
+			'startDate' => request('start_date'),
+			'endDate' => request('end_date'),
+			'studyYears' => StudentLevel::select('year')->distinct()->get(),
+			'studyYear' => request('studyYear')
 		]);
 	}
 

@@ -22,10 +22,10 @@ import DangerButton from '@/Components/DangerButton';
 import { usePrevious } from 'react-use';
 import StudentEntryPaymentMobile from './Components/StudentEntryPaymentMobile';
 import StudentEntryPaymentDesktop from './Components/StudentEntryPaymentDesktop';
+import Datepicker from 'react-tailwindcss-datepicker';
 
-export default function Index({ organization, role, payments, searchFilter, studyYears }) {
-	console.log(studyYears);
-	
+export default function Index({ organization, role, payments, searchFilter, studyYears, studyYear, startDate,
+	endDate }) {	
 	const [search, setSearch] = useState(searchFilter || '');
 	const [titleDeleteModal, setTitleDeleteModal] = useState('');
 	const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
@@ -41,8 +41,25 @@ export default function Index({ organization, role, payments, searchFilter, stud
 	});
 
 	const [dataFilter, setDataFilter] = useState({
-		studyYear: null,
+		studyYear: studyYear || '',
 	});
+
+	const prevSearch = usePrevious(search);
+	const [debounceValue] = useDebounce(search, 500);
+
+	const [dateValue, setDateValue] = useState({
+		startDate: startDate || '',
+		endDate: endDate || '',
+	});
+
+	const [debounceDateValue] = useDebounce(dateValue, 500);
+
+	// useState
+	useEffect(() => {
+		if (prevSearch !== undefined) {
+			handleReloadPage();
+		}
+	}, [debounceValue, debounceDateValue]);
 
 	const handleDelete = (payment) => {
 		setTitleDeleteModal(`Hapus Pembayaran No Ref ${payment.no_ref}`);
@@ -55,6 +72,24 @@ export default function Index({ organization, role, payments, searchFilter, stud
 		
 		handleReloadPage();
 		setShowModalFilter(false);
+	};
+
+	const handleDateValueChange = (newValue) => {
+		setDateValue(newValue);
+	};
+
+	//function
+	const handleReloadPage = () => {
+		router.reload({
+			only: ['payments'],
+			data: {
+				search,
+				start_date: dateValue.startDate,
+				end_date: dateValue.endDate,
+				studyYear: dataFilter.studyYear
+			},
+			preserveState: true,
+		});
 	};
 
 	const handleSubmitDelete = (e) => {
@@ -136,6 +171,9 @@ export default function Index({ organization, role, payments, searchFilter, stud
 				data={payments}
 				hasFilter={true}
 				showFilter={() => setShowModalFilter(true)}
+				hasDate={true}
+				dateValue={dateValue}
+				onChangeDate={handleDateValueChange}
 			/>
 			<ContentMobile>
 				{payments.data.map((payment) => (
@@ -151,7 +189,7 @@ export default function Index({ organization, role, payments, searchFilter, stud
 			{/* Desktop */}
 			<ContainerDesktop>
 				<TitleDesktop>
-					<div className='my-auto w-7/12'>
+					<div className='my-auto w-5/12'>
 						{role !== 'viewer' && (
 							<div className='space-x-2'>
 								<Link href={route('cashflow.student-entry-payment.create', organization.id)}>
@@ -164,6 +202,22 @@ export default function Index({ organization, role, payments, searchFilter, stud
 						<button className='py-3 px-3 border rounded-lg h-full' onClick={() => setShowModalFilter(true)}>
 								<IoFilter />
 						</button>
+						<Datepicker
+							value={dateValue}
+							onChange={handleDateValueChange}
+							showShortcuts={true}
+							configs={{
+								shortcuts: {
+									today: 'Hari Ini',
+									yesterday: 'Kemarin',
+									past: (period) => `${period} Hari Terakhir`,
+									currentMonth: 'Bulan Ini',
+									pastMonth: 'Bulan Lalu',
+									currentYear: 'Tahun Ini',
+								},
+							}}
+							separator={'s.d'}
+						/>
 						
 				</div>
 					<div className='w-3/12 border flex rounded-lg'>
@@ -270,14 +324,16 @@ export default function Index({ organization, role, payments, searchFilter, stud
 								<div className='sm:w-3/4 w-full flex'>
 									<select 
                     className="select select-bordered w-full" 
-                    value={dataFilter.type} 
-                    onChange={e => setDataFilter({...dataFilter, type: e.target.value})} 
+                    value={dataFilter.studyYear} 
+                    onChange={e => setDataFilter({...dataFilter, studyYear: e.target.value})} 
                     id='study_year'
                   >
-                    <option value={'all'}>Semua</option>
-                    <option value={'now'}>Lunas</option>
-                    <option value={'receivable'}>Belum Bayar</option>
-                    <option value={'prepaid'}>Bayar Dimuka</option>
+                    <option value={''}>Semua</option>
+										{
+											studyYears.map((studyYear, index) => 
+												<option value={studyYear.year} key={index}>{studyYear.year}</option>
+											)
+										}
                   </select>
 								</div>
 						</div>

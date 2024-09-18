@@ -41,6 +41,14 @@ class StudentMonthlyPayment extends Model
 														});
 			});
 		});
+
+		$query->when($filters['start_date'] ?? false, function ($query, $start_date) {
+			return $query->where('date', '>=', $start_date);
+		});
+
+		$query->when($filters['end_date'] ?? false, function ($query, $end_date) {
+			return $query->where('date', '<=', $end_date);
+		});
 	}
 
 	public function contact(): BelongsTo

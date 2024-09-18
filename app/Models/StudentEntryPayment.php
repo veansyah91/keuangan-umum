@@ -39,6 +39,18 @@ class StudentEntryPayment extends Model
 														});
 			});
 		});
+
+		$query->when($filters['start_date'] ?? false, function ($query, $start_date) {
+			return $query->where('date', '>=', $start_date);
+		});
+
+		$query->when($filters['end_date'] ?? false, function ($query, $end_date) {
+			return $query->where('date', '<=', $end_date);
+		});
+
+		$query->when($filters['studyYear'] ?? false, function ($query, $studyYear) {
+			return $query->where('study_year', $studyYear);
+		});
 	}
 
 	public function contact(): BelongsTo

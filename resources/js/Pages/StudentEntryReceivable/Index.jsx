@@ -23,7 +23,9 @@ import { usePrevious } from 'react-use';
 import StudentEntryReceivableMobile from './Components/StudentEntryReceivableMobile';
 import StudentEntryReceivableDesktop from './Components/StudentEntryReceivableDesktop';
 
-export default function Index({ organization, role, payments, searchFilter }) {
+export default function Index({ organization, role, receivables, searchFilter }) {
+	console.log(receivables);
+	
 	const [search, setSearch] = useState(searchFilter || '');
 	const [titleDeleteModal, setTitleDeleteModal] = useState('');
 	const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
@@ -91,15 +93,15 @@ export default function Index({ organization, role, payments, searchFilter }) {
 				search={search}
 				setSearch={(e) => setSearch(e.target.value)}
 				pageBefore={
-					payments.links[0].url ? (
+					receivables.links[0].url ? (
 						<Link
 							href={route('cashflow.student-entry-payment', {
 								organization: organization.id,
-								page: payments.current_page - 1,
+								page: receivables.current_page - 1,
 								search: search,
 							})}
 							preserveState
-							only={['payments']}>
+							only={['receivables']}>
 							<IoPlayBack />
 						</Link>
 					) : (
@@ -109,14 +111,14 @@ export default function Index({ organization, role, payments, searchFilter }) {
 					)
 				}
 				pageAfter={
-					payments.links[payments.links.length - 1].url ? (
+					receivables.links[receivables.links.length - 1].url ? (
 						<Link
 							href={route('cashflow.student-entry-payment', {
 								organization: organization.id,
-								page: payments.current_page + 1,
+								page: receivables.current_page + 1,
 								search: search,
 							})}
-							only={['payments']}
+							only={['receivables']}
 							preserveState>
 							<IoPlayForward />
 						</Link>
@@ -128,15 +130,15 @@ export default function Index({ organization, role, payments, searchFilter }) {
 				}
 				page={
 					<>
-						{payments.current_page}/{payments.last_page}
+						{receivables.current_page}/{receivables.last_page}
 					</>
 				}
-				data={payments}
+				data={receivables}
 				hasFilter={true}
 				showFilter={() => setShowModalFilter(true)}
 			/>
 			<ContentMobile>
-				{payments.data.map((payment) => (
+				{receivables.data.map((payment) => (
 					<StudentEntryReceivableMobile
 						payment={payment}
 						key={payment.id}
@@ -179,19 +181,19 @@ export default function Index({ organization, role, payments, searchFilter }) {
 						/>
 					</div>
 					<div className='italic text-xs my-auto w-1/12 text-center'>
-						<PageNumber data={payments} />
+						<PageNumber data={receivables} />
 					</div>
 					<div className='my-auto flex space-x-2 w-1/12'>
 						<div className='my-auto'>
-							{payments.links[0].url ? (
+							{receivables.links[0].url ? (
 								<Link
 									href={route('cashflow.student-entry-payment', {
 										organization: organization.id,
-										page: payments.current_page - 1,
+										page: receivables.current_page - 1,
 										search: search,
 									})}
 									preserveState
-									only={['payments']}>
+									only={['receivables']}>
 									<IoPlayBack />
 								</Link>
 							) : (
@@ -201,17 +203,17 @@ export default function Index({ organization, role, payments, searchFilter }) {
 							)}
 						</div>
 						<div className='my-auto'>
-							{payments.current_page}/{payments.last_page}
+							{receivables.current_page}/{receivables.last_page}
 						</div>
 						<div className='my-auto'>
-							{payments.links[payments.links.length - 1].url ? (
+							{receivables.links[receivables.links.length - 1].url ? (
 								<Link
 									href={route('cashflow.student-entry-payment', {
 										organization: organization.id,
-										page: payments.current_page + 1,
+										page: receivables.current_page + 1,
 										search: search,
 									})}
-									only={['payments']}
+									only={['receivables']}
 									preserveState>
 									<IoPlayForward />
 								</Link>
@@ -230,21 +232,18 @@ export default function Index({ organization, role, payments, searchFilter }) {
 							<table className='table table-pin-rows table-pin-cols text-base'>
 								<thead className='text-base text-gray-900'>
 									<tr className=''>
-										<th className='bg-gray-200'>Tanggal</th>
-										<th className='bg-gray-200'>No Ref</th>
-										<th className='bg-gray-200'>Nama</th>
-										<th className='bg-gray-200'>Tahun Ajaran</th>
-										<th className='bg-gray-200 text-end'>Jumlah Bayar</th>
+										<th className='bg-gray-200'>Siswa</th>
+										<th className='bg-gray-200 text-end'>Jumlah</th>
 										<th className='bg-gray-200'></th>
 									</tr>
 								</thead>
 								<tbody>
-									{payments.data.map((payment, index) => (
+									{receivables.data.map((receivable, index) => (
 										<StudentEntryReceivableDesktop
 											key={index}
-											payment={payment}
+											receivable={receivable}
 											className={`${index % 2 == 0 && 'bg-gray-100'} text-sm`}
-											handleDelete={() => handleDelete(payment)}
+											handleDelete={() => handleDelete(receivable)}
 											role={role}
 										/>
 									))}

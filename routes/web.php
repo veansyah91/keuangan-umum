@@ -43,6 +43,7 @@ use App\Http\Controllers\StudentEntryPaymentController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\StudentMonthlyPaymentController;
 use App\Http\Controllers\Admin\OrganizationMenuController;
+use App\Http\Controllers\StudentEntryReceivableController;
 use App\Http\Controllers\StudentPaymentCategoryController;
 use App\Http\Controllers\Admin\AdminOrganizationController;
 use App\Http\Controllers\StudentMonthlyReceivableController;
@@ -351,6 +352,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
                     // student entry receivable payment
 					Route::get('/student-entry-receivable', [StudentEntryReceivableController::class, 'index'])->name('cashflow.student-entry-receivable');
+					Route::get('/student-entry-receivable/{studentEntryReceivable}', [StudentEntryReceivableController::class, 'show'])->name('cashflow.student-entry-receivable.show');
+					Route::get('/student-entry-receivable/{studentEntryReceivable}/print', [StudentEntryReceivableController::class, 'print'])->name('cashflow.student-entry-receivable.print');
 
         });
 
