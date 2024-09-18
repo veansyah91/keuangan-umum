@@ -89,7 +89,8 @@ class StudentEntryPaymentController extends Controller
 																	->orderBy('no_ref', 'desc')
 																	->paginate(50)->withQueryString(),
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
-			'searchFilter' => $search
+			'searchFilter' => $search,
+			'studyYears' => StudentLevel::select('year')->distinct()->take(10)->get(),
 		]);
 	}
 

@@ -20,12 +20,10 @@ import ContentMobile from '@/Components/Mobiles/ContentMobile';
 import ContentDesktop from '@/Components/Desktop/ContentDesktop';
 import DangerButton from '@/Components/DangerButton';
 import { usePrevious } from 'react-use';
-import StudentEntryPaymentMobile from './Components/StudentEntryPaymentMobile';
-import StudentEntryPaymentDesktop from './Components/StudentEntryPaymentDesktop';
+import StudentEntryReceivableMobile from './Components/StudentEntryReceivableMobile';
+import StudentEntryReceivableDesktop from './Components/StudentEntryReceivableDesktop';
 
-export default function Index({ organization, role, payments, searchFilter, studyYears }) {
-	console.log(studyYears);
-	
+export default function Index({ organization, role, payments, searchFilter }) {
 	const [search, setSearch] = useState(searchFilter || '');
 	const [titleDeleteModal, setTitleDeleteModal] = useState('');
 	const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
@@ -41,11 +39,11 @@ export default function Index({ organization, role, payments, searchFilter, stud
 	});
 
 	const [dataFilter, setDataFilter] = useState({
-		studyYear: null,
+		entryYear: null,
 	});
 
 	const handleDelete = (payment) => {
-		setTitleDeleteModal(`Hapus Pembayaran No Ref ${payment.no_ref}`);
+		setTitleDeleteModal(`Hapus Piutang No Ref ${payment.no_ref}`);
 		setShowDeleteConfirmation(true);
 		setData('id', payment.id);
 	};
@@ -63,7 +61,7 @@ export default function Index({ organization, role, payments, searchFilter, stud
 		destroy(route('cashflow.student-entry-payment.delete', { organization: organization.id, payment: data.id }), {
 			onSuccess: () => {
 				setShowDeleteConfirmation(false);
-				toast.success(`Pembayaran Berhasil Dihapus`, {
+				toast.success(`Piutang Berhasil Dihapus`, {
 					position: toast.POSITION.TOP_CENTER,
 				});
 				reset();
@@ -80,7 +78,7 @@ export default function Index({ organization, role, payments, searchFilter, stud
   return (
     <>
 			{/* Mobile */}
-			<Head title='Pembayaran Iuran Siswa' />
+			<Head title='Piutang Iuran Siswa' />
 			<ToastContainer />
 
 			{role !== 'viewer' && (
@@ -139,7 +137,7 @@ export default function Index({ organization, role, payments, searchFilter, stud
 			/>
 			<ContentMobile>
 				{payments.data.map((payment) => (
-					<StudentEntryPaymentMobile
+					<StudentEntryReceivableMobile
 						payment={payment}
 						key={payment.id}
 						handleDelete={() => handleDelete(payment)}
@@ -242,7 +240,7 @@ export default function Index({ organization, role, payments, searchFilter, stud
 								</thead>
 								<tbody>
 									{payments.data.map((payment, index) => (
-										<StudentEntryPaymentDesktop
+										<StudentEntryReceivableDesktop
 											key={index}
 											payment={payment}
 											className={`${index % 2 == 0 && 'bg-gray-100'} text-sm`}
@@ -262,11 +260,11 @@ export default function Index({ organization, role, payments, searchFilter, stud
 			{/* Filter  */}
 			<Modal show={showModalFilter} onClose={() => setShowModalFilter(false)}>
 				<form onSubmit={handleFilter} className='p-6' id='filter' name='filter'>
-					<h2 className='text-lg font-medium text-gray-900'>Filter Pembayaran Iuran Bulanan</h2>
+					<h2 className='text-lg font-medium text-gray-900'>Filter Piutang Iuran Bulanan</h2>
 
 					<div className='mt-6 '>
 						<div className='flex flex-col sm:flex-row w-full gap-1'>
-								<div className='sm:w-1/4 w-full my-auto font-bold'>Tahun Ajaran</div>
+								<div className='sm:w-1/4 w-full my-auto font-bold'>Tipe</div>
 								<div className='sm:w-3/4 w-full flex'>
 									<select 
                     className="select select-bordered w-full" 
@@ -310,11 +308,11 @@ export default function Index({ organization, role, payments, searchFilter, stud
 
 Index.layout = (page) => (
 	<AuthenticatedLayout
-		header={<Header>Pembayaran Iuran Tahunan Siswa</Header>}
+		header={<Header>Piutang Iuran Tahunan Siswa</Header>}
 		children={page}
 		user={page.props.auth.user}
 		organization={page.props.organization}
-		title='Pembayaran Iuran Tahunan Siswa'
+		title='Piutang Iuran Tahunan Siswa'
 		backLink={
 			<Link href={route('cashflow', page.props.organization.id)}>
 				<IoArrowBackOutline />
@@ -326,7 +324,7 @@ Index.layout = (page) => (
 					<li className='font-bold'>
 						<Link href={route('cashflow', page.props.organization.id)}>Arus Kas</Link>
 					</li>
-					<li>Pembayaran Iuran Tahunan Siswa</li>
+					<li>Piutang Iuran Tahunan Siswa</li>
 				</ul>
 			</div>
 		}
