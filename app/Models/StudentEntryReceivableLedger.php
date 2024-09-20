@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\StudentEntryPayment;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class StudentEntryReceivableLedger extends Model
 {
@@ -22,4 +24,9 @@ class StudentEntryReceivableLedger extends Model
 		'study_year',
 		'paid_date'
 	];
+
+	public function payment(): BelongsTo
+	{
+		return $this->belongsTo(StudentEntryPayment::class);
+	}
 }

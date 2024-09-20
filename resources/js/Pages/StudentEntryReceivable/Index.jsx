@@ -43,37 +43,11 @@ export default function Index({ organization, role, receivables, searchFilter })
 		entryYear: null,
 	});
 
-	const handleDelete = (payment) => {
-		setTitleDeleteModal(`Hapus Piutang No Ref ${payment.no_ref}`);
-		setShowDeleteConfirmation(true);
-		setData('id', payment.id);
-	};
-
 	const handleFilter = (e) => {
 		e.preventDefault();
 		
 		handleReloadPage();
 		setShowModalFilter(false);
-	};
-
-	const handleSubmitDelete = (e) => {
-		e.preventDefault();
-
-		destroy(route('cashflow.student-entry-payment.delete', { organization: organization.id, payment: data.id }), {
-			onSuccess: () => {
-				setShowDeleteConfirmation(false);
-				toast.success(`Piutang Berhasil Dihapus`, {
-					position: toast.POSITION.TOP_CENTER,
-				});
-				reset();
-			},
-			onError: (error) => {
-				setShowDeleteConfirmation(false);
-				toast.error(error.message, {
-					position: toast.POSITION.TOP_CENTER,
-				});
-			},
-		});
 	};
 
   return (
@@ -83,7 +57,7 @@ export default function Index({ organization, role, receivables, searchFilter })
 			<ToastContainer />
 
 			{role !== 'viewer' && (
-				<Link href={route('cashflow.student-entry-payment.create', organization.id)}>
+				<Link href={route('cashflow.student-entry-receivable.create', organization.id)}>
 					<AddButtonMobile label={'Tambah'} />
 				</Link>
 			)}
@@ -94,7 +68,7 @@ export default function Index({ organization, role, receivables, searchFilter })
 				pageBefore={
 					receivables.links[0].url ? (
 						<Link
-							href={route('cashflow.student-entry-payment', {
+							href={route('cashflow.student-entry-receivable', {
 								organization: organization.id,
 								page: receivables.current_page - 1,
 								search: search,
@@ -112,7 +86,7 @@ export default function Index({ organization, role, receivables, searchFilter })
 				pageAfter={
 					receivables.links[receivables.links.length - 1].url ? (
 						<Link
-							href={route('cashflow.student-entry-payment', {
+							href={route('cashflow.student-entry-receivable', {
 								organization: organization.id,
 								page: receivables.current_page + 1,
 								search: search,
@@ -152,7 +126,7 @@ export default function Index({ organization, role, receivables, searchFilter })
 					<div className='my-auto w-7/12'>
 						{role !== 'viewer' && (
 							<div className='space-x-2'>
-								<Link href={route('cashflow.student-entry-payment.create', organization.id)}>
+								<Link href={route('cashflow.student-entry-receivable.create', organization.id)}>
 									<PrimaryButton className='py-3'>Tambah Data</PrimaryButton>
 								</Link>
 							</div>
@@ -185,7 +159,7 @@ export default function Index({ organization, role, receivables, searchFilter })
 						<div className='my-auto'>
 							{receivables.links[0].url ? (
 								<Link
-									href={route('cashflow.student-entry-payment', {
+									href={route('cashflow.student-entry-receivable', {
 										organization: organization.id,
 										page: receivables.current_page - 1,
 										search: search,
@@ -206,7 +180,7 @@ export default function Index({ organization, role, receivables, searchFilter })
 						<div className='my-auto'>
 							{receivables.links[receivables.links.length - 1].url ? (
 								<Link
-									href={route('cashflow.student-entry-payment', {
+									href={route('cashflow.student-entry-receivable', {
 										organization: organization.id,
 										page: receivables.current_page + 1,
 										search: search,

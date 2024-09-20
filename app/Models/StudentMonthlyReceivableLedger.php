@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Journal;
+use App\Models\StudentMonthlyPayment;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\StudentMonthlyReceivable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -42,6 +43,16 @@ class StudentMonthlyReceivableLedger extends Model
 			$query->when($filters['search'] ?? false, function ($query, $search) {
 				return $query->where('no_ref', 'like', '%'.$search.'%');
 			});
+    }
+
+    public function contact(): BelongsTo
+    {
+        return $this->belongsTo(Contact::class);
+    }
+
+    public function payment(): BelongsTo
+    {
+        return $this->belongsTo(StudentMonthlyPayment::class);
     }
 
 }

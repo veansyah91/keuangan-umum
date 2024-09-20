@@ -228,7 +228,7 @@ export default function Index({ organization, role, payments, searchFilter, stud
 							id='search-input'
 							name='search-input'
 							type='search'
-							placeholder='Cari Siswa'
+							placeholder='Cari Pembayaran'
 							className='w-full border-none focus:outline-none focus:ring-0'
 							value={search || ''}
 							onChange={(e) => setSearch(e.target.value)}
