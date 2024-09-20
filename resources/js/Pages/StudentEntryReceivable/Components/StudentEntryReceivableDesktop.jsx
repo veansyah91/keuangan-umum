@@ -16,6 +16,7 @@ export default function StudentEntryReceivableDesktop({
           {receivable.contact.name}
         </div>
       </td>
+      <td className='text-start'>{ receivable.contact.last_level.level }</td>
       <td className='text-end'>IDR. { formatNumber(receivable.value) }</td>
       <td className='text-end'>
         {(role !== 'viewer') && (

@@ -3,7 +3,7 @@ import { Link } from '@inertiajs/react';
 import React from 'react';
 import { IoEllipsisVertical, IoSearchOutline } from 'react-icons/io5';
 
-export default function StudentMobile({ receivable, role }) {	
+export default function StudentMonthlyReceivableMobile({ receivable, role }) {	
 	return (
 		<>
 			<div className=' text-gray-900 py-2 px-3 border flex gap-5 justify-between'>

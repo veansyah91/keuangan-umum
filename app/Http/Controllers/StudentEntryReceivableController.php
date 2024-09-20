@@ -44,7 +44,7 @@ class StudentEntryReceivableController extends Controller
 			'organization' => $organization,
 			'receivables' => StudentEntryReceivable::filter(request(['search']))
 																	->with('contact', function ($query) {
-																			$query->with('student');
+																			$query->with(['student', 'lastLevel']);
 																	})
 																	->whereOrganizationId($organization['id'])
 																	->orderBy('value', 'desc')
@@ -84,9 +84,11 @@ class StudentEntryReceivableController extends Controller
 										->where('contact_id', $studentEntryReceivable['contact_id'])
 										// ->where('credit', '>', 0)
 										->with('contact', function ($query) {
-												$query->with('student');
+												return $query->with('student');
 										})
-										->with('receivables')
+										->with('receivables', function ($query) {
+											return $query->where('credit', '>', 0);
+										})
 										->orderBy('study_year', 'desc')
 										->orderBy('date', 'desc')
 										->orderBy('no_ref', 'desc')

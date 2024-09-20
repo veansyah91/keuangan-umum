@@ -23,67 +23,70 @@ import DangerButton from '@/Components/DangerButton';
 import { usePrevious } from 'react-use';
 import StudentEntryReceivableDetailMobile from './Components/StudentEntryReceivableDetailMobile';
 import StudentEntryReceivableDetailDesktop from './Components/StudentEntryReceivableDetailDesktop';
+import formatNumber from '@/Utils/formatNumber';
 
 export default function Show({ role, organization, receivables, searchFilter, receivable }) {
-    // State
-    const { errors } = usePage().props;
+	console.log(receivables);
+	
+	// State
+	const { errors } = usePage().props;
 
-    const [showSearch, setShowSearch] = useState(false);
-    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+	const [showSearch, setShowSearch] = useState(false);
+	const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
-    const [search, setSearch] = useState(searchFilter || '');
-    const [titleDeleteModal, setTitleDeleteModal] = useState('');
-    const {
-        data,
-        setData,
-        delete: destroy,
-        processing,
-        reset,
-    } = useForm({
-        id: null,
-        receivable_id: null
-    });
+	const [search, setSearch] = useState(searchFilter || '');
+	const [titleDeleteModal, setTitleDeleteModal] = useState('');
+	const {
+		data,
+		setData,
+		delete: destroy,
+		processing,
+		reset,
+	} = useForm({
+		id: null,
+		receivable_id: null
+	});
 
-    const prevSearch = usePrevious(search);
-    const [debounceValue] = useDebounce(search, 500);
+	const prevSearch = usePrevious(search);
+	const [debounceValue] = useDebounce(search, 500);
 
-    // useState
-    useEffect(() => {
-			if (prevSearch !== undefined) {
-				handleReloadPage();
-			}
-    }, [debounceValue]);
+	// useState
+	useEffect(() => {
+		if (prevSearch !== undefined) {
+			handleReloadPage();
+		}
+	}, [debounceValue]);
 
-    useEffect(() => {
-			errors && 
-			toast.error(errors.message, {
-				position: toast.POSITION.TOP_CENTER,
-			});
-    },[]);
+	useEffect(() => {
+		errors && 
+		toast.error(errors.message, {
+			position: toast.POSITION.TOP_CENTER,
+		});
+	},[]);
 
-    //function
-    const handleReloadPage = () => {
-        router.reload({
-            only: ['receivables'],
-            data: {
-                search,
-            },
-        });
-    };
-    const handleDelete = (receivable) => {        
-        setTitleDeleteModal(`Hapus Piutang ${receivable.no_ref}`);
-        setShowDeleteConfirmation(true);
-        setData({
-            id: receivable.id,
-            receivable: receivable.receivable_id
-        });
-    };
+	//function
+	const handleReloadPage = () => {
+		router.reload({
+			only: ['receivables'],
+			data: {
+				search,
+			},
+		});
+	};
+	const handleDelete = (receivable) => {        
+		setTitleDeleteModal(`Hapus Piutang ${receivable.no_ref}`);
+		setShowDeleteConfirmation(true);
+		setData({
+			id: receivable.id,
+			receivable: receivable.receivable_id
+		});
+	};
 
     return (
         <>
-            {/* Mobile */}
-            <Head title='Piutang Iuran Siswa' />
-            <ToastContainer />
+					{/* Mobile */}
+					<Head title='Piutang Iuran Siswa' />
+					<ToastContainer />
             
             <TitleMobile
 							zIndex={'z-50'}
@@ -149,8 +152,8 @@ export default function Show({ role, organization, receivables, searchFilter, re
             {/* Desktop */}
             <ContainerDesktop>
 							<TitleDesktop>
-								<div className='my-auto w-7/12'>
-
+								<div className='my-auto w-7/12 text-2xl'>
+									Total: <span className='font-bold'>IDR. { formatNumber(receivable.value) }</span> 
 								</div>
 								<div className='my-auto w-4/12 flex gap-5 justify-end'>
 									<Link className='py-3 px-3 border rounded-lg h-full' href={route('cashflow.student-entry-receivable.print', {organization: organization.id, studentEntryReceivable: receivable.id})}>
@@ -226,9 +229,8 @@ export default function Show({ role, organization, receivables, searchFilter, re
 										<table className='table table-pin-rows table-pin-cols text-base'>
 											<thead className='text-base text-gray-900'>
 												<tr className=''>
+													<th className='bg-gray-200'>Tanggal Transaksi</th>
 													<th className='bg-gray-200'>No Ref</th>
-													<th className='bg-gray-200'>Tanggal Input</th>
-													<th className='bg-gray-200'>Bulan</th>
 													<th className='bg-gray-200'>Tahun Ajaran</th>
 													<th className='bg-gray-200 text-end'>Jumlah</th>
 													<th className='bg-gray-200'>Status</th>
@@ -241,7 +243,6 @@ export default function Show({ role, organization, receivables, searchFilter, re
 														key={index}
 														receivable={receivable}
 														className={`${index % 2 == 0 && 'bg-gray-100'}`}
-														handleDelete={() => handleDelete(receivable)}
 														role={role}
 													/>
 												))}

@@ -73,7 +73,7 @@ export default function Index({ organization }) {
 									title={'Piutang Iuran Tahunan'} 
 								/>
 							</Link>
-							<Link href={route('cashflow.student-monthly-payment', organization.id)}>
+							<Link href={route('cashflow.student-entry-receivable-payment', organization.id)}>
 								<CardMenu 
 									bgColor={'bg-green-600'} 
 									icon={<FaMoneyBillWaveAlt />} 

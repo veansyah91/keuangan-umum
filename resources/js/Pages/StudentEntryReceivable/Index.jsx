@@ -24,7 +24,6 @@ import StudentEntryReceivableMobile from './Components/StudentEntryReceivableMob
 import StudentEntryReceivableDesktop from './Components/StudentEntryReceivableDesktop';
 
 export default function Index({ organization, role, receivables, searchFilter }) {
-	console.log(receivables);
 	
 	const [search, setSearch] = useState(searchFilter || '');
 	const [titleDeleteModal, setTitleDeleteModal] = useState('');
@@ -138,11 +137,10 @@ export default function Index({ organization, role, receivables, searchFilter })
 				showFilter={() => setShowModalFilter(true)}
 			/>
 			<ContentMobile>
-				{receivables.data.map((payment) => (
+				{receivables.data.map((receivable) => (
 					<StudentEntryReceivableMobile
-						payment={payment}
-						key={payment.id}
-						handleDelete={() => handleDelete(payment)}
+						receivable={receivable}
+						key={receivable.id}
 						role={role}
 					/>
 				))}
@@ -233,6 +231,7 @@ export default function Index({ organization, role, receivables, searchFilter })
 								<thead className='text-base text-gray-900'>
 									<tr className=''>
 										<th className='bg-gray-200'>Siswa</th>
+										<th className='bg-gray-200'>Kelas</th>
 										<th className='bg-gray-200 text-end'>Jumlah</th>
 										<th className='bg-gray-200'></th>
 									</tr>
@@ -243,7 +242,6 @@ export default function Index({ organization, role, receivables, searchFilter })
 											key={index}
 											receivable={receivable}
 											className={`${index % 2 == 0 && 'bg-gray-100'} text-sm`}
-											handleDelete={() => handleDelete(receivable)}
 											role={role}
 										/>
 									))}
