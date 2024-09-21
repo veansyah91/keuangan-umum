@@ -47,6 +47,7 @@ class StudentEntryReceivableController extends Controller
 																			$query->with(['student', 'lastLevel']);
 																	})
 																	->whereOrganizationId($organization['id'])
+																	->where('value', '>', 0)
 																	->orderBy('value', 'desc')
 																	->paginate(50)->withQueryString(),
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),

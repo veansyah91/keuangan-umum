@@ -125,6 +125,7 @@ class StudentEntryReceivablePaymentController extends Controller
 			'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),			
 			'payments' => StudentEntryPayment::where('contact_id', request('selectedContact'))
 																				->where('receivable_value', '>', 0)
+																				->select('id', 'receivable_value', 'no_ref', 'study_year', 'organization_id')
 																				->get(),
 		]);
 	}

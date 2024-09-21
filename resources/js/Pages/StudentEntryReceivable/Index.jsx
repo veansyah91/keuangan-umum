@@ -56,11 +56,6 @@ export default function Index({ organization, role, receivables, searchFilter })
 			<Head title='Piutang Iuran Siswa' />
 			<ToastContainer />
 
-			{role !== 'viewer' && (
-				<Link href={route('cashflow.student-entry-receivable.create', organization.id)}>
-					<AddButtonMobile label={'Tambah'} />
-				</Link>
-			)}
 			<TitleMobile
 				zIndex={'z-50'}
 				search={search}
@@ -126,9 +121,7 @@ export default function Index({ organization, role, receivables, searchFilter })
 					<div className='my-auto w-7/12'>
 						{role !== 'viewer' && (
 							<div className='space-x-2'>
-								<Link href={route('cashflow.student-entry-receivable.create', organization.id)}>
-									<PrimaryButton className='py-3'>Tambah Data</PrimaryButton>
-								</Link>
+								
 							</div>
 						)}
 					</div>	
@@ -256,19 +249,6 @@ export default function Index({ organization, role, receivables, searchFilter })
 						<SecondaryButton onClick={() => setShowModalFilter(false)}>Batal</SecondaryButton>
 
 						<PrimaryButton className='ms-3'>Filter</PrimaryButton>
-					</div>
-				</form>
-			</Modal>
-			<Modal show={showDeleteConfirmation} onClose={() => setShowDeleteConfirmation(false)}>
-				<form onSubmit={handleSubmitDelete} className='p-6'>
-					<h2 className='text-lg font-medium text-gray-900 text-center'>{titleDeleteModal}</h2>
-
-					<div className='mt-6 flex justify-end'>
-						<SecondaryButton onClick={() => setShowDeleteConfirmation(false)}>Batal</SecondaryButton>
-
-						<DangerButton className='ms-3' disabled={processing}>
-							Hapus
-						</DangerButton>
 					</div>
 				</form>
 			</Modal>

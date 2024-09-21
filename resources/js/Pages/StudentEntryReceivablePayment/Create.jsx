@@ -24,7 +24,6 @@ import ReceivableListBox from './Components/ReceivableListBox';
 export default function Create({
   organization, newRef, contacts, date, receivables, studyYears, cashAccounts, payments
 }) {
-  console.log(receivables);
   
   const { data, setData, processing, post, errors, setError, reset } = useForm({
     contact_id:null,
@@ -33,7 +32,7 @@ export default function Create({
     student_id:'',
     no_ref:newRef,
     value:0,
-    paidValue: 0,
+    paidValue:0,
     study_year:studyYear(),
     description:'',
     payment_id: null,
@@ -42,6 +41,9 @@ export default function Create({
 
   const [selectedContact, setSelectedContact] = useState({ id: null, name: '', phone: '' });
   const [selectedCashAccount, setSelectedCashAccount] = useState({ id: null, name: '', code: '', is_cash: true });
+
+  const [selectedPayment, setSelectedPayment] = useState({id: null, noRef: '', receivablevalue: 0, studyYear: ''});
+  const [dataPayment, setDataPayment] = useState(payments);
 
   const [dateValue, setDateValue] = useState({
     startDate: date,
@@ -52,6 +54,34 @@ export default function Create({
   useEffect(() => {
     setDefault(newRef);
   },[]);
+
+  useEffect(() => {
+    if (selectedContact.id) {
+      handleGetPayments();
+    }
+    
+  },[selectedContact]);
+
+  const handleGetPayments = () => {
+    router.reload({
+      only: ['payments'],
+      data: {
+        selectedContact: selectedContact.id
+      },
+      onSuccess: ({ props }) => {
+        const { payments } = props;
+        
+        setData('value', payments[0].receivable_value);
+        setDataPayment(payments);        
+        setSelectedPayment({
+          id: payments[0].id, 
+          noRef: payments[0].no_ref, 
+          receivablevalue: payments[0].receivable_value, 
+          studyYear: payments[0].study_year
+        })
+      }
+    });
+  }  
 
   const setDefault = (newRef) => {
     let tempData = data;
@@ -93,16 +123,6 @@ export default function Create({
     setData('date', newValue.startDate);
   };
 
-  const handleChangeStudyYear = (e) => {
-    let temp = data;
-    temp = {
-      ...temp,
-      study_year : e.target.value,
-      description:`Pembayaran Iuran Tahunan dari ${selectedContact?.name?.toUpperCase()}  Tahun Ajaran ${e.target.value}`,
-    };    
-    setData(temp);
-  }
-
   const handleSelectedContact = (selected) => {    
     setSelectedContact({ id: selected.id, name: selected.name, phone: selected.phone });
     let temp = data;
@@ -122,32 +142,31 @@ export default function Create({
     setError('cash_account_id','');
   };
 
-  const handleChangeValue = (values, index) => {
-    const { value } = values;
-    let tempData = [...data.details];
-    tempData[index] = { ...tempData[index], value: parseInt(value) };
-    let tempTotal = tempData.reduce((total, item) => total + item.value, 0);
-    setData({
-      ...data,
-      details: tempData,
-      value: tempTotal
-    })
-    
-  }
-
   const handleChangePaidValue = (values) => {
     const { value } = values;
     setData('paidValue', parseInt(value) ?? 0);
   }
 
+  const handleSelectedPayment = (selected) => {
+    setSelectedPayment({
+      id: selected.id, 
+      noRef: selected.no_ref, 
+      receivablevalue: selected.receivable_value, 
+      studyYear: selected.study_year
+    })    
+  }
+  
   return (
     <>
       <Head title='Piutang Iuran Tahunan Siswa' />
       <ToastContainer />
 
+
       <FormInput onSubmit={handleSubmit}>
         <div className='w-full sm:mt-2 sm:py-5'>
           <div className='sm:w-1/2 sm:mx-auto px-3 sm:px-0'>
+      {/* Payments : { dataPayment[0] } */}
+
               <div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
                 <div className='w-full sm:w-1/3 my-auto'>
                   <InputLabel
@@ -258,10 +277,6 @@ export default function Create({
                   {errors?.level && <span className='text-red-500 text-xs'>{errors.level}</span>}
                 </div>
               </div>
-{/* 
-            {
-              payments
-            } */}
             <div className='text-center mt-5 font-bold'>Rincian Pembayaran</div>
             <div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
               <div className='w-full sm:w-1/3 my-auto'>
@@ -274,16 +289,21 @@ export default function Create({
 
               <div className='w-full sm:w-2/3'>
                 <ReceivableListBox 
-                  payments={payments}
+                  payments={dataPayment}
                   isError={false}
+                  selected={selectedPayment}
+                  setSelected={(selected) => handleSelectedPayment(selected)}
                 />
+                {selectedPayment?.studyYear && (
+                  <div className='absolute text-xs'>Tahun Ajaran: {selectedPayment.studyYear}</div>
+                )}
                 {/* {errors?.level && <span className='text-red-500 text-xs'>{errors.level}</span>} */}
               </div>
             </div>
 
             <div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 pt-5 sm:mt-2 font-bold text-xl'>
               <div className='w-full sm:w-1/3 my-auto'>
-                TOTAL
+                TOTAL PIUTANG
               </div>
 
               <div className='w-full sm:w-2/3 text-end'>
