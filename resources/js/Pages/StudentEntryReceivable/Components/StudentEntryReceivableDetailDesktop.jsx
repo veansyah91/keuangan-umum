@@ -4,7 +4,8 @@ import formatNumber from '@/Utils/formatNumber';
 import { Link } from '@inertiajs/react';
 import dayjs from 'dayjs';
 import React from 'react'
-import { IoEllipsisVertical, IoSearchOutline } from 'react-icons/io5';
+import { GiMoneyStack } from 'react-icons/gi';
+import { IoEllipsisVertical } from 'react-icons/io5';
 
 export default function StudentEntryReceivableDetailDesktop({
   receivable, className, role,
@@ -38,10 +39,14 @@ export default function StudentEntryReceivableDetailDesktop({
               className='dropdown-content z-[50] menu p-2 shadow bg-base-100 rounded-box w-56'>
               <li>
                 <Link 
-                  href={route('cashflow.student-entry-receivable.show', {organization: receivable.organization_id, studentEntryReceivable: receivable.id})}
+                  href={route('cashflow.student-entry-receivable-payment.create', {
+                          organization: receivable.organization_id, 
+                          contact: receivable.contact.name,
+                          selectedContact: receivable.contact.id
+                        })}
                 >
-                  <IoSearchOutline />
-                    Detail
+                  <GiMoneyStack />
+                    Bayar
                 </Link>
               </li>   
             </ul>

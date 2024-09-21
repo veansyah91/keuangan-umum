@@ -21,7 +21,7 @@ import formatNumber from '@/Utils/formatNumber';
 import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 import ReceivableListBox from './Components/ReceivableListBox';
 
-export default function Create({
+export default function Edit({
   organization, newRef, contacts, contact, date, selectedContactQuery, studyYears, cashAccounts, payments
 }) {  
   const { data, setData, processing, post, errors, setError, reset } = useForm({
@@ -402,13 +402,13 @@ export default function Create({
   )
 }
 
-Create.layout = (page) => (
+Edit.layout = (page) => (
   <AuthenticatedLayout
-    header={<Header>Tambah Pembayaran</Header>}
+    header={<Header>Ubag Pembayaran</Header>}
     children={page}
     user={page.props.auth.user}
     organization={page.props.organization}
-    title='Tambah Pembayaran'
+    title='Ubag Pembayaran'
     backLink={
       <Link href={route('cashflow.student-entry-receivable-payment', page.props.organization.id)}>
         <IoArrowBackOutline />
@@ -423,7 +423,7 @@ Create.layout = (page) => (
           <li className='font-bold'>
             <Link href={route('cashflow.student-entry-receivable-payment', page.props.organization.id)}>Pembayaran Iuran Tahunan Siswa</Link>
           </li>
-          <li>Tambah Pembayaran</li>
+          <li>Ubag Pembayaran</li>
         </ul>
       </div>
     }

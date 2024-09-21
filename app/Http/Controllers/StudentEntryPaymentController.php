@@ -556,7 +556,7 @@ class StudentEntryPaymentController extends Controller
 		DB::transaction(function () use ($validated, $organization, $user, $id){
 			// cek apakah sudah dibuatkan piutang
 			// jika sudah ada maka kurangi piutang
-			$studentReceivable = StudentEntryPayment::where('organization_id', $organization['id'])
+			$studentReceivable = StudentEntryReceivable::where('organization_id', $organization['id'])
 																							->where('contact_id', $validated['contact_id'])
 																							->first();
 
@@ -564,6 +564,7 @@ class StudentEntryPaymentController extends Controller
 
 			$tempStudentReceivableValue = 0;
 			if ($studentReceivable) {
+
 				// cek apakah jika piutang baru lebih kecil dari jumlah yang telah dibayarkan, maka kirimkan pesan error
 				$receivableDetails = StudentEntryReceivableLedger::where('payment_id', $id);
 
@@ -573,7 +574,7 @@ class StudentEntryPaymentController extends Controller
 					return redirect()->back()->withErrors(['paidValue' => 'Error']);
 				}
 
-				$tempStudentReceivableValue = $studentReceivable['value'] - $payment['value'] + $validated['value'];
+				$tempStudentReceivableValue = $studentReceivable['value'] - $payment['receivable_value'] + $validated['receivable_value'];
 
 				$studentReceivable->update([
 					'value' => $tempStudentReceivableValue

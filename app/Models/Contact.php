@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\ContactStaff;
 use App\Models\StudentLevel;
+use App\Models\StudentEntryReceivable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -39,6 +40,11 @@ class Contact extends Model
     public function lastLevel(): HasOne
     {
         return $this->hasOne(StudentLevel::class)->latestOfMany();
+    }
+
+    public function studentEntryReceivable(): HasOne
+    {
+        return $this->hasOne(StudentEntryReceivable::class);
     }
 
     public function scopeFilter($query, $filters)

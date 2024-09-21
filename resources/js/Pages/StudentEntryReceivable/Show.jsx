@@ -25,9 +25,7 @@ import StudentEntryReceivableDetailMobile from './Components/StudentEntryReceiva
 import StudentEntryReceivableDetailDesktop from './Components/StudentEntryReceivableDetailDesktop';
 import formatNumber from '@/Utils/formatNumber';
 
-export default function Show({ role, organization, receivables, searchFilter, receivable }) {
-	console.log(receivables);
-	
+export default function Show({ role, organization, receivables, searchFilter, receivable }) {	
 	// State
 	const { errors } = usePage().props;
 

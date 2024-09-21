@@ -24,9 +24,9 @@ import StudentEntryReceivablePaymentMobile from './Components/StudentEntryReceiv
 import StudentEntryReceivablePaymentDesktop from './Components/StudentEntryReceivablePaymentDesktop';
 import Datepicker from 'react-tailwindcss-datepicker';
 
-export default function Index({ organization, role, receivables, searchFilter, studyYears, studyYear, startDate,
+export default function Index({ organization, role, receivablePayments, searchFilter, studyYears, studyYear, startDate,
 	endDate }) {	
-  console.log(receivables);
+  // console.log(receivablePayments);
   
 	const [search, setSearch] = useState(searchFilter || '');
 	const [titleDeleteModal, setTitleDeleteModal] = useState('');
@@ -83,7 +83,7 @@ export default function Index({ organization, role, receivables, searchFilter, s
 	//function
 	const handleReloadPage = () => {
 		router.reload({
-			only: ['receivables'],
+			only: ['receivablePayments'],
 			data: {
 				search,
 				start_date: dateValue.startDate,
@@ -130,15 +130,15 @@ export default function Index({ organization, role, receivables, searchFilter, s
 				search={search}
 				setSearch={(e) => setSearch(e.target.value)}
 				pageBefore={
-					receivables.links[0].url ? (
+					receivablePayments.links[0].url ? (
 						<Link
 							href={route('cashflow.student-entry-receivable-payment', {
 								organization: organization.id,
-								page: receivables.current_page - 1,
+								page: receivablePayments.current_page - 1,
 								search: search,
 							})}
 							preserveState
-							only={['receivables']}>
+							only={['receivablePayments']}>
 							<IoPlayBack />
 						</Link>
 					) : (
@@ -148,14 +148,14 @@ export default function Index({ organization, role, receivables, searchFilter, s
 					)
 				}
 				pageAfter={
-					receivables.links[receivables.links.length - 1].url ? (
+					receivablePayments.links[receivablePayments.links.length - 1].url ? (
 						<Link
 							href={route('cashflow.student-entry-receivable-payment', {
 								organization: organization.id,
-								page: receivables.current_page + 1,
+								page: receivablePayments.current_page + 1,
 								search: search,
 							})}
-							only={['receivables']}
+							only={['receivablePayments']}
 							preserveState>
 							<IoPlayForward />
 						</Link>
@@ -167,10 +167,10 @@ export default function Index({ organization, role, receivables, searchFilter, s
 				}
 				page={
 					<>
-						{receivables.current_page}/{receivables.last_page}
+						{receivablePayments.current_page}/{receivablePayments.last_page}
 					</>
 				}
-				data={receivables}
+				data={receivablePayments}
 				hasFilter={true}
 				showFilter={() => setShowModalFilter(true)}
 				hasDate={true}
@@ -178,7 +178,7 @@ export default function Index({ organization, role, receivables, searchFilter, s
 				onChangeDate={handleDateValueChange}
 			/>
 			<ContentMobile>
-				{receivables.data.map((payment) => (
+				{receivablePayments.data.map((payment) => (
 					<StudentEntryReceivablePaymentMobile
 						payment={payment}
 						key={payment.id}
@@ -237,19 +237,19 @@ export default function Index({ organization, role, receivables, searchFilter, s
 						/>
 					</div>
 					<div className='italic text-xs my-auto w-1/12 text-center'>
-						<PageNumber data={receivables} />
+						<PageNumber data={receivablePayments} />
 					</div>
 					<div className='my-auto flex space-x-2 w-1/12'>
 						<div className='my-auto'>
-							{receivables.links[0].url ? (
+							{receivablePayments.links[0].url ? (
 								<Link
 									href={route('cashflow.student-entry-receivable-payment', {
 										organization: organization.id,
-										page: receivables.current_page - 1,
+										page: receivablePayments.current_page - 1,
 										search: search,
 									})}
 									preserveState
-									only={['receivables']}>
+									only={['receivablePayments']}>
 									<IoPlayBack />
 								</Link>
 							) : (
@@ -259,17 +259,17 @@ export default function Index({ organization, role, receivables, searchFilter, s
 							)}
 						</div>
 						<div className='my-auto'>
-							{receivables.current_page}/{receivables.last_page}
+							{receivablePayments.current_page}/{receivablePayments.last_page}
 						</div>
 						<div className='my-auto'>
-							{receivables.links[receivables.links.length - 1].url ? (
+							{receivablePayments.links[receivablePayments.links.length - 1].url ? (
 								<Link
 									href={route('cashflow.student-entry-receivable-payment', {
 										organization: organization.id,
-										page: receivables.current_page + 1,
+										page: receivablePayments.current_page + 1,
 										search: search,
 									})}
-									only={['receivables']}
+									only={['receivablePayments']}
 									preserveState>
 									<IoPlayForward />
 								</Link>
@@ -297,7 +297,7 @@ export default function Index({ organization, role, receivables, searchFilter, s
 									</tr>
 								</thead>
 								<tbody>
-									{receivables.data.map((payment, index) => (
+									{receivablePayments.data.map((payment, index) => (
 										<StudentEntryReceivablePaymentDesktop
 											key={index}
 											payment={payment}
