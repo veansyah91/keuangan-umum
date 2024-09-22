@@ -222,6 +222,7 @@ class StudentEntryReceivablePaymentController extends Controller
 		];
 	
 		DB::transaction(function () use ($validated, $organization, $user){
+			$validated['value'] = $validated['receivable_value'];
 			// buat jurnal
 			$journal = $this->journalRepository->store($validated);
 			$validated['journal_id'] = $journal['id'];
