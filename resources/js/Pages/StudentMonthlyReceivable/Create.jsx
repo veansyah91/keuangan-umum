@@ -119,10 +119,11 @@ export default function Create({ organization, newRef, contacts, date, categorie
     router.reload({
         only: ['newRef'],
         data: {
-            date: dateValue.startDate,
+            date: date,
         },
         onSuccess: ({ props }) => {
           const { newRef } = props;
+          
           let temp = data;
           temp = {
             ...data,
@@ -177,7 +178,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
 
   const handleDateValueChange = (newValue) => {
     setDateValue(newValue);
-    setData('date', newValue.startDate);
+    // setData('date', newValue.startDate);
     reloadNewRef(newValue.startDate);
   };
 

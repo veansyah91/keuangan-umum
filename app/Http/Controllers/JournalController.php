@@ -64,7 +64,7 @@ class JournalController extends Controller
         $journals = Journal::filter(request(['search', 'start_date', 'end_date', 'is_approved', 'program', 'project', 'department']))
             ->whereOrganizationId($organization['id'])
             ->orderBy('date', 'desc')
-            ->orderBy('no_ref', 'desc')
+            ->orderBy('created_at', 'desc')
             ->paginate(50)->withQueryString();
 
         $user = Auth::user();

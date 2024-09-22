@@ -63,7 +63,6 @@ export default function Create({
     if (selectedContact.id) {
       handleGetPayments();
     }
-    
   },[selectedContact]);
 
   const handleGetPayments = () => {
@@ -75,7 +74,11 @@ export default function Create({
       onSuccess: ({ props }) => {
         const { payments } = props;
         
-        setData('value', payments[0].receivable_value);
+        setData({
+          ...data,
+          value: payments[0].receivable_value,
+          payment_id: payments[0].id
+        })
         setDataPayment(payments);        
         setSelectedPayment({
           id: payments[0].id, 
@@ -92,27 +95,40 @@ export default function Create({
 
     tempData = {
       ...tempData,
+      contact_id:null,
+      date:date,
+      level:'',
+      student_id:'',
       no_ref:newRef,
-    }
-    
+      value: 0,
+      paidValue:0,
+      description: '',
+      payment_id: null,
+      cash_account_id: null,
+    }    
     setData(tempData);
   }
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    console.log(data);
-
     post(route('cashflow.student-entry-receivable-payment.store', organization.id), {
       only:['newRef', 'flash'],
       onSuccess: ({ props  }) => {
         const { flash, newRef } = props;
         
+        reset();
         toast.success(flash.success, {
           position: toast.POSITION.TOP_CENTER,
         });
         setSelectedCashAccount({ id: null, name: '', code: '', is_cash: true });
         setSelectedContact({ id: null, name: '', phone: '' });
+        setSelectedPayment({
+          id: null, 
+          noRef: '', 
+          receivablevalue: 0, 
+          studyYear: ''
+        });
         setDefault(newRef);
       },
       onError: errors => {        
@@ -121,6 +137,7 @@ export default function Create({
         });
       },
       preserveScroll: false,
+      preserveState: true
     });
   };
 
@@ -130,14 +147,15 @@ export default function Create({
   };
 
   const handleSelectedContact = (selected) => {    
-    setSelectedContact({ id: selected.id, name: selected.name, phone: selected.phone });
+    setSelectedContact({ id: selected ? selected.id : null, name: selected ? selected.name : '', phone: selected ? selected.phone : '' });
+    
     let temp = data;
     temp = {
       ...temp,
-      contact_id: selected.id,
-      description:`Pembayaran Iuran Tahunan dari ${selected.name.toUpperCase()} Tahun Ajaran ${data.study_year}`,
-      student_id: selected.student.no_ref,
-      level: selected.last_level.level
+      contact_id: selected ? selected.id : null,
+      description:`Pembayaran Iuran Tahunan dari ${selected ? selected.name.toUpperCase() : ''}`,
+      student_id: selected ? selected.student.no_ref : '',
+      level: selected ? selected.last_level.level : ''
     };
     setData(temp);
   };
@@ -375,8 +393,7 @@ export default function Create({
 
               </div>
             </div>
-            }
-            
+            }            
 
             <div className='flex justify-end flex-col-reverse sm:flex-row gap-2 mt-5'>
               <div className='w-full sm:w-1/6 my-auto text-center'>

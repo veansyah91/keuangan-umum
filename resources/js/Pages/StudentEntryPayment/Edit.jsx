@@ -124,23 +124,27 @@ export default function Edit({
     setData(temp);
   }
 
-  const handleSelectedContact = (selected) => {    
-    setSelectedContact({ id: selected.id, name: selected.name, phone: selected.phone });
-    let temp = data;
-    temp = {
-      ...temp,
-      contact_id: selected.id,
-      description:`Pembayaran Iuran Tahunan dari ${selected.name.toUpperCase()} Tahun Ajaran ${data.study_year}`,
-      student_id: selected.student.no_ref,
-      level: selected.last_level.level
-    };
-    setData(temp);
+  const handleSelectedContact = (selected) => {  
+    if (selected){  
+      setSelectedContact({ id: selected.id, name: selected.name, phone: selected.phone });
+      let temp = data;
+      temp = {
+        ...temp,
+        contact_id: selected.id,
+        description:`Pembayaran Iuran Tahunan dari ${selected.name.toUpperCase()} Tahun Ajaran ${data.study_year}`,
+        student_id: selected.student.no_ref,
+        level: selected.last_level.level
+      };
+      setData(temp);
+    }
   };
 
   const handleSelectedCashAccount = (selected) => {
-    setSelectedCashAccount({ id: selected.id, name: selected.name, code: selected.code, is_cash: true });
-    setData('cash_account_id', selected.id);
-    setError('cash_account_id','');
+    if (selected){
+      setSelectedCashAccount({ id: selected.id, name: selected.name, code: selected.code, is_cash: true });
+      setData('cash_account_id', selected.id);
+      setError('cash_account_id','');
+    }
   };
 
   const handleChangeValue = (values, index) => {

@@ -22,8 +22,10 @@ import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 import ReceivableListBox from './Components/ReceivableListBox';
 
 export default function Edit({
-  organization, newRef, contacts, contact, date, selectedContactQuery, studyYears, cashAccounts, payments
+  organization, newRef, contacts, date, selectedContactQuery, cashAccounts, payments, receivablePayment
 }) {  
+  console.log(receivablePayment);
+  
   const { data, setData, processing, post, errors, setError, reset } = useForm({
     contact_id:selectedContactQuery ? selectedContactQuery.id : null,
     date:date,

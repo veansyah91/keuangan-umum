@@ -223,6 +223,7 @@ class StudentEntryReceivablePaymentController extends Controller
 	
 		DB::transaction(function () use ($validated, $organization, $user){
 			$validated['value'] = $validated['receivable_value'];
+
 			// buat jurnal
 			$journal = $this->journalRepository->store($validated);
 			$validated['journal_id'] = $journal['id'];
@@ -268,7 +269,7 @@ class StudentEntryReceivablePaymentController extends Controller
 			$this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menambahkan DATA pada PEMBAYARAN PIUTANG IURAN TAHUNAN dengan DATA : '.json_encode($log));
 		});
 
-		return redirect()->back()->with('success', 'Pembayaran Iuran Tahunan Berhasil Ditambahkan');
+		return redirect(route('cashflow.student-entry-receivable-payment.create', $organization['id']))->with('success', 'Pembayaran Iuran Tahunan Berhasil Ditambahkan');
 	}
 
 	public function edit(Organization $organization, $id)
@@ -307,6 +308,7 @@ class StudentEntryReceivablePaymentController extends Controller
 																				->where('receivable_value', '>', 0)
 																				->select('id', 'receivable_value', 'no_ref', 'study_year', 'organization_id')
 																				->get(),
+			'receivablePayment' => StudentEntryReceivableLedger::find($id),
 		]);
 	}
 }
