@@ -111,6 +111,7 @@ class StudentMonthlyReceivableController extends Controller
       'newRef' => $this->newRef($organization, request('date')),
       'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
       'contacts' => $this->contactRepository->getStudents($organization['id'], $contactCategory['id'], request(['contact'])),
+      'selectedContactParam' => Contact::with(['contactCategories', 'student', 'lastLevel'])->find(request('selectedContact')),
       'accounts' => $this->accountRepository->getDataNonCash($organization['id'], request(['account'])),
     ]);
   }

@@ -23,7 +23,7 @@ import ReceivableListBox from './Components/ReceivableListBox';
 
 export default function Create({
   organization, newRef, contacts, contact, date, selectedContactQuery, studyYears, cashAccounts, payments
-}) {  
+}) {    
   const { data, setData, processing, post, errors, setError, reset } = useForm({
     contact_id:selectedContactQuery ? selectedContactQuery.id : null,
     date:date,
@@ -95,15 +95,9 @@ export default function Create({
 
     tempData = {
       ...tempData,
-      contact_id:null,
       date:date,
-      level:'',
-      student_id:'',
       no_ref:newRef,
-      value: 0,
       paidValue:0,
-      description: '',
-      payment_id: null,
       cash_account_id: null,
     }    
     setData(tempData);

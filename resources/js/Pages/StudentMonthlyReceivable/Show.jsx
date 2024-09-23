@@ -24,8 +24,8 @@ import { usePrevious } from 'react-use';
 import StudentMonthlyReceivableDetailMobile from './Components/StudentMonthlyReceivableDetailMobile';
 import StudentMonthlyReceivableDetailDesktop from './Components/StudentMonthlyReceivableDetailDesktop';
 
-export default function Show({ role, organization, receivables, searchFilter, receivable }) {
-    // State
+export default function Show({ role, organization, receivables, searchFilter, receivable, contact }) {
+	// State
     const { errors } = usePage().props;
 
     const [showSearch, setShowSearch] = useState(false);
@@ -106,7 +106,11 @@ export default function Show({ role, organization, receivables, searchFilter, re
             <ToastContainer />
 
             {role !== 'viewer' && (
-							<Link href={route('cashflow.student-monthly-receivable.create', organization.id)}>
+							<Link href={route('cashflow.student-monthly-receivable.create', {
+														organization: organization.id,
+														contact: contact.name,
+														selectedContact: contact.id
+							})}>
 								<AddButtonMobile label={'Tambah'} />
 							</Link>
             )}
@@ -178,7 +182,11 @@ export default function Show({ role, organization, receivables, searchFilter, re
 								<div className='my-auto w-7/12'>
 									{role !== 'viewer' && (
 										<div className='space-x-2'>
-											<Link href={route('cashflow.student-monthly-receivable.create', organization.id)}>
+											<Link href={route('cashflow.student-monthly-receivable.create', {
+												organization: organization.id,
+												contact: contact.name,
+												selectedContact: contact.id
+											})}>
 												<PrimaryButton className='py-3'>Tambah Data</PrimaryButton>
 											</Link>
 										</div>

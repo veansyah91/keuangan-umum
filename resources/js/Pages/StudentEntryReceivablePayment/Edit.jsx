@@ -22,18 +22,18 @@ import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 import ReceivableListBox from './Components/ReceivableListBox';
 
 export default function Edit({
-  organization, newRef, contacts, date, selectedContactQuery, cashAccounts, payments, receivablePayment
+  organization, contacts, selectedContactQuery, cashAccounts, payments, receivablePayment
 }) {  
   console.log(receivablePayment);
   
   const { data, setData, processing, post, errors, setError, reset } = useForm({
     contact_id:selectedContactQuery ? selectedContactQuery.id : null,
-    date:date,
+    date:receivablePayment.date,
     level:selectedContactQuery ? selectedContactQuery.last_level.level : '',
     student_id:selectedContactQuery ? selectedContactQuery.student.no_ref : '',
-    no_ref:newRef,
+    no_ref:receivablePayment.no_ref,
     value: payments.length > 0 ? payments[0].receivable_value : 0,
-    paidValue:0,
+    paidValue:receivablePayment.credit,
     description: selectedContactQuery ? `Pembayaran Piutang Iuran Tahunan Oleh ${selectedContactQuery.name}` : '',
     payment_id: payments.length > 0 ? payments[0].id : null,
     cash_account_id: null,
@@ -52,14 +52,11 @@ export default function Edit({
   const [dataPayment, setDataPayment] = useState(payments);
 
   const [dateValue, setDateValue] = useState({
-    startDate: date,
-    endDate: date,
+    startDate: receivablePayment.date,
+    endDate: receivablePayment.date,
   });
 
   // useEffect
-  useEffect(() => {
-    setDefault(newRef);
-  },[]);
 
   useEffect(() => {
     if (selectedContact.id) {
