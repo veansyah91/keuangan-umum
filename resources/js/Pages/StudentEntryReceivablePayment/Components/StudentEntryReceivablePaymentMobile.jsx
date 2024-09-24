@@ -42,7 +42,7 @@ export default function StudentEntryReceivablePaymentMobile({
 								className='dropdown-content z-[50] menu p-2 shadow bg-base-100 rounded-box w-56'>
 								<li>
 									<Link 
-										href={route('cashflow.student-entry-receivable-payment.show', {organization: payment.payment.organization_id, id: payment.id})}
+										href={route('cashflow.student-entry-receivable-payment.show', {organization: payment.payment.organization_id, receivablePayment: payment.id})}
 									>
 										<LiaFileInvoiceSolid />
 											Detail / Cetak 
@@ -53,7 +53,7 @@ export default function StudentEntryReceivablePaymentMobile({
 									<li>
 										<Link href={route('cashflow.student-entry-receivable-payment.edit', { 
 											organization: payment.payment.organization_id, 
-											id: payment.id,
+											receivablePayment: payment.id,
 											contact: payment.payment.contact.name,
 											selectedContact: payment.payment.contact.id
 										})}>

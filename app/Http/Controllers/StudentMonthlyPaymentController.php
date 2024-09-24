@@ -600,17 +600,17 @@ class StudentMonthlyPaymentController extends Controller
 
 	}
 
-	public function show(Organization $organization, $id)
+	public function show(Organization $organization, StudentMonthlyPayment $payment)
 	{
 		$user = Auth::user();
 
-		$payment = StudentMonthlyPayment::with('details')->find($id);
+		$paymentWithDetail = StudentMonthlyPayment::with('details')->find($payment['id']);
 
 		return Inertia::render('StudentMonthlyPayment/Show',[
 			'organization' => $organization,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'user' => $user,
-			'payment' => $payment,
+			'payment' => $paymentWithDetail,
 			'contact' => Contact::with(['student', 'lastLevel'])->find($payment['contact_id']),
 		]);
 	}

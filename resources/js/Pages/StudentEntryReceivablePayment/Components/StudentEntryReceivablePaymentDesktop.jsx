@@ -38,7 +38,7 @@ export default function StudentEntryReceivablePaymentDesktop({
                 <Link 
                   href={route('cashflow.student-entry-receivable-payment.show', {
                         organization: payment.payment.organization_id, 
-                        id: payment.id,
+                        receivablePayment: payment.id,
                         
                       })}
                 >
@@ -51,7 +51,7 @@ export default function StudentEntryReceivablePaymentDesktop({
                 <li>
                   <Link href={route('cashflow.student-entry-receivable-payment.edit', { 
                                     organization: payment.payment.organization_id, 
-                                    id: payment.id,
+                                    receivablePayment: payment.id,
                                     contact: payment.payment.contact.name,
                                     selectedContact: payment.payment.contact.id
                   })}>

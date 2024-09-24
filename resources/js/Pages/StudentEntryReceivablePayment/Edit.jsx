@@ -12,8 +12,6 @@ import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
 import SecondaryButton from '@/Components/SecondaryButton';
 import PrimaryButton from '@/Components/PrimaryButton';
-import dayjs from 'dayjs';
-import studyYear from '@/Utils/studyYear';
 import StudentSelectInput from '@/Components/SelectInput/StudentSelectInput';
 import Datepicker from 'react-tailwindcss-datepicker';
 import { NumericFormat } from 'react-number-format';
@@ -26,7 +24,7 @@ export default function Edit({
 }) {  
   console.log(receivablePayment);
   
-  const { data, setData, processing, post, errors, setError, reset } = useForm({
+  const { data, setData, processing, patch, errors, setError, reset } = useForm({
     contact_id:selectedContactQuery ? selectedContactQuery.id : null,
     date:receivablePayment.date,
     level:selectedContactQuery ? selectedContactQuery.last_level.level : '',
@@ -100,10 +98,8 @@ export default function Edit({
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    console.log(data);
-
-    post(route('cashflow.student-entry-receivable-payment.store', organization.id), {
-      only:['newRef', 'flash'],
+    patch(route('cashflow.student-entry-receivable-payment.update', {organization: organization.id, receivablePayment: receivablePayment}), {
+      only:['flash'],
       onSuccess: ({ props  }) => {
         const { flash, newRef } = props;
         
@@ -134,7 +130,7 @@ export default function Edit({
     temp = {
       ...temp,
       contact_id: selected.id,
-      description:`Pembayaran Iuran Tahunan dari ${selected.name.toUpperCase()} Tahun Ajaran ${data.study_year}`,
+      description:`Pembayaran Piutang Iuran Tahunan dari ${selected.name.toUpperCase()} Tahun Ajaran ${data.study_year}`,
       student_id: selected.student.no_ref,
       level: selected.last_level.level
     };

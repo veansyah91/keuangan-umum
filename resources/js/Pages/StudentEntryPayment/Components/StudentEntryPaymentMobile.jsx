@@ -42,7 +42,7 @@ export default function StudentEntryPaymentMobile({
 								className='dropdown-content z-[50] menu p-2 shadow bg-base-100 rounded-box w-56'>
 								<li>
 									<Link 
-										href={route('cashflow.student-entry-payment.show', {organization: payment.organization_id, id: payment.id})}
+										href={route('cashflow.student-entry-payment.show', {organization: payment.organization_id, payment: payment.id})}
 									>
 										<LiaFileInvoiceSolid />
 											Detail / Cetak 
@@ -51,7 +51,7 @@ export default function StudentEntryPaymentMobile({
 								{
 									!payment.receivable_ledger && 
 									<li>
-										<Link href={route('cashflow.student-entry-payment.edit', { organization: payment.organization_id, id: payment.id })}>
+										<Link href={route('cashflow.student-entry-payment.edit', { organization: payment.organization_id, payment: payment.id })}>
 											<IoCreateOutline />
 											Ubah
 										</Link>

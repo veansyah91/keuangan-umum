@@ -222,7 +222,7 @@ class StudentEntryReceivablePaymentController extends Controller
 		];
 	
 		DB::transaction(function () use ($validated, $organization, $user){
-			$validated['value'] = $validated['receivable_value'];
+			$validated['value'] = $validated['paidValue'];
 
 			// buat jurnal
 			$journal = $this->journalRepository->store($validated);
@@ -272,7 +272,7 @@ class StudentEntryReceivablePaymentController extends Controller
 		return redirect(route('cashflow.student-entry-receivable-payment.create', $organization['id']))->with('success', 'Pembayaran Iuran Tahunan Berhasil Ditambahkan');
 	}
 
-	public function edit(Organization $organization, $id)
+	public function edit(Organization $organization, StudentEntryReceivableLedger $receivablePayment)
 	{
 		$user = Auth::user();
 		$organizationUser = $user->organizations()->where('organization_id', $organization['id'])->wherePivot('role', "<>", 'viewer')->first();
@@ -308,7 +308,55 @@ class StudentEntryReceivablePaymentController extends Controller
 																				->where('receivable_value', '>', 0)
 																				->select('id', 'receivable_value', 'no_ref', 'study_year', 'organization_id')
 																				->get(),
-			'receivablePayment' => StudentEntryReceivableLedger::find($id),
+			'receivablePayment' => $receivablePayment,
 		]);
+	}
+
+	public function update(Request $request, Organization $organization, $id)
+	{
+		$validated = $request->validate([
+			'contact_id' => [
+				'required',
+				'exists:contacts,id',
+			],
+			'date' => [
+				'required',
+				'date',
+			],
+			'level' => [
+				'required',
+				'numeric',
+			],
+			'student_id' => [
+				'string',
+				'nullable',
+			],
+			'value' => [
+				'required',
+				'numeric',
+			],
+			'paidValue' => [
+				'required',
+				'numeric',
+			],
+			'description' => [
+				'string',
+				'nullable'
+			],
+			'payment_id' => [
+				'required',
+				'exists:student_entry_payments,id',
+			],
+			'cash_account_id' => [
+				'required',
+				'exists:accounts,id'
+			],
+		]);
+		$receivablePayment = StudentEntryReceivableLedger::find($id);
+		dd($receivablePayment);
+
+		DB::transaction(function () use ($validated) {
+
+		});
 	}
 }

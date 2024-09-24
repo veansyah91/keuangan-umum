@@ -356,9 +356,9 @@ class StudentEntryPaymentController extends Controller
 		return redirect()->back()->with('success', 'Pembayaran Iuran Tahunan Berhasil Ditambahkan');
 	}
 
-	public function edit(Organization $organization, $id)
+	public function edit(Organization $organization, StudentEntryPayment $payment)
 	{
-		$payment = StudentEntryPayment::with('details', 'receivables')
+		$paymentWithDetail = StudentEntryPayment::with('details', 'receivables')
 																	->with('contact', function ($query) {
 																		return $query->with('student', 'lastLevel');
 																	})
@@ -367,7 +367,7 @@ class StudentEntryPaymentController extends Controller
 																			return $query->with('account');
 																		});
 																	})						
-																	->find($id);
+																	->find($payment['id']);
 
 		$user = Auth::user();
 		$organizationUser = $user->organizations()->where('organization_id', $organization['id'])->wherePivot('role', "<>", 'viewer')->first();
@@ -401,11 +401,11 @@ class StudentEntryPaymentController extends Controller
 			'studyYears' => StudentLevel::select('year')->distinct()->take(10)->get(),
 			'contacts' => $this->contactRepository->getStudents($organization['id'], $contactCategory['id'], request(['contact'])),
 			'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),
-			'payment' => $payment
+			'payment' => $paymentWithDetail
 		]);
 	}
 
-	public function update(Request $request, Organization $organization, $id)
+	public function update(Request $request, Organization $organization, StudentEntryPayment $payment)
 	{
 		$rules = [
 			'contact_id' => [
@@ -462,7 +462,7 @@ class StudentEntryPaymentController extends Controller
 				'string',
 				Rule::unique('student_entry_payments')->where(function ($query) use ($organization) {
 					return $query->where('organization_id', $organization['id']);
-				})->ignore($id),
+				})->ignore($payment['id']),
 			],
 		];
 
@@ -476,11 +476,11 @@ class StudentEntryPaymentController extends Controller
 		$validated = $validator->validated();
 
 		// cek apakah sudah ada transaksi pembayaran antara siswa dan tahun ajaran
-		$payment = StudentEntryPayment::where('organization_id', $organization['id'])->where('contact_id', $validated['contact_id'])
+		$checkPayment = StudentEntryPayment::where('organization_id', $organization['id'])->where('contact_id', $validated['contact_id'])
 																		->where('study_year', $validated['study_year'])
 																		->first();
 
-		if ($payment && ($payment['id'] !== (int)$id)) {
+		if ($checkPayment && ($payment['id'] !== (int)$payment['id'])) {
 			return redirect()->back()->withErrors(['error' => 'Data is existed']);
 		}
 		
@@ -553,20 +553,18 @@ class StudentEntryPaymentController extends Controller
 			];
 		}
 
-		DB::transaction(function () use ($validated, $organization, $user, $id){
+		DB::transaction(function () use ($validated, $organization, $user, $payment){
 			// cek apakah sudah dibuatkan piutang
 			// jika sudah ada maka kurangi piutang
 			$studentReceivable = StudentEntryReceivable::where('organization_id', $organization['id'])
 																							->where('contact_id', $validated['contact_id'])
 																							->first();
 
-			$payment = StudentEntryPayment::find($id);
-
 			$tempStudentReceivableValue = 0;
 			if ($studentReceivable) {
 
 				// cek apakah jika piutang baru lebih kecil dari jumlah yang telah dibayarkan, maka kirimkan pesan error
-				$receivableDetails = StudentEntryReceivableLedger::where('payment_id', $id);
+				$receivableDetails = StudentEntryReceivableLedger::where('payment_id', $payment['id']);
 
 				$sumCredit = $receivableDetails->sum('credit');
 
@@ -593,7 +591,7 @@ class StudentEntryPaymentController extends Controller
 
 			// hapus detail pembayaran
 			DB::table('s_yearly_payment_details')
-					->where('payment_id', $id)
+					->where('payment_id', $payment['id'])
 					->delete();
 
 			$payment->update($validated);
@@ -648,17 +646,17 @@ class StudentEntryPaymentController extends Controller
 		return redirect()->back()->with('success', 'Pembayaran Iuran Tahunan Berhasil Diubah');
 	}
 
-	public function show(Organization $organization, $id)
+	public function show(Organization $organization, StudentEntryPayment $payment)
 	{
 		$user = Auth::user();
 
-		$payment = StudentEntryPayment::with('details')->find($id);
+		$paymentWithDetail = StudentEntryPayment::with('details')->find($payment['id']);
 
 		return Inertia::render('StudentEntryPayment/Show',[
 			'organization' => $organization,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'user' => $user,
-			'payment' => $payment,
+			'payment' => $paymentWithDetail,
 			'contact' => Contact::with(['student', 'lastLevel'])->find($payment['contact_id']),
 		]);
 	}

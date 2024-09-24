@@ -92,7 +92,7 @@ export default function Edit({
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    patch(route('cashflow.student-entry-payment.update', {organization: organization.id, id: payment.id}), {
+    patch(route('cashflow.student-entry-payment.update', {organization: organization.id, payment: payment.id}), {
       onSuccess: ({ props  }) => {
         const { flash } = props;
         
