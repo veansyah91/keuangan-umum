@@ -77,8 +77,6 @@ class StudentEntryPaymentController extends Controller
 		$user = Auth::user();
 		$search = request(['search']);
 
-		// dd(request('studyYear'));
-
 		return Inertia::render('StudentEntryPayment/Index', [
 			'organization' => $organization,
 			'payments' => StudentEntryPayment::filter(request(['search','studyYear','start_date', 'end_date']))
@@ -324,6 +322,7 @@ class StudentEntryPaymentController extends Controller
 
 				} else {
 					// jika belum, maka buat baru
+					$validated['value'] = $receivableValue;
 					$receivable = StudentEntryReceivable::create($validated);
 				}
 
@@ -483,6 +482,14 @@ class StudentEntryPaymentController extends Controller
 		if ($checkPayment && ($payment['id'] !== (int)$payment['id'])) {
 			return redirect()->back()->withErrors(['error' => 'Data is existed']);
 		}
+
+		// cek apakah sudah dilakukan pembayaran piutang
+		$checkReceivable = StudentEntryReceivableLedger::where('payment_id', $payment['id'])
+																										->where('credit', '>', 0)
+																										->select('credit')
+																										->sum('credit');
+
+																										dd($checkReceivable);
 		
 		$validated['organization_id'] = $organization['id'];
 		$validated['user_id'] = $user['id'];
@@ -667,7 +674,7 @@ class StudentEntryPaymentController extends Controller
 		$receivableLedger = StudentEntryReceivableLedger::where('payment_id', $payment['id']);
 
 		if ($receivableLedger->where('credit', '>', 0)->count() > 0) {
-			return redirect()->back()->withErrors(['error' => "Can't deleted"]);
+			return redirect()->back()->withErrors(['error' => "Pembayaran tidak dapat dihapus"]);
 		}
 
 		$user = Auth::user();

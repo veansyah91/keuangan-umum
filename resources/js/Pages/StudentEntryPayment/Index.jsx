@@ -105,7 +105,7 @@ export default function Index({ organization, role, payments, searchFilter, stud
 			},
 			onError: (error) => {
 				setShowDeleteConfirmation(false);
-				toast.error(error.message, {
+				toast.error(error.error, {
 					position: toast.POSITION.TOP_CENTER,
 				});
 			},

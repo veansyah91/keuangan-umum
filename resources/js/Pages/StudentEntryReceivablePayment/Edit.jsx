@@ -28,7 +28,7 @@ export default function Edit({
     level:selectedContactQuery ? selectedContactQuery.last_level.level : '',
     student_id:selectedContactQuery ? selectedContactQuery.student.no_ref : '',
     no_ref:receivablePayment.no_ref,
-    value: payments.length > 0 ? payments[0].receivable_value : 0,
+    value: payments.length > 0 ? payments[0].receivable_value + receivablePayment.credit : receivablePayment.credit,
     paidValue:receivablePayment.credit,
     description: selectedContactQuery ? `Pembayaran Piutang Iuran Tahunan Oleh ${selectedContactQuery.name}` : '',
     payment_id: payments.length > 0 ? payments[0].id : null,

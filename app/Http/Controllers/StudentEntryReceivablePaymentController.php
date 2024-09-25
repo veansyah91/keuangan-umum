@@ -235,6 +235,7 @@ class StudentEntryReceivablePaymentController extends Controller
 																					->first();
 
 			$tempReceivableValue = $receivable['value'] - $validated['paidValue'];
+
 			$receivable->update([
 				'value' => $tempReceivableValue
 			]);
@@ -357,11 +358,24 @@ class StudentEntryReceivablePaymentController extends Controller
 				'exists:accounts,id'
 			],
 		]);
+
+		$checkRule = StudentEntryReceivableLedger::whereHas('payment', function ($query) use ($organization){
+																								return $query->whereOrganizationId($organization['id']);
+																									})
+																									->where('no_ref', $request['no_ref'])
+																									->first();
+		if ($checkRule) {
+			if ($checkRule['no_ref'] !== $receivablePayment['no_ref']) {
+				return redirect()->back()->withErrors(['no_ref' => 'No Ref is invalid']);
+			}
+		}
+		$validated['no_ref'] = $request['no_ref'];
+		$validated['organization_id'] = $organization['id'];
 		$validated['receivable_value'] = $validated['value'] - $validated['paidValue'];
 
 		$accounts = SchoolAccountSetting::where('organization_id', $organization['id'])->first();
 		$receivableStudentAccount = Account::find($accounts['receivable_entry_student']);
-
+		$user = Auth::user();
 		$cashAccount = Account::find($validated['cash_account_id']);
 
 		$validated['accounts'] = [
