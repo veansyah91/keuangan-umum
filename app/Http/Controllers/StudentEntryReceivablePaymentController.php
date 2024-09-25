@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use Inertia\Inertia;
+use App\Models\Ledger;
 use App\Helpers\NewRef;
 use App\Models\Account;
 use App\Models\Contact;
+use App\Models\Cashflow;
 use Carbon\CarbonImmutable;
 use App\Models\Organization;
 use App\Models\StudentLevel;
@@ -295,6 +297,8 @@ class StudentEntryReceivablePaymentController extends Controller
 			return redirect()->back()->withErrors(['message' => 'Silakan Buat Kategori Kontak SISWA terlebih dahulu!']);
 		}
 
+		$cashFlow = Ledger::whereJournalId($receivablePayment['journal_id'])->where('debit', '>', 0)->first();
+
 		return Inertia::render('StudentEntryReceivablePayment/Edit',[
 			'organization' => $organization,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
@@ -309,10 +313,11 @@ class StudentEntryReceivablePaymentController extends Controller
 																				->select('id', 'receivable_value', 'no_ref', 'study_year', 'organization_id')
 																				->get(),
 			'receivablePayment' => $receivablePayment,
+			'cashAccount' => Account::find($cashFlow['account_id'])
 		]);
 	}
 
-	public function update(Request $request, Organization $organization, $id)
+	public function update(Request $request, Organization $organization, StudentEntryReceivableLedger $receivablePayment)
 	{
 		$validated = $request->validate([
 			'contact_id' => [
@@ -352,11 +357,76 @@ class StudentEntryReceivablePaymentController extends Controller
 				'exists:accounts,id'
 			],
 		]);
-		$receivablePayment = StudentEntryReceivableLedger::find($id);
-		dd($receivablePayment);
+		$validated['receivable_value'] = $validated['value'] - $validated['paidValue'];
 
-		DB::transaction(function () use ($validated) {
+		$accounts = SchoolAccountSetting::where('organization_id', $organization['id'])->first();
+		$receivableStudentAccount = Account::find($accounts['receivable_entry_student']);
+
+		$cashAccount = Account::find($validated['cash_account_id']);
+
+		$validated['accounts'] = [
+			// akun debit (kas)
+			[
+				'id' => $cashAccount['id'],
+				'name' => $cashAccount['name'],
+				'code' => $cashAccount['code'],
+				'is_cash' => 1,
+				'debit' => $validated['paidValue'],
+				'credit' => 0,
+			],
+
+			// akun credit (piutang)
+			[
+				'id' => $receivableStudentAccount['id'],
+				'name' => $receivableStudentAccount['name'],
+				'code' => $receivableStudentAccount['code'],
+				'is_cash' => 0,
+				'debit' => 0,
+				'credit' => $validated['paidValue'],
+			]
+		];
+
+		DB::transaction(function () use ($validated, $receivablePayment, $organization, $user) {
+			// ubah data pada sisa piutang pada pembayaran
+			$payment = StudentEntryPayment::find($validated['payment_id']);
+			
+			$tempPaymentValue = $payment['receivable_value'] + $receivablePayment['credit'] - $validated['paidValue'];
+			$payment->update([
+				'receivable_value' => $tempPaymentValue
+			]);
+
+			// ubah data pada sisa piutang pada siswa (akumulasi)
+			$receivable = StudentEntryReceivable::where('contact_id', $validated['contact_id'])
+																					->first();
+
+			$tempReceivableValue = $receivable['value'] + $receivablePayment['credit'] - $validated['paidValue'];
+			$receivable->update([
+				'value' => $tempReceivableValue
+			]);
+
+			// ubah data pada pembayaran piutang
+			$receivablePayment->update([
+				'credit' => $validated['paidValue'],
+				'no_ref' => $validated['no_ref'],
+				'description' => $validated['description'],
+				'date' => $validated['date'],
+			]);
+
+			// ubah pada jurnal
+			$validated['value'] = $validated['paidValue'];
+			$this->journalRepository->update($validated, $payment->journal);
+
+			// buat log
+			$log = [
+				'description' => $validated['description'],
+				'date' => $validated['date'],
+				'no_ref' => $validated['no_ref'],
+				'value' => $validated['value'],
+			];
+
+			$this->logRepository->store($organization['id'], strtoupper($user['name']).' telah mengubah DATA pada PEMBAYARAN PIUTANG IURAN TAHUNAN dengan DATA : '.json_encode($log));
 
 		});
+		return redirect()->back()->with('success', 'Pembayaran Piutang Iuran Tahunan Berhasil Diubah');
 	}
 }

@@ -20,10 +20,8 @@ import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 import ReceivableListBox from './Components/ReceivableListBox';
 
 export default function Edit({
-  organization, contacts, selectedContactQuery, cashAccounts, payments, receivablePayment
-}) {  
-  console.log(receivablePayment);
-  
+  organization, contacts, selectedContactQuery, cashAccounts, payments, receivablePayment, cashAccount
+}) {    
   const { data, setData, processing, patch, errors, setError, reset } = useForm({
     contact_id:selectedContactQuery ? selectedContactQuery.id : null,
     date:receivablePayment.date,
@@ -34,11 +32,11 @@ export default function Edit({
     paidValue:receivablePayment.credit,
     description: selectedContactQuery ? `Pembayaran Piutang Iuran Tahunan Oleh ${selectedContactQuery.name}` : '',
     payment_id: payments.length > 0 ? payments[0].id : null,
-    cash_account_id: null,
+    cash_account_id: cashAccount.id,
   });
 
   const [selectedContact, setSelectedContact] = useState({ id: selectedContactQuery ? selectedContactQuery.id: null, name: selectedContactQuery ? selectedContactQuery.name: '', phone: selectedContactQuery ? selectedContactQuery.phone: '' });
-  const [selectedCashAccount, setSelectedCashAccount] = useState({ id: null, name: '', code: '', is_cash: true });
+  const [selectedCashAccount, setSelectedCashAccount] = useState({ id: cashAccount.id, name: cashAccount.name, code: cashAccount.code, is_cash: true });
 
   const [selectedPayment, setSelectedPayment] = useState({
     id: payments.length > 0 ? payments[0].id : null, 
@@ -57,10 +55,11 @@ export default function Edit({
   // useEffect
 
   useEffect(() => {
-    if (selectedContact.id) {
-      handleGetPayments();
-    }
-    
+    setTimeout(() => {
+      if (selectedContact.id) {
+        handleGetPayments();
+      }  
+    }, 0);      
   },[selectedContact]);
 
   const handleGetPayments = () => {
@@ -101,14 +100,11 @@ export default function Edit({
     patch(route('cashflow.student-entry-receivable-payment.update', {organization: organization.id, receivablePayment: receivablePayment}), {
       only:['flash'],
       onSuccess: ({ props  }) => {
-        const { flash, newRef } = props;
+        const { flash } = props;
         
         toast.success(flash.success, {
           position: toast.POSITION.TOP_CENTER,
         });
-        setSelectedCashAccount({ id: null, name: '', code: '', is_cash: true });
-        setSelectedContact({ id: null, name: '', phone: '' });
-        setDefault(newRef);
       },
       onError: errors => {        
         toast.error(errors.error, {
@@ -125,22 +121,26 @@ export default function Edit({
   };
 
   const handleSelectedContact = (selected) => {    
-    setSelectedContact({ id: selected.id, name: selected.name, phone: selected.phone });
-    let temp = data;
-    temp = {
-      ...temp,
-      contact_id: selected.id,
-      description:`Pembayaran Piutang Iuran Tahunan dari ${selected.name.toUpperCase()} Tahun Ajaran ${data.study_year}`,
-      student_id: selected.student.no_ref,
-      level: selected.last_level.level
-    };
-    setData(temp);
+    if (selected) {
+      setSelectedContact({ id: selected.id, name: selected.name, phone: selected.phone });
+      let temp = data;
+      temp = {
+        ...temp,
+        contact_id: selected.id,
+        description:`Pembayaran Piutang Iuran Tahunan dari ${selected.name.toUpperCase()} Tahun Ajaran ${data.study_year}`,
+        student_id: selected.student.no_ref,
+        level: selected.last_level.level
+      };
+      setData(temp);
+    }
   };
 
   const handleSelectedCashAccount = (selected) => {
-    setSelectedCashAccount({ id: selected.id, name: selected.name, code: selected.code, is_cash: true });
-    setData('cash_account_id', selected.id);
-    setError('cash_account_id','');
+    if (selected) {
+      setSelectedCashAccount({ id: selected.id, name: selected.name, code: selected.code, is_cash: true });
+      setData('cash_account_id', selected.id);
+      setError('cash_account_id','');
+    }    
   };
 
   const handleChangePaidValue = (values) => {
@@ -149,12 +149,15 @@ export default function Edit({
   }
 
   const handleSelectedPayment = (selected) => {
-    setSelectedPayment({
-      id: selected.id, 
-      noRef: selected.no_ref, 
-      receivablevalue: selected.receivable_value, 
-      studyYear: selected.study_year
-    })    
+    if (selected) {
+      setSelectedPayment({
+        id: selected.id, 
+        noRef: selected.no_ref, 
+        receivablevalue: selected.receivable_value, 
+        studyYear: selected.study_year
+      })    
+    }
+
   }
   
   return (
@@ -399,11 +402,11 @@ export default function Edit({
 
 Edit.layout = (page) => (
   <AuthenticatedLayout
-    header={<Header>Ubag Pembayaran</Header>}
+    header={<Header>Ubah Pembayaran</Header>}
     children={page}
     user={page.props.auth.user}
     organization={page.props.organization}
-    title='Ubag Pembayaran'
+    title='Ubah Pembayaran'
     backLink={
       <Link href={route('cashflow.student-entry-receivable-payment', page.props.organization.id)}>
         <IoArrowBackOutline />
@@ -418,7 +421,7 @@ Edit.layout = (page) => (
           <li className='font-bold'>
             <Link href={route('cashflow.student-entry-receivable-payment', page.props.organization.id)}>Pembayaran Iuran Tahunan Siswa</Link>
           </li>
-          <li>Ubag Pembayaran</li>
+          <li>Ubah Pembayaran</li>
         </ul>
       </div>
     }

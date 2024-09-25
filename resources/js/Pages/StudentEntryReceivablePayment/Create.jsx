@@ -60,9 +60,11 @@ export default function Create({
   },[]);
 
   useEffect(() => {
-    if (selectedContact.id) {
-      handleGetPayments();
-    }
+    setTimeout(() => {
+      if (selectedContact.id) {
+        handleGetPayments();
+      }  
+    }, 0);   
   },[selectedContact]);
 
   const handleGetPayments = () => {
@@ -141,23 +143,27 @@ export default function Create({
   };
 
   const handleSelectedContact = (selected) => {    
-    setSelectedContact({ id: selected ? selected.id : null, name: selected ? selected.name : '', phone: selected ? selected.phone : '' });
-    
-    let temp = data;
-    temp = {
-      ...temp,
-      contact_id: selected ? selected.id : null,
-      description:`Pembayaran Iuran Tahunan dari ${selected ? selected.name.toUpperCase() : ''}`,
-      student_id: selected ? selected.student.no_ref : '',
-      level: selected ? selected.last_level.level : ''
-    };
-    setData(temp);
+    if (selected) { 
+      setSelectedContact({ id: selected ? selected.id : null, name: selected ? selected.name : '', phone: selected ? selected.phone : '' });
+      
+      let temp = data;
+      temp = {
+        ...temp,
+        contact_id: selected ? selected.id : null,
+        description:`Pembayaran Iuran Tahunan dari ${selected ? selected.name.toUpperCase() : ''}`,
+        student_id: selected ? selected.student.no_ref : '',
+        level: selected ? selected.last_level.level : ''
+      };
+      setData(temp);
+    }
   };
 
   const handleSelectedCashAccount = (selected) => {
-    setSelectedCashAccount({ id: selected.id, name: selected.name, code: selected.code, is_cash: true });
-    setData('cash_account_id', selected.id);
-    setError('cash_account_id','');
+    if (selected) {
+      setSelectedCashAccount({ id: selected.id, name: selected.name, code: selected.code, is_cash: true });
+      setData('cash_account_id', selected.id);
+      setError('cash_account_id','');
+    }
   };
 
   const handleChangePaidValue = (values) => {
@@ -166,12 +172,14 @@ export default function Create({
   }
 
   const handleSelectedPayment = (selected) => {
-    setSelectedPayment({
-      id: selected.id, 
-      noRef: selected.no_ref, 
-      receivablevalue: selected.receivable_value, 
-      studyYear: selected.study_year
-    })    
+    if (selected) {
+      setSelectedPayment({
+        id: selected.id, 
+        noRef: selected.no_ref, 
+        receivablevalue: selected.receivable_value, 
+        studyYear: selected.study_year
+      })    
+    }
   }
   
   return (
