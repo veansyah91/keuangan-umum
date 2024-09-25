@@ -489,7 +489,7 @@ class StudentEntryPaymentController extends Controller
 																										->select('credit')
 																										->sum('credit');
 
-																										dd($checkReceivable);
+		// bandingkan
 		
 		$validated['organization_id'] = $organization['id'];
 		$validated['user_id'] = $user['id'];
