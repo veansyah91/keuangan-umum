@@ -21,7 +21,7 @@ import ReceivableListBox from './Components/ReceivableListBox';
 
 export default function Edit({
   organization, contacts, selectedContactQuery, cashAccounts, payments, receivablePayment, cashAccount
-}) {    
+}) {      
   const { data, setData, processing, patch, errors, setError, reset } = useForm({
     contact_id:selectedContactQuery ? selectedContactQuery.id : null,
     date:receivablePayment.date,
@@ -71,13 +71,15 @@ export default function Edit({
       onSuccess: ({ props }) => {
         const { payments } = props;
         
-        setData('value', payments[0].receivable_value);
+        let filteredPayments = payments.filter(payment => parseInt(payment.id) === parseInt(receivablePayment.payment_id));
+        
+        setData('value', filteredPayments[0].receivable_value + receivablePayment.credit);
         setDataPayment(payments);        
         setSelectedPayment({
-          id: payments[0].id, 
-          noRef: payments[0].no_ref, 
-          receivablevalue: payments[0].receivable_value, 
-          studyYear: payments[0].study_year
+          id: filteredPayments[0].id, 
+          noRef: filteredPayments[0].no_ref, 
+          receivablevalue: filteredPayments[0].receivable_value, 
+          studyYear: filteredPayments[0].study_year
         })
       }
     });
@@ -106,7 +108,7 @@ export default function Edit({
           position: toast.POSITION.TOP_CENTER,
         });
       },
-      onError: errors => {        
+      onError: errors => {                
         toast.error(errors.error, {
           position: toast.POSITION.TOP_CENTER,
         });

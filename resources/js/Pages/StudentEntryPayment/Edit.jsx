@@ -101,6 +101,8 @@ export default function Edit({
         });
       },
       onError: errors => {        
+        console.log(errors);
+        
         toast.error(errors.error, {
           position: toast.POSITION.TOP_CENTER,
         });

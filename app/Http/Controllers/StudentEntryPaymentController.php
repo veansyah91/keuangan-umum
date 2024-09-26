@@ -489,12 +489,20 @@ class StudentEntryPaymentController extends Controller
 																										->select('credit')
 																										->sum('credit');
 
-		// bandingkan
+		// bandingkan jumlah nilai pembayaran dengan piutang yang telah dibayar
+		if (($validated['value'] < (int)$checkReceivable) || ($validated['paidValue'] < (int)$checkReceivable)) {
+			return redirect()->back()->withErrors(['error' => 'Jumlah Pembayaran tidak valid']);
+		}
 		
 		$validated['organization_id'] = $organization['id'];
 		$validated['user_id'] = $user['id'];
 		$validated['created_by_id'] = $user['id'];
+
 		$validated['receivable_value'] = $validated['value'] - $validated['paidValue'];
+		
+		// pembayaran selain pembayaran pada piutang
+		$tempPaidValue = $validated['paidValue'] - (int)$checkReceivable;
+		$validated['paidValue'] = $tempPaidValue;
 
 		$accounts = SchoolAccountSetting::where('organization_id', $organization['id'])->first();
 		$entryStudentAccount = Account::find($accounts['entry_student']);
@@ -560,13 +568,12 @@ class StudentEntryPaymentController extends Controller
 			];
 		}
 
-		DB::transaction(function () use ($validated, $organization, $user, $payment){
+		DB::transaction(function () use ($validated, $organization, $user, $payment, $checkReceivable){
 			// cek apakah sudah dibuatkan piutang
 			// jika sudah ada maka kurangi piutang
 			$studentReceivable = StudentEntryReceivable::where('organization_id', $organization['id'])
 																							->where('contact_id', $validated['contact_id'])
 																							->first();
-
 			$tempStudentReceivableValue = 0;
 			if ($studentReceivable) {
 
@@ -575,9 +582,9 @@ class StudentEntryPaymentController extends Controller
 
 				$sumCredit = $receivableDetails->sum('credit');
 
-				if ($validated['receivable_value'] < $sumCredit) {
-					return redirect()->back()->withErrors(['paidValue' => 'Error']);
-				}
+				// if ($validated['receivable_value'] < $sumCredit) {
+				// 	return redirect()->back()->withErrors(['error' => 'Jumlah Pembayaran tidak valid']);
+				// }
 
 				$tempStudentReceivableValue = $studentReceivable['value'] - $payment['receivable_value'] + $validated['receivable_value'];
 
@@ -592,7 +599,7 @@ class StudentEntryPaymentController extends Controller
 					'description' => $validated['description'],
 					'date' => $validated['date'],
 					'study_year' => $validated['study_year'],
-					'debit' => $validated['receivable_value'],
+					'debit' => $validated['receivable_value'] + $checkReceivable,
 				]);
 			}
 
@@ -627,7 +634,7 @@ class StudentEntryPaymentController extends Controller
 					'created_by_id' => $validated['created_by_id'],
 					'payment_id' => $payment['id'],
 					'journal_id' => $journal['id'],
-					'debit' => $validated['receivable_value'],
+					'debit' => $validated['receivable_value'] + $checkReceivable,
 					'credit' => 0,
 					'no_ref' => $validated['no_ref'],
 					'description' => $validated['description'],

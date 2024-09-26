@@ -310,11 +310,25 @@ class StudentEntryReceivablePaymentController extends Controller
 			'selectedContactQuery' => Contact::with(['contactCategories', 'student', 'lastLevel'])->find(request('selectedContact')),
 			'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),			
 			'payments' => StudentEntryPayment::where('contact_id', request('selectedContact'))
-																				->where('receivable_value', '>', 0)
+																				// ->where('receivable_value', '>', 0)
 																				->select('id', 'receivable_value', 'no_ref', 'study_year', 'organization_id')
 																				->get(),
 			'receivablePayment' => $receivablePayment,
 			'cashAccount' => Account::find($cashFlow['account_id'])
+		]);
+	}
+
+	public function Show(Organization $organization, StudentEntryReceivableLedger $receivablePayment)
+	{
+		$user = Auth::user();
+		$receivablePaymentWithDetail = StudentEntryReceivableLedger::with('payment')->find($receivablePayment['id']);
+
+		return Inertia::render('StudentEntryReceivablePayment/Show',[
+			'organization' => $organization,
+			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+			'user' => $user,
+			'payment' => $receivablePaymentWithDetail,
+			'contact' => Contact::with(['student', 'lastLevel'])->find($receivablePaymentWithDetail->payment->contact_id),
 		]);
 	}
 
