@@ -32,7 +32,6 @@ export default function Show({ contact, organization, role, payment, user }) {
 			phone = "62" + phone.slice(1);
 		}
 
-
 		let detail = '';
 
 		payment.details.forEach((r, index) => {

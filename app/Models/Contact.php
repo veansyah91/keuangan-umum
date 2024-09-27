@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\ContactStaff;
 use App\Models\StudentLevel;
+use App\Models\StudentEntryPayment;
 use App\Models\StudentEntryReceivable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -45,6 +46,11 @@ class Contact extends Model
     public function studentEntryReceivable(): HasOne
     {
         return $this->hasOne(StudentEntryReceivable::class);
+    }
+
+    public function studentEntryPayment(): HasMany
+    {
+        return $this->hasMany(StudentEntryPayment::class);
     }
 
     public function scopeFilter($query, $filters)

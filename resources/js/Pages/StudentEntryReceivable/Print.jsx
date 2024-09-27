@@ -9,7 +9,8 @@ import SecondaryButton from '@/Components/SecondaryButton';
 import formatNumber from '@/Utils/formatNumber';
 import { toast, ToastContainer } from 'react-toastify';
 
-export default function Print({ organization, receivable, receivables, role, contact, user }) {	
+export default function Print({ organization, receivable, receivables, contact, user }) {	
+  
 	const [waLink] = useState('https://web.whatsapp.com/send');
 
 	const handlePrint = () => {
@@ -34,12 +35,12 @@ export default function Print({ organization, receivable, receivables, role, con
 		let detail = '';
 
 		receivables.forEach(r => {
-			detail += `%0ANo Ref: ${r.no_ref}%0ABulan: ${r.month}%0ATahun Ajaran: ${r.study_year}%0AJumlah: IDR ${formatNumber(r.debit)}%0A`;
+			detail += `%0ANo Ref: ${r.no_ref}%0ATahun Ajaran: ${r.study_year}%0AJumlah: IDR ${formatNumber(r.receivable_value)}%0A`;
 		});
 
 		detail += `%0A*Total: ${ formatNumber(receivable.value) }*`
 		
-		let message = `*TAGIHAN IURAN BULANAN*%0A-------------------------------------------------------%0A*Nama*: ${contact.name}%0A*No. Siswa*: ${contact.student.no_ref ?? '-'}%0A*Tahun Masuk*: ${contact.student.entry_year}%0A*Kelas Sekarang*: ${contact.last_level.level}%0A${detail}%0A%0A%0ATtd,%0A%0A%0A*${organization.name}*`;
+		let message = `*TAGIHAN IURAN Tahunan*%0A-------------------------------------------------------%0A*Nama*: ${contact.name}%0A*No. Siswa*: ${contact.student.no_ref ?? '-'}%0A*Tahun Masuk*: ${contact.student.entry_year}%0A*Kelas Sekarang*: ${contact.last_level.level}%0A${detail}%0A%0A%0ATtd,%0A%0A%0A*${organization.name}*`;
 
 		let whatsapp = `${waLink}?phone=${phone}&text=${message}`
 
@@ -49,7 +50,7 @@ export default function Print({ organization, receivable, receivables, role, con
   return (
     <>
 			<Head
-				title={`Tagihan Iuran Bulanan ${contact.name} (${contact.student.no_ref})`}
+				title={`Tagihan Iuran Tahunan ${contact.name} (${contact.student.no_ref})`}
 			/>
 
 			<ToastContainer />
@@ -102,7 +103,7 @@ export default function Print({ organization, receivable, receivables, role, con
 
 					{/* Title Print*/}
 					<div className='uppercase pt-9 pb-3 border-b hidden print:flex print:justify-between'>
-						<div className='w-1/2 text-2xl my-auto'>Tagihan Iuran Bulanan</div>
+						<div className='w-1/2 text-2xl my-auto'>Tagihan Iuran Tahunan</div>
 						<div className='w-1/2 text-end mt-auto'>
 							<div>{organization.name}</div>
 							<div className='text-xs'>{organization.address}</div>
@@ -127,10 +128,6 @@ export default function Print({ organization, receivable, receivables, role, con
 									<div className='w-3/4'>: {contact.student.no_ref ?? '-'}</div>
 								</div>
 								<div className='flex'>
-									<div className='w-1/4'>Tahun Masuk</div>
-									<div className='w-3/4'>: {contact.student.entry_year}</div>
-								</div>
-								<div className='flex'>
 									<div className='w-1/4'>Kelas Sekarang</div>
 									<div className='w-3/4'>: {contact.last_level.level}</div>
 								</div>
@@ -141,7 +138,6 @@ export default function Print({ organization, receivable, receivables, role, con
 								<thead className='text-base text-gray-900'>
 									<tr>
 										<th className='text-start'>No Ref</th>
-										<th className='text-start'>Bulan</th>
 										<th className='text-start'>Tahun Ajaran</th>
 										<th className='text-end'>Jumlah</th>
 									</tr>
@@ -151,16 +147,15 @@ export default function Print({ organization, receivable, receivables, role, con
 										receivables.map(receivable => 
 											<tr key={receivable.id}>
 												<td>{receivable.no_ref}</td>
-												<td>{receivable.month}</td>
 												<td>{receivable.study_year}</td>
-												<td className='text-end'>IDR. { formatNumber(receivable.debit) }</td>
+												<td className='text-end'>IDR. { formatNumber(receivable.receivable_value) }</td>
 											</tr>
 										)
 									}
 								</tbody>
 								<tfoot className='text-base text-gray-900'>
 									<tr>
-										<th className='text-start' colSpan={3}>Total</th>
+										<th className='text-start' colSpan={2}>Total</th>
 										<th className='text-end'>IDR. { formatNumber(receivable.value) }</th>
 									</tr>
 								</tfoot>
@@ -189,7 +184,7 @@ Print.layout = (page) => (
 		organization={page.props.organization}
 		title={`Print Piutang`}
 		backLink={
-			<Link href={route('cashflow.student-monthly-receivable', page.props.organization.id)}>
+			<Link href={route('cashflow.student-entry-receivable.show', {organization: page.props.organization.id, studentEntryReceivable: page.props.receivable.id})}>
 				<IoArrowBackOutline />
 			</Link>
 		}
@@ -199,10 +194,14 @@ Print.layout = (page) => (
 					<li className='font-bold'>
 						<Link href={route('cashflow', page.props.organization.id)}>Arus Kas</Link>
 					</li>
-                    <li className='font-bold'>
-						<Link href={route('cashflow.student-monthly-receivable', page.props.organization.id)}>Piutang Iuran Bulanan Siswa</Link>
+          <li className='font-bold'>
+						<Link href={route('cashflow.student-monthly-receivable', page.props.organization.id)}>Piutang Iuran Tahunan Siswa</Link>
 					</li>
-					<li>Print Piutang Iuran Bulanan Siswa</li>
+          <li className='font-bold'>
+						<Link href={route('cashflow.student-entry-receivable.show', {organization: page.props.organization.id, studentEntryReceivable: page.props.receivable.id})}>Detail Piutang Iuran Tahunan Siswa</Link>
+					</li>
+          
+					<li>Print Piutang Iuran Tahunan Siswa</li>
 				</ul>
 			</div>
 		}

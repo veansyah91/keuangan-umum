@@ -4,6 +4,7 @@ import formatNumber from '@/Utils/formatNumber';
 import { Link } from '@inertiajs/react';
 import dayjs from 'dayjs';
 import React from 'react'
+import { BiDetail } from 'react-icons/bi';
 import { GiMoneyStack } from 'react-icons/gi';
 import { IoEllipsisVertical } from 'react-icons/io5';
 
@@ -36,7 +37,24 @@ export default function StudentEntryReceivableDetailDesktop({
             </div>
             <ul
               tabIndex={0}
-              className='dropdown-content z-[50] menu p-2 shadow bg-base-100 rounded-box w-56'>
+              className='dropdown-content z-[50] menu p-2 shadow bg-base-100 rounded-box w-56'
+            >
+              {
+                receivable.receivable_value > 0 &&
+                <li>
+                  <Link 
+                    href={route('cashflow.student-entry-receivable-payment.create', {
+                            organization: receivable.organization_id, 
+                            contact: receivable.contact.name,
+                            selectedContact: receivable.contact.id
+                          })}
+                  >
+                    <GiMoneyStack />
+                      Bayar
+                  </Link>
+                </li>   
+              }
+              
               <li>
                 <Link 
                   href={route('cashflow.student-entry-receivable-payment.create', {
@@ -45,10 +63,10 @@ export default function StudentEntryReceivableDetailDesktop({
                           selectedContact: receivable.contact.id
                         })}
                 >
-                  <GiMoneyStack />
-                    Bayar
+                  <BiDetail />
+                    Detail
                 </Link>
-              </li>   
+              </li> 
             </ul>
           </div>
         )}

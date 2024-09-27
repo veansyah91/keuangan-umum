@@ -1,46 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { IoArrowBackOutline, IoFilter, IoPlayBack, IoPlayForward, IoSearchSharp } from 'react-icons/io5';
-import AddButtonMobile from '@/Components/AddButtonMobile';
 import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
 import PrimaryButton from '@/Components/PrimaryButton';
-import { useDebounce } from 'use-debounce';
 import ContainerDesktop from '@/Components/Desktop/ContainerDesktop';
 import TitleDesktop from '@/Components/Desktop/TitleDesktop';
 import PageNumber from '@/Components/PageNumber';
 import TitleMobile from '@/Components/Mobiles/TitleMobile';
 import ContentMobile from '@/Components/Mobiles/ContentMobile';
 import ContentDesktop from '@/Components/Desktop/ContentDesktop';
-import DangerButton from '@/Components/DangerButton';
-import { usePrevious } from 'react-use';
 import StudentEntryReceivableMobile from './Components/StudentEntryReceivableMobile';
 import StudentEntryReceivableDesktop from './Components/StudentEntryReceivableDesktop';
 
-export default function Index({ organization, role, receivables, searchFilter }) {
-	
+export default function Index({ organization, role, receivables, searchFilter, type }) {
 	const [search, setSearch] = useState(searchFilter || '');
-	const [titleDeleteModal, setTitleDeleteModal] = useState('');
-	const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 	const [showModalFilter, setShowModalFilter] = useState(false);
-	const {
-		data,
-		setData,
-		delete: destroy,
-		processing,
-		reset,
-	} = useForm({
-		id: 0,
-	});
 
 	const [dataFilter, setDataFilter] = useState({
-		entryYear: null,
+		type: type, // all, paid, unpaid
 	});
 
 	const handleFilter = (e) => {
@@ -49,6 +33,15 @@ export default function Index({ organization, role, receivables, searchFilter })
 		handleReloadPage();
 		setShowModalFilter(false);
 	};
+
+	const handleReloadPage = () => {		
+		router.reload({
+			only: ['receivables'],
+			data: {
+				type: dataFilter.type
+			},
+		})
+	}
 
   return (
     <>
@@ -237,9 +230,8 @@ export default function Index({ organization, role, receivables, searchFilter })
                     id='study_year'
                   >
                     <option value={'all'}>Semua</option>
-                    <option value={'now'}>Lunas</option>
-                    <option value={'receivable'}>Belum Bayar</option>
-                    <option value={'prepaid'}>Bayar Dimuka</option>
+                    <option value={'paid'}>Lunas</option>
+                    <option value={'unpaid'}>Belum Lunas</option>
                   </select>
 								</div>
 						</div>

@@ -40,14 +40,21 @@ class StudentEntryReceivableController extends Controller
 		$user = Auth::user();
 		$search = request(['search']);
 
+		$type = request('type') ?? 'unpaid';
+
 		return Inertia::render('StudentEntryReceivable/Index', [
 			'organization' => $organization,
+			'type' => $type,
 			'receivables' => StudentEntryReceivable::filter(request(['search']))
 																	->with('contact', function ($query) {
 																			$query->with(['student', 'lastLevel']);
 																	})
+																	->when($type !== 'all' ?? false, function ($query) use ($type){
+																		return $type === 'paid' 
+																		? $query->where('value', 0)
+																		: $query->where('value', '>', 0);
+																	})
 																	->whereOrganizationId($organization['id'])
-																	->where('value', '>', 0)
 																	->orderBy('value', 'desc')
 																	->paginate(50)->withQueryString(),
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
@@ -102,24 +109,29 @@ class StudentEntryReceivableController extends Controller
 	/**
 	 * Show the form for editing the specified resource.
 	 */
-	public function edit(Organization $organization, StudentEntryReceivable $studentEntryReceivable)
+	public function print(Organization $organization, StudentEntryReceivable $studentEntryReceivable)
 	{
-			//
-	}
+		$user = Auth::user();
 
-	/**
-	 * Update the specified resource in storage.
-	 */
-	public function update(Request $request, Organization $organization, StudentEntryReceivable $studentEntryReceivable)
-	{
-		
-	}
-
-	/**
-	 * Remove the specified resource from storage.
-	 */
-	public function destroy(Organization $organization, StudentEntryReceivable $studentEntryReceivable)
-	{
-		
+		return Inertia::render('StudentEntryReceivable/Print', [
+			'organization' => $organization,
+			'receivable' => $studentEntryReceivable,
+			'receivables' => StudentEntryPayment::whereOrganizationId($organization['id'])
+										->where('contact_id', $studentEntryReceivable['contact_id'])
+										->where('receivable_value', '>', 0)
+										->with('contact', function ($query) {
+												return $query->with('student');
+										})
+										->with('receivables', function ($query) {
+											return $query->where('credit', '>', 0);
+										})
+										->orderBy('study_year', 'desc')
+										->orderBy('date', 'desc')
+										->orderBy('no_ref', 'desc')
+										->get(),
+			'user' => $user,
+			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+			'contact' => Contact::with(['student', 'lastLevel'])->find($studentEntryReceivable['contact_id']),
+		]);
 	}
 }

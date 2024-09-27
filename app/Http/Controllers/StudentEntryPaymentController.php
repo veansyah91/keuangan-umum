@@ -58,7 +58,7 @@ class StudentEntryPaymentController extends Controller
 		$now = $this->now;
 		$date = $dateRequest ?? $now->isoFormat('YYYY-MM-DD');
 		$dateRef = Carbon::create($date);
-		$refHeader = 'EP-'.$dateRef->isoFormat('YYYY').$dateRef->isoFormat('MM');
+		$refHeader = 'IT-'.$dateRef->isoFormat('YYYY').$dateRef->isoFormat('MM');
 		$newRef = $refHeader.'0001';
 
 		$payment = StudentEntryPayment::whereOrganizationId($organization['id'])
@@ -67,7 +67,7 @@ class StudentEntryPaymentController extends Controller
 				->first();
 
 		if ($payment) {
-			$newRef = NewRef::create('EP-', $payment['no_ref']);
+			$newRef = NewRef::create('IT-', $payment['no_ref']);
 		}
 
 		return $newRef;

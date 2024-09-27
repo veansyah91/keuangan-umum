@@ -25,7 +25,8 @@ import StudentEntryReceivablePaymentDesktop from './Components/StudentEntryRecei
 import Datepicker from 'react-tailwindcss-datepicker';
 
 export default function Index({ organization, role, receivablePayments, searchFilter, studyYears, studyYear, startDate,
-	endDate }) {	  
+	endDate }) {	 
+		
 	const [search, setSearch] = useState(searchFilter || '');
 	const [titleDeleteModal, setTitleDeleteModal] = useState('');
 	const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);

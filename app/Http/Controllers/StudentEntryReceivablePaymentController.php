@@ -57,7 +57,7 @@ class StudentEntryReceivablePaymentController extends Controller
 		$now = $this->now;
 		$date = $dateRequest ?? $now->isoFormat('YYYY-MM-DD');
 		$dateRef = Carbon::create($date);
-		$refHeader = 'REP-'.$dateRef->isoFormat('YYYY').$dateRef->isoFormat('MM');
+		$refHeader = 'PIT-'.$dateRef->isoFormat('YYYY').$dateRef->isoFormat('MM');
 		$newRef = $refHeader.'0001';
 
 		$payment = StudentEntryReceivableLedger::whereHas('payment', function ($query) use ($organization){
@@ -69,7 +69,7 @@ class StudentEntryReceivablePaymentController extends Controller
 				->first();
 
 		if ($payment) {
-			$newRef = NewRef::create('REP-', $payment['no_ref']);
+			$newRef = NewRef::create('PIT-', $payment['no_ref']);
 		}
 
 		return $newRef;
