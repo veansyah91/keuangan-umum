@@ -29,4 +29,29 @@ class StudentEntryReceivableLedger extends Model
 	{
 		return $this->belongsTo(StudentEntryPayment::class);
 	}
+
+	public function scopeFilter($query, $filters)
+	{
+		$query->when($filters['search'] ?? false, function ($query, $search) {
+			return $query->where('no_ref', 'like', '%'.$search.'%')
+										->orWhereHas('contact', function ($query) use ($search){
+											$query->where('name', 'like', '%'. $search .'%')
+														->orWhereHas('student', function ($query) use ($search){
+															$query->where('no_ref', 'like', '%'. $search .'%');
+														});
+			});
+		});
+
+		$query->when($filters['start_date'] ?? false, function ($query, $start_date) {
+			return $query->where('date', '>=', $start_date);
+		});
+
+		$query->when($filters['end_date'] ?? false, function ($query, $end_date) {
+			return $query->where('date', '<=', $end_date);
+		});
+
+		$query->when($filters['studyYear'] ?? false, function ($query, $studyYear) {
+			return $query->where('study_year', $studyYear);
+		});
+	}
 }
