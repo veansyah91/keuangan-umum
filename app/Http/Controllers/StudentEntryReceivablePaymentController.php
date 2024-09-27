@@ -8,6 +8,7 @@ use App\Models\Ledger;
 use App\Helpers\NewRef;
 use App\Models\Account;
 use App\Models\Contact;
+use App\Models\Journal;
 use App\Models\Cashflow;
 use Carbon\CarbonImmutable;
 use App\Models\Organization;
@@ -456,5 +457,46 @@ class StudentEntryReceivablePaymentController extends Controller
 
 		});
 		return redirect()->back()->with('success', 'Pembayaran Piutang Iuran Tahunan Berhasil Diubah');
+	}
+
+	public function destroy(Organization $organization, StudentEntryReceivableLedger $receivablePayment)
+	{
+		$user = Auth::user();
+		DB::transaction(function() use ($receivablePayment, $user) {
+			// hapus data pada pembayaran piutang
+			$receivablePayment->delete();
+
+			// hapus jurnal
+			$journal = Journal::find($receivablePayment['journal_id']);
+			$journal->delete();
+
+			// perbarui sisa piutang pada pembayaran
+			$payment = StudentEntryPayment::find($receivablePayment['payment_id']);
+			$temp = $payment['receivable_value'] + $receivablePayment['credit'];
+			$payment->update([
+				'receivable_value' => $temp 
+			]);
+
+			// perbarui sisa piutang siswa
+			$receivable = StudentEntryReceivable::where('contact_id', $payment['contact_id'])
+																					->first();
+			$temp = $receivable['value'] + $receivablePayment['credit'];
+			$receivable->update([
+				'value' => $temp
+			]);
+
+			// buat log
+			$log = [
+				'description' => $journal['description'],
+				'date' => $journal['date'],
+				'no_ref' => $journal['no_ref'],
+				'value' => $journal['value'],
+			];
+
+			$this->logRepository->store($payment['organization_id'], strtoupper($user['name']).' telah menghapus DATA pada PEMBAYARAN IURAN TAHUNAN dengan DATA : '.json_encode($log));
+		});
+
+		return redirect()->back()->with('success', 'Pembayaran Piutang Iuran Tahunan Berhasil Dihapus');
+		
 	}
 }

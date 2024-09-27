@@ -95,7 +95,7 @@ export default function Index({ organization, role, receivablePayments, searchFi
 	const handleSubmitDelete = (e) => {
 		e.preventDefault();
 
-		destroy(route('cashflow.student-entry-receivable-payment.delete', { organization: organization.id, payment: data.id }), {
+		destroy(route('cashflow.student-entry-receivable-payment.delete', { organization: organization.id, receivablePayment: data.id }), {
 			onSuccess: () => {
 				setShowDeleteConfirmation(false);
 				toast.success(`Pembayaran Piutang Berhasil Dihapus`, {

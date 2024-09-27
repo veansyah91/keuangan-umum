@@ -33,7 +33,7 @@ export default function Show({ contact, organization, role, payment, user }) {
 
 		let detail = `*Jumlah Bayar: IDR. ${ formatNumber(payment.credit) }*%0A`;
 		
-		let message = `*PEMBAYARAN PIUTANG IURAN TAHUNAN*%0A-------------------------------------------------------%0A*Nama*: ${contact.name}%0A*No. Siswa*: ${contact.student.no_ref ?? '-'}%0A*Tahun Masuk*: ${contact.student.entry_year}%0A*Kelas Sekarang*: ${contact.last_level.level}%0A-------------------------------------------------------%0A*No Ref*: ${payment.no_ref}%0A*Tanggal*: ${dayjs(payment.date).locale('id').format('DD MMMM YYYY')}%0A*Tahun Ajaran*: ${payment.study_year}%0A${detail}%0A%0A%0ATtd,%0A%0A*${organization.name}*`;
+		let message = `*PEMBAYARAN PIUTANG IURAN TAHUNAN*%0A-------------------------------------------------------%0A*Nama*: ${contact.name}%0A*No. Siswa*: ${contact.student.no_ref ?? '-'}%0A*Kelas Sekarang*: ${contact.last_level.level}%0A-------------------------------------------------------%0A*No Ref*: ${payment.no_ref}%0A*Tanggal*: ${dayjs(payment.date).locale('id').format('DD MMMM YYYY')}%0A${detail}%0A%0ATtd,%0A%0A*${organization.name}*`;
 
 		let whatsapp = `${waLink}?phone=${phone}&text=${message}`
 
@@ -118,10 +118,6 @@ export default function Show({ contact, organization, role, payment, user }) {
 									<div className='w-3/4'>: {contact.student.no_ref ?? '-'}</div>
 								</div>
 								<div className='flex'>
-									<div className='w-1/4'>Tahun Masuk</div>
-									<div className='w-3/4'>: {contact.student.entry_year}</div>
-								</div>
-								<div className='flex'>
 									<div className='w-1/4'>Kelas Sekarang</div>
 									<div className='w-3/4'>: {contact.last_level.level}</div>
 								</div>
@@ -137,15 +133,31 @@ export default function Show({ contact, organization, role, payment, user }) {
 									<div className='w-3/4'>: { dayjs(payment.date).locale('id').format('DD MMMM YYYY') }</div>
 								</div>
 								<div className='flex'>
-									<div className='w-1/4'>Tahun Ajaran</div>
-									<div className='w-3/4'>: { payment.study_year }</div>
-								</div>
-								<div className='flex'>
-									<div className='w-1/4'>Jumlah Bayar</div>
+									<div className='w-1/4'>Jumlah</div>
 									<div className='w-3/4'>: IDR. { formatNumber(payment.credit) }</div>
 								</div>
-                <div className='flex'>
-									<div className='w-1/4'>Sisa Piutang</div>
+							</div>
+
+							<div className='w-full space-y-2 mt-2 pt-3 border-t border-slate-900'>
+								<div className='font-bold uppercase'>Faktur Pembayaran Iuran Tahunan</div>
+								<div className='flex'>
+									<div className='w-1/4'>No Ref</div>
+									<div className='w-3/4'>: {payment.payment.no_ref}</div>
+								</div>
+								<div className='flex'>
+									<div className='w-1/4'>Tanggal</div>
+									<div className='w-3/4'>: { dayjs(payment.payment.date).locale('id').format('DD MMMM YYYY') }</div>
+								</div>
+								<div className='flex'>
+									<div className='w-1/4'>Tahun Ajaran</div>
+									<div className='w-3/4'>: { payment.payment.study_year }</div>
+								</div>
+								<div className='flex'>
+									<div className='w-1/4'>Total</div>
+									<div className='w-3/4'>: IDR. { formatNumber(payment.payment.value) }</div>
+								</div>
+								<div className='flex'>
+									<div className='w-1/4'>Sisa</div>
 									<div className='w-3/4'>: IDR. { formatNumber(payment.payment.receivable_value) }</div>
 								</div>
 							</div>
