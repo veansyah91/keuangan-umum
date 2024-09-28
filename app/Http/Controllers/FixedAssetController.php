@@ -241,8 +241,8 @@ class FixedAssetController extends Controller
         $validated['accumulated_depreciation'] = $depreciationAccumulation ? $depreciationAccumulation['id'] : null;
         $validated['depreciation'] = $depreciationCost ? $depreciationCost['id'] : null;
 
-        if ($formatedMonths->diffInMonths($this->now) > 0) {
-            $validated['depreciation_accumulated'] = $formatedMonths->diffInMonths($this->now) < $validated['lifetime'] ? $validated['depreciation_value'] * floor($formatedMonths->diffInMonths($this->now)) : $validated['value'];
+        if (floor($formatedMonths->diffInMonths($this->now)) > 0) {
+            $validated['depreciation_accumulated'] = floor($formatedMonths->diffInMonths($this->now)) < $validated['lifetime'] ? $validated['depreciation_value'] * floor($formatedMonths->diffInMonths($this->now)) : $validated['value'];
         }
 
         $data = [
@@ -562,7 +562,6 @@ class FixedAssetController extends Controller
                 }
 
                 // akun beban penyusutan
-
                 if ($depreciationCostAccount) {
                     $depreciationCostAccount->update([
                         'name' => 'BEBAN PENYUSUTAN '.$validated['name'],
@@ -586,8 +585,8 @@ class FixedAssetController extends Controller
         $validated['no_ref'] = $validated['code'];
         $validated['description'] = 'PENGADAAN HARTA TETAP : '.$validated['name'];
 
-        if ($formatedMonths->diffInMonths($this->now) > 0) {
-            $validated['depreciation_accumulated'] = $formatedMonths->diffInMonths($this->now) < $validated['lifetime'] ? $validated['depreciation_value'] * floor($formatedMonths->diffInMonths($this->now)) : $validated['value'];
+        if (floor($formatedMonths->diffInMonths($this->now)) > 0) {
+            $validated['depreciation_accumulated'] = floor($formatedMonths->diffInMonths($this->now)) < $validated['lifetime'] ? $validated['depreciation_value'] * floor($formatedMonths->diffInMonths($this->now)) : $validated['value'];
         }
 
         // update Fixed Asset

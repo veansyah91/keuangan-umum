@@ -11,6 +11,7 @@ use App\Models\StudentEntryPayment;
 use Illuminate\Support\Facades\Auth;
 use App\Models\StudentEntryReceivable;
 use App\Repositories\User\UserRepository;
+use App\Models\StudentEntryReceivableLedger;
 
 class StudentEntryReceivableController extends Controller
 {
@@ -157,6 +158,20 @@ class StudentEntryReceivableController extends Controller
 			'user' => $user,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'contact' => Contact::with(['student', 'lastLevel'])->find($studentEntryReceivable['contact_id']),
+		]);
+	}
+
+	public function printPerPayment(Organization $organization, StudentEntryPayment $payment)
+	{
+		$user = Auth::user();
+
+		return Inertia::render('StudentEntryReceivable/PrintPerPayment', [
+			'organization' => $organization,
+			'payment' => $payment,
+			'ledgers' => StudentEntryReceivableLedger::where('payment_id', $payment['id'])->where('credit','>',0)->get(),
+			'user' => $user,
+			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+			'contact' => Contact::with(['student', 'lastLevel', 'studentEntryReceivable'])->find($payment['contact_id']),
 		]);
 	}
 }

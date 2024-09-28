@@ -11,6 +11,8 @@ import { IoEllipsisVertical } from 'react-icons/io5';
 export default function StudentEntryReceivableDetailDesktop({
   receivable, className, role,
 }) {  
+  console.log(receivable);
+  
   return (
     <tr className={className}>
       <td>
@@ -57,10 +59,9 @@ export default function StudentEntryReceivableDetailDesktop({
               
               <li>
                 <Link 
-                  href={route('cashflow.student-entry-receivable-payment.create', {
+                  href={route('cashflow.student-entry-receivable.print-per-payment', {
                           organization: receivable.organization_id, 
-                          contact: receivable.contact.name,
-                          selectedContact: receivable.contact.id
+                          payment: receivable.id
                         })}
                 >
                   <BiDetail />
