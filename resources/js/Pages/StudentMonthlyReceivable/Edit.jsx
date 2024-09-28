@@ -176,7 +176,7 @@ export default function Edit({ organization, newRef, contacts, date, categories,
 
   const handleDateValueChange = (newValue) => {
     setDateValue(newValue);
-    reloadNewRef(newValue.startDate);
+    setData('date', `${newValue.startDate.getFullYear()}-${newValue.startDate.getMonth() + 1}-${newValue.startDate.getDate()}`);
   };
 
   const handleChangeValue = (values, index) => {

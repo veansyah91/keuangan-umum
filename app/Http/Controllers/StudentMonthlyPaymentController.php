@@ -55,7 +55,7 @@ class StudentMonthlyPaymentController extends Controller
 	protected function newRef($organization, $dateRequest = '')
 	{
 		$now = $this->now;
-		$date = $dateRequest ?? $now->isoFormat('YYYY-MM-DD');
+		$date = $dateRequest ?? $now->isoFormat('YYYY-M-DD');
 		$dateRef = Carbon::create($date);
 		$refHeader = 'IB-'.$dateRef->isoFormat('YYYY').$dateRef->isoFormat('MM');
 		$newRef = $refHeader.'0001';
@@ -146,7 +146,7 @@ class StudentMonthlyPaymentController extends Controller
 																							->whereIsActive(true)
 																							->get(),
 			'newRef' => $this->newRef($organization, request('date')),
-			'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
+			'date' => request('date') ?? $this->now->isoFormat('YYYY-M-DD'),
 			'studyYears' => StudentLevel::select('year')->distinct()->take(10)->get(),
 			'contacts' => $this->contactRepository->getStudents($organization['id'], $contactCategory['id'], request(['contact'])),
 			'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),
@@ -399,7 +399,7 @@ class StudentMonthlyPaymentController extends Controller
 																							->whereIsActive(true)
 																							->get(),
 			'newRef' => $this->newRef($organization, request('date')),
-			'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
+			'date' => request('date') ?? $this->now->isoFormat('YYYY-M-DD'),
 			'studyYears' => StudentLevel::select('year')->distinct()->take(10)->get(),
 			'contacts' => $this->contactRepository->getStudents($organization['id'], $contactCategory['id'], request(['contact'])),
 			'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),

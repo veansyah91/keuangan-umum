@@ -22,9 +22,7 @@ import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 
 export default function Create({
   organization, newRef, contacts, date, categories, studyYears, cashAccounts,
-}) {
-  // console.log(contacts);
-  
+}) {  
   const { data, setData, processing, post, errors, setError, reset } = useForm({
     contact_id:null,
     date:date,
@@ -106,7 +104,7 @@ export default function Create({
 
   const handleDateValueChange = (newValue) => {
     setDateValue(newValue);
-    setData('date', newValue.startDate);
+    setData('date', `${newValue.startDate.getFullYear()}-${newValue.startDate.getMonth() + 1}-${newValue.startDate.getDate()}`);
   };
 
   const handleChangeStudyYear = (e) => {

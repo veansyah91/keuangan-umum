@@ -42,7 +42,7 @@ class JournalController extends Controller
     protected function newRef($organization, $dateRequest = '')
     {
         $now = $this->now;
-        $date = $dateRequest ?? $now->isoFormat('YYYY-MM-DD');
+        $date = $dateRequest ?? $now->isoFormat('YYYY-M-DD');
         $dateRef = Carbon::create($date);
         $refHeader = 'JU-'.$dateRef->isoFormat('YYYY').$dateRef->isoFormat('MM');
         $newRef = $refHeader.'0001';
@@ -101,7 +101,7 @@ class JournalController extends Controller
             'organization' => $organization,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'newRef' => $this->newRef($organization, request('date')),
-            'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
+            'date' => request('date') ?? $this->now->isoFormat('YYYY-M-DD'),
             'accounts' => $this->accountRepository
                 ->getData($organization['id'], request(['search'])),
             'projects' => Project::whereOrganizationId($organization['id'])
@@ -184,7 +184,7 @@ class JournalController extends Controller
 
         // cek tanggal
         // jika tanggal lebih tinggi dari hari sekarang, maka kirimkan error\
-        if ($validated['date'] > $this->now->isoFormat('YYYY-MM-DD')) {
+        if ($validated['date'] > $this->now->isoFormat('YYYY-M-DD')) {
             return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
         }
 
@@ -387,7 +387,7 @@ class JournalController extends Controller
 
         // cek tanggal
         // jika tanggal lebih tinggi dari hari sekarang, maka kirimkan error\
-        if (($validated['date'] > $this->now->isoFormat('YYYY-MM-DD')) || ($journal['date'] > $this->now->isoFormat('YYYY-MM-DD'))) {
+        if (($validated['date'] > $this->now->isoFormat('YYYY-M-DD')) || ($journal['date'] > $this->now->isoFormat('YYYY-M-DD'))) {
             return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
         }
 
@@ -447,7 +447,7 @@ class JournalController extends Controller
         }
         // cek tanggal
         // jika tanggal lebih tinggi dari hari sekarang, maka kirimkan error\
-        if ($journal['date'] > $this->now->isoFormat('YYYY-MM-DD')) {
+        if ($journal['date'] > $this->now->isoFormat('YYYY-M-DD')) {
             return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
         }
 

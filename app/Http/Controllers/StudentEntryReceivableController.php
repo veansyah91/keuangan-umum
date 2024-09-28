@@ -106,6 +106,31 @@ class StudentEntryReceivableController extends Controller
 		]);
 	}
 
+	public function showPerPayment(Organization $organization, StudentEntryReceivable $studentEntryReceivable)
+	{
+		$user = Auth::user();
+
+		return Inertia::render('StudentEntryReceivable/Show', [
+			'organization' => $organization,
+			'receivable' => $studentEntryReceivable,
+			'receivables' => StudentEntryPayment::whereOrganizationId($organization['id'])
+										->where('contact_id', $studentEntryReceivable['contact_id'])
+										// ->where('credit', '>', 0)
+										->with('contact', function ($query) {
+												return $query->with('student');
+										})
+										->with('receivables', function ($query) {
+											return $query->where('credit', '>', 0);
+										})
+										->orderBy('study_year', 'desc')
+										->orderBy('date', 'desc')
+										->orderBy('no_ref', 'desc')
+										->paginate(50)->withQueryString(),
+			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+			'contact' => Contact::with(['student', 'lastLevel'])->find($studentEntryReceivable['contact_id']),
+		]);
+	}
+
 	/**
 	 * Show the form for editing the specified resource.
 	 */

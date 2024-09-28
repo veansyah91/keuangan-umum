@@ -55,7 +55,7 @@ class StudentEntryReceivablePaymentController extends Controller
 	protected function newRef($organization, $dateRequest = '')
 	{
 		$now = $this->now;
-		$date = $dateRequest ?? $now->isoFormat('YYYY-MM-DD');
+		$date = $dateRequest ?? $now->isoFormat('YYYY-M-DD');
 		$dateRef = Carbon::create($date);
 		$refHeader = 'PIT-'.$dateRef->isoFormat('YYYY').$dateRef->isoFormat('MM');
 		$newRef = $refHeader.'0001';
@@ -128,7 +128,7 @@ class StudentEntryReceivablePaymentController extends Controller
 			'organization' => $organization,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'newRef' => $this->newRef($organization, request('date')),
-			'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
+			'date' => request('date') ?? $this->now->isoFormat('YYYY-M-DD'),
 			'contacts' => $this->contactRepository->getStudentEntryReceivable($organization['id'], $contactCategory['id'], request(['contact'])),
 			'contact' => request('contact'),
 			'selectedContactQuery' => Contact::with(['contactCategories', 'student', 'lastLevel'])->find(request('selectedContact')),
@@ -305,7 +305,7 @@ class StudentEntryReceivablePaymentController extends Controller
 			'organization' => $organization,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'newRef' => $this->newRef($organization, request('date')),
-			'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
+			'date' => request('date') ?? $this->now->isoFormat('YYYY-M-DD'),
 			'contacts' => $this->contactRepository->getStudentEntryReceivable($organization['id'], $contactCategory['id'], request(['contact'])),
 			'contact' => request('contact'),
 			'selectedContactQuery' => Contact::with(['contactCategories', 'student', 'lastLevel'])->find(request('selectedContact')),

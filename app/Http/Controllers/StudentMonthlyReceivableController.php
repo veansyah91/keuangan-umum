@@ -49,7 +49,7 @@ class StudentMonthlyReceivableController extends Controller
   protected function newRef($organization, $dateRequest = '')
   {
       $now = $this->now;
-      $date = $dateRequest ?? $now->isoFormat('YYYY-MM-DD');
+      $date = $dateRequest ?? $now->isoFormat('YYYY-M-DD');
       $dateRef = Carbon::create($date);
       $refHeader = 'IB-'.$dateRef->isoFormat('YYYY').$dateRef->isoFormat('MM');
       $newRef = $refHeader.'0001';
@@ -109,7 +109,7 @@ class StudentMonthlyReceivableController extends Controller
 																							->get(),
       'role' => $this->userRepository->getRole($user['id'], $organization['id']),
       'newRef' => $this->newRef($organization, request('date')),
-      'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
+      'date' => request('date') ?? $this->now->isoFormat('YYYY-M-DD'),
       'contacts' => $this->contactRepository->getStudents($organization['id'], $contactCategory['id'], request(['contact'])),
       'selectedContactParam' => Contact::with(['contactCategories', 'student', 'lastLevel'])->find(request('selectedContact')),
       'accounts' => $this->accountRepository->getDataNonCash($organization['id'], request(['account'])),
