@@ -14,6 +14,10 @@ export default function PrintPerPayment({ organization, payment, ledgers, contac
 	
 	const [waLink] = useState('https://web.whatsapp.com/send');
 
+	const total = ledgers.reduce((accumulator, currentObject) => {
+		return accumulator + currentObject.credit;
+	}, 0);
+
 	const handlePrint = () => {
 		window.print();
 	};	
@@ -36,12 +40,12 @@ export default function PrintPerPayment({ organization, payment, ledgers, contac
 		let detail = '';
 
 		ledgers.forEach(r => {
-			detail += `%0ANo Ref: ${r.no_ref}%0ATahun Ajaran: ${r.study_year}%0AJumlah: IDR ${formatNumber(r.receivable_value)}%0A`;
+			detail += `%0ATanggal: ${dayjs(r.date).locale('id').format('MMMM DD, YYYY')}%0ANo_Ref: ${r.no_ref}%0AJumlah: IDR ${formatNumber(r.credit)}%0A`;
 		});
 
-		detail += `%0A*Total: ${ formatNumber(contact.student_entry_receivable.value) }*`
+		detail += !detail ? '%0A%0A%0A_Belum Dilakukan Pembayaran_' : `%0A*Total: ${ formatNumber(payment.value - payment.receivable_value + total) }*`
 		
-		let message = `*TAGIHAN IURAN Tahunan*%0A-------------------------------------------------------%0A*Nama*: ${contact.name}%0A*No. Siswa*: ${contact.student.no_ref ?? '-'}%0A*Tahun Masuk*: ${contact.student.entry_year}%0A*Kelas Sekarang*: ${contact.last_level.level}%0A${detail}%0A%0A%0ATtd,%0A%0A%0A*${organization.name}*`;
+		let message = `*RINCIAN PEMBAYARAN IURAN Tahunan*%0A-------------------------------------------------------%0A*Nama*: ${contact.name}%0A*No. Siswa*: ${contact.student.no_ref ?? '-'}%0A*Kelas Sekarang*: ${contact.last_level.level}%0A-------------------------------------------------------%0A*FAKTUR PEMBAYARAN*%0A*Tanggal*: ${dayjs(payment.date).locale('id').format('MMMM DD, YYYY')}%0A*No Ref*: ${payment.no_ref}%0A*Tahun Ajaran*: ${payment.study_year}%0A*Nilai*: ${formatNumber(payment.value)}%0A*Jumlah Bayar Tunai*: IDR. ${formatNumber(payment.value - payment.receivable_value + total)}${detail}%0A%0A%0ATtd,%0A%0A%0A*${organization.name}*`;
 
 		let whatsapp = `${waLink}?phone=${phone}&text=${message}`
 
@@ -119,37 +123,50 @@ export default function PrintPerPayment({ organization, payment, ledgers, contac
 					<div className="my-2 space-y-3 mx-3 print:font-['Open_Sans'] overflow-auto">
 						<div className='sm:w-3/4 w-[550px] print:w-full'>
 							<div className='flex justify-between'>
-								{/* Identity */}
-								<div className='w-full space-y-2'>
+								<div className='w-1/2 font-bold uppercase'>Faktur Pembayaran</div>
+							</div>
+							<div className='flex justify-between'>
+								{/* Invoice */}
+								<div className='w-1/2 space-y-2'>
 									<div className='flex'>
-										<div className='w-1/4'>Nama</div>
-										<div className='w-3/4'>: {contact.name}</div>
+										<div className='w-1/3'>Tanggal</div>
+										<div className='w-2/3'>: {dayjs(payment.date).locale('id').format('MMMM DD, YYYY')}</div>
 									</div>
 									<div className='flex'>
-										<div className='w-1/4'>No. Siswa</div>
-										<div className='w-3/4'>: {contact.student.no_ref ?? '-'}</div>
+										<div className='w-1/3'>No Ref</div>
+										<div className='w-2/3'>: {payment.no_ref}</div>
 									</div>
 									<div className='flex'>
-										<div className='w-1/4'>Kelas Sekarang</div>
-										<div className='w-3/4'>: {contact.last_level.level}</div>
+										<div className='w-1/3'>Tahun Ajaran</div>
+										<div className='w-2/3'>: {payment.study_year}</div>
+									</div>
+									<div className='flex'>
+										<div className='w-1/3'>Nilai</div>
+										<div className='w-2/3'>: IDR. {formatNumber(payment.value)}</div>
+									</div>
+									<div className='flex'>
+										<div className='w-1/3'>Jumlah Bayar Tunai</div>
+										<div className='w-2/3'>: IDR. {formatNumber(payment.value - payment.receivable_value + total)}</div>
 									</div>
 								</div>
 
 								{/* Identity */}
-								<div className='w-full space-y-2'>
+								<div className='w-1/2 space-y-2'>
 									<div className='flex'>
-										<div className='w-1/4'>Nama</div>
-										<div className='w-3/4'>: {contact.name}</div>
+										<div className='w-1/3'>Nama</div>
+										<div className='w-2/3'>: {contact.name}</div>
 									</div>
 									<div className='flex'>
-										<div className='w-1/4'>No. Siswa</div>
-										<div className='w-3/4'>: {contact.student.no_ref ?? '-'}</div>
+										<div className='w-1/3'>No. Siswa</div>
+										<div className='w-2/3'>: {contact.student.no_ref ?? '-'}</div>
 									</div>
 									<div className='flex'>
-										<div className='w-1/4'>Kelas Sekarang</div>
-										<div className='w-3/4'>: {contact.last_level.level}</div>
+										<div className='w-1/3'>Kelas Sekarang</div>
+										<div className='w-2/3'>: {contact.last_level.level}</div>
 									</div>
 								</div>
+
+								
 							</div>
 
 							{/* Data */}
@@ -175,9 +192,7 @@ export default function PrintPerPayment({ organization, payment, ledgers, contac
 								<tfoot className='text-base text-gray-900'>
 									<tr>
 										<th className='text-start' colSpan={2}>Total</th>
-										<th className='text-end'>IDR. { formatNumber(ledgers.reduce((accumulator, currentObject) => {
-																							return accumulator + currentObject.credit;
-																						}, 0)) }
+										<th className='text-end'>IDR. { formatNumber(total) }
 										</th>
 									</tr>
 								</tfoot>

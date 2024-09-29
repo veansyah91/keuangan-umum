@@ -1,0 +1,1 @@
+import{j as s}from"./app-404c1d62.js";function o({textColor:t="text-gray-800",children:e,className:r}){return s.jsx("h2",{className:`font-semibold text-xl leading-tight ${t} ${r}`,children:e})}export{o as H};

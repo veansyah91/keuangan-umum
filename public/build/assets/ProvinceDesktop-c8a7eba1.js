@@ -1,0 +1,1 @@
+import{j as t}from"./app-404c1d62.js";function n({province:r,className:e}){return t.jsx(t.Fragment,{children:t.jsxs("tr",{className:e,children:[t.jsx("td",{children:r.id}),t.jsx("td",{children:r.name}),t.jsx("td",{})]})})}export{n as default};
