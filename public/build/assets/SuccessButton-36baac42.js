@@ -1,5 +1,0 @@
-<<<<<<<< HEAD:public/build/assets/SuccessButton-36baac42.js
-import{j as r}from"./app-60093d8b.js";function i({className:t="",disabled:e,children:n,...o}){return r.jsx("button",{...o,className:`inline-flex items-center px-4 py-2 bg-green-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 ${e&&"opacity-25"} `+t,disabled:e,children:n})}export{i as S};
-========
-import{j as r}from"./app-404c1d62.js";function i({className:t="",disabled:e,children:n,...o}){return r.jsx("button",{...o,className:`inline-flex items-center px-4 py-2 bg-green-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 ${e&&"opacity-25"} `+t,disabled:e,children:n})}export{i as S};
->>>>>>>> version-1.1:public/build/assets/SuccessButton-a3eb270c.js

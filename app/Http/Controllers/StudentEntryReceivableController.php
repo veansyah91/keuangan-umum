@@ -59,7 +59,7 @@ class StudentEntryReceivableController extends Controller
 																	->orderBy('value', 'desc')
 																	->paginate(50)->withQueryString(),
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
-			'searchFilter' => $search,
+			'searchFilter' => request('search'),
 		]);
 	}
 

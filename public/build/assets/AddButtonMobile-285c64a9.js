@@ -1,5 +1,0 @@
-<<<<<<<< HEAD:public/build/assets/AddButtonMobile-285c64a9.js
-import{j as t}from"./app-60093d8b.js";import{k as s}from"./index.esm-53cbca2f.js";function o({handleShowInputModal:e,label:i=t.jsx(s,{height:20,width:20})}){return t.jsx("div",{className:"md:hidden fixed bottom-2 w-full z-40",children:t.jsx("div",{className:"px-5",children:t.jsx("button",{type:"button",className:"btn bg-gray-800 text-white w-full",onClick:e,children:t.jsx("div",{className:"text-xl font-bold",children:i})})})})}export{o as A};
-========
-import{j as t}from"./app-404c1d62.js";import{k as s}from"./index.esm-6826a6ec.js";function o({handleShowInputModal:e,label:i=t.jsx(s,{height:20,width:20})}){return t.jsx("div",{className:"md:hidden fixed bottom-2 w-full z-40",children:t.jsx("div",{className:"px-5",children:t.jsx("button",{type:"button",className:"btn bg-gray-800 text-white w-full",onClick:e,children:t.jsx("div",{className:"text-xl font-bold",children:i})})})})}export{o as A};
->>>>>>>> version-1.1:public/build/assets/AddButtonMobile-04589f0c.js

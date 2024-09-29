@@ -1,5 +1,0 @@
-<<<<<<<< HEAD:public/build/assets/RegencyMobile-0a0c853b.js
-import{j as s}from"./app-60093d8b.js";function r({regency:e}){return s.jsx(s.Fragment,{children:s.jsxs("div",{className:" text-gray-900 py-2 px-2 border flex gap-5 justify-start",children:[s.jsx("div",{className:"ml-2",children:e.id}),s.jsxs("div",{className:"mr-2 text-start",children:[s.jsx("div",{children:e.name}),s.jsxs("div",{className:"text-sm",children:["Provinsi: ",e.province.name]})]})]})})}export{r as default};
-========
-import{j as s}from"./app-404c1d62.js";function r({regency:e}){return s.jsx(s.Fragment,{children:s.jsxs("div",{className:" text-gray-900 py-2 px-2 border flex gap-5 justify-start",children:[s.jsx("div",{className:"ml-2",children:e.id}),s.jsxs("div",{className:"mr-2 text-start",children:[s.jsx("div",{children:e.name}),s.jsxs("div",{className:"text-sm",children:["Provinsi: ",e.province.name]})]})]})})}export{r as default};
->>>>>>>> version-1.1:public/build/assets/RegencyMobile-f58535cd.js

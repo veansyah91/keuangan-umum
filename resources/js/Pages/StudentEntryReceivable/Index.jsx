@@ -18,8 +18,11 @@ import ContentMobile from '@/Components/Mobiles/ContentMobile';
 import ContentDesktop from '@/Components/Desktop/ContentDesktop';
 import StudentEntryReceivableMobile from './Components/StudentEntryReceivableMobile';
 import StudentEntryReceivableDesktop from './Components/StudentEntryReceivableDesktop';
+import { usePrevious } from 'react-use';
+import { useDebounce } from 'use-debounce';
 
 export default function Index({ organization, role, receivables, searchFilter, type }) {
+	
 	const [search, setSearch] = useState(searchFilter || '');
 	const [showModalFilter, setShowModalFilter] = useState(false);
 
@@ -27,19 +30,33 @@ export default function Index({ organization, role, receivables, searchFilter, t
 		type: type, // all, paid, unpaid
 	});
 
+	const prevSearch = usePrevious(search);
+	const [debounceValue] = useDebounce(search, 500);
+
+	// useState
+	useEffect(() => {
+		if (prevSearch !== undefined) {
+			let data = {
+				search: search
+			};
+			handleReloadPage(data);
+		}
+	}, [debounceValue]);
+
 	const handleFilter = (e) => {
 		e.preventDefault();
 		
-		handleReloadPage();
+		let data = {
+			type: dataFilter.type
+		};
+		handleReloadPage(data);
 		setShowModalFilter(false);
 	};
 
-	const handleReloadPage = () => {		
+	const handleReloadPage = (data) => {		
 		router.reload({
 			only: ['receivables'],
-			data: {
-				type: dataFilter.type
-			},
+			data: data,
 		})
 	}
 

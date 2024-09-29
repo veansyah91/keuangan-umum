@@ -1,5 +1,0 @@
-<<<<<<<< HEAD:public/build/assets/SecondaryButton-a2ff8619.js
-import{j as i}from"./app-60093d8b.js";function a({type:o="button",className:e="",disabled:t,children:n,...r}){return i.jsx("button",{...r,type:o,className:`inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 ${t&&"opacity-25"} `+e,disabled:t,children:n})}export{a as S};
-========
-import{j as i}from"./app-404c1d62.js";function a({type:o="button",className:e="",disabled:t,children:n,...r}){return i.jsx("button",{...r,type:o,className:`inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 ${t&&"opacity-25"} `+e,disabled:t,children:n})}export{a as S};
->>>>>>>> version-1.1:public/build/assets/SecondaryButton-6441f1d6.js

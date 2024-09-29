@@ -1,5 +1,0 @@
-<<<<<<<< HEAD:public/build/assets/ProvinceMobile-3a8ad4fd.js
-import{j as e}from"./app-60093d8b.js";function t({province:s}){return e.jsx(e.Fragment,{children:e.jsxs("div",{className:" text-gray-900 py-2 px-2 border flex gap-5 justify-start",children:[e.jsx("div",{className:"ml-2",children:s.id}),e.jsx("div",{className:"mr-2 text-start",children:s.name})]})})}export{t as default};
-========
-import{j as e}from"./app-404c1d62.js";function t({province:s}){return e.jsx(e.Fragment,{children:e.jsxs("div",{className:" text-gray-900 py-2 px-2 border flex gap-5 justify-start",children:[e.jsx("div",{className:"ml-2",children:s.id}),e.jsx("div",{className:"mr-2 text-start",children:s.name})]})})}export{t as default};
->>>>>>>> version-1.1:public/build/assets/ProvinceMobile-0384476b.js

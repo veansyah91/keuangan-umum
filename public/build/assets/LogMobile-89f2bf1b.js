@@ -1,5 +1,0 @@
-<<<<<<<< HEAD:public/build/assets/LogMobile-4f942455.js
-import{j as s}from"./app-60093d8b.js";import{d as a}from"./dayjs.min-af66fe14.js";function l({logItem:e,...r}){return s.jsx("div",{className:"border-2",...r,children:s.jsxs("div",{className:" text-gray-900 py-2 border px-2",children:[s.jsxs("div",{className:"w-full border-b-2 text-xs italic",children:["Tanggal:",a(e.created_at).format("MMM DD, YYYY")]}),s.jsxs("div",{className:"w-full",children:[s.jsx("div",{children:"Deskripsi: "}),e.message]})]})})}export{l as default};
-========
-import{j as s}from"./app-404c1d62.js";import{d as a}from"./dayjs.min-b356c38e.js";function l({logItem:e,...r}){return s.jsx("div",{className:"border-2",...r,children:s.jsxs("div",{className:" text-gray-900 py-2 border px-2",children:[s.jsxs("div",{className:"w-full border-b-2 text-xs italic",children:["Tanggal:",a(e.created_at).format("MMM DD, YYYY")]}),s.jsxs("div",{className:"w-full",children:[s.jsx("div",{children:"Deskripsi: "}),e.message]})]})})}export{l as default};
->>>>>>>> version-1.1:public/build/assets/LogMobile-89f2bf1b.js

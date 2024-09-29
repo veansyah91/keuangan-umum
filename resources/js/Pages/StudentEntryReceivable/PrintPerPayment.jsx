@@ -10,8 +10,6 @@ import formatNumber from '@/Utils/formatNumber';
 import { toast, ToastContainer } from 'react-toastify';
 
 export default function PrintPerPayment({ organization, payment, ledgers, contact, user }) {	
-  console.log(payment);
-	
 	const [waLink] = useState('https://web.whatsapp.com/send');
 
 	const total = ledgers.reduce((accumulator, currentObject) => {

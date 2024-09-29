@@ -11,8 +11,6 @@ import { IoEllipsisVertical } from 'react-icons/io5';
 export default function StudentEntryReceivableDetailDesktop({
   receivable, className, role,
 }) {  
-  console.log(receivable);
-  
   return (
     <tr className={className}>
       <td>

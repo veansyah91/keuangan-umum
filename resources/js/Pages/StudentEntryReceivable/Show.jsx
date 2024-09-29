@@ -159,20 +159,7 @@ export default function Show({ role, organization, receivables, searchFilter, re
 									</Link>
 										
 								</div>
-								<div className='w-3/12 border flex rounded-lg'>
-									<label htmlFor='search-input' className='my-auto ml-2'>
-										<IoSearchSharp />
-									</label>
-									<input
-										id='search-input'
-										name='search-input'
-										type='search'
-										placeholder='Cari No Ref'
-										className='w-full border-none focus:outline-none focus:ring-0'
-										value={search || ''}
-										onChange={(e) => setSearch(e.target.value)}
-									/>
-								</div>
+								
 								<div className='italic text-xs my-auto w-1/12 text-center'>
 									<PageNumber data={receivables} />
 								</div>
