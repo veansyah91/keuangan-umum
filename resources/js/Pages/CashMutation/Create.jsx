@@ -141,7 +141,7 @@ export default function Create({ organization, newRef, date, cashAccounts, proje
 
     const handleDateValueChange = (newValue) => {
         setDateValue(newValue);
-        setData('date', newValue.startDate);
+        setData('date', `${newValue.startDate.getFullYear()}-${newValue.startDate.getMonth() + 1}-${newValue.startDate.getDate()}`);
     };
 
     const handleSelectedProgram = (selected) => {

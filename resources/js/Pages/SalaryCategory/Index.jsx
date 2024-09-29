@@ -199,7 +199,11 @@ export default function Index({ role, organization, salaryCategories, searchFilt
         pageBefore={
           salaryCategories.links[0].url ? (
             <Link
-              href={`/data-master/${organization.id}/salary-category?page=${salaryCategories.current_page - 1}&search=${search}`}
+              href={route('data-master.salary-category', {
+                organization: organization.id,
+                page: salaryCategories.current_page - 1,
+                search: search,
+              })}
               preserveState
               only={['salaryCategories']}>
               <IoPlayBack />
@@ -213,7 +217,11 @@ export default function Index({ role, organization, salaryCategories, searchFilt
         pageAfter={
           salaryCategories.links[salaryCategories.links.length - 1].url ? (
             <Link
-              href={`/data-master/${organization.id}/salary-category?page=${salaryCategories.current_page + 1}&search=${search}`}
+              href={route('data-master.salary-category', {
+                organization: organization.id,
+                page: salaryCategories.current_page + 1,
+                search: search,
+              })}
               only={['salaryCategories']}
               preserveState>
               <IoPlayForward />
@@ -275,7 +283,11 @@ export default function Index({ role, organization, salaryCategories, searchFilt
             <div className='my-auto'>
               {salaryCategories.links[0].url ? (
                 <Link
-                  href={`/admin/data-master/${organization.id}/salary-category?page=${salaryCategories.current_page - 1}&search=${search}`}
+                  href={route('data-master.salary-category', {
+                    organization: organization.id,
+                    page: salaryCategories.current_page - 1,
+                    search: search,
+                  })}
                   preserveState
                   only={['salaryCategories']}>
                   <IoPlayBack />
@@ -292,7 +304,11 @@ export default function Index({ role, organization, salaryCategories, searchFilt
             <div className='my-auto'>
               {salaryCategories.links[salaryCategories.links.length - 1].url ? (
                 <Link
-                  href={`/admin/data-master/${organization.id}/salary-category?page=${salaryCategories.current_page + 1}&search=${search}`}
+                  href={route('data-master.salary-category', {
+                    organization: organization.id,
+                    page: salaryCategories.current_page + 1,
+                    search: search,
+                  })}
                   only={['salaryCategories']}
                   preserveState>
                   <IoPlayForward />

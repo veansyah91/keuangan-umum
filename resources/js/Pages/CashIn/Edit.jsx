@@ -186,9 +186,9 @@ export default function Edit({
     };
 
     const handleDateValueChange = (newValue) => {
-        setDateValue(newValue);
-        setData('date', newValue.startDate);
-    };
+			setDateValue(newValue);
+			setData('date', `${newValue.startDate.getFullYear()}-${newValue.startDate.getMonth() + 1}-${newValue.startDate.getDate()}`);
+		};
 
     const handleAddAccount = () => {
         const tempDetail = [...data.accounts, { id: null, name: '', code: '', value: 0, is_cash: false }];

@@ -52,7 +52,7 @@ class CashMutationController extends Controller
     protected function newRef($organization, $dateRequest = '')
     {
         $now = $this->now;
-        $date = $dateRequest ?? $now->isoFormat('YYYY-MM-DD');
+        $date = $dateRequest ?? $now->isoFormat('YYYY-M-DD');
         $dateRef = Carbon::create($date);
         $refHeader = 'MK-'.$dateRef->isoFormat('YYYY').$dateRef->isoFormat('MM');
         $newRef = $refHeader.'0001';
@@ -107,7 +107,7 @@ class CashMutationController extends Controller
             'organization' => $organization,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'newRef' => $this->newRef($organization, request('date')),
-            'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
+            'date' => request('date') ?? $this->now->isoFormat('YYYY-M-DD'),
             'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),
             'programs' => $this->programRepository->getData($organization['id']),
             'projects' => $this->projectRepository->getData($organization['id']),
@@ -167,7 +167,7 @@ class CashMutationController extends Controller
 
         // cek tanggal
         // jika tanggal lebih tinggi dari hari sekarang, maka kirimkan error\
-        if ($validated['date'] > $this->now->isoFormat('YYYY-MM-DD')) {
+        if ($validated['date'] > $this->now->isoFormat('YYYY-M-DD')) {
             return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
         }
 
@@ -278,7 +278,7 @@ class CashMutationController extends Controller
             'organization' => $organization,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'newRef' => $this->newRef($organization, request('date')),
-            'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
+            'date' => request('date') ?? $this->now->isoFormat('YYYY-M-DD'),
             'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),
             'programs' => $this->programRepository->getData($organization['id']),
             'projects' => $this->projectRepository->getData($organization['id']),
@@ -350,7 +350,7 @@ class CashMutationController extends Controller
 
         // cek tanggal
         // jika tanggal lebih tinggi dari hari sekarang, maka kirimkan error\
-        if ($validated['date'] > $this->now->isoFormat('YYYY-MM-DD')) {
+        if ($validated['date'] > $this->now->isoFormat('YYYY-M-DD')) {
             return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
         }
 
@@ -409,7 +409,7 @@ class CashMutationController extends Controller
 
         // cek tanggal
         // jika tanggal lebih tinggi dari hari sekarang, maka kirimkan error\
-        if ($cashMutation['date'] > $this->now->isoFormat('YYYY-MM-DD')) {
+        if ($cashMutation['date'] > $this->now->isoFormat('YYYY-M-DD')) {
             return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
         }
 

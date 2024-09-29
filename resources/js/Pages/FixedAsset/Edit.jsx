@@ -120,7 +120,7 @@ export default function Edit({
 
     const handleDateValueChange = (newValue) => {
         setDateValue(newValue);
-        setData('date', newValue.startDate);
+        setData('date', `${newValue.startDate.getFullYear()}-${newValue.startDate.getMonth() + 1}-${newValue.startDate.getDate()}`);
     };
 
     const handleChangeValue = (values) => {
