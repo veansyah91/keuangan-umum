@@ -4,12 +4,15 @@ namespace App\Console\Commands;
 
 use Carbon\Carbon;
 use App\Helpers\NewRef;
+use App\Models\Account;
 use App\Models\Contact;
 use App\Models\Organization;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use App\Models\SchoolAccountSetting;
 use App\Models\StudentMonthlyPayment;
 use App\Models\StudentMonthlyReceivable;
+use App\Models\StudentMonthlyReceivableLedger;
 use App\Repositories\Journal\JournalRepository;
 
 class CreateMonthlyReceivableCron extends Command
@@ -73,47 +76,66 @@ class CreateMonthlyReceivableCron extends Command
 												})
 												->whereHas('student')
 												->whereHas('studentMonthlyPayment')
+												->with('lastStudentMonthlyPayment', function ($query){
+													return $query->with('details');
+												})
 												->whereIsActive(true)
 												->get();
 												
 		$journalRepository = new JournalRepository;
 
-		// \Log::info('Tanggal Sebelum: '. $usingDate->isoFormat('YYYY/MM/DD'));
-		// return ;
+		
 		foreach ($students as $student) {
-			// cek apakah telah terjadi pembayaran pada bulan yag dibutuhkan
-			$payment = StudentMonthlyPayment::where('contact_id', $student['id'])
-																				->where('month', $now->month - 1)
-																				->where('study_year', $studyYear)
-																				->first();
-																				
-			if (!$payment) {
-				// cek histori pembayaran sebelumnya sebagai acuan utk membuat data baru
-				$historyPayment = StudentMonthlyPayment::where('contact_id', $student['id'])
-																									->with('details')
-																									->latest('id')->first();
-
-				DB::transaction(function () use ($historyPayment, $now, $studyYear, $student, $usingDate, $journalRepository) {
+			$lastPayment = $student['lastStudentMonthlyPayment'];
+			if (($lastPayment['month'] !== ($usingDate->month)) || ($lastPayment['study_year'] !== $studyYear)) {
+				// return;
+				DB::transaction(function () use ($lastPayment, $now, $studyYear, $student, $usingDate, $journalRepository) {
+					$accounts = SchoolAccountSetting::where('organization_id', $student['organization_id'])->first();
+					$paymentAccount = Account::find($accounts['revenue_student']);
+					$receivableAccount = Account::find($accounts['receivable_monthly_student']);
 					$dataPayment = [
 						'organization_id' => $student['organization_id'],
 						'contact_id' => $student['id'],
 						'no_ref' => $this->newRef($student['organization_id'], $now->subDays(1)),
-						'value' => $historyPayment['value'],
+						'value' => $lastPayment['value'],
 						'type' => 'receivable',
-						'month' => $now->month - 1,
+						'month' => $now->month,
 						'study_year' => $studyYear,
 						'date' => $usingDate->isoFormat('YYYY/MM/DD'),
-						'description' => "Piutang SPP Siswa: " . $student['name'] . 'Bulan : ' . $now->month - 1 . "Tahun Ajaran: " . $studyYear,
-						'user_id' => $payment['contact_id']
+						'description' => "Piutang SPP Siswa: " . $student['name'] . ' Bulan : ' . $now->month - 1 . ", Tahun Ajaran: " . $studyYear,
+						'user_id' => $lastPayment['contact_id'],
+						'created_by_id' => $lastPayment['contact_id'],
+						'accounts' => [
+							// debit
+							[
+								'id' => $receivableAccount['id'],
+								'name' => $receivableAccount['name'],
+								'code' => $receivableAccount['code'],
+								'is_cash' => 0,
+								'debit' => $lastPayment['value'],
+								'credit' => 0,
+							],
+							// credit
+							[
+								'id' => $paymentAccount['id'],
+								'name' => $paymentAccount['name'],
+								'code' => $paymentAccount['code'],
+								'is_cash' => 0,
+								'debit' => 0,
+								'credit' => $lastPayment['value'],
+							]
+						]
 					];
 
 					// journal
-					$journalRepository->store($journalData);
+					$journal = $journalRepository->store($dataPayment);
+
+					$dataPayment['journal_id'] = $journal['id'];
 
 					$payment = StudentMonthlyPayment::create($dataPayment);
 
 					// masukkan detail
-					foreach ($historyPayment['details'] as $detail) {
+					foreach ($lastPayment['details'] as $detail) {
 						$data = [
 							'payment_id' => $payment['id'],
 							'student_payment_category_id' => $detail['id'],
@@ -128,20 +150,34 @@ class CreateMonthlyReceivableCron extends Command
 					$studentReceivable = StudentMonthlyReceivable::whereContactId($student['id'])
 																												->first();
 
+					// jika sudah ada piutang, maka perbarui nilai piutang
 					if ($studentReceivable) {
-						# code...
+						$temp = $studentReceivable['value'] + $lastPayment['value'];
+						$studentReceivable->update([
+							'value' => $temp
+						]);
+					} 
+					// jika belum ada, maka buat data baru
+					else {
+						$studentReceivable = StudentMonthlyReceivable::create($dataPayment);
 					}
 
-					// jika sudah ada piutang, maka perbarui nilai piutang
-
-					// jika belum ada, maka buat data baru
+					// detail piutang
+					StudentMonthlyReceivableLedger::create([
+						'receivable_id' => $studentReceivable['id'],
+						'debit' => $dataPayment['value'],
+						'credit' => 0,
+						'date' => $dataPayment['date'],
+						'description' => $dataPayment['description'],
+						'no_ref' => $dataPayment['no_ref'],
+						'month' => $dataPayment['month'],
+						'study_year' => $dataPayment['study_year'],
+						'journal_id' => $dataPayment['journal_id'],
+						'created_by_id' => $dataPayment['created_by_id'],
+						'payment_id' => $payment['id'],
+					]);
 				});
-				
-				
 			}
-			
-
-			
 		}
 
 

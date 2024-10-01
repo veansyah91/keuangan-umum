@@ -66,6 +66,11 @@ class Contact extends Model
         return $this->hasMany(StudentMonthlyPayment::class);
     }
 
+    public function lastStudentMonthlyPayment(): HasOne
+    {
+        return $this->hasOne(StudentMonthlyPayment::class)->latestOfMany();
+    }
+
     public function scopeFilter($query, $filters)
     {
         $query->when($filters['search'] ?? false, function ($query, $search) {

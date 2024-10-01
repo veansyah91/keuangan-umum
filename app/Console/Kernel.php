@@ -26,8 +26,8 @@ class Kernel extends ConsoleKernel
             ->daily();
         // ->everyMinute();
         $schedule->command('createMonthlyReceivable:cron')
-            // ->daily();
-        ->everyMinute();
+            ->monthly();
+        // ->everyMinute();
     }
 
     /**
