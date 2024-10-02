@@ -65,7 +65,7 @@ class CreateMonthlyReceivableCron extends Command
 
 	public function handle()
 	{
-		// \Log::info('Cron job pencatatan piutang spp dijalankan '.date('Y-m-d H:i:s'));
+		\Log::info('Cron job penghitungan piutang spp dijalankan '.date('Y-m-d H:i:s'));
 		$now = Carbon::now();
 		$usingDate = $now->subDays(1);
 
@@ -88,7 +88,6 @@ class CreateMonthlyReceivableCron extends Command
 		foreach ($students as $student) {
 			$lastPayment = $student['lastStudentMonthlyPayment'];
 			if (($lastPayment['month'] !== ($usingDate->month)) || ($lastPayment['study_year'] !== $studyYear)) {
-				// return;
 				DB::transaction(function () use ($lastPayment, $now, $studyYear, $student, $usingDate, $journalRepository) {
 					$accounts = SchoolAccountSetting::where('organization_id', $student['organization_id'])->first();
 					$paymentAccount = Account::find($accounts['revenue_student']);
@@ -179,7 +178,5 @@ class CreateMonthlyReceivableCron extends Command
 				});
 			}
 		}
-
-
 	}
 }
