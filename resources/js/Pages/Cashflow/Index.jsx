@@ -82,8 +82,7 @@ export default function Index({ organization }) {
 							</Link>
 						</div>
 					</section>  
-				</section>
-					
+				</section>					
 			</ContainerDesktop>
 			{/* Desktop */}
 
@@ -151,8 +150,7 @@ export default function Index({ organization }) {
 						</Link>
 					</div>
 				</div>
-			</section>
-			
+			</section>			
 			{/* Mobile */}
 		</>
 	);
