@@ -17,6 +17,7 @@ import { NumericFormat } from 'react-number-format';
 import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 import { useDebounce } from 'use-debounce';
 import { usePrevious } from 'react-use';
+import dayjs from 'dayjs';
 
 const depreciationValue = (value, lifetime, residue) => (lifetime > 0 ? Math.ceil((value - residue) / lifetime) : 0);
 
@@ -68,7 +69,7 @@ export default function Create({ organization, role, newRef, date, accounts, fix
         router.reload({
             only: ['newRef'],
             data: {
-                date: dateValue.startDate,
+                date: dayjs(dateValue.startDate).format('YYYY-MM-DD'),
             },
             onSuccess: (page) => {
                 setData('code', page.props.newRef);
@@ -78,7 +79,7 @@ export default function Create({ organization, role, newRef, date, accounts, fix
 
     const handleDateValueChange = (newValue) => {
         setDateValue(newValue);
-        setData('date', `${newValue.startDate.getFullYear()}-${newValue.startDate.getMonth() + 1}-${newValue.startDate.getDate()}`);
+        setData('date', dayjs(dateValue.startDate).format('YYYY-MM-DD'));
     };
 
     const handleChangeValue = (values) => {

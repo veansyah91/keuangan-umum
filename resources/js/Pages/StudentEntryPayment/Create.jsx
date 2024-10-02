@@ -104,7 +104,7 @@ export default function Create({
 
   const handleDateValueChange = (newValue) => {
     setDateValue(newValue);
-    setData('date', `${newValue.startDate.getFullYear()}-${newValue.startDate.getMonth() + 1}-${newValue.startDate.getDate()}`);
+    setData('date', dayjs(dateValue.startDate).format('YYYY-MM-DD'));
   };
 
   const handleChangeStudyYear = (e) => {

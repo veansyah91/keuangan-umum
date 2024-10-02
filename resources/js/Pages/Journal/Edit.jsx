@@ -154,7 +154,7 @@ export default function Edit({
         router.reload({
             only: ['newRef'],
             data: {
-                date: dateValue.startDate,
+                date: dayjs(dateValue.startDate).format('YYYY-MM-DD'),
             },
             onSuccess: (page) => {
                 setData('no_ref', page.props.newRef);
@@ -184,7 +184,7 @@ export default function Edit({
 
     const handleDateValueChange = (newValue) => {
         setDateValue(newValue);
-        setData('date', `${newValue.startDate.getFullYear()}-${newValue.startDate.getMonth() + 1}-${newValue.startDate.getDate()}`);
+        setData('date', dayjs(dateValue.startDate).format('YYYY-MM-DD'));
     };
 
     const handleDeleteAccount = (index) => {

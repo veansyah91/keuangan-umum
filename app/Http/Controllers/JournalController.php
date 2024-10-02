@@ -188,6 +188,7 @@ class JournalController extends Controller
             return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
         }
 
+
         // jika tahun, tidak dalam peride
         $year = $this->now->isoFormat('YYYY');
         $tempDateInput = Carbon::create($validated['date']);

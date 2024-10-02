@@ -535,6 +535,7 @@ class StudentMonthlyPaymentController extends Controller
 			$ledger = Ledger::whereJournalId($payment['journal_id'])->where('credit', '>', 0)->count();
 
 			// jika ledger > 1, berarti telah terjadi  pendapatan dari pembayaran di muka
+			dd($ledger);
 			// journal
 			$this->journalRepository->update($validated, $payment->journal);
 
