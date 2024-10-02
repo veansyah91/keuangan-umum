@@ -25,6 +25,7 @@ class ContactRepository implements ContactRepositoryInterface
                         ->whereHas('contactCategories', function ($query) use ($contactCategoryId){
                             $query->where('contact_category_id', $contactCategoryId);
                         })
+                        ->whereIsActive(true)
                         ->orderBy('name')
                         ->take(20)
                         ->get();

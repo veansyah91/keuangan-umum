@@ -19,6 +19,8 @@ import Datepicker from 'react-tailwindcss-datepicker';
 import { NumericFormat } from 'react-number-format';
 import formatNumber from '@/Utils/formatNumber';
 import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
+import { usePrevious } from 'react-use';
+import { useDebounce } from 'use-debounce';
 
 export default function Create({
   organization, newRef, contacts, date, categories, studyYears, cashAccounts,
@@ -45,10 +47,23 @@ export default function Create({
     endDate: date,
   });
 
+  const [debounceDateValue] = useDebounce(dateValue, 500);
+
+  const prevDate = usePrevious(dateValue);
+
   // useEffect
   useEffect(() => {
     setDefault(newRef);
   },[]);
+
+  // useUffect
+  useEffect(() => {
+    if (prevDate !== undefined) {
+      if (dateValue.startDate) {
+        reloadNewRef();
+      }
+    }
+  }, [debounceDateValue]);
 
   const setDefault = (newRef) => {
     let tempData = data;
@@ -78,6 +93,19 @@ export default function Create({
     setData(tempData);
   }
 
+  // function
+  const reloadNewRef = () => {        
+    router.reload({
+      only: ['newRef'],
+      data: {
+        date: dayjs(dateValue.startDate).format('YYYY-MM-DD'),
+      },
+      onSuccess: (page) => {
+        setData('no_ref', page.props.newRef);
+      },
+    });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -104,7 +132,7 @@ export default function Create({
 
   const handleDateValueChange = (newValue) => {
     setDateValue(newValue);
-    setData('date', `${newValue.startDate.getFullYear()}-${newValue.startDate.getMonth() + 1}-${newValue.startDate.getDate()}`);
+    setData('date', dayjs(newValue.startDate).format('YYYY-MM-DD'));
   };
 
   const handleChangeStudyYear = (e) => {

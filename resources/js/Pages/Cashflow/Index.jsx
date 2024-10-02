@@ -128,6 +128,27 @@ export default function Index({ organization }) {
 								title={'Piutang Iuran Bulanan'} 
 							/>
 						</Link>
+						<Link href={route('cashflow.student-entry-payment', organization.id)}>
+							<CardMenu 
+								bgColor={'bg-blue-600'} 
+								icon={<PiMoney />} 
+								title={'Pembayaran Iuran Tahunan'} 
+							/>
+						</Link>
+						<Link href={route('cashflow.student-entry-receivable', organization.id)}>
+							<CardMenu 
+								bgColor={'bg-red-600'} 
+								icon={<CgNotes />} 
+								title={'Piutang Iuran Tahunan'} 
+							/>
+						</Link>
+						<Link href={route('cashflow.student-entry-receivable-payment', organization.id)}>
+							<CardMenu 
+								bgColor={'bg-green-600'} 
+								icon={<FaMoneyBillWaveAlt />} 
+								title={'Pembayaran Piutang Iuran Tahunan'} 
+							/>
+						</Link>
 					</div>
 				</div>
 			</section>

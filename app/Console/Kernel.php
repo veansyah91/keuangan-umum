@@ -25,6 +25,14 @@ class Kernel extends ConsoleKernel
         $schedule->command('organizationInvoice:cron')
             ->daily();
         // ->everyMinute();
+        $schedule->command('createMonthlyReceivable:cron')
+            ->timezone('Asia/Jakarta')
+            ->monthlyOn(1, '00:00');
+        // ->everyMinute();
+        $schedule->command('monthlyPaymentPrepaid:cron')
+            // ->timezone('Asia/Jakarta')
+            // ->monthlyOn(1, '00:00');
+        ->everyMinute();
     }
 
     /**

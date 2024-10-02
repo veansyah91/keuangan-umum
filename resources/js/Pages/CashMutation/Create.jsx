@@ -15,6 +15,7 @@ import { useDebounce } from 'use-debounce';
 import { NumericFormat } from 'react-number-format';
 import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 import { Disclosure, Transition } from '@headlessui/react';
+import dayjs from 'dayjs';
 
 export default function Create({ organization, newRef, date, cashAccounts, projects, programs, departments }) {
     // state
@@ -65,7 +66,9 @@ export default function Create({ organization, newRef, date, cashAccounts, proje
     // useEffect
     useEffect(() => {
         if (prevDate !== undefined) {
-            reloadNewRef();
+            if (dateValue.startDate) {
+                reloadNewRef();
+            }
         }
     }, [debounceDateValue]);
 
@@ -121,7 +124,7 @@ export default function Create({ organization, newRef, date, cashAccounts, proje
         router.reload({
             only: ['newRef'],
             data: {
-                date: dateValue.startDate,
+                date: dayjs(dateValue.startDate).format('YYYY-MM-DD'),
             },
             onSuccess: (page) => {
                 setData('no_ref', page.props.newRef);
@@ -141,7 +144,7 @@ export default function Create({ organization, newRef, date, cashAccounts, proje
 
     const handleDateValueChange = (newValue) => {
         setDateValue(newValue);
-        setData('date', `${newValue.startDate.getFullYear()}-${newValue.startDate.getMonth() + 1}-${newValue.startDate.getDate()}`);
+        setData('date', dayjs(newValue.startDate).format('YYYY-MM-DD'));
     };
 
     const handleSelectedProgram = (selected) => {

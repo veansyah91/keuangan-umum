@@ -17,6 +17,7 @@ import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 import { Disclosure, Transition } from '@headlessui/react';
 import ContactSelectInput from '@/Components/SelectInput/ContactSelectInput';
 import formatNumber from '@/Utils/formatNumber';
+import dayjs from 'dayjs';
 
 export default function Create({
     organization,
@@ -90,10 +91,12 @@ export default function Create({
     const prevDate = usePrevious(dateValue);
 
     // useEffect
-    useEffect(() => {
-        if (prevDate !== undefined) {
-          reloadNewRef();
-        }
+    useEffect(() => {			
+			if ((prevDate !== undefined)) {				
+				if (dateValue.startDate) {
+					reloadNewRef();					
+				}
+			}
     }, [debounceDateValue]);
 
     useEffect(() => {
@@ -173,7 +176,7 @@ export default function Create({
         router.reload({
             only: ['newRef'],
             data: {
-                date: dateValue.startDate,
+                date: dayjs(dateValue.startDate).format('YYYY-MM-DD'),
             },
             onSuccess: (page) => {
                 setData('no_ref', page.props.newRef);
@@ -223,7 +226,7 @@ export default function Create({
 
     const handleDateValueChange = (newValue) => {
         setDateValue(newValue);
-        setData('date', `${newValue.startDate.getFullYear()}-${newValue.startDate.getMonth() + 1}-${newValue.startDate.getDate()}`);
+        setData('date', dayjs(newValue.startDate).format('YYYY-MM-DD'));
     };
 
     const handleAddAccount = () => {

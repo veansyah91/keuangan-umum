@@ -80,7 +80,9 @@ export default function Edit({ organization, newRef, contacts, date, categories,
 
   useEffect(() => {
     if (prevDate !== undefined) {
-      reloadNewRef();
+      if (dateValue.startDate) {
+        reloadNewRef();
+      }
     }
   }, [debounceDateValue]);
 
@@ -186,7 +188,7 @@ export default function Edit({ organization, newRef, contacts, date, categories,
 
   const handleDateValueChange = (newValue) => {
     setDateValue(newValue);
-    setData('date', `${newValue.startDate.getFullYear()}-${newValue.startDate.getMonth() + 1}-${newValue.startDate.getDate()}`);
+    setData('date', dayjs(newValue.startDate).format('YYYY-MM-DD'));
   };
   
   const handleChangeValue = (values, index) => {
@@ -259,7 +261,7 @@ export default function Edit({ organization, newRef, contacts, date, categories,
     router.reload({
       only: ['newRef'],
       data: {
-        date: dateValue.startDate,
+        date: dayjs(dateValue.startDate).format('YYYY-MM-DD'),
       },
       onSuccess: (page) => {
         setData('no_ref', dayjs(dateValue.startDate).format('MM') === dayjs(payment.date).format('MM') 
