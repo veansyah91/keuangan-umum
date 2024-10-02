@@ -77,7 +77,9 @@ export default function Create({ organization, newRef, date, accounts, projects,
     // useUffect
     useEffect(() => {
         if (prevDate !== undefined) {
-            reloadNewRef();
+            if (dateValue.startDate) {
+                reloadNewRef();
+            }
         }
     }, [debounceDateValue]);
 
@@ -128,7 +130,7 @@ export default function Create({ organization, newRef, date, accounts, projects,
 
     const handleDateValueChange = (newValue) => {
         setDateValue(newValue);
-        setData('date', dayjs(dateValue.startDate).format('YYYY-MM-DD'));
+        setData('date', dayjs(newValue.startDate).format('YYYY-MM-DD'));
     };
 
     const handleDeleteAccount = (index) => {

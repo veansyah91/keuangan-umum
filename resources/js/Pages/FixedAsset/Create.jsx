@@ -60,7 +60,9 @@ export default function Create({ organization, role, newRef, date, accounts, fix
     // useEffect
     useEffect(() => {
         if (prevDate !== undefined) {
-            reloadNewRef();
+            if (dateValue.startDate) {
+                reloadNewRef();
+            }
         }
     }, [debounceDateValue]);
 
@@ -79,7 +81,7 @@ export default function Create({ organization, role, newRef, date, accounts, fix
 
     const handleDateValueChange = (newValue) => {
         setDateValue(newValue);
-        setData('date', dayjs(dateValue.startDate).format('YYYY-MM-DD'));
+        setData('date', dayjs(newValue.startDate).format('YYYY-MM-DD'));
     };
 
     const handleChangeValue = (values) => {

@@ -66,7 +66,9 @@ export default function Create({ organization, newRef, date, cashAccounts, proje
     // useEffect
     useEffect(() => {
         if (prevDate !== undefined) {
-            reloadNewRef();
+            if (dateValue.startDate) {
+                reloadNewRef();
+            }
         }
     }, [debounceDateValue]);
 
@@ -142,7 +144,7 @@ export default function Create({ organization, newRef, date, cashAccounts, proje
 
     const handleDateValueChange = (newValue) => {
         setDateValue(newValue);
-        setData('date', dayjs(dateValue.startDate).format('YYYY-MM-DD'));
+        setData('date', dayjs(newValue.startDate).format('YYYY-MM-DD'));
     };
 
     const handleSelectedProgram = (selected) => {

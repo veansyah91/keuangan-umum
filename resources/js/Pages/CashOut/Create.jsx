@@ -91,7 +91,9 @@ export default function Create({
     // useEffect
     useEffect(() => {
         if (prevDate !== undefined) {
-            reloadNewRef();
+            if (dateValue.startDate) {
+                reloadNewRef();
+            }
         }
     }, [debounceDateValue]);
 
@@ -222,7 +224,7 @@ export default function Create({
 
     const handleDateValueChange = (newValue) => {
         setDateValue(newValue);
-        setData('date', dayjs(dateValue.startDate).format('YYYY-MM-DD'));
+        setData('date', dayjs(newValue.startDate).format('YYYY-MM-DD'));
     };
 
     const handleAddAccount = () => {

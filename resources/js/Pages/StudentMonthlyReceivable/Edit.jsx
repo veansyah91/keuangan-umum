@@ -19,6 +19,8 @@ import Datepicker from 'react-tailwindcss-datepicker';
 import { NumericFormat } from 'react-number-format';
 import formatNumber from '@/Utils/formatNumber';
 import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
+import { useDebounce } from 'use-debounce';
+import { usePrevious } from 'react-use';
 
 const yearList = () => {
   const now = dayjs().year();
@@ -78,10 +80,21 @@ export default function Edit({ organization, newRef, contacts, date, categories,
     endDate: date,
   });
 
+  const [debounceDateValue] = useDebounce(dateValue, 500);
+  const prevDate = usePrevious(dateValue);
+
   // useEffect
   useEffect(() => {
     setDefault();
   },[]);
+
+  useEffect(() => {
+    if (prevDate !== undefined) {
+      if (dateValue.startDate) {        
+        reloadNewRef();
+      }
+    }
+  }, [debounceDateValue]);
 
   // function
   const setDefault = () => {
@@ -118,7 +131,7 @@ export default function Edit({ organization, newRef, contacts, date, categories,
     router.reload({
         only: ['newRef'],
         data: {
-            date: dateValue.startDate,
+          date: dayjs(dateValue.startDate).format('YYYY-MM-DD'),
         },
         onSuccess: ({ props }) => {
           const { newRef } = props;
@@ -176,7 +189,7 @@ export default function Edit({ organization, newRef, contacts, date, categories,
 
   const handleDateValueChange = (newValue) => {
     setDateValue(newValue);
-    setData('date', `${newValue.startDate.getFullYear()}-${newValue.startDate.getMonth() + 1}-${newValue.startDate.getDate()}`);
+    setData('date', dayjs(newValue.startDate).format('YYYY-MM-DD'));
   };
 
   const handleChangeValue = (values, index) => {

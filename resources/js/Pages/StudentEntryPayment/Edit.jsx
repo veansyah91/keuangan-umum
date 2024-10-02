@@ -19,6 +19,8 @@ import Datepicker from 'react-tailwindcss-datepicker';
 import { NumericFormat } from 'react-number-format';
 import formatNumber from '@/Utils/formatNumber';
 import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
+import { useDebounce } from 'use-debounce';
+import { usePrevious } from 'react-use';
 
 export default function Edit({
   organization, newRef, contacts, date, categories, studyYears, cashAccounts, payment
@@ -46,10 +48,29 @@ export default function Edit({
     endDate: payment.date,
   });
 
+  const [debounceDateValue] = useDebounce(dateValue, 500);
+
+  const prevDate = usePrevious(dateValue);
+
   // useEffect
   useEffect(() => {
     setDefault();
   },[]);
+
+  // useEffect
+  useEffect(() => {
+    if (prevDate !== undefined) {
+      if (dateValue.startDate) {
+        let inputDateFormatted = dayjs(dateValue.startDate);
+        let tempInputDate = `${inputDateFormatted.month() + 1}-${inputDateFormatted.year()}`;
+
+        let oldDateFormatted = dayjs(payment.date);
+        let tempOldDate = `${oldDateFormatted.month() + 1}-${oldDateFormatted.year()}`;
+
+        tempInputDate !== tempOldDate ? reloadNewRef() : setData('no_ref', payment.no_ref);
+      }
+    }
+  }, [debounceDateValue]);
 
   const setDefault = () => {
     let tempData = data;
@@ -89,6 +110,18 @@ export default function Edit({
     setData(tempData);
   }
 
+  const reloadNewRef = () => {        
+    router.reload({
+      only: ['newRef'],
+      data: {
+        date: dayjs(dateValue.startDate).format('YYYY-MM-DD'),
+      },
+      onSuccess: (page) => {
+        setData('no_ref', page.props.newRef);
+      },
+    });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -113,7 +146,7 @@ export default function Edit({
 
   const handleDateValueChange = (newValue) => {
     setDateValue(newValue);
-    setData('date', `${newValue.startDate.getFullYear()}-${newValue.startDate.getMonth() + 1}-${newValue.startDate.getDate()}`);
+    setData('date', dayjs(newValue.startDate).format('YYYY-MM-DD'));
   };
 
   const handleChangeStudyYear = (e) => {

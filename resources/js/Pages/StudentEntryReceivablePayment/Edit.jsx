@@ -18,6 +18,9 @@ import { NumericFormat } from 'react-number-format';
 import formatNumber from '@/Utils/formatNumber';
 import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 import ReceivableListBox from './Components/ReceivableListBox';
+import { useDebounce } from 'use-debounce';
+import { usePrevious } from 'react-use';
+import dayjs from 'dayjs';
 
 export default function Edit({
   organization, contacts, selectedContactQuery, cashAccounts, payments, receivablePayment, cashAccount
@@ -52,8 +55,11 @@ export default function Edit({
     endDate: receivablePayment.date,
   });
 
-  // useEffect
+  const [debounceDateValue] = useDebounce(dateValue, 500);
 
+  const prevDate = usePrevious(dateValue);
+
+  // useEffect
   useEffect(() => {
     setTimeout(() => {
       if (selectedContact.id) {
@@ -61,6 +67,33 @@ export default function Edit({
       }  
     }, 0);      
   },[selectedContact]);
+
+  // useEffect
+  useEffect(() => {
+    if (prevDate !== undefined) {
+      if (dateValue.startDate) {
+        let inputDateFormatted = dayjs(dateValue.startDate);
+        let tempInputDate = `${inputDateFormatted.month() + 1}-${inputDateFormatted.year()}`;
+
+        let oldDateFormatted = dayjs(receivablePayment.date);
+        let tempOldDate = `${oldDateFormatted.month() + 1}-${oldDateFormatted.year()}`;
+
+        tempInputDate !== tempOldDate ? reloadNewRef() : setData('no_ref', receivablePayment.no_ref);
+      }
+    }
+  }, [debounceDateValue]);
+
+  const reloadNewRef = () => {        
+    router.reload({
+      only: ['newRef'],
+      data: {
+        date: dayjs(dateValue.startDate).format('YYYY-MM-DD'),
+      },
+      onSuccess: (page) => {
+        setData('no_ref', page.props.newRef);
+      },
+    });
+  };
 
   const handleGetPayments = () => {
     router.reload({
@@ -98,6 +131,7 @@ export default function Edit({
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
 
     patch(route('cashflow.student-entry-receivable-payment.update', {organization: organization.id, receivablePayment: receivablePayment}), {
       only:['flash'],
@@ -118,8 +152,8 @@ export default function Edit({
   };
 
   const handleDateValueChange = (newValue) => {
-    setDateValue(newValue);
-    setData('date', `${newValue.startDate.getFullYear()}-${newValue.startDate.getMonth() + 1}-${newValue.startDate.getDate()}`);
+    setDateValue(newValue);    
+    setData('date', dayjs(newValue.startDate).format('YYYY-MM-DD'));
   };
 
   const handleSelectedContact = (selected) => {    
