@@ -17,20 +17,27 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         $schedule->command('depreciation:cron')
+            ->timezone('Asia/Jakarta')
             ->daily();
             // ->everyMinute();
         $schedule->command('deactiveOrganization:cron')
+            ->timezone('Asia/Jakarta')
             ->daily();
         // ->everyMinute();
         $schedule->command('organizationInvoice:cron')
+            ->timezone('Asia/Jakarta')
             ->daily();
         // ->everyMinute();
         $schedule->command('createMonthlyReceivable:cron')
             ->timezone('Asia/Jakarta')
-            ->monthlyOn(1, '00:00');
+            ->lastDayOfMonth('20:00');
         // ->everyMinute();
         $schedule->command('monthlyPaymentPrepaid:cron')
-            // ->timezone('Asia/Jakarta')
+            ->timezone('Asia/Jakarta')
+            ->monthlyOn(1, '00:00');
+        // ->everyMinute();
+        $schedule->command('studentLevelUpdate:cron')
+            ->timezone('Asia/Jakarta')
             // ->monthlyOn(1, '00:00');
         ->everyMinute();
     }

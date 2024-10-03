@@ -38,9 +38,7 @@ class CreateMonthlyReceivableCron extends Command
 	protected function newRef($organization, $now)
 	{
 		$refHeader = 'IB-'.$now->isoFormat('YYYY').$now->isoFormat('MM');
-		$newRef = $refHeader.'0001';
-
-		
+		$newRef = $refHeader.'0001';		
 
 		$payment = StudentMonthlyPayment::whereOrganizationId($organization)
 				->where('no_ref', 'like', $refHeader.'%')
@@ -67,7 +65,7 @@ class CreateMonthlyReceivableCron extends Command
 	{
 		\Log::info('Cron job penghitungan piutang spp dijalankan '.date('Y-m-d H:i:s'));
 		$now = Carbon::now();
-		$usingDate = $now->subDays(1);
+		// $usingDate = $now->subDays(1);
 
 		$studyYear = $this->studyYear($now);
 
@@ -83,12 +81,11 @@ class CreateMonthlyReceivableCron extends Command
 												->get();
 												
 		$journalRepository = new JournalRepository;
-
 		
 		foreach ($students as $student) {
 			$lastPayment = $student['lastStudentMonthlyPayment'];
-			if (($lastPayment['month'] !== ($usingDate->month)) || ($lastPayment['study_year'] !== $studyYear)) {
-				DB::transaction(function () use ($lastPayment, $now, $studyYear, $student, $usingDate, $journalRepository) {
+			if (($lastPayment['month'] !== ($now->month)) || ($lastPayment['study_year'] !== $studyYear)) {
+				DB::transaction(function () use ($lastPayment, $now, $studyYear, $student, $journalRepository) {
 					$accounts = SchoolAccountSetting::where('organization_id', $student['organization_id'])->first();
 					$paymentAccount = Account::find($accounts['revenue_student']);
 					$receivableAccount = Account::find($accounts['receivable_monthly_student']);
@@ -100,7 +97,7 @@ class CreateMonthlyReceivableCron extends Command
 						'type' => 'receivable',
 						'month' => $now->month,
 						'study_year' => $studyYear,
-						'date' => $usingDate->isoFormat('YYYY/MM/DD'),
+						'date' => $now->isoFormat('YYYY/MM/DD'),
 						'description' => "Piutang SPP Siswa: " . $student['name'] . ' Bulan : ' . $now->month - 1 . ", Tahun Ajaran: " . $studyYear,
 						'user_id' => $lastPayment['contact_id'],
 						'created_by_id' => $lastPayment['contact_id'],
