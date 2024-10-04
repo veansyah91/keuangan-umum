@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Contact;
 use App\Models\Journal;
+use App\Models\Organization;
 use App\Models\StudentPaymentCategory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\StudentMonthlyReceivableLedger;
@@ -27,7 +28,8 @@ class StudentMonthlyPayment extends Model
 		'month',
 		'study_year',
 		'created_by_id',
-		'journal_id'
+		'journal_id',
+		'prepaid_journal_id'
 	];
 
 	public function scopeFilter($query, $filters)
@@ -40,6 +42,14 @@ class StudentMonthlyPayment extends Model
 															$query->where('no_ref', 'like', '%'. $search .'%');
 														});
 			});
+		});
+
+		$query->when($filters['start_date'] ?? false, function ($query, $start_date) {
+			return $query->where('date', '>=', $start_date);
+		});
+
+		$query->when($filters['end_date'] ?? false, function ($query, $end_date) {
+			return $query->where('date', '<=', $end_date);
 		});
 	}
 
@@ -59,7 +69,12 @@ class StudentMonthlyPayment extends Model
 	}
 
 	public function journal(): BelongsTo
-    {
-        return $this->belongsTo(Journal::class);
-    }
+	{
+			return $this->belongsTo(Journal::class);
+	}
+
+	public function organization(): BelongsTo
+	{
+			return $this->belongsTo(Organization::class);
+	}
 }

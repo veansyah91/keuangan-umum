@@ -186,7 +186,11 @@ export default function Index({ role, organization, studentPaymentCategories, se
                 pageBefore={
                     studentPaymentCategories.links[0].url ? (
                         <Link
-                            href={`/data-master/${organization.id}/student-entry-payment-category?page=${studentPaymentCategories.current_page - 1}&search=${search}`}
+														href={route('data-master.student-entry-payment-category', {
+															organization: organization.id,
+															page: studentPaymentCategories.current_page - 1,
+															search: search,
+														})}
                             preserveState
                             only={['studentPaymentCategories']}>
                             <IoPlayBack />
@@ -200,7 +204,11 @@ export default function Index({ role, organization, studentPaymentCategories, se
                 pageAfter={
                     studentPaymentCategories.links[studentPaymentCategories.links.length - 1].url ? (
                         <Link
-                            href={`/data-master/${organization.id}/student-entry-payment-category?page=${studentPaymentCategories.current_page + 1}&search=${search}`}
+														href={route('data-master.student-entry-payment-category', {
+															organization: organization.id,
+															page: studentPaymentCategories.current_page - 1,
+															search: search,
+														})}
                             only={['studentPaymentCategories']}
                             preserveState>
                             <IoPlayForward />
@@ -262,7 +270,11 @@ export default function Index({ role, organization, studentPaymentCategories, se
                         <div className='my-auto'>
                             {studentPaymentCategories.links[0].url ? (
                                 <Link
-                                    href={`/admin/data-master/${organization.id}/student-entry-payment-category?page=${studentPaymentCategories.current_page - 1}&search=${search}`}
+																		href={route('data-master.student-entry-payment-category', {
+																			organization: organization.id,
+																			page: studentPaymentCategories.current_page - 1,
+																			search: search,
+																		})}
                                     preserveState
                                     only={['studentPaymentCategories']}>
                                     <IoPlayBack />
@@ -279,7 +291,11 @@ export default function Index({ role, organization, studentPaymentCategories, se
                         <div className='my-auto'>
                             {studentPaymentCategories.links[studentPaymentCategories.links.length - 1].url ? (
                                 <Link
-                                    href={`/admin/data-master/${organization.id}/student-entry-payment-category?page=${studentPaymentCategories.current_page + 1}&search=${search}`}
+																		href={route('data-master.student-entry-payment-category', {
+																			organization: organization.id,
+																			page: studentPaymentCategories.current_page + 1,
+																			search: search,
+																		})}
                                     only={['studentPaymentCategories']}
                                     preserveState>
                                     <IoPlayForward />

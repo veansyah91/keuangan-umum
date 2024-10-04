@@ -3,7 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
 import { Head, Link } from '@inertiajs/react';
 import ContainerDesktop from '@/Components/Desktop/ContainerDesktop';
-import { FaHandHoldingUsd } from 'react-icons/fa';
+import { FaHandHoldingUsd, FaMoneyBillWaveAlt } from 'react-icons/fa';
 import CardMenu from '@/Components/CardMenu';
 import { FaMoneyBillTransfer } from 'react-icons/fa6';
 import { SlNotebook } from "react-icons/sl";
@@ -66,17 +66,23 @@ export default function Index({ organization }) {
 									title={'Pembayaran Iuran Tahunan'} 
 								/>
 							</Link>
-							<Link href={route('cashflow.student-monthly-payment', organization.id)}>
+							<Link href={route('cashflow.student-entry-receivable', organization.id)}>
 								<CardMenu 
 									bgColor={'bg-red-600'} 
 									icon={<CgNotes />} 
 									title={'Piutang Iuran Tahunan'} 
 								/>
 							</Link>
+							<Link href={route('cashflow.student-entry-receivable-payment', organization.id)}>
+								<CardMenu 
+									bgColor={'bg-green-600'} 
+									icon={<FaMoneyBillWaveAlt />} 
+									title={'Pembayaran Piutang Iuran Tahunan'} 
+								/>
+							</Link>
 						</div>
 					</section>  
-				</section>
-					
+				</section>					
 			</ContainerDesktop>
 			{/* Desktop */}
 
@@ -121,10 +127,30 @@ export default function Index({ organization }) {
 								title={'Piutang Iuran Bulanan'} 
 							/>
 						</Link>
+						<Link href={route('cashflow.student-entry-payment', organization.id)}>
+							<CardMenu 
+								bgColor={'bg-blue-600'} 
+								icon={<PiMoney />} 
+								title={'Pembayaran Iuran Tahunan'} 
+							/>
+						</Link>
+						<Link href={route('cashflow.student-entry-receivable', organization.id)}>
+							<CardMenu 
+								bgColor={'bg-red-600'} 
+								icon={<CgNotes />} 
+								title={'Piutang Iuran Tahunan'} 
+							/>
+						</Link>
+						<Link href={route('cashflow.student-entry-receivable-payment', organization.id)}>
+							<CardMenu 
+								bgColor={'bg-green-600'} 
+								icon={<FaMoneyBillWaveAlt />} 
+								title={'Pembayaran Piutang Iuran Tahunan'} 
+							/>
+						</Link>
 					</div>
 				</div>
-			</section>
-			
+			</section>			
 			{/* Mobile */}
 		</>
 	);

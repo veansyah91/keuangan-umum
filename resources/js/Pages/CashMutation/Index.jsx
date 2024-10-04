@@ -206,7 +206,11 @@ export default function Index({
                 pageBefore={
                     cashMutations.links[0].url ? (
                         <Link
-                            href={`/cashflows/${organization.id}/cash-mutation?page=${cashMutations.current_page - 1}&search=${search}`}
+                            href={route('cashflow.cash-mutation', {
+                                organization: organization.id,
+                                page: cashMutations.current_page - 1,
+                                search: search,
+                            })}
                             preserveState
                             only={['cashMutations']}>
                             <IoPlayBack />
@@ -220,7 +224,11 @@ export default function Index({
                 pageAfter={
                     cashMutations.links[cashMutations.links.length - 1].url ? (
                         <Link
-                            href={`/cashflows/${organization.id}/cash-mutation?page=${cashMutations.current_page + 1}&search=${search}`}
+                            href={route('cashflow.cash-mutation', {
+                                organization: organization.id,
+                                page: cashMutations.current_page + 1,
+                                search: search,
+                            })}
                             only={['cashMutations']}
                             preserveState>
                             <IoPlayForward />
@@ -311,7 +319,11 @@ export default function Index({
                         <div className='my-auto'>
                             {cashMutations.links[0].url ? (
                                 <Link
-                                    href={`/cashflows/${organization.id}/cash-mutation?page=${cashMutations.current_page - 1}&search=${search}`}
+                                    href={route('cashflow.cash-mutation', {
+                                        organization: organization.id,
+                                        page: cashMutations.current_page - 1,
+                                        search: search,
+                                    })}
                                     preserveState
                                     only={['cashMutations']}>
                                     <IoPlayBack />
@@ -328,7 +340,11 @@ export default function Index({
                         <div className='my-auto'>
                             {cashMutations.links[cashMutations.links.length - 1].url ? (
                                 <Link
-                                    href={`/cashflows/${organization.id}/cash-mutation?page=${cashMutations.current_page + 1}&search=${search}`}
+                                    href={route('cashflow.cash-mutation', {
+                                        organization: organization.id,
+                                        page: cashMutations.current_page + 1,
+                                        search: search,
+                                    })}
                                     only={['cashMutations']}
                                     preserveState>
                                     <IoPlayForward />
