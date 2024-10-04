@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Carbon\Carbon;
 use App\Models\Contact;
+use App\Models\StudentLevel;
 use Illuminate\Console\Command;
 
 class StudentLevelUpdateCron extends Command
@@ -38,11 +39,25 @@ class StudentLevelUpdateCron extends Command
     public function handle()
     {
 		$now = Carbon::now();
-		\Log::info($now->month);
-		\Log::info($this->studyYear($now));
         
-        // if ($now->month === 7) {
-        //     $contacts = Contact::whereHas('or')
-        // }
+        if ($now->month === 7) {
+            $contacts = Contact::whereHas('organization', function ($query){
+                                    return $query->where('status','<>','deactive');
+                                })
+                                ->whereHas('lastLevel')
+                                ->where('is_active', true)
+                                ->with('lastLevel')
+                                ->get();
+            
+            foreach ($contacts as $contact) {
+                if (($contact['lastLevel']['year'] < $this->studyYear($now)) && ($contact['lastLevel']['level'] < 12)) {
+                    StudentLevel::create([
+                        'contact_id' => $contact['id'],
+                        'level' => $contact['lastLevel']['level'] + 1,
+                        'year' => $this->studyYear($now)
+                    ]);
+                }                
+            }
+        }
     }
 }

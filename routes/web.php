@@ -24,6 +24,7 @@ use App\Http\Controllers\AffiliationController;
 use App\Http\Controllers\CashMutationController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\StaffContactController;
+use App\Http\Controllers\StudentLevelController;
 use App\Http\Controllers\AccountSchoolController;
 use App\Http\Controllers\Admin\RegencyController;
 use App\Http\Controllers\Admin\VillageController;
@@ -219,6 +220,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 			Route::post('/students', [StudentContactController::class, 'store'])->name('data-master.students.post')->middleware('is.not.viewer');
 			Route::patch('/students/{contact}', [StudentContactController::class, 'update'])->name('data-master.students.update')->middleware('is.not.viewer');
 			Route::delete('/students/{contact}', [StudentContactController::class, 'destroy'])->name('data-master.students.destroy')->middleware('is.not.viewer');
+
+			Route::patch('/student-level/{level}', [StudentLevelController::class, 'update'])->name('data-master.student-level.update');
 
 			// Student Payment Category
 			Route::get('/student-payment-category', [StudentPaymentCategoryController::class, 'index'])->name('data-master.student-payment-category');

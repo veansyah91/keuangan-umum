@@ -42,7 +42,7 @@ const levelArr = () => {
     return levelArr;
 }
 
-export default function Create({ organization, category }) {
+export default function Create({ organization, category }) {    
     // state
     const { data, setData, processing, post, errors, setError, reset } = useForm({
         name: '',
@@ -163,7 +163,7 @@ export default function Create({ organization, category }) {
                             </div>
 
                             <div className='w-full sm:w-2/3'>
-                                <select className="select select-bordered w-full" defaultValue={data.entry_year} onChange={e => setData('entry_year', parseInt(e.target.value))} id='entry_year'>
+                                <select className="select select-bordered w-full" value={data.entry_year} onChange={e => setData('entry_year', parseInt(e.target.value))} id='entry_year'>
                                     {
                                         yearList().map(year => 
                                             <option 
@@ -208,7 +208,7 @@ export default function Create({ organization, category }) {
                             </div>
 
                             <div className='w-full sm:w-2/3'>
-                                <select className="select select-bordered w-full" defaultValue={data.level} onChange={e => setData('level', parseInt(e.target.value))} id='level'>
+                                <select className="select select-bordered w-full" value={data.level} onChange={e => setData('level', parseInt(e.target.value))} id='level'>
                                     {
                                         levelArr().map(level => 
                                             <option 
