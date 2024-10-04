@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Contact;
 use App\Models\Journal;
+use App\Models\Organization;
 use App\Models\StudentPaymentCategory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\StudentMonthlyReceivableLedger;
@@ -68,7 +69,12 @@ class StudentMonthlyPayment extends Model
 	}
 
 	public function journal(): BelongsTo
-    {
-        return $this->belongsTo(Journal::class);
-    }
+	{
+			return $this->belongsTo(Journal::class);
+	}
+
+	public function organization(): BelongsTo
+	{
+			return $this->belongsTo(Organization::class);
+	}
 }

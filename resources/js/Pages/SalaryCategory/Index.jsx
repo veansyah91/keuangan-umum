@@ -29,6 +29,7 @@ import { NumericFormat } from 'react-number-format';
 
 export default function Index({ role, organization, salaryCategories, searchFilter }) {
   // State
+  
   const [showSearch, setShowSearch] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [showModalInput, setShowModalInput] = useState(false);

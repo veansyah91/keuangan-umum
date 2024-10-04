@@ -64,7 +64,10 @@ class MonthlyPaymentPrepaidCron extends Command
 		$now = Carbon::now();
 			
 		// cek pembayaran yang dibayar di muka
-		$payments = StudentMonthlyPayment::where('type', 'prepaid')
+		$payments = StudentMonthlyPayment::whereHas('organization', function ($query){
+																					return $query->where('status','<>','deactive');
+																				})
+																			->where('type', 'prepaid')
 																			->where('month', $now->month)
 																			->where('study_year', $this->studyYear($now))
 																			->with('contact')

@@ -90,7 +90,6 @@ export default function Create({ organization, newRef, contacts, date, categorie
     setDefault(newRef);
   },[]);
 
-  // useEffect
   useEffect(() => {
     if (prevDate !== undefined) {
       if (dateValue.startDate) {        

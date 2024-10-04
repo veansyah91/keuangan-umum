@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Carbon\Carbon;
+use App\Models\Contact;
 use Illuminate\Console\Command;
 
 class StudentLevelUpdateCron extends Command
@@ -40,8 +41,8 @@ class StudentLevelUpdateCron extends Command
 		\Log::info($now->month);
 		\Log::info($this->studyYear($now));
         
-        if ($now->month === 7) {
-            
-        }
+        // if ($now->month === 7) {
+        //     $contacts = Contact::whereHas('or')
+        // }
     }
 }
