@@ -160,8 +160,7 @@ export default function Balance({
 
     const handleEndDateValueChange = (newValue) => {
         setEndDateValue(newValue);
-        setEndDate(dayjs(newValue.endDate).format('YYYY-MM-DD'));
-
+        setEndDate(newValue.endDate);
     };
 
     const handleReload = () => {

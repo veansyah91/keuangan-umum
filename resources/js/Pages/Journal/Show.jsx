@@ -45,50 +45,46 @@ export default function Show({ organization, program, department, project, journ
 
                     {/* Sub Title */}
                     <div className='w-full flex print:pt-5 gap-2'>
-                        <div className={`${(program && project && department) ? 'w-5/12' : 'w-full'} space-y-3`}>
+                        <div className='w-5/12 space-y-3'>
                             <div className='flex gap-2'>
-                                <div className={`${(program && project && department) ? 'w-4/12' : 'w-2/12'}`}>No. Ref</div>
+                                <div className='w-4/12'>No. Ref</div>
                                 <div className='w-1/12 text-end'>:</div>
                                 <div className='w-7/12'>{journal.no_ref}</div>
                             </div>
                             <div className='flex gap-2'>
-                                <div className={`${(program && project && department) ? 'w-4/12' : 'w-2/12'}`}>Tanggal</div>
+                                <div className='w-4/12'>Tanggal</div>
                                 <div className='w-1/12 text-end'>:</div>
                                 <div className='w-7/12'>{dayjs(journal.date).format('MMM DD, YYYY')}</div>
                             </div>
                             <div className='flex gap-2'>
-                                <div className={`${(program && project && department) ? 'w-4/12' : 'w-2/12'}`}>Deskripsi</div>
+                                <div className='w-4/12'>Deskripsi</div>
                                 <div className='w-1/12 text-end'>:</div>
                                 <div className='w-7/12'>{journal.description}</div>
                             </div>
                         </div>
-                        {
-                            (program && project && department) && 
-                                <div className='w-7/12 space-y-3'>
-                                {program && (
-                                    <div className='flex gap-2'>
-                                        <div className='w-4/12'>Program Kegiatan</div>
-                                        <div className='w-1/12 text-end'>:</div>
-                                        <div className='w-7/12'>{program.name}</div>
-                                    </div>
-                                )}
-                                {project && (
-                                    <div className='flex gap-2'>
-                                        <div className='w-4/12'>Proyek</div>
-                                        <div className='w-1/12 text-end'>:</div>
-                                        <div className='w-7/12'>{project.name}</div>
-                                    </div>
-                                )}
-                                {department && (
-                                    <div className='flex gap-2'>
-                                        <div className='w-4/12'>Departemen</div>
-                                        <div className='w-1/12 text-end'>:</div>
-                                        <div className='w-7/12'>{department.name}</div>
-                                    </div>
-                                )}
-                            </div>
-                        }
-                        
+                        <div className='w-7/12 space-y-3'>
+                            {program && (
+                                <div className='flex gap-2'>
+                                    <div className='w-4/12'>Program Kegiatan</div>
+                                    <div className='w-1/12 text-end'>:</div>
+                                    <div className='w-7/12'>{program.name}</div>
+                                </div>
+                            )}
+                            {project && (
+                                <div className='flex gap-2'>
+                                    <div className='w-4/12'>Proyek</div>
+                                    <div className='w-1/12 text-end'>:</div>
+                                    <div className='w-7/12'>{project.name}</div>
+                                </div>
+                            )}
+                            {department && (
+                                <div className='flex gap-2'>
+                                    <div className='w-4/12'>Departemen</div>
+                                    <div className='w-1/12 text-end'>:</div>
+                                    <div className='w-7/12'>{department.name}</div>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     {/* Ledgers */}

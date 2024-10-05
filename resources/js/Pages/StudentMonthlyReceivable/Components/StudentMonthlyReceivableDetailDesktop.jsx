@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 import React from 'react';
 import { IoCreateOutline, IoEllipsisVertical, IoSearchOutline, IoTrash } from 'react-icons/io5';
 
-export default function StudentMonthlyReceivableDetailDesktop({ receivable, className, role, handleEdit, handleDelete }) {
+export default function StudentDesktop({ receivable, className, role, handleEdit, handleDelete }) {
 	return (
 		<>
 			<tr className={className}>

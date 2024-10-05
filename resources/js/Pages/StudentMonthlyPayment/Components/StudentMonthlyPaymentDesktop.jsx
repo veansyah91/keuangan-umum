@@ -51,7 +51,7 @@ export default function StudentDesktop({ payment, className, role, handleDelete,
 										className='dropdown-content z-[50] menu p-2 shadow bg-base-100 rounded-box w-56'>
 										<li>
 											<Link 
-												href={route('cashflow.student-monthly-payment.show', {organization: payment.organization_id, payment: payment.id})}
+												href={route('cashflow.student-monthly-payment.show', {organization: payment.organization_id, id: payment.id})}
 											>
 												<LiaFileInvoiceSolid />
 													Detail / Cetak 

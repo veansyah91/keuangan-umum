@@ -127,15 +127,13 @@ export default function Edit({
 
     useEffect(() => {
         if (prevDate !== undefined) {
-            if (dateValue.startDate) {
-                let inputDateFormatted = dayjs(dateValue.startDate);
-                let tempInputDate = `${inputDateFormatted.month() + 1}-${inputDateFormatted.year()}`;
+            let inputDateFormatted = dayjs(dateValue.startDate);
+            let tempInputDate = `${inputDateFormatted.month() + 1}-${inputDateFormatted.year()}`;
 
-                let oldDateFormatted = dayjs(journal.date);
-                let tempOldDate = `${oldDateFormatted.month() + 1}-${oldDateFormatted.year()}`;
+            let oldDateFormatted = dayjs(journal.date);
+            let tempOldDate = `${oldDateFormatted.month() + 1}-${oldDateFormatted.year()}`;
 
-                tempInputDate !== tempOldDate ? reloadNewRef() : setData('code', journal.no_ref);
-            }
+            tempInputDate !== tempOldDate ? reloadNewRef() : setData('code', journal.no_ref);
         }
     }, [debounceDateValue]);
 
@@ -156,7 +154,7 @@ export default function Edit({
         router.reload({
             only: ['newRef'],
             data: {
-                date: dayjs(dateValue.startDate).format('YYYY-MM-DD'),
+                date: dateValue.startDate,
             },
             onSuccess: (page) => {
                 setData('no_ref', page.props.newRef);
@@ -186,7 +184,7 @@ export default function Edit({
 
     const handleDateValueChange = (newValue) => {
         setDateValue(newValue);
-        setData('date', dayjs(newValue.startDate).format('YYYY-MM-DD'));
+        setData('date', newValue.startDate);
     };
 
     const handleDeleteAccount = (index) => {

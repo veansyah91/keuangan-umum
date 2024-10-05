@@ -175,11 +175,7 @@ export default function Index({ role, organization, contactCategories, searchFil
                 pageBefore={
                     contactCategories.links[0].url ? (
                         <Link
-                            href={route('data-master.contact-category', {
-                                organization: organization.id,
-                                page: contactCategories.current_page - 1,
-                                search: search,
-                            })}
+                            href={`/data-ledger/${organization.id}/account-categories?page=${contactCategories.current_page - 1}&search=${search}`}
                             preserveState
                             only={['contactCategories']}>
                             <IoPlayBack />
@@ -193,11 +189,7 @@ export default function Index({ role, organization, contactCategories, searchFil
                 pageAfter={
                     contactCategories.links[contactCategories.links.length - 1].url ? (
                         <Link
-                            href={route('data-master.contact-category', {
-                                organization: organization.id,
-                                page: contactCategories.current_page + 1,
-                                search: search,
-                            })}
+                            href={`/data-ledger/${organization.id}/account-categories?page=${contactCategories.current_page + 1}&search=${search}`}
                             only={['contactCategories']}
                             preserveState>
                             <IoPlayForward />
@@ -264,11 +256,7 @@ export default function Index({ role, organization, contactCategories, searchFil
                         <div className='my-auto'>
                             {contactCategories.links[0].url ? (
                                 <Link
-                                    href={route('data-master.contact-category', {
-                                        organization: organization.id,
-                                        page: contactCategories.current_page - 1,
-                                        search: search,
-                                    })}
+                                    href={`/data-ledger/${organization.id}/account-categories?page=${contactCategories.current_page - 1}&search=${search}`}
                                     preserveState
                                     only={['contactCategories']}>
                                     <IoPlayBack />
@@ -285,11 +273,7 @@ export default function Index({ role, organization, contactCategories, searchFil
                         <div className='my-auto'>
                             {contactCategories.links[contactCategories.links.length - 1].url ? (
                                 <Link
-                                    href={route('data-master.contact-category', {
-                                        organization: organization.id,
-                                        page: contactCategories.current_page + 1,
-                                        search: search,
-                                    })}
+                                    href={`/data-ledger/${organization.id}/account-categories?page=${contactCategories.current_page + 1}&search=${search}`}
                                     only={['contactCategories']}
                                     preserveState>
                                     <IoPlayForward />

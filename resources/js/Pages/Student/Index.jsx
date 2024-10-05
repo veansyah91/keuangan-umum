@@ -104,11 +104,7 @@ export default function Index({ role, organization, contacts, searchFilter }) {
                 pageBefore={
                     contacts.links[0].url ? (
                         <Link
-														href={route('data-master.students', {
-															organization: organization.id,
-															page: contacts.current_page - 1,
-															search: search,
-														})}
+                            href={`/data-ledger/${organization.id}/contacts?page=${contacts.current_page - 1}&search=${search}`}
                             preserveState
                             only={['contacts']}>
                             <IoPlayBack />
@@ -122,11 +118,7 @@ export default function Index({ role, organization, contacts, searchFilter }) {
                 pageAfter={
                     contacts.links[contacts.links.length - 1].url ? (
                         <Link
-														href={route('data-master.students', {
-															organization: organization.id,
-															page: contacts.current_page + 1,
-															search: search,
-														})}
+                            href={`/data-ledger/${organization.id}/contacts?page=${contacts.current_page + 1}&search=${search}`}
                             only={['contacts']}
                             preserveState>
                             <IoPlayForward />
@@ -189,45 +181,37 @@ export default function Index({ role, organization, contacts, searchFilter }) {
                         <PageNumber data={contacts} />
                     </div>
                     <div className='my-auto flex space-x-2 w-1/12'>
-											<div className='my-auto'>
-												{contacts.links[0].url ? (
-													<Link
-														href={route('data-master.students', {
-															organization: organization.id,
-															page: contacts.current_page - 1,
-															search: search,
-														})}
-														preserveState
-														only={['contacts']}>
-														<IoPlayBack />
-													</Link>
-												) : (
-													<div className='text-gray-300'>
-														<IoPlayBack />
-													</div>
-												)}
-											</div>
-											<div className='my-auto'>
-												{contacts.current_page}/{contacts.last_page}
-											</div>
-											<div className='my-auto'>
-												{contacts.links[contacts.links.length - 1].url ? (
-													<Link
-														href={route('data-master.students', {
-															organization: organization.id,
-															page: contacts.current_page + 1,
-															search: search,
-														})}
-														only={['contacts']}
-														preserveState>
-														<IoPlayForward />
-													</Link>
-												) : (
-													<div className='text-gray-300'>
-														<IoPlayForward />
-													</div>
-												)}
-											</div>
+                        <div className='my-auto'>
+                            {contacts.links[0].url ? (
+                                <Link
+                                    href={`/admin/data-ledger/${organization.id}/contacts?page=${contacts.current_page - 1}&search=${search}`}
+                                    preserveState
+                                    only={['contacts']}>
+                                    <IoPlayBack />
+                                </Link>
+                            ) : (
+                                <div className='text-gray-300'>
+                                    <IoPlayBack />
+                                </div>
+                            )}
+                        </div>
+                        <div className='my-auto'>
+                            {contacts.current_page}/{contacts.last_page}
+                        </div>
+                        <div className='my-auto'>
+                            {contacts.links[contacts.links.length - 1].url ? (
+                                <Link
+                                    href={`/admin/data-ledger/${organization.id}/contacts?page=${contacts.current_page + 1}&search=${search}`}
+                                    only={['contacts']}
+                                    preserveState>
+                                    <IoPlayForward />
+                                </Link>
+                            ) : (
+                                <div className='text-gray-300'>
+                                    <IoPlayForward />
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </TitleDesktop>
 

@@ -52,7 +52,6 @@ class StudentContactController extends Controller
                                     ->whereHas('contactCategories', function ($query) use ($contactCategory){
                                         $query->where('contact_category_id', $contactCategory['id']);
                                     })
-                                    ->whereHas('levels')
                                     ->with(['contactCategories', 'student', 'levels'])
                                     ->orderBy('name')
                                     ->paginate(50)->withQueryString(),

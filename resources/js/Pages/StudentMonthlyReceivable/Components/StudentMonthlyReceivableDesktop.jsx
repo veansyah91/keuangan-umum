@@ -3,7 +3,7 @@ import { Link } from '@inertiajs/react';
 import React from 'react';
 import { IoEllipsisVertical, IoSearchOutline } from 'react-icons/io5';
 
-export default function StudentMonthlyReceivableDesktop({ receivable, className, role }) {
+export default function StudentDesktop({ receivable, className, role }) {
 	return (
 		<>
 			<tr className={className}>

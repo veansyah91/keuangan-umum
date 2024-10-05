@@ -55,7 +55,7 @@ class StudentMonthlyPaymentController extends Controller
 	protected function newRef($organization, $dateRequest = '')
 	{
 		$now = $this->now;
-		$date = $dateRequest ?? $now->isoFormat('YYYY-M-DD');
+		$date = $dateRequest ?? $now->isoFormat('YYYY-MM-DD');
 		$dateRef = Carbon::create($date);
 		$refHeader = 'IB-'.$dateRef->isoFormat('YYYY').$dateRef->isoFormat('MM');
 		$newRef = $refHeader.'0001';
@@ -82,7 +82,7 @@ class StudentMonthlyPaymentController extends Controller
 
 		return Inertia::render('StudentMonthlyPayment/Index',[
 			'organization' => $organization,
-			'payments' => StudentMonthlyPayment::filter(request(['search', 'start_date', 'end_date']))  
+			'payments' => StudentMonthlyPayment::filter(request(['search']))  
 																	->when($type !== 'all' ?? false, function ($query) use ($type){
 																			$query->where('type', $type);
 																	} )
@@ -97,9 +97,7 @@ class StudentMonthlyPaymentController extends Controller
 																	->paginate(50)->withQueryString(),
 				'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 				'type' => request('type') ?? 'now',
-				'searchFilter' => $search,
-				'startDate' => request('start_date'),
-				'endDate' => request('end_date'),
+				'searchFilter' => $search
 		]);
 	}
 
@@ -146,7 +144,7 @@ class StudentMonthlyPaymentController extends Controller
 																							->whereIsActive(true)
 																							->get(),
 			'newRef' => $this->newRef($organization, request('date')),
-			'date' => request('date') ?? $this->now->isoFormat('YYYY-M-DD'),
+			'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
 			'studyYears' => StudentLevel::select('year')->distinct()->take(10)->get(),
 			'contacts' => $this->contactRepository->getStudents($organization['id'], $contactCategory['id'], request(['contact'])),
 			'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),
@@ -271,6 +269,10 @@ class StudentMonthlyPaymentController extends Controller
 		];		
 
 		if ($payment) {
+			// if ($payment['type'] !== 'receivable') {
+			// 	return redirect()->back()->withErrors(['error' => 'Data is existed']);
+			// }
+
 			DB::transaction(function() use ($organization, $payment, $validated){				
 				$journal = $this->journalRepository->store($validated);
 				$validated['journal_id'] = $journal['id'];
@@ -399,7 +401,7 @@ class StudentMonthlyPaymentController extends Controller
 																							->whereIsActive(true)
 																							->get(),
 			'newRef' => $this->newRef($organization, request('date')),
-			'date' => request('date') ?? $this->now->isoFormat('YYYY-M-DD'),
+			'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
 			'studyYears' => StudentLevel::select('year')->distinct()->take(10)->get(),
 			'contacts' => $this->contactRepository->getStudents($organization['id'], $contactCategory['id'], request(['contact'])),
 			'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),
@@ -535,7 +537,6 @@ class StudentMonthlyPaymentController extends Controller
 			$ledger = Ledger::whereJournalId($payment['journal_id'])->where('credit', '>', 0)->count();
 
 			// jika ledger > 1, berarti telah terjadi  pendapatan dari pembayaran di muka
-			dd($ledger);
 			// journal
 			$this->journalRepository->update($validated, $payment->journal);
 
@@ -601,17 +602,17 @@ class StudentMonthlyPaymentController extends Controller
 
 	}
 
-	public function show(Organization $organization, StudentMonthlyPayment $payment)
+	public function show(Organization $organization, $id)
 	{
 		$user = Auth::user();
 
-		$paymentWithDetail = StudentMonthlyPayment::with('details')->find($payment['id']);
+		$payment = StudentMonthlyPayment::with('details')->find($id);
 
 		return Inertia::render('StudentMonthlyPayment/Show',[
 			'organization' => $organization,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'user' => $user,
-			'payment' => $paymentWithDetail,
+			'payment' => $payment,
 			'contact' => Contact::with(['student', 'lastLevel'])->find($payment['contact_id']),
 		]);
 	}
@@ -653,6 +654,8 @@ class StudentMonthlyPaymentController extends Controller
 
 				// hapus jurnal
 				$journal->delete();
+
+				return redirect()->back()->with('success', 'Data Pembayaran Berhasil Dihapus');
 			});
 		}
 
@@ -669,7 +672,5 @@ class StudentMonthlyPaymentController extends Controller
 			});
 
 		}
-
-		return redirect()->back()->with('success', 'Data Pembayaran Berhasil Dihapus');
 	}
 }

@@ -90,12 +90,12 @@ export default function Journal({
 
     const handleStartDateValueChange = (newValue) => {
         setStartDateValue(newValue);
-        setStartDate(dayjs(newValue.endDate).format('YYYY-MM-DD'));
+        setStartDate(newValue.startDate);
     };
 
     const handleEndDateValueChange = (newValue) => {
         setEndDateValue(newValue);
-        setEndDate(dayjs(newValue.endDate).format('YYYY-MM-DD'));
+        setEndDate(newValue.endDate);
     };
 
     const handleReload = () => {

@@ -28,7 +28,7 @@ export default function Print({ organization, receivable, receivables, role, con
 		}
 
 		if (phone[0] !== '6' && phone[1] !== '2') {
-			phone = "62" + phone.slice(1);
+			phone = '62' + phone;
 		}
 
 		let detail = '';
