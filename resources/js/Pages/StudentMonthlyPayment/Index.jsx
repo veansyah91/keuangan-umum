@@ -199,9 +199,8 @@ export default function Index({ role, organization, payments, searchFilter, type
 					<div className='my-auto w-4/12 flex gap-5 justify-end'>
 						<button className='py-3 px-3 border rounded-lg h-full' onClick={() => setShowModalFilter(true)}>
 								<IoFilter />
-						</button>
-						
-				</div>
+						</button>	
+					</div>
 					<div className='w-3/12 border flex rounded-lg'>
 						<label htmlFor='search-input' className='my-auto ml-2'>
 							<IoSearchSharp />

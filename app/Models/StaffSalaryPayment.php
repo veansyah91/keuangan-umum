@@ -9,7 +9,7 @@ class StaffSalaryPayment extends Model
 {
     use HasFactory;
 
-    protected $table = ['s_salary_payments'];
+    protected $table = 's_salary_payments';
 
     protected $fillable = [
         'organization_id',

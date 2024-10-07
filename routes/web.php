@@ -38,6 +38,7 @@ use App\Http\Controllers\Admin\UserMasterController;
 use App\Http\Controllers\Admin\AdminMasterController;
 use App\Http\Controllers\Admin\UserWithdrawController;
 use App\Http\Controllers\FixedAssetCategoryController;
+use App\Http\Controllers\StaffSalaryPaymentController;
 use App\Http\Controllers\OrganizationInvoiceController;
 use App\Http\Controllers\StudentEntryPaymentController;
 use App\Http\Controllers\Admin\AdminDashboardController;
@@ -343,6 +344,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 					// student entry payment
 					Route::get('/student-entry-payment', [StudentEntryPaymentController::class, 'index'])->name('cashflow.student-entry-payment');
 					Route::get('/student-entry-payment/create', [StudentEntryPaymentController::class, 'create'])->name('cashflow.student-entry-payment.create');
+
+					// staff salary
+					Route::get('/staff-salary-payment', [StaffSalaryPaymentController::class, 'index'])->name('cashflow.staff-salary-payment');
+					Route::get('/staff-salary-payment/create', [StaffSalaryPaymentController::class, 'create'])->name('cashflow.staff-salary-payment.create');
 
         });
 
