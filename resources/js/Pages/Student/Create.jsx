@@ -27,7 +27,7 @@ const yearList = () => {
             ...arrayYear, index
         ];
     }
-    return arrayYear;
+    return parseInt(arrayYear);
 }
 
 const levelArr = () => {
@@ -39,7 +39,7 @@ const levelArr = () => {
         ];
     }
 
-    return levelArr;
+    return parseInt(levelArr);
 }
 
 export default function Create({ organization, category }) {    
@@ -64,6 +64,8 @@ export default function Create({ organization, category }) {
     // function
     const handleSubmit = (e) => {
         e.preventDefault();
+        console.log(data);
+        
         
         post(route('data-master.students.post', organization.id), {
             onSuccess: () => {
