@@ -67,7 +67,6 @@ export default function Create({ organization, category }) {
         
         post(route('data-master.students.post', organization.id), {
             onSuccess: () => {
-                
                 toast.success(`Siswa Berhasil Ditambahkan`, {
                     position: toast.POSITION.TOP_CENTER,
                 });
