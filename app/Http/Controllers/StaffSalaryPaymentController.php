@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Inertia\Inertia;
 use App\Helpers\NewRef;
 use Carbon\CarbonImmutable;
+use App\Models\ContactStaff;
 use App\Models\Organization;
 use Illuminate\Http\Request;
 use App\Models\SalaryCategory;
@@ -99,6 +100,11 @@ class StaffSalaryPaymentController extends Controller
 			'newRef' => $this->newRef($organization, request('date')),
 			'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
 			'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),
+			'contacts' => ContactStaff::whereHas('contact', function ($query) use ($organization){
+																		return $query->where('organization_id', $organization['id'])
+																								->where('is_active', true);
+																	})
+																	->get()
 		]);
 	}
 }
