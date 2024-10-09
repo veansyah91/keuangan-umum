@@ -115,6 +115,8 @@ class StaffContactController extends Controller
             return redirect()->back()->withErrors(['message' => 'Tidak dapat menghapus Data Staf']);
         }
 
+        ContactStaff::where('contact_id', $contact['id'])->delete();
+
         $contact->delete();
 
         return redirect()->back()->with('success', 'Data Staf Berhasil Dihapus');

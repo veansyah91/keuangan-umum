@@ -191,8 +191,9 @@ class StudentContactController extends Controller
             return redirect()->back()->withErrors(['message' => 'Tidak dapat menghapus Data Siswa']);
         }
 
-        $studentLevel = StudentLevel::whereContactId($contact['id'])->first();
-        $studentLevel->delete();
+        $studentLevel = StudentLevel::whereContactId($contact['id'])->delete();
+
+        $contacStudent = ContactStudent::where('contact_id', $contact['id'])->delete();
 
         $contact->delete();
 

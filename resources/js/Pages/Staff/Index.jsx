@@ -103,7 +103,7 @@ export default function Index({ role, organization, contacts, category, searchFi
 	};
 
 	const handleDelete = (contact) => {
-		setTitleDeleteModal(`Hapus Rincian Biaya Bulanan ${contact.name} ?`);
+		setTitleDeleteModal(`Hapus Data Staff ${contact.name} ?`);
 		setShowDeleteConfirmation(true);
 		setData('id', contact.id);
 	};
