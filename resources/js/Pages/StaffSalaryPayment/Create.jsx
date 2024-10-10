@@ -9,6 +9,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { IoArrowBackOutline, IoFilter, IoPlayBack, IoPlayForward, IoSearchSharp } from 'react-icons/io5';
 import dayjs from 'dayjs';
 import studyYear from '@/Utils/studyYear';
+import FormInput from '@/Components/FormInput';
 
 const monthNow = () => {
   let month = dayjs().format('MM');
@@ -18,7 +19,6 @@ const monthNow = () => {
 export default function Create({
   organization, role, categories, newRef, date, cashAccounts, contacts
 }) {
-  console.log(contacts);
   const { data, setData, post, reset, errors } = useForm({
     value: 0,
     organization_id : organization.id,
@@ -26,10 +26,43 @@ export default function Create({
     date: date,
     month:parseInt(monthNow()),
     study_year:studyYear(),
+		details:[]
   })
+
+	// function
+	const handleSubmit = (e) => {
+		e.preventDefault();
+		console.log(data);
+		
+		post(route('cashflow.staff-salary-payment.store'),{
+			onSuccess: ({ props }) => {
+				console.log(props);
+				
+			}
+		})
+
+
+	}
   
   return (
-    <div>Create</div>
+    <>
+			<Head title='Piutang Iuran Bulanan Siswa' />
+      <ToastContainer />
+
+			<FormInput onSubmit={handleSubmit}>
+				<div className='w-full sm:mt-2 sm:py-5'>
+					<div className='sm:mx-auto px-3 sm:px-5'>
+						<div>
+
+						</div>
+						<div>Detail</div>
+						<div>
+
+						</div>
+					</div>
+				</div>
+			</FormInput>
+		</>
   )
 }
 

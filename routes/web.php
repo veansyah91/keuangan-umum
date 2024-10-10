@@ -347,6 +347,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 					// staff salary
 					Route::get('/staff-salary-payment', [StaffSalaryPaymentController::class, 'index'])->name('cashflow.staff-salary-payment');
+					Route::post('/staff-salary-payment', [StaffSalaryPaymentController::class, 'store'])->name('cashflow.staff-salary-payment.store');
 					Route::get('/staff-salary-payment/create', [StaffSalaryPaymentController::class, 'create'])->name('cashflow.staff-salary-payment.create');
 
         });

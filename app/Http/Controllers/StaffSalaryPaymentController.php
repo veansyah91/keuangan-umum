@@ -104,6 +104,7 @@ class StaffSalaryPaymentController extends Controller
 																		return $query->where('organization_id', $organization['id'])
 																								->where('is_active', true);
 																	})
+																	->with('contact')
 																	->get()
 		]);
 	}
