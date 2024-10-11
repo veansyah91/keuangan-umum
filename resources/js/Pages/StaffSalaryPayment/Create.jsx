@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
@@ -10,6 +10,10 @@ import { IoArrowBackOutline, IoFilter, IoPlayBack, IoPlayForward, IoSearchSharp 
 import dayjs from 'dayjs';
 import studyYear from '@/Utils/studyYear';
 import FormInput from '@/Components/FormInput';
+import InputLabel from '@/Components/InputLabel';
+import Datepicker from 'react-tailwindcss-datepicker';
+import { useDebounce } from 'use-debounce';
+import { usePrevious } from 'react-use';
 
 const monthNow = () => {
   let month = dayjs().format('MM');
@@ -29,7 +33,21 @@ export default function Create({
 		details:[]
   })
 
+	const [dateValue, setDateValue] = useState({
+		startDate: date,
+		endDate: date,
+	});
+
+	const [debounceDateValue] = useDebounce(dateValue, 500);
+
+	const prevDate = usePrevious(dateValue);
+
 	// function
+	const handleDateValueChange = (newValue) => {
+		setDateValue(newValue);
+		setData('date', newValue.startDate);
+	};
+
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		console.log(data);
@@ -52,8 +70,24 @@ export default function Create({
 			<FormInput onSubmit={handleSubmit}>
 				<div className='w-full sm:mt-2 sm:py-5'>
 					<div className='sm:mx-auto px-3 sm:px-5'>
-						<div>
-
+						<div className='w-full flex gap-2'>
+							<div className='sm:w-1/4 w-full text-slate-900 space-y-2'>
+								<div>
+									<InputLabel value={'Tanggal'} />
+								</div>
+								<div>
+									<Datepicker
+										value={dateValue}
+										onChange={handleDateValueChange}
+										inputClassName={errors?.date && 'border-red-500 rounded-lg'}
+										useRange={false}
+										asSingle={true}
+										placeholder='Tanggal'
+										id='date'
+										displayFormat='MMMM DD, YYYY'
+									/>
+								</div>
+							</div>
 						</div>
 						<div>Detail</div>
 						<div>
