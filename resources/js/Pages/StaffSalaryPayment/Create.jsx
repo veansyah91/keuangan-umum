@@ -20,6 +20,23 @@ const monthNow = () => {
   return month;
 }
 
+const monthList = () => {
+  let monthListTemp = [];
+
+  for (let index = 7; index < 13; index++) {
+    monthListTemp = [
+      ...monthListTemp, index
+    ];
+  }
+
+  for (let index = 1; index < 7; index++) {
+    monthListTemp = [
+      ...monthListTemp, index
+    ];
+  }
+  return monthListTemp;
+}
+
 export default function Create({
   organization, role, categories, newRef, date, cashAccounts, contacts
 }) {
@@ -45,7 +62,7 @@ export default function Create({
 	// function
 	const handleDateValueChange = (newValue) => {
 		setDateValue(newValue);
-		setData('date', newValue.startDate);
+		setData('date', dayjs(newValue.startDate).format('YYYY-MM-DD'));
 	};
 
 	const handleSubmit = (e) => {
@@ -59,7 +76,6 @@ export default function Create({
 			}
 		})
 
-
 	}
   
   return (
@@ -71,9 +87,9 @@ export default function Create({
 				<div className='w-full sm:mt-2 sm:py-5'>
 					<div className='sm:mx-auto px-3 sm:px-5'>
 						<div className='w-full flex gap-2'>
-							<div className='sm:w-1/4 w-full text-slate-900 space-y-2'>
+							<div className='sm:w-1/5 w-full text-slate-900 space-y-2'>
 								<div>
-									<InputLabel value={'Tanggal'} />
+									<InputLabel value={'Tanggal Pembayaran'} />
 								</div>
 								<div>
 									<Datepicker
@@ -86,6 +102,28 @@ export default function Create({
 										id='date'
 										displayFormat='MMMM DD, YYYY'
 									/>
+								</div>
+							</div>
+							<div className='sm:w-1/5 w-full text-slate-900 space-y-2'>
+								<div>
+									<InputLabel value={'Bulan'} />
+								</div>
+								<div>
+									<select 
+                    className="select select-bordered w-full" 
+                    value={data.month} 
+                    onChange={e => setData('month', e.target.value)} 
+                    id='month'
+                  >
+                    {
+                      monthList().map((month, index) => 
+                        <option 
+                          key={index} 
+                        >{month}</option>
+                      )
+                    }
+                  </select>
+                  {errors?.month && <span className='text-red-500 text-xs'>{errors.month}</span>}
 								</div>
 							</div>
 						</div>
