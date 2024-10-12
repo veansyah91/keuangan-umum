@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
@@ -13,7 +13,10 @@ import FormInput from '@/Components/FormInput';
 import InputLabel from '@/Components/InputLabel';
 import Datepicker from 'react-tailwindcss-datepicker';
 import { useDebounce } from 'use-debounce';
-import { usePrevious } from 'react-use';
+import { usePrevious, useSetState } from 'react-use';
+import formatNumber from '@/Utils/formatNumber';
+import PrimaryButton from '@/Components/PrimaryButton';
+import SecondaryButton from '@/Components/SecondaryButton';
 
 const monthNow = () => {
   let month = dayjs().format('MM');
@@ -49,7 +52,7 @@ export default function Create({
     study_year:studyYear(),
 		details:[]
   })
-
+	
 	const [dateValue, setDateValue] = useState({
 		startDate: date,
 		endDate: date,
@@ -59,16 +62,54 @@ export default function Create({
 
 	const prevDate = usePrevious(dateValue);
 
+	const [step, setStep] = useState(0);	
+
+	// useUffect
+	useEffect(() => {
+		handleSetDetails();
+	},[]);
+
 	// function
+	const handleSetDetails = () => {
+		// loop untuk kontak
+		contacts.map((contact, index) => {
+			let temp = data.details;
+
+			console.log(contact);
+			
+
+			temp = [
+				...temp, 
+				{
+					'contact_id' : contact.id,
+					'contact_name' : contact.name
+				}
+			]
+
+			setData('details', temp);
+		})
+	}
+
 	const handleDateValueChange = (newValue) => {
 		setDateValue(newValue);
 		setData('date', dayjs(newValue.startDate).format('YYYY-MM-DD'));
 	};
 
+	const handlePrevData = (tempStep) => {
+		let tempData = tempStep - 1;
+		setStep(tempData);
+	}
+
+	const handleNextData = (tempStep) => {
+		let tempData = tempStep + 1;
+		setStep(tempData);
+	}
+
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		console.log(data);
 		
+		return
 		post(route('cashflow.staff-salary-payment.store'),{
 			onSuccess: ({ props }) => {
 				console.log(props);
@@ -84,11 +125,12 @@ export default function Create({
       <ToastContainer />
 
 			<FormInput onSubmit={handleSubmit}>
-				<div className='w-full sm:mt-2 sm:py-5'>
-					<div className='sm:mx-auto px-3 sm:px-5'>
-						<div className='w-full flex gap-2'>
-							<div className='sm:w-1/5 w-full text-slate-900 space-y-2'>
-								<div>
+				<div className='w-full sm:mt-2'>
+					<div className='sm:mx-auto px-3 sm:px-5 bg-white py-2 sm:pt-0'>
+						<div className='w-full flex gap-2 md:py-5'>
+							<div className='sm:w-1/2 w-full text-slate-900 space-y-2 my-auto text-xl font-bold'>
+								Total: IDR. { formatNumber(data.value) }
+								{/* <div>
 									<InputLabel value={'Tanggal Pembayaran'} />
 								</div>
 								<div>
@@ -102,10 +144,13 @@ export default function Create({
 										id='date'
 										displayFormat='MMMM DD, YYYY'
 									/>
-								</div>
+								</div> */}
 							</div>
-							<div className='sm:w-1/5 w-full text-slate-900 space-y-2'>
-								<div>
+							<div className='sm:w-1/2 text-end w-full text-slate-900 space-y-2'>
+								<PrimaryButton>
+									Buat Pembayaran
+								</PrimaryButton>
+								{/* <div>
 									<InputLabel value={'Bulan'} />
 								</div>
 								<div>
@@ -124,12 +169,34 @@ export default function Create({
                     }
                   </select>
                   {errors?.month && <span className='text-red-500 text-xs'>{errors.month}</span>}
-								</div>
+								</div> */}
 							</div>
 						</div>
-						<div>Detail</div>
 						<div>
-
+							{/* navigasi */}
+							<div className="flex justify-center gap-3">
+								<div>
+									<button 
+										onClick={() => handlePrevData(step)} 
+										className={`my-auto p-2`} 
+										disabled={step + 1 < 1 ? 'disabled' : false}
+									>
+											<IoPlayBack size={20} color={step < 1 ? 'gray' : ''}/>
+									</button>
+								</div>
+								<div className="my-auto">
+									{ step + 1 } / { contacts.length }
+								</div>
+								<div>
+									<button 
+										onClick={() => handleNextData(step)} 
+										className='my-auto p-2'
+										disabled={contacts.length > step + 1 ? false : 'disabled'}
+									>
+										<IoPlayForward size={20} color={contacts.length > step + 1 ? '' : 'gray'}/>
+									</button>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
