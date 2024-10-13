@@ -17,6 +17,8 @@ import { usePrevious, useSetState } from 'react-use';
 import formatNumber from '@/Utils/formatNumber';
 import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
+import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
+import StaffSelectInput from '@/Components/SelectInput/StaffSelectInput';
 
 const monthNow = () => {
   let month = dayjs().format('MM');
@@ -40,6 +42,17 @@ const monthList = () => {
   return monthListTemp;
 }
 
+const contactResource = (contacts) => {
+	return contacts.map(contact => {
+		return {
+			id: contact.contact_id, 
+			name: contact.contact.name, 
+			position: contact.position, 
+			no_ref:contact.no_ref
+		}
+	})
+}
+
 export default function Create({
   organization, role, categories, newRef, date, cashAccounts, contacts
 }) {
@@ -58,6 +71,9 @@ export default function Create({
 		endDate: date,
 	});
 
+	const [selectedContact, setSelectedContact] = useState({ id: null, name: '', position: '', no_ref:'' });
+	const [contactResources, setContactResources] = useState([]);
+
 	const [debounceDateValue] = useDebounce(dateValue, 500);
 
 	const prevDate = usePrevious(dateValue);
@@ -72,12 +88,18 @@ export default function Create({
 	// function
 	const handleSetDetails = () => {
 		// loop untuk kontak
-		contacts.map((contact, index) => {
+		contacts.map((contact, index) => {	
+			if (index < 1) {
+				setSelectedContact({
+					id: contact.contact_id, 
+					name: contact.contact.name, 
+					position: contact.position, 
+					no_ref:contact.no_ref
+				})
+			}
+
 			let temp = data.details;
-
-			console.log(contact);
 			
-
 			temp = [
 				...temp, 
 				{
@@ -97,12 +119,30 @@ export default function Create({
 
 	const handlePrevData = (tempStep) => {
 		let tempData = tempStep - 1;
+
+		setSelectedContact(contactResource(contacts)[tempData]);
+		
 		setStep(tempData);
 	}
 
 	const handleNextData = (tempStep) => {
 		let tempData = tempStep + 1;
+
+		setSelectedContact(contactResource(contacts)[tempData]);
+
 		setStep(tempData);
+	}
+
+	const handleSelectedContact = (selected) => {
+		setSelectedContact({
+			id: selected.id, 
+			name: selected.name, 
+			position: selected.position, 
+			no_ref:selected.no_ref
+		});
+
+		let index = contactResource(contacts).findIndex(user => user.id === selected.id);
+		setStep(index);		
 	}
 
 	const handleSubmit = (e) => {
@@ -174,29 +214,47 @@ export default function Create({
 						</div>
 						<div>
 							{/* navigasi */}
-							<div className="flex justify-center gap-3">
-								<div>
-									<button 
-										onClick={() => handlePrevData(step)} 
-										className={`my-auto p-2`} 
-										disabled={step + 1 < 1 ? 'disabled' : false}
-									>
-											<IoPlayBack size={20} color={step < 1 ? 'gray' : ''}/>
-									</button>
+							<section>
+								<div className="flex justify-center gap-3">
+									<div className='my-auto'>
+										<button 
+											onClick={() => handlePrevData(step)} 
+											className={`my-auto p-2`} 
+											disabled={step + 1 < 1 ? 'disabled' : false}
+											type='button'
+										>
+												<IoPlayBack size={20} color={step < 1 ? 'gray' : ''}/>
+										</button>
+									</div>
+									<div className="my-auto relative w-1/3">
+										<div>
+											<StaffSelectInput
+												resources={contactResource(contacts)}
+												selected={selectedContact}
+												setSelected={(selected) => handleSelectedContact(selected)}
+												maxHeight='max-h-40'
+												placeholder='Cari Kontak'
+												isError={false}
+												id='contact'
+												notFound={<span>Tidak Ada Data.</span>}
+											/>
+										</div>
+									</div>
+									<div className='my-auto'>
+										<button 
+											onClick={() => handleNextData(step)} 
+											className='my-auto p-2'
+											disabled={contacts.length > step + 1 ? false : 'disabled'}
+											type='button'
+										>
+											<IoPlayForward size={20} color={contacts.length > step + 1 ? '' : 'gray'}/>
+										</button>
+									</div>
 								</div>
-								<div className="my-auto">
-									{ step + 1 } / { contacts.length }
+								<div className='text-center text-xs'>
+									{ step + 1 } / { contacts.length }										
 								</div>
-								<div>
-									<button 
-										onClick={() => handleNextData(step)} 
-										className='my-auto p-2'
-										disabled={contacts.length > step + 1 ? false : 'disabled'}
-									>
-										<IoPlayForward size={20} color={contacts.length > step + 1 ? '' : 'gray'}/>
-									</button>
-								</div>
-							</div>
+							</section>
 						</div>
 					</div>
 				</div>
