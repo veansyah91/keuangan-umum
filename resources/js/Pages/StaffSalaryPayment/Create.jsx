@@ -53,6 +53,17 @@ const contactResource = (contacts) => {
 	})
 }
 
+const dataDetails = (contacts, categories) => {
+	return contacts.map(contact => {
+		return {
+			id: contact.contact_id, 
+			name: contact.contact.name, 
+			position: contact.position, 
+			no_ref:contact.no_ref
+		}
+	})
+}
+
 export default function Create({
   organization, role, categories, newRef, date, cashAccounts, contacts
 }) {
@@ -63,7 +74,7 @@ export default function Create({
     date: date,
     month:parseInt(monthNow()),
     study_year:studyYear(),
-		details:[]
+		details:dataDetails(contacts, categories)
   })
 	
 	const [dateValue, setDateValue] = useState({
@@ -80,6 +91,9 @@ export default function Create({
 
 	const [step, setStep] = useState(0);	
 
+	console.log(categories);
+	
+
 	// useUffect
 	useEffect(() => {
 		handleSetDetails();
@@ -88,28 +102,7 @@ export default function Create({
 	// function
 	const handleSetDetails = () => {
 		// loop untuk kontak
-		contacts.map((contact, index) => {	
-			if (index < 1) {
-				setSelectedContact({
-					id: contact.contact_id, 
-					name: contact.contact.name, 
-					position: contact.position, 
-					no_ref:contact.no_ref
-				})
-			}
-
-			let temp = data.details;
-			
-			temp = [
-				...temp, 
-				{
-					'contact_id' : contact.id,
-					'contact_name' : contact.name
-				}
-			]
-
-			setData('details', temp);
-		})
+		
 	}
 
 	const handleDateValueChange = (newValue) => {
@@ -156,7 +149,6 @@ export default function Create({
 				
 			}
 		})
-
 	}
   
   return (
