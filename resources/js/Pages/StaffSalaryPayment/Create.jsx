@@ -19,6 +19,8 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 import StaffSelectInput from '@/Components/SelectInput/StaffSelectInput';
+import TextInput from '@/Components/TextInput';
+import { NumericFormat } from 'react-number-format';
 
 const monthNow = () => {
   let month = dayjs().format('MM');
@@ -48,7 +50,7 @@ const contactResource = (contacts) => {
 			id: contact.contact_id, 
 			name: contact.contact.name, 
 			position: contact.position, 
-			no_ref:contact.no_ref
+			no_ref:contact.no_ref,
 		}
 	})
 }
@@ -59,7 +61,18 @@ const dataDetails = (contacts, categories) => {
 			id: contact.contact_id, 
 			name: contact.contact.name, 
 			position: contact.position, 
-			no_ref:contact.no_ref
+			no_ref:contact.no_ref,
+			categories: categories.map(category => {
+				return {
+					id: category.id,
+					name: category.name,
+					value: category.value,
+					unit: category.unit,
+					has_hour: category.has_hour ? true : false,
+					qty: 0,
+					total: category.has_hour ? 0 : category.value
+				}
+			})
 		}
 	})
 }
@@ -83,6 +96,7 @@ export default function Create({
 	});
 
 	const [selectedContact, setSelectedContact] = useState({ id: null, name: '', position: '', no_ref:'' });
+	const [contactForm, setContactForm] = useState({});
 	const [contactResources, setContactResources] = useState([]);
 
 	const [debounceDateValue] = useDebounce(dateValue, 500);
@@ -92,7 +106,6 @@ export default function Create({
 	const [step, setStep] = useState(0);	
 
 	console.log(categories);
-	
 
 	// useUffect
 	useEffect(() => {
@@ -101,8 +114,19 @@ export default function Create({
 
 	// function
 	const handleSetDetails = () => {
-		// loop untuk kontak
-		
+		setSelectedContact({
+			id: contacts[0].contact_id, 
+			name: contacts[0].contact.name, 
+			position: contacts[0].position, 
+			no_ref:contacts[0].no_ref
+		});
+		setContactForm({
+			id: data.details[0].id, 
+			name: data.details[0].name, 
+			position: data.details[0].position, 
+			no_ref:data.details[0].no_ref,
+			categories:data.details[0].categories,
+		})
 	}
 
 	const handleDateValueChange = (newValue) => {
@@ -138,9 +162,17 @@ export default function Create({
 		setStep(index);		
 	}
 
+	const handleChangeHour = () => {
+
+	}
+
+	const handleChangeTotal = () => {
+
+	}
+
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		console.log(data);
+		console.log(data.details);
 		
 		return
 		post(route('cashflow.staff-salary-payment.store'),{
@@ -158,27 +190,9 @@ export default function Create({
 
 			<FormInput onSubmit={handleSubmit}>
 				<div className='w-full sm:mt-2'>
-					<div className='sm:mx-auto px-3 sm:px-5 bg-white py-2 sm:pt-0'>
-						<div className='w-full flex gap-2 md:py-5'>
-							<div className='sm:w-1/2 w-full text-slate-900 space-y-2 my-auto text-xl font-bold'>
-								Total: IDR. { formatNumber(data.value) }
-								{/* <div>
-									<InputLabel value={'Tanggal Pembayaran'} />
-								</div>
-								<div>
-									<Datepicker
-										value={dateValue}
-										onChange={handleDateValueChange}
-										inputClassName={errors?.date && 'border-red-500 rounded-lg'}
-										useRange={false}
-										asSingle={true}
-										placeholder='Tanggal'
-										id='date'
-										displayFormat='MMMM DD, YYYY'
-									/>
-								</div> */}
-							</div>
-							<div className='sm:w-1/2 text-end w-full text-slate-900 space-y-2'>
+					<div className='sm:mx-auto px-3 sm:px-5 bg-white py-2 sm:pt-0 space-y-5 md:space-y-0'>
+						<div className='w-full md:flex gap-2 md:py-5 '>
+							<div className='sm:w-1/2 text-center md:text-start w-full text-slate-900 space-y-2'>
 								<PrimaryButton>
 									Buat Pembayaran
 								</PrimaryButton>
@@ -203,6 +217,24 @@ export default function Create({
                   {errors?.month && <span className='text-red-500 text-xs'>{errors.month}</span>}
 								</div> */}
 							</div>
+							<div className='sm:w-1/2 w-full text-center text-sm text-slate-900 space-y-2 my-auto md:text-xl font-bold'>
+								Total: IDR. { formatNumber(data.value) }
+								{/* <div>
+									<InputLabel value={'Tanggal Pembayaran'} />
+								</div>
+								<div>
+									<Datepicker
+										value={dateValue}
+										onChange={handleDateValueChange}
+										inputClassName={errors?.date && 'border-red-500 rounded-lg'}
+										useRange={false}
+										asSingle={true}
+										placeholder='Tanggal'
+										id='date'
+										displayFormat='MMMM DD, YYYY'
+									/>
+								</div> */}
+							</div>							
 						</div>
 						<div>
 							{/* navigasi */}
@@ -218,7 +250,7 @@ export default function Create({
 												<IoPlayBack size={20} color={step < 1 ? 'gray' : ''}/>
 										</button>
 									</div>
-									<div className="my-auto relative w-1/3">
+									<div className="my-auto relative md:w-1/3 w-3/4">
 										<div>
 											<StaffSelectInput
 												resources={contactResource(contacts)}
@@ -245,6 +277,112 @@ export default function Create({
 								</div>
 								<div className='text-center text-xs'>
 									{ step + 1 } / { contacts.length }										
+								</div>
+							</section>
+
+							<section className='w-full md:w-3/4 mx-auto mt-5'>
+								<div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
+									<div className='w-full sm:w-1/3 my-auto'>
+										<InputLabel
+											value={'Nama Staff'}
+											htmlFor='name'
+											className=' mx-auto my-auto'
+										/>
+									</div>
+
+									<div className='w-full sm:w-2/3'>
+										<TextInput
+											id='name'
+											name='name'
+											className={`w-full`}
+											placeholder='Nama'
+											value={contactForm.name || ''}
+											disabled
+										/>
+									</div>
+								</div>
+								<div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
+									<div className='w-full sm:w-1/3 my-auto'>
+										<InputLabel
+											value={'Jabatan'}
+											htmlFor='position'
+											className=' mx-auto my-auto'
+										/>
+									</div>
+
+									<div className='w-full sm:w-2/3'>
+										<TextInput
+											id='position'
+											name='position'
+											className={`w-full`}
+											placeholder='Jabatan'
+											value={contactForm.position || ''}
+											disabled
+										/>
+									</div>
+								</div>
+								<div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
+									<div className='w-full sm:w-1/3 my-auto'>
+										<InputLabel
+											value={'No.Id'}
+											htmlFor='id'
+											className=' mx-auto my-auto'
+										/>
+									</div>
+
+									<div className='w-full sm:w-2/3'>
+										<TextInput
+											id='id'
+											name='id'
+											className={`w-full`}
+											placeholder='No.Id'
+											value={contactForm.no_ref || ''}
+											disabled
+										/>
+									</div>
+								</div>
+								<div className='mt-5 overflow-x-auto'>
+									<div className='w-[600px] md:w-full'>
+										<div className='flex font-bold gap-3 border-b py-3'>
+											<div className='w-5/12'>Kategori</div>
+											<div className='w-1/12 text-end'>Jam</div>
+											<div className='w-3/12 text-end'>Nilai</div>
+											<div className='w-3/12 text-end'>Total</div>
+										</div>
+										{
+											contactForm?.categories?.map((category, index) => 
+												<div className='flex gap-3 border-b py-3' key={index}>
+													<div className='w-5/12 my-auto'>{ category.name }</div>
+													<div className='w-1/12 text-end'>
+														{
+															category.has_hour && 
+															<NumericFormat
+																value={category.qty}
+																customInput={TextInput}
+																onValueChange={(values) => handleChangeHour(values, index)}
+																thousandSeparator={true}
+																className='text-end w-full'
+																prefix={' '}
+															/>
+														}
+													</div>
+													<div className='w-3/12 text-end'>
+														
+													</div>
+													<div className='w-3/12 text-end'>
+														<NumericFormat
+															value={category.total}
+															customInput={TextInput}
+															onValueChange={(values) => handleChangeTotal(values, index)}
+															thousandSeparator={true}
+															className='text-end w-full'
+															prefix={'IDR. '}
+														/>
+													</div>
+												</div>
+											)
+										}
+									</div>
 								</div>
 							</section>
 						</div>
