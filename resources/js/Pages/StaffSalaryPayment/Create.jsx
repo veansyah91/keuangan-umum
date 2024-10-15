@@ -61,7 +61,8 @@ const dataDetails = (contacts, categories) => {
 			id: contact.contact_id, 
 			name: contact.contact.name, 
 			position: contact.position, 
-			no_ref:contact.no_ref,
+			no_ref: contact.no_ref,
+			value: categories.reduce((acc, category) => acc + (category.has_hour ? 0 : category.value), 0),
 			categories: categories.map(category => {
 				return {
 					id: category.id,
@@ -105,8 +106,6 @@ export default function Create({
 
 	const [step, setStep] = useState(0);	
 
-	console.log(categories);
-
 	// useUffect
 	useEffect(() => {
 		handleSetDetails();
@@ -126,7 +125,13 @@ export default function Create({
 			position: data.details[0].position, 
 			no_ref:data.details[0].no_ref,
 			categories:data.details[0].categories,
-		})
+			value: data.details[0].categories.reduce((acc, category) => acc + (category.has_hour ? 0 : category.value), 0)
+		});
+
+		// get value
+		let temData = data.details;
+
+		setData('value', temData.reduce((acc, detail) => acc + detail.value, 0));
 	}
 
 	const handleDateValueChange = (newValue) => {
@@ -138,6 +143,14 @@ export default function Create({
 		let tempData = tempStep - 1;
 
 		setSelectedContact(contactResource(contacts)[tempData]);
+		setContactForm({
+			id: data.details[tempData].id, 
+			name: data.details[tempData].name, 
+			position: data.details[tempData].position, 
+			no_ref:data.details[tempData].no_ref,
+			categories:data.details[tempData].categories,
+			value: data.details[tempData].categories.reduce((acc, category) => acc + (category.has_hour ? 0 : category.value), 0)
+		});
 		
 		setStep(tempData);
 	}
@@ -146,27 +159,64 @@ export default function Create({
 		let tempData = tempStep + 1;
 
 		setSelectedContact(contactResource(contacts)[tempData]);
+		setContactForm({
+			id: data.details[tempData].id, 
+			name: data.details[tempData].name, 
+			position: data.details[tempData].position, 
+			no_ref:data.details[tempData].no_ref,
+			categories:data.details[tempData].categories,
+			value: data.details[tempData].categories.reduce((acc, category) => acc + (category.has_hour ? 0 : category.value), 0)
+		});
 
 		setStep(tempData);
 	}
 
 	const handleSelectedContact = (selected) => {
-		setSelectedContact({
-			id: selected.id, 
-			name: selected.name, 
-			position: selected.position, 
-			no_ref:selected.no_ref
-		});
+		if (selected) {
+			setSelectedContact({
+				id: selected.id, 
+				name: selected.name, 
+				position: selected.position, 
+				no_ref:selected.no_ref
+			});
+			let index = contactResource(contacts).findIndex(user => user.id === selected.id);
 
-		let index = contactResource(contacts).findIndex(user => user.id === selected.id);
-		setStep(index);		
+			setContactForm({
+				id: data.details[index].id, 
+				name: data.details[index].name, 
+				position: data.details[index].position, 
+				no_ref:data.details[index].no_ref,
+				categories:data.details[index].categories,
+			});
+
+			setStep(index);		
+		}
+		
 	}
 
-	const handleChangeHour = () => {
+	const handleChangeHour = (values, index) => {
+		let tempDataDetail = data.details;
+		let tempContactForm = contactForm;
+
+		let tempValue = tempContactForm.categories[index].value;
+		// tempValue += 
+		tempDataDetail[step].total += values.floatValue;
+
+		console.log(tempContactForm.categories[index]);
+		
+		// console.log('change hour');
+		// console.log(values);
+		// console.log(index);
+
+
+		
+	}
+
+	const handleChangeValue = (values, index) => {
 
 	}
 
-	const handleChangeTotal = () => {
+	const handleChangeTotal = (values, index) => {
 
 	}
 
@@ -244,10 +294,10 @@ export default function Create({
 										<button 
 											onClick={() => handlePrevData(step)} 
 											className={`my-auto p-2`} 
-											disabled={step + 1 < 1 ? 'disabled' : false}
+											disabled={step < 1 ? 'disabled' : false}
 											type='button'
 										>
-												<IoPlayBack size={20} color={step < 1 ? 'gray' : ''}/>
+											<IoPlayBack size={20} color={step < 1 ? 'gray' : ''}/>
 										</button>
 									</div>
 									<div className="my-auto relative md:w-1/3 w-3/4">
@@ -342,10 +392,10 @@ export default function Create({
 									</div>
 								</div>
 								<div className='mt-5 overflow-x-auto'>
-									<div className='w-[600px] md:w-full'>
+									<div className='w-[700px] md:w-full'>
 										<div className='flex font-bold gap-3 border-b py-3'>
 											<div className='w-5/12'>Kategori</div>
-											<div className='w-1/12 text-end'>Jam</div>
+											<div className='w-1/12 text-end'>Jam/Hari</div>
 											<div className='w-3/12 text-end'>Nilai</div>
 											<div className='w-3/12 text-end'>Total</div>
 										</div>
@@ -355,19 +405,31 @@ export default function Create({
 													<div className='w-5/12 my-auto'>{ category.name }</div>
 													<div className='w-1/12 text-end'>
 														{
-															category.has_hour && 
-															<NumericFormat
-																value={category.qty}
-																customInput={TextInput}
-																onValueChange={(values) => handleChangeHour(values, index)}
-																thousandSeparator={true}
-																className='text-end w-full'
-																prefix={' '}
-															/>
+															category.has_hour && <div className='md:flex gap-1'>
+																<NumericFormat
+																	value={category.qty}
+																	customInput={TextInput}
+																	onValueChange={(values) => handleChangeHour(values, index)}
+																	thousandSeparator={true}
+																	className='text-end w-full'
+																	prefix={''}
+																/>
+																<div className='my-auto hidden md:block'>{category.unit}</div>
+															</div>
 														}
 													</div>
 													<div className='w-3/12 text-end'>
-														
+														{	
+															category.has_hour && 
+																<NumericFormat
+																	value={category.value}
+																	customInput={TextInput}
+																	onValueChange={(values) => handleChangeValue(values, index)}
+																	thousandSeparator={true}
+																	className='text-end w-full'
+																	prefix={'IDR. '}
+																/>
+														}
 													</div>
 													<div className='w-3/12 text-end'>
 														<NumericFormat
@@ -377,11 +439,16 @@ export default function Create({
 															thousandSeparator={true}
 															className='text-end w-full'
 															prefix={'IDR. '}
+															disabled={category.has_hour ? 'disabled' : false}
 														/>
 													</div>
 												</div>
 											)
 										}
+										<div className='flex font-bold gap-3 border-b py-3'>
+											<div className='w-5/12'>Total</div>
+											<div className='w-7/12 text-end'>IDR. {formatNumber(contactForm.value)}</div>
+										</div>
 									</div>
 								</div>
 							</section>

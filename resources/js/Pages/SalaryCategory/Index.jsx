@@ -88,7 +88,7 @@ export default function Index({ role, organization, salaryCategories, searchFilt
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
+    
     isUpdate
     ? patch(route('data-master.salary-category.update', {organization: organization.id, salaryCategory: data.id}), {
       onSuccess: ({ props }) => {
@@ -408,7 +408,7 @@ export default function Index({ role, organization, salaryCategories, searchFilt
                 </div>
 
                 <div className='sm:w-2/3 w-full'>
-                <select className="select select-bordered w-full" defaultValue={data.entry_year} onChange={e => setData('unit', parseInt(e.target.value))} id='unit'>
+                <select className="select select-bordered w-full" value={data.unit} onChange={e => setData('unit', e.target.value)} id='unit'>
                     <option value={'jam'}>Jam</option>
                     <option value={'hari'}>Hari</option>
                   </select>
