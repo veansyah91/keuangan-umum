@@ -195,14 +195,23 @@ export default function Create({
 	}
 
 	const handleChangeHour = (values, index) => {
-		let tempDataDetail = data.details;
-		let tempContactForm = contactForm;
+		// let tempDataDetail = data.details;
+		let tempContactForm = {...contactForm};
+		
+		tempContactForm.categories[index] = {
+			...tempContactForm.categories[index],
+			qty: values.floatValue,
+			total: values.floatValue * tempContactForm.categories[index].value
+		}
 
-		let tempValue = tempContactForm.categories[index].value;
-		// tempValue += 
-		tempDataDetail[step].total += values.floatValue;
+		setContactForm(tempContactForm);
+		// console.log(tempContactForm);
+		
 
-		console.log(tempContactForm.categories[index]);
+		// tempDataDetail[step].total += values.floatValue;
+
+		// console.log(tempContactForm.categories[index]);
+		// console.log(tempValue);
 		
 		// console.log('change hour');
 		// console.log(values);
@@ -330,7 +339,7 @@ export default function Create({
 								</div>
 							</section>
 
-							<section className='w-full md:w-3/4 mx-auto mt-5'>
+							<section className='w-full md:w-10/12 mx-auto mt-5'>
 								<div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
 									<div className='w-full sm:w-1/3 my-auto'>
 										<InputLabel
@@ -392,20 +401,20 @@ export default function Create({
 									</div>
 								</div>
 								<div className='mt-5 overflow-x-auto'>
-									<div className='w-[700px] md:w-full'>
+									<div className='w-[750px] md:w-full'>
 										<div className='flex font-bold gap-3 border-b py-3'>
-											<div className='w-5/12'>Kategori</div>
-											<div className='w-1/12 text-end'>Jam/Hari</div>
+											<div className='w-4/12'>Kategori</div>
+											<div className='w-2/12 text-end'>Jam/Hari</div>
 											<div className='w-3/12 text-end'>Nilai</div>
 											<div className='w-3/12 text-end'>Total</div>
 										</div>
 										{
-											contactForm?.categories?.map((category, index) => 
+											contactForm.categories?.map((category, index) => 
 												<div className='flex gap-3 border-b py-3' key={index}>
 													<div className='w-5/12 my-auto'>{ category.name }</div>
 													<div className='w-1/12 text-end'>
 														{
-															category.has_hour && <div className='md:flex gap-1'>
+															category.has_hour && <div className='gap-1'>
 																<NumericFormat
 																	value={category.qty}
 																	customInput={TextInput}
@@ -414,7 +423,7 @@ export default function Create({
 																	className='text-end w-full'
 																	prefix={''}
 																/>
-																<div className='my-auto hidden md:block'>{category.unit}</div>
+																<div className='my-auto hidden md:block text-xs'>{category.unit}</div>
 															</div>
 														}
 													</div>
