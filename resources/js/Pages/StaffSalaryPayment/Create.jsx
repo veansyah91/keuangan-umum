@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
@@ -69,8 +69,9 @@ const dataDetails = (contacts, categories) => {
 					name: category.name,
 					value: category.value,
 					unit: category.unit,
+					is_cut: category.is_cut ? true : false,
 					has_hour: category.has_hour ? true : false,
-					qty: 0,
+					qty: category.has_hour ? 0 : 1,
 					total: category.has_hour ? 0 : category.value
 				}
 			})
@@ -112,7 +113,7 @@ export default function Create({
 	},[]);
 
 	// function
-	const handleSetDetails = () => {
+	const handleSetDetails = () => {		
 		setSelectedContact({
 			id: contacts[0].contact_id, 
 			name: contacts[0].contact.name, 
@@ -194,44 +195,88 @@ export default function Create({
 		
 	}
 
-	const handleChangeHour = (values, index) => {
-		// let tempDataDetail = data.details;
+	const handleChangeHour =(values, index) => {	
 		let tempContactForm = {...contactForm};
-		
+		let valueUsed = values.floatValue || 0;
+				
 		tempContactForm.categories[index] = {
 			...tempContactForm.categories[index],
-			qty: values.floatValue,
-			total: values.floatValue * tempContactForm.categories[index].value
+			qty: valueUsed,
+			total: valueUsed * tempContactForm.categories[index].value * (tempContactForm.categories[index].is_cut ? -1 : 1)
+		}		
+
+		tempContactForm = {
+			...tempContactForm,
+			value: tempContactForm.categories.reduce((acc, category) => acc + category.total , 0)
 		}
 
 		setContactForm(tempContactForm);
-		// console.log(tempContactForm);
-		
 
-		// tempDataDetail[step].total += values.floatValue;
+		let tempData = {...data};
 
-		// console.log(tempContactForm.categories[index]);
-		// console.log(tempValue);
-		
-		// console.log('change hour');
-		// console.log(values);
-		// console.log(index);
+		tempData.details[step] = tempContactForm;
 
+		tempData.value = tempData.details.reduce((acc, detail) => acc + detail.value , 0);
 
-		
-	}
+		setData(tempData);		
+	};
 
 	const handleChangeValue = (values, index) => {
+		let tempContactForm = {...contactForm};
+		let valueUsed = values.floatValue || 0;
+				
+		tempContactForm.categories[index] = {
+			...tempContactForm.categories[index],
+			value: valueUsed,
+			total: valueUsed * tempContactForm.categories[index].qty * (tempContactForm.categories[index].is_cut ? -1 : 1)
+		}		
+
+		tempContactForm = {
+			...tempContactForm,
+			value: tempContactForm.categories.reduce((acc, category) => acc + category.total , 0)
+		}
+
+		setContactForm(tempContactForm);
+
+		let tempData = {...data};
+
+		tempData.details[step] = tempContactForm;
+
+		tempData.value = tempData.details.reduce((acc, detail) => acc + detail.value , 0);
+
+		setData(tempData);		
 
 	}
 
-	const handleChangeTotal = (values, index) => {
+	// const handleChangeTotal = (values, index) => { 		
+	// 	let tempContactForm = {...contactForm};
+	// 	let valueUsed = values.floatValue || 0;
+	// 	console.log('berubah');
+				
+	// 	tempContactForm.categories[index] = {
+	// 		...tempContactForm.categories[index],
+	// 		total: valueUsed * (tempContactForm.categories[index].is_cut ? -1 : 1)
+	// 	}	
 
-	}
+	// 	tempContactForm = {
+	// 		...tempContactForm,
+	// 		value: tempContactForm.categories.reduce((acc, category) => acc + category.total , 0)
+	// 	}
+
+	// 	setContactForm(tempContactForm);
+
+	// 	let tempData = {...data};
+
+	// 	tempData.details[step] = tempContactForm;
+
+	// 	tempData.value = tempData.details.reduce((acc, detail) => acc + detail.value , 0);
+
+	// 	setData(tempData);		
+	// }
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		console.log(data.details);
+		console.log(data);
 		
 		return
 		post(route('cashflow.staff-salary-payment.store'),{
@@ -383,7 +428,7 @@ export default function Create({
 								<div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
 									<div className='w-full sm:w-1/3 my-auto'>
 										<InputLabel
-											value={'No.Id'}
+											value={'No. Id'}
 											htmlFor='id'
 											className=' mx-auto my-auto'
 										/>
@@ -411,7 +456,7 @@ export default function Create({
 										{
 											contactForm.categories?.map((category, index) => 
 												<div className='flex gap-3 border-b py-3' key={index}>
-													<div className='w-5/12 my-auto'>{ category.name }</div>
+													<div className={`w-5/12 my-auto${category.is_cut ? ' text-red-500' : ''}`}>{ category.name }</div>
 													<div className='w-1/12 text-end'>
 														{
 															category.has_hour && <div className='gap-1'>
@@ -420,7 +465,7 @@ export default function Create({
 																	customInput={TextInput}
 																	onValueChange={(values) => handleChangeHour(values, index)}
 																	thousandSeparator={true}
-																	className='text-end w-full'
+																	className={`text-end w-full${category.is_cut ? ' text-red-500' : ''}`}
 																	prefix={''}
 																/>
 																<div className='my-auto hidden md:block text-xs'>{category.unit}</div>
@@ -428,27 +473,23 @@ export default function Create({
 														}
 													</div>
 													<div className='w-3/12 text-end'>
-														{	
-															category.has_hour && 
-																<NumericFormat
-																	value={category.value}
-																	customInput={TextInput}
-																	onValueChange={(values) => handleChangeValue(values, index)}
-																	thousandSeparator={true}
-																	className='text-end w-full'
-																	prefix={'IDR. '}
-																/>
-														}
+														<NumericFormat
+															value={category.value}
+															customInput={TextInput}
+															onValueChange={(values) => handleChangeValue(values, index)}
+															thousandSeparator={true}
+															className={`text-end w-full${category.is_cut ? ' text-red-500' : ''}`}
+															prefix={'IDR. '}
+														/>
 													</div>
 													<div className='w-3/12 text-end'>
 														<NumericFormat
 															value={category.total}
 															customInput={TextInput}
-															onValueChange={(values) => handleChangeTotal(values, index)}
 															thousandSeparator={true}
-															className='text-end w-full'
+															className={`text-end w-full${category.is_cut ? ' text-red-500' : ''}`}
 															prefix={'IDR. '}
-															disabled={category.has_hour ? 'disabled' : false}
+															disabled='disabled'
 														/>
 													</div>
 												</div>

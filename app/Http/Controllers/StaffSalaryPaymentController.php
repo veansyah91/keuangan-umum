@@ -95,6 +95,7 @@ class StaffSalaryPaymentController extends Controller
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'categories' => SalaryCategory::where('is_active', true)
 																			->where('organization_id', $organization['id'])																			
+																			->orderBy('has_hour', 'asc')
 																			->orderBy('is_cut', 'asc')
 																			->get(),
 			'newRef' => $this->newRef($organization, request('date')),
