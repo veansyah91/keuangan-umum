@@ -21,6 +21,7 @@ import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 import StaffSelectInput from '@/Components/SelectInput/StaffSelectInput';
 import TextInput from '@/Components/TextInput';
 import { NumericFormat } from 'react-number-format';
+import Modal from '@/Components/Modal';
 
 const monthNow = () => {
   let month = dayjs().format('MM');
@@ -100,6 +101,7 @@ export default function Create({
 	const [selectedContact, setSelectedContact] = useState({ id: null, name: '', position: '', no_ref:'' });
 	const [contactForm, setContactForm] = useState({});
 	const [contactResources, setContactResources] = useState([]);
+	const [showModal, setShowModal] = useState(false);
 
 	const [debounceDateValue] = useDebounce(dateValue, 500);
 
@@ -292,220 +294,287 @@ export default function Create({
 			<Head title='Piutang Iuran Bulanan Siswa' />
       <ToastContainer />
 
-			<FormInput onSubmit={handleSubmit}>
-				<div className='w-full sm:mt-2'>
-					<div className='sm:mx-auto px-3 sm:px-5 bg-white py-2 sm:pt-0 space-y-5 md:space-y-0'>
-						<div className='w-full md:flex gap-2 md:py-5 '>
-							<div className='sm:w-1/2 text-center md:text-start w-full text-slate-900 space-y-2'>
-								<PrimaryButton>
-									Buat Pembayaran
-								</PrimaryButton>
-								{/* <div>
-									<InputLabel value={'Bulan'} />
-								</div>
-								<div>
-									<select 
-                    className="select select-bordered w-full" 
-                    value={data.month} 
-                    onChange={e => setData('month', e.target.value)} 
-                    id='month'
-                  >
-                    {
-                      monthList().map((month, index) => 
-                        <option 
-                          key={index} 
-                        >{month}</option>
-                      )
-                    }
-                  </select>
-                  {errors?.month && <span className='text-red-500 text-xs'>{errors.month}</span>}
-								</div> */}
+			<div className='w-full sm:mt-2'>
+				<div className='sm:mx-auto px-3 sm:px-5 bg-white py-2 sm:pt-0 space-y-5 md:space-y-0'>
+					<div className='w-full md:flex gap-2 md:py-5 '>
+						<div className='sm:w-1/2 text-center md:text-start w-full text-slate-900 space-y-2'>
+							<PrimaryButton onClick={() => setShowModal(true)}>
+								Buat Pembayaran
+							</PrimaryButton>
+							{/* <div>
+								<InputLabel value={'Bulan'} />
 							</div>
-							<div className='sm:w-1/2 w-full text-center text-sm text-slate-900 space-y-2 my-auto md:text-xl font-bold'>
-								Total: IDR. { formatNumber(data.value) }
-								{/* <div>
-									<InputLabel value={'Tanggal Pembayaran'} />
+							<div>
+								<select 
+									className="select select-bordered w-full" 
+									value={data.month} 
+									onChange={e => setData('month', e.target.value)} 
+									id='month'
+								>
+									{
+										monthList().map((month, index) => 
+											<option 
+												key={index} 
+											>{month}</option>
+										)
+									}
+								</select>
+								{errors?.month && <span className='text-red-500 text-xs'>{errors.month}</span>}
+							</div> */}
+						</div>
+						<div className='sm:w-1/2 w-full text-center text-sm text-slate-900 space-y-2 my-auto md:text-xl font-bold'>
+							Total: IDR. { formatNumber(data.value) }
+							{/* <div>
+								<InputLabel value={'Tanggal Pembayaran'} />
+							</div>
+							<div>
+								<Datepicker
+									value={dateValue}
+									onChange={handleDateValueChange}
+									inputClassName={errors?.date && 'border-red-500 rounded-lg'}
+									useRange={false}
+									asSingle={true}
+									placeholder='Tanggal'
+									id='date'
+									displayFormat='MMMM DD, YYYY'
+								/>
+							</div> */}
+						</div>							
+					</div>
+					<div>
+						{/* navigasi */}
+						<section>
+							<div className="flex justify-center gap-3">
+								<div className='my-auto'>
+									<button 
+										onClick={() => handlePrevData(step)} 
+										className={`my-auto p-2`} 
+										disabled={step < 1 ? 'disabled' : false}
+										type='button'
+									>
+										<IoPlayBack size={20} color={step < 1 ? 'gray' : ''}/>
+									</button>
 								</div>
-								<div>
-									<Datepicker
-										value={dateValue}
-										onChange={handleDateValueChange}
-										inputClassName={errors?.date && 'border-red-500 rounded-lg'}
-										useRange={false}
-										asSingle={true}
-										placeholder='Tanggal'
-										id='date'
-										displayFormat='MMMM DD, YYYY'
+								<div className="my-auto relative md:w-1/3 w-3/4">
+									<div>
+										<StaffSelectInput
+											resources={contactResource(contacts)}
+											selected={selectedContact}
+											setSelected={(selected) => handleSelectedContact(selected)}
+											maxHeight='max-h-40'
+											placeholder='Cari Kontak'
+											isError={false}
+											id='contact'
+											notFound={<span>Tidak Ada Data.</span>}
+										/>
+									</div>
+								</div>
+								<div className='my-auto'>
+									<button 
+										onClick={() => handleNextData(step)} 
+										className='my-auto p-2'
+										disabled={contacts.length > step + 1 ? false : 'disabled'}
+										type='button'
+									>
+										<IoPlayForward size={20} color={contacts.length > step + 1 ? '' : 'gray'}/>
+									</button>
+								</div>
+							</div>
+							<div className='text-center text-xs'>
+								{ step + 1 } / { contacts.length }										
+							</div>
+						</section>
+
+						<section className='w-full md:w-10/12 mx-auto mt-5'>
+							<div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
+								<div className='w-full sm:w-1/3 my-auto'>
+									<InputLabel
+										value={'Nama Staff'}
+										htmlFor='name'
+										className=' mx-auto my-auto'
 									/>
-								</div> */}
-							</div>							
-						</div>
-						<div>
-							{/* navigasi */}
-							<section>
-								<div className="flex justify-center gap-3">
-									<div className='my-auto'>
-										<button 
-											onClick={() => handlePrevData(step)} 
-											className={`my-auto p-2`} 
-											disabled={step < 1 ? 'disabled' : false}
-											type='button'
-										>
-											<IoPlayBack size={20} color={step < 1 ? 'gray' : ''}/>
-										</button>
-									</div>
-									<div className="my-auto relative md:w-1/3 w-3/4">
-										<div>
-											<StaffSelectInput
-												resources={contactResource(contacts)}
-												selected={selectedContact}
-												setSelected={(selected) => handleSelectedContact(selected)}
-												maxHeight='max-h-40'
-												placeholder='Cari Kontak'
-												isError={false}
-												id='contact'
-												notFound={<span>Tidak Ada Data.</span>}
-											/>
-										</div>
-									</div>
-									<div className='my-auto'>
-										<button 
-											onClick={() => handleNextData(step)} 
-											className='my-auto p-2'
-											disabled={contacts.length > step + 1 ? false : 'disabled'}
-											type='button'
-										>
-											<IoPlayForward size={20} color={contacts.length > step + 1 ? '' : 'gray'}/>
-										</button>
-									</div>
 								</div>
-								<div className='text-center text-xs'>
-									{ step + 1 } / { contacts.length }										
-								</div>
-							</section>
 
-							<section className='w-full md:w-10/12 mx-auto mt-5'>
-								<div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
-									<div className='w-full sm:w-1/3 my-auto'>
-										<InputLabel
-											value={'Nama Staff'}
-											htmlFor='name'
-											className=' mx-auto my-auto'
-										/>
-									</div>
-
-									<div className='w-full sm:w-2/3'>
-										<TextInput
-											id='name'
-											name='name'
-											className={`w-full`}
-											placeholder='Nama'
-											value={contactForm.name || ''}
-											disabled
-										/>
-									</div>
+								<div className='w-full sm:w-2/3'>
+									<TextInput
+										id='name'
+										name='name'
+										className={`w-full`}
+										placeholder='Nama'
+										value={contactForm.name || ''}
+										disabled
+									/>
 								</div>
-								<div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
-									<div className='w-full sm:w-1/3 my-auto'>
-										<InputLabel
-											value={'Jabatan'}
-											htmlFor='position'
-											className=' mx-auto my-auto'
-										/>
-									</div>
-
-									<div className='w-full sm:w-2/3'>
-										<TextInput
-											id='position'
-											name='position'
-											className={`w-full`}
-											placeholder='Jabatan'
-											value={contactForm.position || ''}
-											disabled
-										/>
-									</div>
+							</div>
+							<div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
+								<div className='w-full sm:w-1/3 my-auto'>
+									<InputLabel
+										value={'Jabatan'}
+										htmlFor='position'
+										className=' mx-auto my-auto'
+									/>
 								</div>
-								<div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
-									<div className='w-full sm:w-1/3 my-auto'>
-										<InputLabel
-											value={'No. Id'}
-											htmlFor='id'
-											className=' mx-auto my-auto'
-										/>
-									</div>
 
-									<div className='w-full sm:w-2/3'>
-										<TextInput
-											id='id'
-											name='id'
-											className={`w-full`}
-											placeholder='No.Id'
-											value={contactForm.no_ref || ''}
-											disabled
-										/>
-									</div>
+								<div className='w-full sm:w-2/3'>
+									<TextInput
+										id='position'
+										name='position'
+										className={`w-full`}
+										placeholder='Jabatan'
+										value={contactForm.position || ''}
+										disabled
+									/>
 								</div>
-								<div className='mt-5 overflow-x-auto'>
-									<div className='w-[750px] md:w-full'>
-										<div className='flex font-bold gap-3 border-b py-3'>
-											<div className='w-4/12'>Kategori</div>
-											<div className='w-2/12 text-end'>Jam/Hari</div>
-											<div className='w-3/12 text-end'>Nilai</div>
-											<div className='w-3/12 text-end'>Total</div>
-										</div>
-										{
-											contactForm.categories?.map((category, index) => 
-												<div className='flex gap-3 border-b py-3' key={index}>
-													<div className={`w-5/12 my-auto${category.is_cut ? ' text-red-500' : ''}`}>{ category.name }</div>
-													<div className='w-1/12 text-end'>
-														{
-															category.has_hour && <div className='gap-1'>
-																<NumericFormat
-																	value={category.qty}
-																	customInput={TextInput}
-																	onValueChange={(values) => handleChangeHour(values, index)}
-																	thousandSeparator={true}
-																	className={`text-end w-full${category.is_cut ? ' text-red-500' : ''}`}
-																	prefix={''}
-																/>
-																<div className='my-auto hidden md:block text-xs'>{category.unit}</div>
-															</div>
-														}
-													</div>
-													<div className='w-3/12 text-end'>
-														<NumericFormat
-															value={category.value}
-															customInput={TextInput}
-															onValueChange={(values) => handleChangeValue(values, index)}
-															thousandSeparator={true}
-															className={`text-end w-full${category.is_cut ? ' text-red-500' : ''}`}
-															prefix={'IDR. '}
-														/>
-													</div>
-													<div className='w-3/12 text-end'>
-														<NumericFormat
-															value={category.total}
-															customInput={TextInput}
-															thousandSeparator={true}
-															className={`text-end w-full${category.is_cut ? ' text-red-500' : ''}`}
-															prefix={'IDR. '}
-															disabled='disabled'
-														/>
-													</div>
+							</div>
+							<div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
+								<div className='w-full sm:w-1/3 my-auto'>
+									<InputLabel
+										value={'No. Id'}
+										htmlFor='id'
+										className=' mx-auto my-auto'
+									/>
+								</div>
+
+								<div className='w-full sm:w-2/3'>
+									<TextInput
+										id='id'
+										name='id'
+										className={`w-full`}
+										placeholder='No.Id'
+										value={contactForm.no_ref || ''}
+										disabled
+									/>
+								</div>
+							</div>
+							<div className='mt-5 overflow-x-auto'>
+								<div className='w-[750px] md:w-full'>
+									<div className='flex font-bold gap-3 border-b py-3'>
+										<div className='w-4/12'>Kategori</div>
+										<div className='w-2/12 text-end'>Jam/Hari</div>
+										<div className='w-3/12 text-end'>Nilai</div>
+										<div className='w-3/12 text-end'>Total</div>
+									</div>
+									{
+										contactForm.categories?.map((category, index) => 
+											<div className='flex gap-3 border-b py-3' key={index}>
+												<div className={`w-5/12 my-auto${category.is_cut ? ' text-red-500' : ''}`}>{ category.name }</div>
+												<div className='w-1/12 text-end'>
+													{
+														category.has_hour && <div className='gap-1'>
+															<NumericFormat
+																value={category.qty}
+																customInput={TextInput}
+																onValueChange={(values) => handleChangeHour(values, index)}
+																thousandSeparator={true}
+																className={`text-end w-full${category.is_cut ? ' text-red-500' : ''}`}
+																prefix={''}
+															/>
+															<div className='my-auto hidden md:block text-xs'>{category.unit}</div>
+														</div>
+													}
 												</div>
-											)
-										}
-										<div className='flex font-bold gap-3 border-b py-3'>
-											<div className='w-5/12'>Total</div>
-											<div className='w-7/12 text-end'>IDR. {formatNumber(contactForm.value)}</div>
-										</div>
+												<div className='w-3/12 text-end'>
+													<NumericFormat
+														value={category.value}
+														customInput={TextInput}
+														onValueChange={(values) => handleChangeValue(values, index)}
+														thousandSeparator={true}
+														className={`text-end w-full${category.is_cut ? ' text-red-500' : ''}`}
+														prefix={'IDR. '}
+													/>
+												</div>
+												<div className='w-3/12 text-end'>
+													<NumericFormat
+														value={category.total}
+														customInput={TextInput}
+														thousandSeparator={true}
+														className={`text-end w-full${category.is_cut ? ' text-red-500' : ''}`}
+														prefix={'IDR. '}
+														disabled='disabled'
+													/>
+												</div>
+											</div>
+										)
+									}
+									<div className='flex font-bold gap-3 border-b py-3'>
+										<div className='w-5/12'>Total</div>
+										<div className='w-7/12 text-end'>IDR. {formatNumber(contactForm.value)}</div>
 									</div>
 								</div>
-							</section>
-						</div>
+							</div>
+						</section>
 					</div>
 				</div>
-			</FormInput>
+			</div>
+
+			<Modal show={showModal} onClose={() => setShowModal(false)}>
+				<form onSubmit={handleSubmit} className='p-6' id='filter' name='filter'>
+					<h2 className='text-lg font-medium text-gray-900'>Buat Pembayaran Gaji</h2>
+
+					<div className='mt-6 '>
+						<div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
+							<div className='w-full sm:w-1/3 my-auto'>
+								<InputLabel
+									value={'Bulan'}
+									htmlFor='id'
+									className=' mx-auto my-auto'
+								/>
+							</div>
+
+							<div className='w-full sm:w-2/3'>
+								<select 
+									className="select select-bordered w-full" 
+									value={data.month} 
+									onChange={e => setData('month', e.target.value)} 
+									id='month'
+								>
+									{
+										monthList().map((month, index) => 
+											<option 
+												key={index} 
+											>{month}</option>
+										)
+									}
+								</select>
+								{errors?.month && <span className='text-red-500 text-xs'>{errors.month}</span>}
+							</div>
+						</div>
+						<div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
+							<div className='w-full sm:w-1/3 my-auto'>
+								<InputLabel
+									value={'Bulan'}
+									htmlFor='id'
+									className=' mx-auto my-auto'
+								/>
+							</div>
+
+							<div className='w-full sm:w-2/3'>
+								<select 
+									className="select select-bordered w-full" 
+									value={data.month} 
+									onChange={e => setData('month', e.target.value)} 
+									id='month'
+								>
+									{
+										monthList().map((month, index) => 
+											<option 
+												key={index} 
+											>{month}</option>
+										)
+									}
+								</select>
+								{errors?.month && <span className='text-red-500 text-xs'>{errors.month}</span>}
+							</div>
+						</div>
+					</div>
+
+					<div className='mt-6 flex justify-end'>
+						<SecondaryButton onClick={() => setShowModal(false)}>Batal</SecondaryButton>
+
+						<PrimaryButton className='ms-3'>Simpan</PrimaryButton>
+					</div>
+				</form>
+			</Modal>
 		</>
   )
 }
