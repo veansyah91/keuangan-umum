@@ -5,15 +5,20 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use Inertia\Inertia;
 use App\Helpers\NewRef;
+use App\Models\Account;
 use Carbon\CarbonImmutable;
 use App\Models\ContactStaff;
 use App\Models\Organization;
+use App\Models\StudentLevel;
 use Illuminate\Http\Request;
 use App\Models\SalaryCategory;
 use App\Models\ContactCategory;
 use App\Models\StaffSalaryPayment;
+use Illuminate\Support\Facades\DB;
+use App\Models\SchoolAccountSetting;
 use Illuminate\Support\Facades\Auth;
 use App\Repositories\Log\LogRepository;
+use App\Models\StaffSalaryPaymentDetail;
 use App\Repositories\User\UserRepository;
 use App\Repositories\Account\AccountRepository;
 use App\Repositories\Contact\ContactRepository;
@@ -101,6 +106,7 @@ class StaffSalaryPaymentController extends Controller
 			'newRef' => $this->newRef($organization, request('date')),
 			'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
 			'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),
+			'studyYears' => StudentLevel::select('year')->distinct()->take(10)->get(),
 			'contacts' => ContactStaff::whereHas('contact', function ($query) use ($organization){
 																		return $query->where('organization_id', $organization['id'])
 																								->where('is_active', true);
@@ -108,5 +114,100 @@ class StaffSalaryPaymentController extends Controller
 																	->with('contact')
 																	->get()
 		]);
+	}
+
+	public function store(Request $request, Organization $organization)
+	{
+		// dd($request);
+		$validated = $request->validate([
+			'value' => 'numeric|required',
+			'date' => 'required|date',
+			'no_ref' => 'string|required',
+			'month' => 'required|numeric',
+			'study_year' => 'required|string',
+			'details' => 'required',
+			'details.*.id' => 'required|exists:contacts,id',
+			'details.*.value' => 'required|numeric',
+			'details.*.categories' => 'required',
+			'details.*.categories.*.id' => 'required|exists:salary_categories,id',
+			'details.*.categories.*.id' => 'required|numeric',
+			'cash_account_id' => [
+				'required',
+				'exists:accounts,id'
+			],
+		]);
+
+		$user = Auth::user();
+		$validated['organization_id'] = $organization['id'];
+		$validated['user_id'] = $user['id'];
+		$validated['created_by_id'] = $user['id'];
+		// dd($validated);
+
+		// tautkan akun-akun
+		$schoolAccount = SchoolAccountSetting::whereOrganizationId($organization['id'])->first();
+		$debitAccount = Account::find($schoolAccount['staff_salary_expense']);
+		$creditAccount = Account::find($validated['cash_account_id']);
+		$validated['accounts'] = [
+			[
+				'id' => $creditAccount['id'],
+				'name' => $creditAccount['name'],
+				'code' => $creditAccount['code'],
+				'is_cash' => 1,
+				'debit' => $validated['value'],
+				'credit' => 0,
+			],
+			[
+				'id' => $debitAccount['id'],
+				'name' => $debitAccount['name'],
+				'code' => $debitAccount['code'],
+				'is_cash' => 0,
+				'debit' => 0,
+				'credit' => $validated['value'],
+			],
+		];		
+
+		// validasi apakah sudah ada data dengan parameter bulan dan tahun yang sama
+		$payment = StaffSalaryPayment::where('organization_id', $organization['id'])
+																	->where('study_year', $validated['study_year'])
+																	->where('month', $validated['month'])
+																	->first();
+
+		if ($payment)
+		{
+			return redirect()->back()->withErrors(['error' => 'Data is existed']);
+		}
+
+		
+
+		DB::transaction(function() use ($validated) {
+			// buat jurnal
+			$journal = $this->journalRepository->store($validated);
+			$validated['journal_id'] = $journal['id'];
+
+			// salary payment
+			$payment = StaffSalaryPayment::create($validated);
+
+			foreach ($validated['details'] as $detail) {
+				$data = [];
+				foreach ($detail['categories'] as $category) {
+					$data[] = [
+						'contact_id' => $detail['id'],
+						'category_id' => $category['id'],
+						'payment_id' => $payment['id'],
+						'value' => $category['total'],
+						'created_at' => $this->now(),
+						'updated_at' => $this->now(),
+					];
+				}
+
+				// salary payment details
+				StaffSalaryPaymentDetail::insert($data);
+			}
+		});
+
+		dd('berhasil');
+		
+
+
 	}
 }
