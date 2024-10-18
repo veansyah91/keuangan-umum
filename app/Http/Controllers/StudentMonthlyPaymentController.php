@@ -269,10 +269,6 @@ class StudentMonthlyPaymentController extends Controller
 		];		
 
 		if ($payment) {
-			// if ($payment['type'] !== 'receivable') {
-			// 	return redirect()->back()->withErrors(['error' => 'Data is existed']);
-			// }
-
 			DB::transaction(function() use ($organization, $payment, $validated){				
 				$journal = $this->journalRepository->store($validated);
 				$validated['journal_id'] = $journal['id'];

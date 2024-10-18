@@ -1,19 +1,17 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { IoArrowBackOutline, IoFilter, IoPlayBack, IoPlayForward, IoSearchSharp } from 'react-icons/io5';
+import { IoArrowBackOutline, IoPlayBack, IoPlayForward, IoReload, IoReloadCircleOutline } from 'react-icons/io5';
 import dayjs from 'dayjs';
-import studyYear from '@/Utils/studyYear';
-import FormInput from '@/Components/FormInput';
 import InputLabel from '@/Components/InputLabel';
 import Datepicker from 'react-tailwindcss-datepicker';
 import { useDebounce } from 'use-debounce';
-import { usePrevious, useSetState } from 'react-use';
+import { usePrevious } from 'react-use';
 import formatNumber from '@/Utils/formatNumber';
 import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
@@ -81,15 +79,17 @@ const dataDetails = (contacts, categories) => {
 }
 
 export default function Create({
-  organization, role, categories, newRef, date, cashAccounts, contacts, studyYears
+  organization, role, categories, newRef, date, cashAccounts, contacts, studyYears, history
 }) {
+	console.log(history.details)
+	
   const { data, setData, post, reset, errors } = useForm({
     value: 0,
     organization_id : organization.id,
     no_ref: newRef,
     date: date,
     month:parseInt(monthNow()),
-    study_year:studyYear(),
+    study_year:dayjs(date).format('YYYY').toString(),
 		cash_account_id: '',
 		details:dataDetails(contacts, categories)
   })
@@ -101,7 +101,6 @@ export default function Create({
 
 	const [selectedContact, setSelectedContact] = useState({ id: null, name: '', position: '', no_ref:'' });
 	const [contactForm, setContactForm] = useState({});
-	const [contactResources, setContactResources] = useState([]);
 	const [showModal, setShowModal] = useState(false);
 
 	const [selectedCashAccount, setSelectedCashAccount] = useState({ id: null, name: '', code: '', is_cash: true });
@@ -252,6 +251,11 @@ export default function Create({
 
 	}
 
+	const handleReloadOldValue = () => {
+		console.log('handle reload');
+		
+	}
+
 	const handleSelectedCashAccount = (selected) => {
 		setSelectedCashAccount({ id: selected.id, name: selected.name, code: selected.code, is_cash: true });
 		setData('cash_account_id', selected.id);
@@ -259,11 +263,21 @@ export default function Create({
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		console.log(data);
 		
 		post(route('cashflow.staff-salary-payment.store', { organization: organization.id }),{
 			onSuccess: ({ props }) => {
-				console.log(props);
+				const { flash } = props;
+
+				toast.success(flash.success, {
+					position: toast.POSITION.TOP_CENTER,
+				});
+			},
+			onError: errors => {
+				const { error } = errors;
+
+				toast.error(error, {
+					position: toast.POSITION.TOP_CENTER,
+				});
 				
 			}
 		})
@@ -393,6 +407,14 @@ export default function Create({
 											/>
 										</div>
 									</div>
+									{
+										history && <div className='w-full text-end mt-2 text-blue-500'>
+										<button className='border text-xs rounded-md p-1 font-medium hover:bg-slate-100 flex space-x-1' onClick={handleReloadOldValue}>
+											<div className='my-auto'><IoReload /></div>
+											<div className='my-auto'>Ambil Dari Data Sebelumnya</div>											 
+										</button>
+									</div>	
+									}																	
 									<div className='mt-5 overflow-x-auto'>
 										<div className='w-[750px] md:w-full'>
 											<div className='flex font-bold gap-3 border-b py-3'>
@@ -521,13 +543,8 @@ export default function Create({
 									onChange={e => setData('study_year', e.target.value)} 
 									id='study_year'
 								>
-									{
-										studyYears.map((study_year, index) => 
-											<option 
-												key={index} 
-											>{study_year.year}</option>
-										)
-									}
+									<option>{dayjs(date).format('YYYY').toString()}</option>
+									<option>{(dayjs(date).format('YYYY') - 1).toString()}</option>
 								</select>
 								{errors?.study_year && <span className='text-red-500 text-xs'>{errors.study_year}</span>}
 							</div>
@@ -583,7 +600,7 @@ export default function Create({
 						<div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
 							<div className='w-full sm:w-1/3 my-auto'>
 								<InputLabel
-									value={'Total'}
+									value={'Akun Kas'}
 									htmlFor='id'
 									className=' mx-auto my-auto'
 								/>

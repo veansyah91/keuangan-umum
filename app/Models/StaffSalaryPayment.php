@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\StaffSalaryPaymentDetail;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class StaffSalaryPayment extends Model
 {
@@ -21,4 +23,9 @@ class StaffSalaryPayment extends Model
         'study_year',
         'month',
     ];
+
+    public function details(): HasMany
+    {
+        return $this->hasMany(StaffSalaryPaymentDetail::class, 'payment_id');
+    }
 }

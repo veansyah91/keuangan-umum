@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
@@ -23,9 +23,15 @@ import { usePrevious } from 'react-use';
 
 
 export default function Index({
-  role, payment, organization, payments, searchFilter 
+  role, payment, organization, payments, searchFilter, flash
 }) {
-	const [search, setSearch] = useState(searchFilter || '');
+	const [search, setSearch] = useState(searchFilter || '');	
+
+	useEffect(() => {
+		flash?.success && toast.success(flash.success, {
+			position: toast.POSITION.TOP_CENTER,
+		});
+	},[])
 
   return (
     <>

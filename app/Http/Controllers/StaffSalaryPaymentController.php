@@ -103,6 +103,10 @@ class StaffSalaryPaymentController extends Controller
 																			->orderBy('has_hour', 'asc')
 																			->orderBy('is_cut', 'asc')
 																			->get(),
+			'history' => StaffSalaryPayment::where('organization_id', $organization['id'])
+																			->with('details')
+																			->latest()
+																			->first(),
 			'newRef' => $this->newRef($organization, request('date')),
 			'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
 			'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),
@@ -118,7 +122,6 @@ class StaffSalaryPaymentController extends Controller
 
 	public function store(Request $request, Organization $organization)
 	{
-		// dd($request);
 		$validated = $request->validate([
 			'value' => 'numeric|required',
 			'date' => 'required|date',
@@ -138,10 +141,10 @@ class StaffSalaryPaymentController extends Controller
 		]);
 
 		$user = Auth::user();
+		$validated['description'] = 'Pembayaran Gaji Staf pada Bulan: ' . $validated['month'] . ', Tahun: ' . $validated['study_year'];
 		$validated['organization_id'] = $organization['id'];
 		$validated['user_id'] = $user['id'];
 		$validated['created_by_id'] = $user['id'];
-		// dd($validated);
 
 		// tautkan akun-akun
 		$schoolAccount = SchoolAccountSetting::whereOrganizationId($organization['id'])->first();
@@ -177,9 +180,7 @@ class StaffSalaryPaymentController extends Controller
 			return redirect()->back()->withErrors(['error' => 'Data is existed']);
 		}
 
-		
-
-		DB::transaction(function() use ($validated) {
+		DB::transaction(function() use ($validated, $organization, $user) {
 			// buat jurnal
 			$journal = $this->journalRepository->store($validated);
 			$validated['journal_id'] = $journal['id'];
@@ -195,19 +196,26 @@ class StaffSalaryPaymentController extends Controller
 						'category_id' => $category['id'],
 						'payment_id' => $payment['id'],
 						'value' => $category['total'],
-						'created_at' => $this->now(),
-						'updated_at' => $this->now(),
+						'created_at' => $this->now->format('Y-m-d H:i:s'),
+						'updated_at' => $this->now->format('Y-m-d H:i:s'),
 					];
 				}
 
 				// salary payment details
 				StaffSalaryPaymentDetail::insert($data);
 			}
+
+			$log = [
+				'description' => $validated['description'],
+				'date' => $validated['date'],
+				'no_ref' => $validated['no_ref'],
+				'value' => $validated['value'],
+			];
+	
+			$this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menambahkan DATA pada PEMBAYARAN GAJI STAF dengan DATA : '.json_encode($log));
 		});
-
-		dd('berhasil');
 		
-
+		return redirect(route('cashflow.staff-salary-payment', $organization['id']))->with('success', 'Pembayaran Gaji Staff Berhasil');
 
 	}
 }
