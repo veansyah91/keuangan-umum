@@ -249,38 +249,39 @@ export default function Create({
 
 	}
 
-	const handleReloadOldValue = () => {
-		// console.log('Histori: ');
+	const handleReloadOldValue = () => {	
+		let tempData = data;
 		
-		// console.log(history.details);
-		
-		let tempData = {...data};
-		let tempDetails = [...data.details];
-		let newDetails = tempDetails.map(detail =>
-			{
-				// console.log('detail');
-				// console.log(detail);
-				
+		let newDetails = tempData.details.map(detail =>
+			{				
 				let newCategory = detail.categories.map(category => {
 					let findCategoryInHistory = history.details.find(history => history.contact_id === detail.id && history.category_id === category.id);
 					
 					return {
-						id: category.id,
-						name: category.name,
+						...category,
 						value: category.has_hour ? category.value : findCategoryInHistory.value,
-						unit: category.unit,
-						is_cut: category.is_cut ? true : false,
-						has_hour: category.has_hour ? true : false,
-						qty: category.has_hour ? 0 : 1,
-						total: category.has_hour ?  category.value : findCategoryInHistory.value
+						total: category.has_hour ?  0 : findCategoryInHistory.value,
+						qty: category.has_hour ?  0 : 1
 					}				
 				});
 
-				console.log(newCategory);
-				
+				return {
+					...detail,
+					categories : newCategory,
+					value: newCategory.reduce((acc, category) => acc + category.total, 0),
+				}
 			}
-			
 		)
+
+		tempData = {
+			...tempData,
+			value : newDetails.reduce((acc, detail) => acc + detail.value, 0),
+			details: newDetails
+		}
+
+		setData(tempData);
+
+		setContactForm
 	}
 
 	const handleSelectedCashAccount = (selected) => {
