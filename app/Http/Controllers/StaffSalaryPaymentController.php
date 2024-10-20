@@ -216,6 +216,23 @@ class StaffSalaryPaymentController extends Controller
 		});
 		
 		return redirect(route('cashflow.staff-salary-payment', $organization['id']))->with('success', 'Pembayaran Gaji Staff Berhasil');
+	}
 
+	public function show(Organization $organization, $id)
+	{
+		// dd($id);
+		$payment = StaffSalaryPayment::find($id);
+		if (!$payment) {
+			return abort(404);
+		}
+
+		$details = StaffSalaryPaymentDetail::join('contacts', 's_salary_payment_details.contact_id', '=', 'contacts.id')
+																				->where('s_salary_payment_details.payment_id', $id)
+																				->select('s_salary_payment_details.contact_id', 'contacts.name', DB::raw('SUM(value) as total'))
+																				->groupBy('s_salary_payment_details.contact_id')
+																				->get();
+
+																				dd($details);
+		
 	}
 }
