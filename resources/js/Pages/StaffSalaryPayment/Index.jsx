@@ -20,6 +20,8 @@ import ContentMobile from '@/Components/Mobiles/ContentMobile';
 import ContentDesktop from '@/Components/Desktop/ContentDesktop';
 import DangerButton from '@/Components/DangerButton';
 import { usePrevious } from 'react-use';
+import StaffSalaryPaymentMobile from './Components/StaffSalaryPaymentMobile';
+import StaffSalaryPaymentDesktop from './Components/StaffSalaryPaymentDesktop';
 
 
 export default function Index({
@@ -45,6 +47,7 @@ export default function Index({
 				</Link>
 			)}
 			
+			{/* Mobile */}
 			<TitleMobile
 				zIndex={'z-50'}
 				search={search}
@@ -94,7 +97,17 @@ export default function Index({
 				hasFilter={true}
 				showFilter={() => setShowModalFilter(true)}
 			/>
+			<ContentMobile>
+				{payments.data.map((payment) => (
+					<StaffSalaryPaymentMobile
+						payment={payment}
+						key={payment.id}
+						role={role}
+					/>
+				))}
+			</ContentMobile>
 
+			{/* Desktop */}
 			<ContainerDesktop>
 				<TitleDesktop>
           <div className='my-auto w-7/12'>
@@ -170,6 +183,35 @@ export default function Index({
 						</div>
 					</div>
         </TitleDesktop>
+
+				<div className='sm:flex hidden gap-5'>
+					<div className='w-full'>
+						<ContentDesktop>
+							<table className='table table-pin-rows table-pin-cols text-base'>
+								<thead className='text-base text-gray-900'>
+									<tr className=''>
+										<th className='bg-gray-200'>Tanggal</th>
+										<th className='bg-gray-200'>No Ref</th>
+										<th className='bg-gray-200'>Bulan</th>
+										<th className='bg-gray-200'>Tahun</th>
+										<th className='bg-gray-200 text-end'>Nilai</th>
+										<th className='bg-gray-200'></th>
+									</tr>
+								</thead>
+								<tbody>
+									{payments.data.map((payment, index) => (
+										<StaffSalaryPaymentDesktop
+											key={index}
+											payment={payment}
+											className={`${index % 2 == 0 && 'bg-gray-100'} text-sm`}
+											role={role}
+										/>
+									))}
+								</tbody>
+							</table>
+						</ContentDesktop>
+					</div>
+				</div>
       </ContainerDesktop>
     </>
   )

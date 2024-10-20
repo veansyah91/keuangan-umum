@@ -281,7 +281,14 @@ export default function Create({
 
 		setData(tempData);
 
-		setContactForm
+		setContactForm({
+			id: tempData.details[step].id, 
+			name: tempData.details[step].name, 
+			position: tempData.details[step].position, 
+			no_ref:tempData.details[step].no_ref,
+			categories:tempData.details[step].categories,
+			value: tempData.details[step].categories.reduce((acc, category) => acc + (category.has_hour ? 0 : category.value), 0)
+		});
 	}
 
 	const handleSelectedCashAccount = (selected) => {
