@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -114,7 +114,25 @@ export default function Create({
 		handleSetDetails();
 	},[]);
 
+	// useUffect
+	useEffect(() => {
+		if (prevDate !== undefined) {
+			reloadNewRef();
+		}
+}, [debounceDateValue]);
+
 	// function
+	const reloadNewRef = () => {
+		router.reload({
+			only: ['newRef'],
+			data: {
+				date: dateValue.startDate,
+			},
+			onSuccess: (page) => {
+				setData('no_ref', page.props.newRef);
+			},
+		});
+	};
 	const handleSetDetails = () => {		
 		setSelectedContact({
 			id: contacts[0].contact_id, 

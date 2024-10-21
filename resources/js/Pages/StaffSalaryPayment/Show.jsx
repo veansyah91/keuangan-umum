@@ -15,11 +15,11 @@ import PageNumber from '@/Components/PageNumber';
 import TitleMobile from '@/Components/Mobiles/TitleMobile';
 import ContentMobile from '@/Components/Mobiles/ContentMobile';
 import ContentDesktop from '@/Components/Desktop/ContentDesktop';
+import StaffSalaryPaymentDetailMobile from './Components/StaffSalaryPaymentDetailMobile';
+// import StaffSalaryPaymentDetailDesktop from './Components/StaffSalaryPaymentDetailDesktop';
 
 export default function Show({ role, organization, details, payment, searchFilter, flash }) {
 	const [search, setSearch] = useState(searchFilter || '');	
-
-  console.log(details);
   
   return (
     <>
@@ -84,8 +84,109 @@ export default function Show({ role, organization, details, payment, searchFilte
 			/>
 
       <ContentMobile>
-      
+      	{details.data.map((detail, index) => (
+					<StaffSalaryPaymentDetailMobile
+						payment={payment}
+						detail={detail}
+						key={index}
+						role={role}
+					/>
+				))}
       </ContentMobile>
+
+			<ContainerDesktop>
+				<TitleDesktop>
+					<div className='my-auto w-7/12'>
+						{/* {role !== 'viewer' && (
+							<div className='space-x-2'>
+								<Link href={route('cashflow.staff-salary-payment.create', organization.id)}>
+									<PrimaryButton className='py-3'>Tambah Data</PrimaryButton>
+								</Link>
+							</div>
+						)} */}
+					</div>
+          <div className='my-auto w-4/12 flex gap-5 justify-end'>
+						{/* <button className='py-3 px-3 border rounded-lg h-full' onClick={() => setShowModalFilter(true)}>
+								<IoFilter />
+						</button>	 */}
+					</div>
+					<div className='w-3/12 border flex rounded-lg'>
+						<label htmlFor='search-input' className='my-auto ml-2'>
+							<IoSearchSharp />
+						</label>
+						<input
+							id='search-input'
+							name='search-input'
+							type='search'
+							placeholder='Cari'
+							className='w-full border-none focus:outline-none focus:ring-0'
+							value={search || ''}
+							onChange={(e) => setSearch(e.target.value)}
+						/>
+					</div>
+					<div className='italic text-xs my-auto w-1/12 text-center'>
+						<PageNumber data={details} />
+					</div>
+					<div className='my-auto flex space-x-2 w-1/12'>
+						<div className='my-auto'>
+							{details.links[0].url ? (
+								<Link
+									href={route('cashflow.student-monthly-payment', {
+										organization: organization.id,
+										page: details.current_page - 1,
+										search: search,
+									})}
+									preserveState
+									only={['details']}>
+									<IoPlayBack />
+								</Link>
+							) : (
+								<div className='text-gray-300'>
+									<IoPlayBack />
+								</div>
+							)}
+						</div>
+						<div className='my-auto'>
+							{details.current_page}/{details.last_page}
+						</div>
+						<div className='my-auto'>
+							{details.links[details.links.length - 1].url ? (
+								<Link
+									href={route('cashflow.student-monthly-payment', {
+										organization: organization.id,
+										page: details.current_page + 1,
+										search: search,
+									})}
+									only={['details']}
+									preserveState>
+									<IoPlayForward />
+								</Link>
+							) : (
+								<div className='text-gray-300'>
+									<IoPlayForward />
+								</div>
+							)}
+						</div>
+					</div>
+				</TitleDesktop>			
+
+				<div className='sm:flex hidden gap-5'>
+					<div className='w-full'>
+						<ContentDesktop>
+							<table className='table table-pin-rows table-pin-cols text-base'>
+								<thead className='text-base text-gray-900'>
+									<tr className=''>
+										<th className='bg-gray-200'>No Ref</th>
+										<th className='bg-gray-200'>Nama</th>
+										<th className='bg-gray-200 text-end'>Nilai</th>
+										<th className='bg-gray-200'></th>
+									</tr>
+								</thead>
+							</table>
+						</ContentDesktop>	
+					</div>	
+				</div>
+			</ContainerDesktop>
     </>
   )
 }
