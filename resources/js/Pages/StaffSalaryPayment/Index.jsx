@@ -1,31 +1,26 @@
 import React, {useEffect, useState} from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { IoArrowBackOutline, IoFilter, IoPlayBack, IoPlayForward, IoSearchSharp } from 'react-icons/io5';
 import AddButtonMobile from '@/Components/AddButtonMobile';
-import Modal from '@/Components/Modal';
-import SecondaryButton from '@/Components/SecondaryButton';
 import PrimaryButton from '@/Components/PrimaryButton';
-import { useDebounce } from 'use-debounce';
 import ContainerDesktop from '@/Components/Desktop/ContainerDesktop';
 import TitleDesktop from '@/Components/Desktop/TitleDesktop';
 import PageNumber from '@/Components/PageNumber';
 import TitleMobile from '@/Components/Mobiles/TitleMobile';
 import ContentMobile from '@/Components/Mobiles/ContentMobile';
 import ContentDesktop from '@/Components/Desktop/ContentDesktop';
-import DangerButton from '@/Components/DangerButton';
-import { usePrevious } from 'react-use';
 import StaffSalaryPaymentMobile from './Components/StaffSalaryPaymentMobile';
 import StaffSalaryPaymentDesktop from './Components/StaffSalaryPaymentDesktop';
 
 
 export default function Index({
-  role, payment, organization, payments, searchFilter, flash
+  role, organization, payments, searchFilter, flash
 }) {
 	const [search, setSearch] = useState(searchFilter || '');	
 

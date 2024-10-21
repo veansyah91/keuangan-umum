@@ -1,6 +1,3 @@
-import BadgePrimary from '@/Components/Badges/BadgePrimary';
-import BadgeSecondary from '@/Components/Badges/BadgeSecondary';
-import BadgeSuccess from '@/Components/Badges/BadgeSuccess';
 import formatMonth from '@/Utils/formatMonth';
 import formatNumber from '@/Utils/formatNumber';
 import { Link } from '@inertiajs/react';
@@ -19,7 +16,7 @@ export default function StaffSalaryPaymentDesktop({ payment, className, role }) 
 				<td>{payment.study_year}</td>
 				<td className='text-end'>IDR. { formatNumber(payment.value) }</td>
 				<td className='text-end'>
-					{(role !== 'viewer' && payment.type !== 'receivable') && (
+					{(role !== 'viewer') && (
 							<div className='dropdown dropdown-left'>
 									<div
 										tabIndex={0}

@@ -225,14 +225,22 @@ class StaffSalaryPaymentController extends Controller
 		if (!$payment) {
 			return abort(404);
 		}
+		$user = Auth::user();
 
 		$details = StaffSalaryPaymentDetail::join('contacts', 's_salary_payment_details.contact_id', '=', 'contacts.id')
+																				->join('contact_staff', 's_salary_payment_details.contact_id', '=', 'contact_staff.contact_id')
 																				->where('s_salary_payment_details.payment_id', $id)
-																				->select('s_salary_payment_details.contact_id', 'contacts.name', DB::raw('SUM(value) as total'))
-																				->groupBy('s_salary_payment_details.contact_id')
-																				->get();
+																				->select('s_salary_payment_details.contact_id', 'contacts.name', 'contact_staff.position', 'contact_staff.no_ref',DB::raw('SUM(value) as total'))
+																				->groupBy('s_salary_payment_details.contact_id','contact_staff.position', 'contact_staff.no_ref')
+																				->orderBy('contacts.name', 'asc')
+																				->paginate(50);
 
-																				dd($details);
+		return Inertia::render('StaffSalaryPayment/Show',[
+			'organization' => $organization,
+			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+			'details' => $details,
+			'payment' => $payment,
+		]);
 		
 	}
 }

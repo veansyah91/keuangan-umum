@@ -6,29 +6,23 @@ import React from 'react';
 import { IoEllipsisVertical,} from 'react-icons/io5';
 import { LiaFileInvoiceSolid } from 'react-icons/lia';
 
-export default function StaffSalaryPaymentMobile({ payment, role }) {
-	return (
-		<>
+export default function StaffSalaryPaymentDetailMobile({ payment, role, detail }) {
+  return (
+    <>
 			<div className=' text-gray-900 py-2 px-3 border flex gap-5 justify-between'>
 				<div className='text-start my-auto w-6/12'>
 					<div className='text-xs'>
-						{dayjs(payment.date).format('MMMM DD, YYYY')}
+						No. Ref: { detail.no_ref }
 					</div>
 					<div className='text-xs'>
-						{ payment.no_ref }
-					</div>
-					<div>
-					</div>
-					<div className='text-xs'>
-						<div>Bulan: {formatMonth(payment.month)} ({payment.month})</div>
-						<div>Tahun: {payment.study_year}</div>
+						{ detail.name }
 					</div>
 				</div>
 				<div className='text-end my-auto w-5/12'>
-					<div>IDR {formatNumber(payment.value)}</div>
+					<div>IDR {formatNumber(parseInt(detail.value))}</div>
 				</div>
 				<div className='text-start w-1/12'>
-					{(role !== 'viewer') && (
+					{(role !== 'viewer' && payment.type !== 'receivable') && (
 						<div className='dropdown dropdown-left'>
 							<div
 								tabIndex={0}
@@ -53,6 +47,5 @@ export default function StaffSalaryPaymentMobile({ payment, role }) {
 				</div>
 			</div>
 		</>
-	);
+  )
 }
-
