@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Inertia\Inertia;
 use App\Helpers\NewRef;
 use App\Models\Account;
+use App\Models\Contact;
 use Carbon\CarbonImmutable;
 use App\Models\ContactStaff;
 use App\Models\Organization;
@@ -220,7 +221,6 @@ class StaffSalaryPaymentController extends Controller
 
 	public function show(Organization $organization, $id)
 	{
-		// dd($id);
 		$payment = StaffSalaryPayment::find($id);
 		if (!$payment) {
 			return abort(404);
@@ -246,7 +246,14 @@ class StaffSalaryPaymentController extends Controller
 	public function editStaff(Organization $organization, $id, $staff)
 	{
 		$payment = StaffSalaryPayment::find($id);
-		$payment['details'] = StaffSalaryPaymentDetail::where('payment_id', $id)->where('contact_id', $staff)->get();
+		$contact = Contact::find($staff);
+		if (!$payment || !$contact) {
+			return abort(404);
+		}
+
+		$payment['details'] = StaffSalaryPaymentDetail::where('payment_id', $id)->where('contact_id', $staff)->get();		
+
+		$user = Auth::user();
 		
 		return Inertia::render('StaffSalaryPayment/Edit', [
 			'organization' => $organization,
@@ -256,7 +263,8 @@ class StaffSalaryPaymentController extends Controller
 																			->orderBy('has_hour', 'asc')
 																			->orderBy('is_cut', 'asc')
 																			->get(),
-			'payment' => $payment
+			'payment' => $payment,
+			'contact' => $contact,
 		]);
 	}
 

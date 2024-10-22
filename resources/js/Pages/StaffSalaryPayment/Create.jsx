@@ -338,7 +338,7 @@ export default function Create({
   
   return (
     <>
-			<Head title='Piutang Iuran Bulanan Siswa' />
+			<Head title='Pembayaran Gaji Staf' />
       <ToastContainer />
 
 			<div className='w-full sm:mt-2'>
