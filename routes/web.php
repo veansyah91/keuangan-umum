@@ -350,6 +350,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 					Route::get('/staff-salary-payment/create', [StaffSalaryPaymentController::class, 'create'])->name('cashflow.staff-salary-payment.create');
 					Route::post('/staff-salary-payment', [StaffSalaryPaymentController::class, 'store'])->name('cashflow.staff-salary-payment.store');
 					Route::get('/staff-salary-payment/{id}', [StaffSalaryPaymentController::class, 'show'])->name('cashflow.staff-salary-payment.show');
+					Route::get('/staff-salary-payment/{id}/{staff}', [StaffSalaryPaymentController::class, 'showStaff'])->name('cashflow.staff-salary-payment.staff');
+					Route::get('/staff-salary-payment/{id}/{staff}', [StaffSalaryPaymentController::class, 'editStaff'])->name('cashflow.staff-salary-payment.staff.detail');
 
         });
 

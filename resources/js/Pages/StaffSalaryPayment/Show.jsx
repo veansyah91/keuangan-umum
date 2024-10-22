@@ -16,6 +16,7 @@ import TitleMobile from '@/Components/Mobiles/TitleMobile';
 import ContentMobile from '@/Components/Mobiles/ContentMobile';
 import ContentDesktop from '@/Components/Desktop/ContentDesktop';
 import StaffSalaryPaymentDetailMobile from './Components/StaffSalaryPaymentDetailMobile';
+import StaffSalaryPaymentDetailDesktop from './Components/StaffSalaryPaymentDetailDesktop';
 // import StaffSalaryPaymentDetailDesktop from './Components/StaffSalaryPaymentDetailDesktop';
 
 export default function Show({ role, organization, details, payment, searchFilter, flash }) {
@@ -182,6 +183,17 @@ export default function Show({ role, organization, details, payment, searchFilte
 										<th className='bg-gray-200'></th>
 									</tr>
 								</thead>
+								<tbody>
+									{details.data.map((detail, index) => (
+										<StaffSalaryPaymentDetailDesktop
+											payment={payment}
+											detail={detail}
+											key={index}
+											role={role}
+											className={`${index % 2 == 0 && 'bg-gray-100'} text-sm`}
+										/>
+									))}
+								</tbody>
 							</table>
 						</ContentDesktop>	
 					</div>	

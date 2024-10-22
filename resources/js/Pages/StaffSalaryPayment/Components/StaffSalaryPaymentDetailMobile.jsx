@@ -7,8 +7,7 @@ import { IoEllipsisVertical,} from 'react-icons/io5';
 import { LiaFileInvoiceSolid } from 'react-icons/lia';
 
 export default function StaffSalaryPaymentDetailMobile({ payment, role, detail }) {
-	console.log(detail);
-	
+		
   return (
     <>
 			<div className=' text-gray-900 py-2 px-3 border flex gap-5 justify-between'>
@@ -24,7 +23,7 @@ export default function StaffSalaryPaymentDetailMobile({ payment, role, detail }
 					<div>IDR {formatNumber(parseInt(detail.total))}</div>
 				</div>
 				<div className='text-start w-1/12'>
-					{(role !== 'viewer' && payment.type !== 'receivable') && (
+					{(role !== 'viewer') && (
 						<div className='dropdown dropdown-left'>
 							<div
 								tabIndex={0}
