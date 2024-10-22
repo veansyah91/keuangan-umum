@@ -3,7 +3,7 @@ import formatNumber from '@/Utils/formatNumber';
 import { Link } from '@inertiajs/react';
 import dayjs from 'dayjs';
 import React from 'react';
-import { IoEllipsisVertical,} from 'react-icons/io5';
+import { IoCreateOutline, IoEllipsisVertical,} from 'react-icons/io5';
 import { LiaFileInvoiceSolid } from 'react-icons/lia';
 
 export default function StaffSalaryPaymentDetailMobile({ payment, role, detail }) {
@@ -36,10 +36,16 @@ export default function StaffSalaryPaymentDetailMobile({ payment, role, detail }
 								className='dropdown-content z-[50] menu p-2 shadow bg-base-100 rounded-box w-56'>
 								<li>
 									<Link 
-										href={route('cashflow.staff-salary-payment.show', {organization: payment.organization_id, id: payment.id})}
+										href={route('cashflow.staff-salary-payment.staff', {organization: payment.organization_id, id: payment.id, staff: parseInt(detail.contact_id)})}
 									>
 										<LiaFileInvoiceSolid />
-											Detail
+											Detail / Print
+									</Link>
+								</li>
+								<li>
+									<Link href={route('cashflow.staff-salary-payment.staff.edit', { organization: payment.organization_id, id: payment.id, staff: parseInt(detail.contact_id) })}>
+										<IoCreateOutline />
+										Ubah
 									</Link>
 								</li>
 							</ul>
