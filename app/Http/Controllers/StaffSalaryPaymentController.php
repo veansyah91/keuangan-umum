@@ -241,6 +241,27 @@ class StaffSalaryPaymentController extends Controller
 			'details' => $details,
 			'payment' => $payment,
 		]);
+	}
+
+	public function editStaff(Organization $organization, $id, $staff)
+	{
+		$payment = StaffSalaryPayment::find($id);
+		$payment['details'] = StaffSalaryPaymentDetail::where('payment_id', $id)->where('contact_id', $staff)->get();
 		
+		return Inertia::render('StaffSalaryPayment/Edit', [
+			'organization' => $organization,
+			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+			'categories' => SalaryCategory::where('is_active', true)
+																			->where('organization_id', $organization['id'])																			
+																			->orderBy('has_hour', 'asc')
+																			->orderBy('is_cut', 'asc')
+																			->get(),
+			'payment' => $payment
+		]);
+	}
+
+	public function showStaff(Organization $organization, $id, $staff)
+	{
+		dd($id);
 	}
 }
