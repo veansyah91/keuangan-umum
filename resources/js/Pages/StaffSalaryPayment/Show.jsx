@@ -225,7 +225,7 @@ Show.layout = (page) => (
           <li className='font-bold'>
 						<Link href={route('cashflow.staff-salary-payment', page.props.organization.id)}>Pembayaran Gaji Bulanan</Link>
 					</li>
-					<li>Pembayaran Gaji Bulanan</li>
+					<li>Rincian Pembayaran Gaji Bulanan</li>
 				</ul>
 			</div>
 		}

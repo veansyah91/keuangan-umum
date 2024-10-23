@@ -246,7 +246,7 @@ class StaffSalaryPaymentController extends Controller
 	public function editStaff(Organization $organization, $id, $staff)
 	{
 		$payment = StaffSalaryPayment::find($id);
-		$contact = Contact::find($staff);
+		$contact = Contact::with('staff')->find($staff);
 		if (!$payment || !$contact) {
 			return abort(404);
 		}
