@@ -23,30 +23,74 @@ import Modal from '@/Components/Modal';
 import FormInput from '@/Components/FormInput';
 
 const details = (categories, details) => {
-	const newCategory = categories.map(category => {
+	return categories.map(category => {
+		let findDetail = details.find(detail => detail.category_id === category.id);
 		return {
 			id: category.id,
 			name: category.name,
-			value: category.value,
+			value: findDetail.value/findDetail.qty,
 			unit: category.unit,
 			is_cut: category.is_cut ? true : false,
 			has_hour: category.has_hour ? true : false,
-			qty: category.has_hour ? 0 : 1,
-			total: category.has_hour ? 0 : category.value
+			qty: findDetail.qty,
+			total: findDetail.value
 		}
 	});
-
 }
 
 export default function Edit({ organization, role, categories, payment, contact }) {
-	console.log(payment.details);
-	
-	// console.log(details(categories, payment.details));
-	
 	const { data, setData } = useForm({
 		value: payment.value,
-		details: payment.details
+		details: details(categories, payment.details)
 	});
+
+	const handleChangeHour =(values, index) => {	
+		// let tempContactForm = {...contactForm};
+		// let valueUsed = values.floatValue || 0;
+				
+		// tempContactForm.categories[index] = {
+		// 	...tempContactForm.categories[index],
+		// 	qty: valueUsed,
+		// 	total: valueUsed * tempContactForm.categories[index].value * (tempContactForm.categories[index].is_cut ? -1 : 1)
+		// }		
+
+		// tempContactForm = {
+		// 	...tempContactForm,
+		// 	value: tempContactForm.categories.reduce((acc, category) => acc + category.total , 0)
+		// }
+
+		// let tempData = {...data};
+
+		// tempData.details[step] = tempContactForm;
+
+		// tempData.value = tempData.details.reduce((acc, detail) => acc + detail.value , 0);
+
+		setData(tempData);		
+	};
+
+	const handleChangeValue = (values, index) => {
+		// let tempContactForm = {...contactForm};
+		// let valueUsed = values.floatValue || 0;
+				
+		// tempContactForm.categories[index] = {
+		// 	...tempContactForm.categories[index],
+		// 	value: valueUsed,
+		// 	total: valueUsed * tempContactForm.categories[index].qty * (tempContactForm.categories[index].is_cut ? -1 : 1)
+		// }		
+
+		// tempContactForm = {
+		// 	...tempContactForm,
+		// 	value: tempContactForm.categories.reduce((acc, category) => acc + category.total , 0)
+		// }
+
+		// let tempData = {...data};
+
+		// tempData.details[step] = tempContactForm;
+
+		// tempData.value = tempData.details.reduce((acc, detail) => acc + detail.value , 0);
+
+		setData(tempData);		
+	}
 	
 	const handleSubmit = (e) => {
 		e.preventDefault();
@@ -120,6 +164,63 @@ export default function Edit({ organization, role, categories, payment, contact 
 										value={contact.staff.no_ref || ''}
 										disabled
 									/>
+								</div>
+							</div>
+
+							<div className='mt-5 overflow-x-auto'>
+								<div className='w-[750px] md:w-full'>
+									<div className='flex font-bold gap-3 border-b py-3'>
+										<div className='w-4/12'>Kategori</div>
+										<div className='w-2/12 text-end'>Jam/Hari</div>
+										<div className='w-3/12 text-end'>Nilai</div>
+										<div className='w-3/12 text-end'>Total</div>
+									</div>
+									{
+										data.details.map((category, index) => 
+											<div className='flex gap-3 border-b py-3' key={index}>
+												<div className={`w-5/12 my-auto${category.is_cut ? ' text-red-500' : ''}`}>{ category.name }</div>
+												<div className='w-1/12 text-end'>
+													{
+														category.has_hour && <div className='gap-1'>
+															<NumericFormat
+																value={category.qty}
+																customInput={TextInput}
+																onValueChange={(values) => handleChangeHour(values, index)}
+																thousandSeparator={true}
+																className={`text-end w-full${category.is_cut ? ' text-red-500' : ''}`}
+																prefix={''}
+															/>
+															<div className='my-auto hidden md:block text-xs'>{category.unit}</div>
+														</div>
+													}
+												</div>
+												<div className='w-3/12 text-end'>
+													<NumericFormat
+														value={category.value}
+														customInput={TextInput}
+														onValueChange={(values) => handleChangeValue(values, index)}
+														thousandSeparator={true}
+														className={`text-end w-full${category.is_cut ? ' text-red-500' : ''}`}
+														prefix={'IDR. '}
+													/>
+												</div>
+												<div className='w-3/12 text-end'>
+													<NumericFormat
+														value={category.total}
+														customInput={TextInput}
+														thousandSeparator={true}
+														className={`text-end w-full${category.is_cut ? ' text-red-500' : ''}`}
+														prefix={'IDR. '}
+														disabled='disabled'
+													/>
+												</div>
+											</div>
+										)
+									}
+									<div className='flex font-bold gap-3 border-b py-3'>
+										<div className='w-5/12'>Total</div>
+										<div className='w-7/12 text-end'>IDR. {formatNumber(data.value)}</div>
+									</div>
 								</div>
 							</div>
 						</section>

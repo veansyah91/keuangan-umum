@@ -15,6 +15,7 @@ class StaffSalaryPaymentDetail extends Model
         'payment_id',
         'contact_id',
         'category_id',
-        'value'
+        'value',
+        'qty'
     ];
 }

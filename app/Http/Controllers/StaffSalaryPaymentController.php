@@ -197,6 +197,7 @@ class StaffSalaryPaymentController extends Controller
 						'category_id' => $category['id'],
 						'payment_id' => $payment['id'],
 						'value' => $category['total'],
+						'qty' => $category['qty'],
 						'created_at' => $this->now->format('Y-m-d H:i:s'),
 						'updated_at' => $this->now->format('Y-m-d H:i:s'),
 					];
