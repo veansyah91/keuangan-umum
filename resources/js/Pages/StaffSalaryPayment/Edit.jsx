@@ -22,11 +22,30 @@ import { NumericFormat } from 'react-number-format';
 import Modal from '@/Components/Modal';
 import FormInput from '@/Components/FormInput';
 
+const details = (categories, details) => {
+	const newCategory = categories.map(category => {
+		return {
+			id: category.id,
+			name: category.name,
+			value: category.value,
+			unit: category.unit,
+			is_cut: category.is_cut ? true : false,
+			has_hour: category.has_hour ? true : false,
+			qty: category.has_hour ? 0 : 1,
+			total: category.has_hour ? 0 : category.value
+		}
+	});
+
+}
+
 export default function Edit({ organization, role, categories, payment, contact }) {
-	console.log(payment);
+	console.log(payment.details);
+	
+	// console.log(details(categories, payment.details));
 	
 	const { data, setData } = useForm({
-		value: payment.value
+		value: payment.value,
+		details: payment.details
 	});
 	
 	const handleSubmit = (e) => {
