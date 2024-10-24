@@ -28,7 +28,7 @@ export default function Index({
 		flash?.success && toast.success(flash.success, {
 			position: toast.POSITION.TOP_CENTER,
 		});
-	},[])
+	},[]);
 
   return (
     <>

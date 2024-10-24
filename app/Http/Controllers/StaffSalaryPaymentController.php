@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use Inertia\Inertia;
+use App\Models\Ledger;
 use App\Helpers\NewRef;
 use App\Models\Account;
 use App\Models\Contact;
+use App\Models\Journal;
 use Carbon\CarbonImmutable;
 use App\Models\ContactStaff;
 use App\Models\Organization;
@@ -278,19 +280,72 @@ class StaffSalaryPaymentController extends Controller
 			'details.*.qty' => 'required|numeric|min:0',
 			'details.*.total' => 'required|numeric'
 		]);
+
+		$user = Auth::user();
 		
-		DB::transaction(function() use ($validated, $organization, $staff, $payment){
+		DB::transaction(function() use ($validated, $organization, $staff, $payment, $user){
 			// dapatkan nilai sebelumnya
 			$updateValue = $payment['value'];
 			$oldValue = StaffSalaryPaymentDetail::where('payment_id', $payment['id'])->where('contact_id', $staff['id'])->sum('value');
 			$updateValue = $payment['value'] - (int)$oldValue + $validated['value'];
 
-			dd($updateValue);
-			// lalu kurangkan dengan nilai sebelumnya
+			// perbarui jurnal dan ledger
+			$journal = Journal::find($payment['journal_id']);
+			$journal->update([
+				'value' => $updateValue
+			]);
 
-			// lalu tambahkan dengan nilai terbaru
+			$ledgers = Ledger::whereJournalId($payment['journal_id'])->get();
+			foreach ($ledgers as $ledger) {
+				if ($ledger['debit'] > 0) {
+					$ledger->update([
+						'debit' => $updateValue
+					]);
+				} else {
+					$ledger->update([
+						'credit' => $updateValue
+					]);
+				}
+			}
 
+			// perbarui payment
+			$payment->update([
+				'value' => $updateValue
+			]);
+
+			// hapus detail
+			StaffSalaryPaymentDetail::where('payment_id', $payment['id'])->where('contact_id', $staff['id'])->delete();
+
+			// buat baru
+			foreach ($validated['details'] as $detail) {
+				$data[] = [
+					'contact_id' => $staff['id'],
+					'category_id' => $detail['id'],
+					'payment_id' => $payment['id'],
+					'value' => $detail['total'],
+					'qty' => $detail['qty'],
+					'created_at' => $this->now->format('Y-m-d H:i:s'),
+					'updated_at' => $this->now->format('Y-m-d H:i:s'),
+				];
+			}
+
+			// salary payment details
+			StaffSalaryPaymentDetail::insert($data);
+
+			$log = [
+				'description' => $payment['description'],
+				'date' => $payment['date'],
+				'no_ref' => $payment['no_ref'],
+				'value' => $payment['value'],
+			];
+	
+			$this->logRepository->store($organization['id'], strtoupper($user['name']).' telah mengubah DATA pada PEMBAYARAN GAJI STAF dengan DATA : '.json_encode($log));
 		});
+		
+		return redirect(route('cashflow.staff-salary-payment.show', [
+															'organization' => $organization['id'],
+															'id' => $payment['id'],
+													]))->with('success', 'Pembayaran Gaji Staff Berhasil Diubah');
 	}
 
 	public function showStaff(Organization $organization, $id, $staff)

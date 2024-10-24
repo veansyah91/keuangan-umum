@@ -18,10 +18,17 @@ import ContentDesktop from '@/Components/Desktop/ContentDesktop';
 import StaffSalaryPaymentDetailMobile from './Components/StaffSalaryPaymentDetailMobile';
 import StaffSalaryPaymentDetailDesktop from './Components/StaffSalaryPaymentDetailDesktop';
 import { FaPrint } from 'react-icons/fa';
+import formatNumber from '@/Utils/formatNumber';
 // import StaffSalaryPaymentDetailDesktop from './Components/StaffSalaryPaymentDetailDesktop';
 
 export default function Show({ role, organization, details, payment, searchFilter, flash }) {
 	const [search, setSearch] = useState(searchFilter || '');	
+
+	useEffect(() => {
+		flash?.success && toast.success(flash.success, {
+			position: toast.POSITION.TOP_CENTER,
+		});
+	},[])
   
   return (
     <>
@@ -99,13 +106,16 @@ export default function Show({ role, organization, details, payment, searchFilte
 			<ContainerDesktop>
 				<TitleDesktop>
 					<div className='my-auto w-7/12'>
-						{/* {role !== 'viewer' && (
+						{/* {role !== 'viewer' && ( */}
 							<div className='space-x-2'>
-								<Link href={route('cashflow.staff-salary-payment.create', organization.id)}>
+								{/* <Link href={route('cashflow.staff-salary-payment.create', organization.id)}>
 									<PrimaryButton className='py-3'>Tambah Data</PrimaryButton>
-								</Link>
+								</Link> */}
+								<div className='text-2xl font-bold'>
+									Total: IDR. { formatNumber(payment.value) }
+								</div>
 							</div>
-						)} */}
+						{/* )} */}
 					</div>
           <div className='my-auto w-4/12 flex gap-5 justify-end'>
 						<button className='py-3 px-3 border rounded-lg h-full' onClick={() => setShowModalFilter(true)}>

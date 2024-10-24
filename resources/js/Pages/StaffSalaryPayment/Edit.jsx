@@ -6,20 +6,13 @@ import { Head, Link, router, useForm } from '@inertiajs/react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { IoArrowBackOutline, IoPlayBack, IoPlayForward, IoReload, IoReloadCircleOutline } from 'react-icons/io5';
-import dayjs from 'dayjs';
+import { IoArrowBackOutline } from 'react-icons/io5';
 import InputLabel from '@/Components/InputLabel';
-import Datepicker from 'react-tailwindcss-datepicker';
-import { useDebounce } from 'use-debounce';
-import { usePrevious } from 'react-use';
 import formatNumber from '@/Utils/formatNumber';
 import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
-import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
-import StaffSelectInput from '@/Components/SelectInput/StaffSelectInput';
 import TextInput from '@/Components/TextInput';
 import { NumericFormat } from 'react-number-format';
-import Modal from '@/Components/Modal';
 import FormInput from '@/Components/FormInput';
 
 const details = (categories, details) => {
@@ -38,9 +31,9 @@ const details = (categories, details) => {
 	});
 }
 
-export default function Edit({ organization, role, categories, payment, contact }) {
+export default function Edit({ organization, role, categories, payment, contact }) {	
 	const { data, setData, processing, patch } = useForm({
-		value: payment.value,
+		value:payment.details.reduce((acc, detail) => acc + detail.value, 0),
 		details: details(categories, payment.details)
 	});
 
@@ -72,11 +65,7 @@ export default function Edit({ organization, role, categories, payment, contact 
 	const handleSubmit = (e) => {
 		e.preventDefault();
 
-		console.log(data);
 		patch(route('cashflow.staff-salary-payment.staff.update', {organization: organization.id, payment:payment.id, staff: contact.id}),{
-			onSuccess: (props) => {
-				console.log(props);				
-			},
 			onError: errors => {
 				console.log(errors);				
 			}
@@ -222,7 +211,7 @@ export default function Edit({ organization, role, categories, payment, contact 
 
 								<div className='w-full sm:w-1/12 text-center'>
 									<PrimaryButton className='w-full' disabled={processing}>
-										<div className='text-center w-full'>Tambah</div>
+										<div className='text-center w-full'>Ubah</div>
 									</PrimaryButton>
 								</div>
 							</div>
