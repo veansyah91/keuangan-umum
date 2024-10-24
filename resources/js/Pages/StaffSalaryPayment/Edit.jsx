@@ -39,61 +39,48 @@ const details = (categories, details) => {
 }
 
 export default function Edit({ organization, role, categories, payment, contact }) {
-	const { data, setData } = useForm({
+	const { data, setData, processing, patch } = useForm({
 		value: payment.value,
 		details: details(categories, payment.details)
 	});
 
 	const handleChangeHour =(values, index) => {	
-		// let tempContactForm = {...contactForm};
-		// let valueUsed = values.floatValue || 0;
-				
-		// tempContactForm.categories[index] = {
-		// 	...tempContactForm.categories[index],
-		// 	qty: valueUsed,
-		// 	total: valueUsed * tempContactForm.categories[index].value * (tempContactForm.categories[index].is_cut ? -1 : 1)
-		// }		
+		let tempData = {...data};
+		tempData.details[index] = {
+			...tempData.details[index],
+			qty: values.floatValue || 0,
+			total: (values.floatValue || 0) * tempData.details[index].value
+		}
 
-		// tempContactForm = {
-		// 	...tempContactForm,
-		// 	value: tempContactForm.categories.reduce((acc, category) => acc + category.total , 0)
-		// }
-
-		// let tempData = {...data};
-
-		// tempData.details[step] = tempContactForm;
-
-		// tempData.value = tempData.details.reduce((acc, detail) => acc + detail.value , 0);
-
+		tempData.value = tempData.details.reduce((acc, detail) => acc + detail.total, 0);
 		setData(tempData);		
+
 	};
 
 	const handleChangeValue = (values, index) => {
-		// let tempContactForm = {...contactForm};
-		// let valueUsed = values.floatValue || 0;
-				
-		// tempContactForm.categories[index] = {
-		// 	...tempContactForm.categories[index],
-		// 	value: valueUsed,
-		// 	total: valueUsed * tempContactForm.categories[index].qty * (tempContactForm.categories[index].is_cut ? -1 : 1)
-		// }		
+		let tempData = {...data};
+		tempData.details[index] = {
+			...tempData.details[index],
+			value: values.floatValue || 0,
+			total: (values.floatValue || 0) * tempData.details[index].qty
+		}
 
-		// tempContactForm = {
-		// 	...tempContactForm,
-		// 	value: tempContactForm.categories.reduce((acc, category) => acc + category.total , 0)
-		// }
-
-		// let tempData = {...data};
-
-		// tempData.details[step] = tempContactForm;
-
-		// tempData.value = tempData.details.reduce((acc, detail) => acc + detail.value , 0);
-
+		tempData.value = tempData.details.reduce((acc, detail) => acc + detail.total, 0);
 		setData(tempData);		
 	}
 	
 	const handleSubmit = (e) => {
 		e.preventDefault();
+
+		console.log(data);
+		patch(route('cashflow.staff-salary-payment.staff.update', {organization: organization.id, payment:payment.id, staff: contact.id}),{
+			onSuccess: (props) => {
+				console.log(props);				
+			},
+			onError: errors => {
+				console.log(errors);				
+			}
+		})
 
 	}
   return (
@@ -221,6 +208,22 @@ export default function Edit({ organization, role, categories, payment, contact 
 										<div className='w-5/12'>Total</div>
 										<div className='w-7/12 text-end'>IDR. {formatNumber(data.value)}</div>
 									</div>
+								</div>
+							</div>
+
+							<div className='flex justify-end flex-col-reverse sm:flex-row gap-2 mt-5'>
+								<div className='w-full sm:w-1/12 my-auto text-center'>
+									<Link href={route('cashflow.staff-salary-payment.show', {organization: organization.id, id: payment.id})}>
+										<SecondaryButton className='w-full'>
+											<div className='text-center w-full'>Batal</div>
+										</SecondaryButton>
+									</Link>
+								</div>
+
+								<div className='w-full sm:w-1/12 text-center'>
+									<PrimaryButton className='w-full' disabled={processing}>
+										<div className='text-center w-full'>Tambah</div>
+									</PrimaryButton>
 								</div>
 							</div>
 						</section>

@@ -352,6 +352,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 					Route::get('/staff-salary-payment/{id}', [StaffSalaryPaymentController::class, 'show'])->name('cashflow.staff-salary-payment.show');
 					Route::get('/staff-salary-payment/{id}/{staff}', [StaffSalaryPaymentController::class, 'showStaff'])->name('cashflow.staff-salary-payment.staff');
 					Route::get('/staff-salary-payment/{id}/{staff}/edit', [StaffSalaryPaymentController::class, 'editStaff'])->name('cashflow.staff-salary-payment.staff.edit');
+					Route::patch('/staff-salary-payment/{payment}/{staff}', [StaffSalaryPaymentController::class, 'updateStaff'])->name('cashflow.staff-salary-payment.staff.update');
 
         });
 

@@ -79,9 +79,9 @@ const dataDetails = (contacts, categories) => {
 }
 
 export default function Create({
-  organization, role, categories, newRef, date, cashAccounts, contacts, studyYears, history
+  organization, categories, newRef, date, cashAccounts, contacts, history
 }) {	
-  const { data, setData, post, reset, errors } = useForm({
+  const { data, setData, post, errors } = useForm({
     value: 0,
     organization_id : organization.id,
     no_ref: newRef,
@@ -96,6 +96,9 @@ export default function Create({
 		startDate: date,
 		endDate: date,
 	});	
+
+	
+	
 
 	const [selectedContact, setSelectedContact] = useState({ id: null, name: '', position: '', no_ref:'' });
 	const [contactForm, setContactForm] = useState({});

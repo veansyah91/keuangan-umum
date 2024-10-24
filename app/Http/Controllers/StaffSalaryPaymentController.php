@@ -269,6 +269,30 @@ class StaffSalaryPaymentController extends Controller
 		]);
 	}
 
+	public function updateStaff(Request $request, Organization $organization, StaffSalaryPayment $payment, Contact $staff)
+	{
+		$validated = $request->validate([
+			'value' => 'required|numeric',
+			'details' => 'required',
+			'details.*.id' => 'required|exists:salary_categories,id',
+			'details.*.qty' => 'required|numeric|min:0',
+			'details.*.total' => 'required|numeric'
+		]);
+		
+		DB::transaction(function() use ($validated, $organization, $staff, $payment){
+			// dapatkan nilai sebelumnya
+			$updateValue = $payment['value'];
+			$oldValue = StaffSalaryPaymentDetail::where('payment_id', $payment['id'])->where('contact_id', $staff['id'])->sum('value');
+			$updateValue = $payment['value'] - (int)$oldValue + $validated['value'];
+
+			dd($updateValue);
+			// lalu kurangkan dengan nilai sebelumnya
+
+			// lalu tambahkan dengan nilai terbaru
+
+		});
+	}
+
 	public function showStaff(Organization $organization, $id, $staff)
 	{
 		dd($id);
