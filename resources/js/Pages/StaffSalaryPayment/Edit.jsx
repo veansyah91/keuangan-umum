@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { IoArrowBackOutline } from 'react-icons/io5';
@@ -247,7 +247,7 @@ Edit.layout = (page) => (
 					<li className='font-bold'>
 						<Link href={route('cashflow.staff-salary-payment.show', { organization: page.props.organization.id, id: page.props.payment.id })}>Rincian Pembayaran Gaji Bulanan</Link>
 					</li>
-					<li>Ubah Pembayaran Gaji Bulanan {}</li>
+					<li>Ubah Pembayaran Gaji Bulanan</li>
 				</ul>
 			</div>
 		}

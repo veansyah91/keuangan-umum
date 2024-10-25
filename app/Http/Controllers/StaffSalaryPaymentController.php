@@ -345,11 +345,33 @@ class StaffSalaryPaymentController extends Controller
 		return redirect(route('cashflow.staff-salary-payment.show', [
 															'organization' => $organization['id'],
 															'id' => $payment['id'],
-													]))->with('success', 'Pembayaran Gaji Staff Berhasil Diubah');
+													]))->with('success', 'Pembayaran Gaji Staff Nama: ' . $staff['name'] . ' Berhasil Diubah');
 	}
 
 	public function showStaff(Organization $organization, $id, $staff)
 	{
-		dd($id);
+		$payment = StaffSalaryPayment::find($id);
+		$contact = Contact::with('staff')->find($staff);
+		if (!$payment || !$contact) {
+			return abort(404);
+		}
+
+		$payment['details'] = StaffSalaryPaymentDetail::where('payment_id', $id)->where('contact_id', $staff)->get();		
+
+		$user = Auth::user();
+		
+		return Inertia::render('StaffSalaryPayment/ShowStaff', [
+			'organization' => $organization,
+			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+			'categories' => SalaryCategory::where('is_active', true)
+																			->where('organization_id', $organization['id'])																			
+																			->orderBy('has_hour', 'asc')
+																			->orderBy('is_cut', 'asc')
+																			->get(),
+			'payment' => $payment,
+			'contact' => $contact,
+			'user' => $user,
+
+		]);
 	}
 }
