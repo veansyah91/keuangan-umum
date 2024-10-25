@@ -3,7 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
 import { Head, Link, useForm } from '@inertiajs/react';
 
-import { ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { IoArrowBackOutline } from 'react-icons/io5';
@@ -17,9 +17,10 @@ import FormInput from '@/Components/FormInput';
 import { FaPrint, FaWhatsapp } from 'react-icons/fa';
 import dayjs from 'dayjs';
 
-const details = (categories, details) => {
+const details = (categories, details, type = 'plus') => {
 	return categories.map(category => {
 		let findDetail = details.find(detail => detail.category_id === category.id);
+		
 		return {
 			id: category.id,
 			name: category.name,
@@ -35,13 +36,11 @@ const details = (categories, details) => {
 
 export default function ShowStaff({
   organization, role, categories, payment, contact, user
-}) {
+}) {	
   const [waLink] = useState('https://web.whatsapp.com/send');
 
-  const [detail] = useState(details(categories, payment.details));
-
-  console.log(details(categories, payment.details));
-  
+  const [detailPlus] = useState(details(categories, payment.details).filter(detail => !detail.is_cut));
+  const [detailMinus] = useState(details(categories, payment.details).filter(detail => detail.is_cut));  
 
 	const handlePrint = () => {
 		window.print();
@@ -64,13 +63,13 @@ export default function ShowStaff({
 
 		let detail = '';
 
-		payment.details.forEach((r, index) => {
+		detailPlus.forEach((r, index) => {
 			detail += `%0A${index+1}. ${r.name} : IDR ${formatNumber(r.pivot.value)}`;
 		});
 
 		detail += `%0A*Total: ${ formatNumber(payment.value) }*`
 		
-		let message = `*PEMBAYARAN IURAN BULANAN*%0A-------------------------------------------------------%0A*Nama*: ${contact.name}%0A*No. Siswa*: ${contact.student.no_ref ?? '-'}%0A*Tahun Masuk*: ${contact.student.entry_year}%0A*Kelas Sekarang*: ${contact.last_level.level}%0A-------------------------------------------------------%0A*No Ref*: ${payment.no_ref}%0A*Tanggal*: ${dayjs(payment.date).locale('id').format('DD MMMM YYYY')}%0A*Bulan*: ${payment.month} (${payment.study_year})%0A*Total*: IDR. ${formatNumber(payment.value)}%0A%0A*DETAIL:*${detail}%0A%0A%0ATtd,%0A%0A%0A*${organization.name}*`;
+		let message = `*PEMBAYARAN GAJI BULANAN*%0A-------------------------------------------------------%0A*Nama*: ${contact.name}%0A*No. Siswa*: ${contact.staff.no_ref ?? '-'}%0A*Tahun Masuk*: ${contact.staff.entry_year}%0A-------------------------------------------------------%0ATanggal*: ${dayjs(payment.date).locale('id').format('DD MMMM YYYY')}%0A*Bulan*: ${payment.month} (${payment.study_year})%0A*Total*: IDR. ${formatNumber(payment.value)}%0A%0A*DETAIL:*${detail}%0A%0A%0ATtd,%0A%0A%0A*${organization.name}*`;
 
 		let whatsapp = `${waLink}?phone=${phone}&text=${message}`
 
@@ -80,7 +79,7 @@ export default function ShowStaff({
   return (
     <>
       <Head
-				title={`Rincian Gaji Bulanan Staf ${contact.name} (${contact.staff.no_ref})`}
+				title={`Rincian Gaji Bulanan Staf ${contact.name} (${contact.staff.no_ref ?? '-'})`}
 			/>
 
 			<div className='sm:pt-0 pb-16 pt-12'>
@@ -90,7 +89,7 @@ export default function ShowStaff({
 						<div className='px-3 my-auto flex gap-3'>
 						</div>
 						<div className='text-end px-3 hidden sm:block space-x-5'>
-							<SecondaryButton onClick={handleSendWA}>
+							<SecondaryButton onClick={handleSendWA} disabled={!contact.phone}>
 								<div className='flex gap-2'>
 									<div className='my-auto'>
 										<FaWhatsapp/>
@@ -167,15 +166,11 @@ export default function ShowStaff({
 
               <div className='w-full space-y-2 mt-2 pt-3 border-t border-slate-900'>
 								<div className='flex'>
-									<div className='w-1/4'>No Ref</div>
-									<div className='w-3/4'>: {payment.no_ref}</div>
-								</div>
-								<div className='flex'>
 									<div className='w-1/4'>Tanggal</div>
 									<div className='w-3/4'>: { dayjs(payment.date).locale('id').format('DD MMMM YYYY') }</div>
 								</div>
 								<div className='flex'>
-									<div className='w-1/4'>Bulan</div>
+									<div className='w-1/4'>Bulan (Tahun)</div>
 									<div className='w-3/4'>: {payment.month} ({ payment.study_year })</div>
 								</div>
 								<div className='flex'>
@@ -185,7 +180,7 @@ export default function ShowStaff({
 							</div>
 
               {/* Data */}
-							<table className='mt-5 w-full table text-base'>
+							<table className='mt-5 w-full table text-sm'>
 								<thead className='text-base text-gray-900'>
 									<tr>
 										<th className='text-start'>Kategori</th>
@@ -196,7 +191,7 @@ export default function ShowStaff({
 								</thead>
                 <tbody>
                   {
-                    detail.map(d => (d.total > 0) && <tr>
+                    detailPlus.map(d => <tr key={d.id}>
                       <td className='text-start'>
                         {d.name}
                       </td>
@@ -217,6 +212,33 @@ export default function ShowStaff({
                       </td>
                     </tr>)
                   }
+									{
+										detailMinus.length > 0 && <tr>
+											<th className='text-start text-red-500' colSpan={4}>Potongan:</th>
+										</tr>
+									}
+									{
+										detailMinus.map(d => <tr key={d.id}>
+                      <td className='text-start'>
+                        {d.name}
+                      </td>
+                      <td className='text-end'>
+                        {
+                          d.unit ? `${d.qty} ${d.unit}` : ''
+                        }
+                      </td>
+                      <td className='text-end'>
+                        {
+                          `IDR. ${formatNumber(d.total / d.qty)}`
+                        }
+                      </td>
+                      <td className='text-end'>
+                        {
+                          `IDR. ${formatNumber(d.total)}`
+                        }
+                      </td>
+                    </tr>)
+									}
                 </tbody>
                 <tfoot className='text-base text-gray-900'>
 									<tr>
