@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\SalaryCategory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class StaffSalaryPaymentDetail extends Model
 {
@@ -18,4 +20,9 @@ class StaffSalaryPaymentDetail extends Model
         'value',
         'qty'
     ];
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(SalaryCategory::class);
+    }
 }

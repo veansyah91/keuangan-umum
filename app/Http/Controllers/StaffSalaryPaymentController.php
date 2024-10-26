@@ -360,7 +360,9 @@ class StaffSalaryPaymentController extends Controller
 			return abort(404);
 		}
 
-		$payment['details'] = StaffSalaryPaymentDetail::where('payment_id', $id)->where('contact_id', $staff)->get();		
+		$payment['details'] = StaffSalaryPaymentDetail::where('payment_id', $id)
+																										->where('contact_id', $staff)
+																										->get();		
 
 		$user = Auth::user();
 		
@@ -375,12 +377,33 @@ class StaffSalaryPaymentController extends Controller
 			'payment' => $payment,
 			'contact' => $contact,
 			'user' => $user,
-
 		]);
 	}
 
 	public function print(Request $request, Organization $organization, StaffSalaryPayment $payment)
 	{
-		dd( $payment);
+		$user = Auth::user();
+
+		$details = [];
+		$contacts = Contact::whereHas('staff')
+												->where('organization_id', $organization['id'])
+												->orderBy('name')
+												->get();
+
+		foreach ($contacts as $key => $contact) {
+			$tempDetail = StaffSalaryPaymentDetail::wherePaymentId($payment['id'])
+																				->whereContactId($contact['id'])
+																				->with('category')
+																				->get();
+			$details[$key] = $tempDetail;
+		}
+
+		return Inertia::render('StaffSalaryPayment/Print',[
+			'organization' => $organization,
+			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+			'payment' => $payment,
+			'details' => $details,
+			'user' => $user,
+		]);
 	}
 }
