@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -19,16 +19,38 @@ import StaffSalaryPaymentDetailMobile from './Components/StaffSalaryPaymentDetai
 import StaffSalaryPaymentDetailDesktop from './Components/StaffSalaryPaymentDetailDesktop';
 import { FaPrint } from 'react-icons/fa';
 import formatNumber from '@/Utils/formatNumber';
+import { usePrevious } from 'react-use';
+import { useDebounce } from 'use-debounce';
 // import StaffSalaryPaymentDetailDesktop from './Components/StaffSalaryPaymentDetailDesktop';
 
 export default function Show({ role, organization, details, payment, searchFilter, flash }) {
 	const [search, setSearch] = useState(searchFilter || '');	
 
+	const prevSearch = usePrevious(search);
+	const [debounceValue] = useDebounce(search, 500);
+
+	// useState
+	useEffect(() => {
+		if (prevSearch !== undefined) {
+			handleReloadPage();
+		}
+	}, [debounceValue]);
+
 	useEffect(() => {
 		flash?.success && toast.success(flash.success, {
 			position: toast.POSITION.TOP_CENTER,
 		});
-	},[])
+	},[]);
+
+	const handleReloadPage = () => {
+		router.reload({
+			only: ['details'],
+			data: {
+				search,
+			},
+			preserveState: true,
+		});
+	};
   
   return (
     <>
@@ -118,9 +140,14 @@ export default function Show({ role, organization, details, payment, searchFilte
 						{/* )} */}
 					</div>
           <div className='my-auto w-4/12 flex gap-5 justify-end'>
-						<button className='py-3 px-3 border rounded-lg h-full' onClick={() => setShowModalFilter(true)}>
+						<Link className='py-3 px-3 border rounded-lg h-full' 
+									href={route('cashflow.staff-salary-payment.staff.print', {
+													organization: organization.id,
+													payment: payment.id,
+												}
+						)}>
 								<FaPrint />
-						</button>	
+						</Link>	
 					</div>
 					<div className='w-3/12 border flex rounded-lg'>
 						<label htmlFor='search-input' className='my-auto ml-2'>

@@ -232,6 +232,10 @@ class StaffSalaryPaymentController extends Controller
 
 		$details = StaffSalaryPaymentDetail::join('contacts', 's_salary_payment_details.contact_id', '=', 'contacts.id')
 																				->join('contact_staff', 's_salary_payment_details.contact_id', '=', 'contact_staff.contact_id')
+																				->when(request('search') ?? false, function ($query, $search) {
+																					return $query->where('contacts.name', 'like', '%'.$search.'%')
+																												->orWhere('contact_staff.no_ref', 'like', '%'.$search.'%');
+																				})
 																				->where('s_salary_payment_details.payment_id', $id)
 																				->select('s_salary_payment_details.contact_id', 'contacts.name', 'contact_staff.position', 'contact_staff.no_ref',DB::raw('SUM(value) as total'))
 																				->groupBy('s_salary_payment_details.contact_id','contact_staff.position', 'contact_staff.no_ref')
@@ -373,5 +377,10 @@ class StaffSalaryPaymentController extends Controller
 			'user' => $user,
 
 		]);
+	}
+
+	public function print(Request $request, Organization $organization, StaffSalaryPayment $payment)
+	{
+		dd( $payment);
 	}
 }

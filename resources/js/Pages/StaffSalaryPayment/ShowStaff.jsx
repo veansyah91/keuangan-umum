@@ -1,19 +1,11 @@
 import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link, useForm } from '@inertiajs/react';
-
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { Head, Link } from '@inertiajs/react';
 
 import { IoArrowBackOutline } from 'react-icons/io5';
-import InputLabel from '@/Components/InputLabel';
 import formatNumber from '@/Utils/formatNumber';
-import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
-import TextInput from '@/Components/TextInput';
-import { NumericFormat } from 'react-number-format';
-import FormInput from '@/Components/FormInput';
 import { FaPrint, FaWhatsapp } from 'react-icons/fa';
 import dayjs from 'dayjs';
 
@@ -50,26 +42,28 @@ export default function ShowStaff({
 		// cek format contact phone
 		let phone = contact.phone;		
 
-		if (!phone) {
-			toast.error(`No Handphone ${contact.name} tidak ditemukan`, {
-				position: toast.POSITION.TOP_CENTER,
-			});
-			return
-		}
-
 		if (phone[0] !== '6' && phone[1] !== '2') {
 			phone = '62' + phone;
 		}
 
 		let detail = '';
 
-		detailPlus.forEach((r, index) => {
-			detail += `%0A${index+1}. ${r.name} : IDR ${formatNumber(r.pivot.value)}`;
+		detailPlus.forEach((d, index) => {
+			let unit = d.unit ? `${ d.qty } ${ d.unit } x IDR. ${ formatNumber(d.total/d.qty) } = ` : '';
+			detail += `%0A${index+1}. ${d.name} : IDR. ${ unit } ${formatNumber(d.total)}`;
 		});
 
-		detail += `%0A*Total: ${ formatNumber(payment.value) }*`
+		if (detailMinus.length > 0) {
+			detail += '%0A*Potongan*';
+			detailMinus.forEach((d, index) => {
+				let unit = d.unit ? `${ d.qty } ${ d.unit } x IDR. ${ formatNumber(d.total/d.qty) } = ` : '';
+				detail += `%0A${index+1}. ${d.name} : IDR. ${ unit } ${formatNumber(d.total)}`;
+			});
+		}
+
+		detail += `%0A*Total: ${ formatNumber(payment.details.reduce((acc, detail) => acc + detail.value, 0)) }*`
 		
-		let message = `*PEMBAYARAN GAJI BULANAN*%0A-------------------------------------------------------%0A*Nama*: ${contact.name}%0A*No. Siswa*: ${contact.staff.no_ref ?? '-'}%0A*Tahun Masuk*: ${contact.staff.entry_year}%0A-------------------------------------------------------%0ATanggal*: ${dayjs(payment.date).locale('id').format('DD MMMM YYYY')}%0A*Bulan*: ${payment.month} (${payment.study_year})%0A*Total*: IDR. ${formatNumber(payment.value)}%0A%0A*DETAIL:*${detail}%0A%0A%0ATtd,%0A%0A%0A*${organization.name}*`;
+		let message = `*PEMBAYARAN GAJI BULANAN*%0A-------------------------------------------------------%0A*Nama*: ${contact.name}%0A*No. Siswa*: ${contact.staff.no_ref ?? '-'}%0A*Tahun Masuk*: ${contact.staff.entry_year}%0A-------------------------------------------------------%0ATanggal*: ${dayjs(payment.date).locale('id').format('DD MMMM YYYY')}%0A*Bulan*: ${payment.month} (${payment.study_year})%0A*Total*: IDR. ${formatNumber(payment.details.reduce((acc, detail) => acc + detail.value, 0))}%0A%0A*DETAIL:*${detail}%0A%0A%0ATtd,%0A%0A%0A*${organization.name}*`;
 
 		let whatsapp = `${waLink}?phone=${phone}&text=${message}`
 
