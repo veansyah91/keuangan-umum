@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -17,18 +17,106 @@ import ContentMobile from '@/Components/Mobiles/ContentMobile';
 import ContentDesktop from '@/Components/Desktop/ContentDesktop';
 import StaffSalaryPaymentMobile from './Components/StaffSalaryPaymentMobile';
 import StaffSalaryPaymentDesktop from './Components/StaffSalaryPaymentDesktop';
+import Modal from '@/Components/Modal';
+import SecondaryButton from '@/Components/SecondaryButton';
+import InputLabel from '@/Components/InputLabel';
+import TextInput from '@/Components/TextInput';
+import Datepicker from 'react-tailwindcss-datepicker';
+import { usePrevious } from 'react-use';
+import { useDebounce } from 'use-debounce';
+import dayjs from 'dayjs';
+import { NumericFormat } from 'react-number-format';
+import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 
+const monthList = () => {
+  let monthListTemp = [];
+
+  for (let index = 7; index < 13; index++) {
+    monthListTemp = [
+      ...monthListTemp, index
+    ];
+  }
+
+  for (let index = 1; index < 7; index++) {
+    monthListTemp = [
+      ...monthListTemp, index
+    ];
+  }
+  return monthListTemp;
+}
+
+const yearList = () => {
+	const now = dayjs().format('YYYY');
+
+	let arrayYear = [];
+
+	for (let index = 0; index < 15; index++) {
+		arrayYear = [...arrayYear, now - index];		
+	}
+
+	return arrayYear;
+}
 
 export default function Index({
   role, organization, payments, searchFilter, flash
 }) {
+	
 	const [search, setSearch] = useState(searchFilter || '');	
+	const [showEdit, setShowEdit] = useState(false);
+
+	const { data, setData, reset, processing, errors } = useForm({
+		id: null,
+		date: '',
+		no_ref: '',
+		bulan: '',
+		tahun: ''
+	});
+
+	const [dateValue, setDateValue] = useState({
+		startDate: '',
+		endDate: '',
+	});	
+
+	const [debounceDateValue] = useDebounce(dateValue, 500);
+
+	const prevDate = usePrevious(dateValue);
+
+	const [refDate, setRefDate] = useState('');
 
 	useEffect(() => {
 		flash?.success && toast.success(flash.success, {
 			position: toast.POSITION.TOP_CENTER,
 		});
 	},[]);
+
+	const handelEdit = (dataEdit) => {
+		setDateValue({
+			startDate: dataEdit.date,
+			endDate: dataEdit.date,
+		});
+		setData({
+			id: dataEdit.id,
+			date: dataEdit.date,
+			no_ref: dataEdit.no_ref,
+			month: dataEdit.month,
+			study_year: dataEdit.study_year
+		});
+		setShowEdit(true);
+	}
+
+	const handleDateValueChange = (newValue) => {
+		setDateValue(newValue);
+		setData('date', dayjs(newValue.startDate).format('YYYY-MM-DD'));
+	};
+
+	const closeShowEdit = () => {
+		setShowEdit(false);
+		reset();
+	}
+
+	const submitEdit = () => {
+
+	}
 
   return (
     <>
@@ -200,6 +288,7 @@ export default function Index({
 											payment={payment}
 											className={`${index % 2 == 0 && 'bg-gray-100'} text-sm`}
 											role={role}
+											handelEdit={handelEdit}
 										/>
 									))}
 								</tbody>
@@ -208,6 +297,159 @@ export default function Index({
 					</div>
 				</div>
       </ContainerDesktop>
+
+			{/* Modal */}
+			<Modal show={showEdit} onClose={closeShowEdit}>
+				<form onSubmit={submitEdit} className='p-6' id='filter' name='filter'>
+					<h2 className='text-lg font-medium text-gray-900'>Ubah Pembayaran</h2>
+					<div className='mt-6 '>
+						<div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
+							<div className='w-full sm:w-1/3 my-auto'>
+								<InputLabel
+									value={'No. Ref'}
+									htmlFor='id'
+									className=' mx-auto my-auto'
+								/>
+							</div>
+
+							<div className='w-full sm:w-2/3'>
+								<TextInput
+									id='no_ref'
+									name='no_ref'
+									className={`w-full`}
+									placeholder='No Ref'
+									value={data.no_ref || ''}
+									disabled
+								/>
+								{errors?.no_ref && <span className='text-red-500 text-xs'>{errors.no_ref}</span>}
+							</div>
+						</div>
+						<div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
+							<div className='w-full sm:w-1/3 my-auto'>
+								<InputLabel
+									value={'Tanggal'}
+									htmlFor='id'
+									className=' mx-auto my-auto'
+								/>
+							</div>
+
+							<div className='w-full sm:w-2/3'>
+								<Datepicker
+										value={dateValue}
+										onChange={handleDateValueChange}
+										inputClassName={errors?.date && 'border-red-500 rounded-lg'}
+										useRange={false}
+										asSingle={true}
+										placeholder='Tanggal'
+										id='date'
+										displayFormat='MMMM DD, YYYY'
+								/>
+								{errors?.date && <span className='text-red-500 text-xs'>{errors.date}</span>}
+							</div>
+						</div>
+						<div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
+							<div className='w-full sm:w-1/3 my-auto'>
+								<InputLabel
+									value={'Tahun Ajaran'}
+									htmlFor='id'
+									className=' mx-auto my-auto'
+								/>
+							</div>
+
+							<div className='w-full sm:w-2/3'>
+								<select 
+									className="select select-bordered w-full" 
+									value={data.study_year} 
+									onChange={e => setData('study_year', e.target.value)} 
+									id='study_year'
+								>
+									{
+										yearList().map(year =>
+											<option>{year}</option>
+										)
+									}
+								</select>
+								{errors?.study_year && <span className='text-red-500 text-xs'>{errors.study_year}</span>}
+							</div>
+						</div>
+						<div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
+							<div className='w-full sm:w-1/3 my-auto'>
+								<InputLabel
+									value={'Bulan'}
+									htmlFor='id'
+									className=' mx-auto my-auto'
+								/>
+							</div>
+
+							<div className='w-full sm:w-2/3'>
+								<select 
+									className="select select-bordered w-full" 
+									value={data.month} 
+									onChange={e => setData('month', e.target.value)} 
+									id='month'
+								>
+									{
+										monthList().map((month, index) => 
+											<option 
+												key={index} 
+											>{month}</option>
+										)
+									}
+								</select>
+								{errors?.month && <span className='text-red-500 text-xs'>{errors.month}</span>}
+							</div>
+						</div>
+						<div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
+							<div className='w-full sm:w-1/3 my-auto'>
+								<InputLabel
+									value={'Total'}
+									htmlFor='id'
+									className=' mx-auto my-auto'
+								/>
+							</div>
+
+							<div className='w-full sm:w-2/3'>
+								<NumericFormat
+										value={data.value}
+										customInput={TextInput}
+										thousandSeparator={true}
+										className={`text-end w-full`}
+										prefix={'IDR. '}
+										disabled='disabled'
+								/>
+								{errors?.value && <span className='text-red-500 text-xs'>{errors.value}</span>}
+							</div>
+						</div>
+						<div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
+							<div className='w-full sm:w-1/3 my-auto'>
+								<InputLabel
+									value={'Akun Kas'}
+									htmlFor='id'
+									className=' mx-auto my-auto'
+								/>
+							</div>
+
+							<div className='w-full sm:w-2/3'>
+								<ClientSelectInput
+										resources={cashAccounts}
+										selected={selectedCashAccount}
+										setSelected={(selected) => handleSelectedCashAccount(selected)}
+										maxHeight='max-h-40'
+										placeholder='Cari Akun'
+										isError={errors.cash_account_id ? true : false}
+										id='cash_account'
+										notFound={<span>Tidak Ada Data. <Link className='font-bold text-blue-600' href={route('data-ledger.account', {organization:organization.id})}>Buat Baru ?</Link></span>}
+								/>
+							</div>
+						</div>
+					</div>
+					<div className='mt-6 flex justify-end'>
+						<SecondaryButton onClick={closeShowEdit}>Batal</SecondaryButton>
+
+						<PrimaryButton className='ms-3' disabled={processing}>Ubah</PrimaryButton>
+					</div>
+				</form>
+			</Modal>
     </>
   )
 }

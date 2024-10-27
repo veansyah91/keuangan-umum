@@ -6,7 +6,7 @@ import React from 'react';
 import { IoCreateOutline, IoEllipsisVertical, IoSearchOutline, IoTrash } from 'react-icons/io5';
 import { LiaFileInvoiceSolid } from 'react-icons/lia';
 
-export default function StaffSalaryPaymentDesktop({ payment, className, role }) {
+export default function StaffSalaryPaymentDesktop({ payment, className, role, handelEdit }) {
 	return (
 		<>
 			<tr className={className}>
@@ -34,6 +34,12 @@ export default function StaffSalaryPaymentDesktop({ payment, className, role }) 
 												<LiaFileInvoiceSolid />
 													Detail 
 											</Link>
+										</li>
+										<li>
+											<button onClick={() => handelEdit(payment)}>
+												<IoCreateOutline />
+													Ubah 
+											</button>
 										</li>
 									</ul>
 							</div>
