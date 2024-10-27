@@ -384,7 +384,7 @@ class StaffSalaryPaymentController extends Controller
 	{
 		$user = Auth::user();
 
-		$details = [];
+		$payments = [];
 		$contacts = Contact::whereHas('staff')
 												->where('organization_id', $organization['id'])
 												->orderBy('name')
@@ -395,14 +395,16 @@ class StaffSalaryPaymentController extends Controller
 																				->whereContactId($contact['id'])
 																				->with('category')
 																				->get();
-			$details[$key] = $tempDetail;
+			$payments[$key] = $contact;
+			$payments[$key]['value'] = $tempDetail->sum('value');
+			$payments[$key]['categories'] = $tempDetail;
 		}
 
 		return Inertia::render('StaffSalaryPayment/Print',[
 			'organization' => $organization,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'payment' => $payment,
-			'details' => $details,
+			'payments' => $payments,
 			'user' => $user,
 		]);
 	}

@@ -17,11 +17,12 @@ import FormInput from '@/Components/FormInput';
 import { FaPrint, FaWhatsapp } from 'react-icons/fa';
 import dayjs from 'dayjs';
 export default function Print({
-	organization, payment, details, user
+	organization, payment, details, user, payments
 }) {
 	const handlePrint = () => {
 		window.print();
 	};
+	
   return (
     <>
 			<Head
@@ -89,26 +90,38 @@ export default function Print({
 							</div>
 
               {/* Data */}
-							<table className='mt-5 w-full table'>
-                <tbody>
-									<tr className='font-bold'>
-										<td>1</td>
-										<td colSpan={4}>Qodirul</td>
-										<td className='text-end'>1400</td>
-									</tr>
-									<tr className='text-sm'>
-										<td></td>
-										<td>Jam Mengajar</td>
-										<td>130 Jam</td>
-										<td>x</td>
-										<td className='text-end'>IDR. 3.000</td>
-										<td className='text-end'>IDR. 390.000</td>
-									</tr>
-                </tbody>
-                <tfoot className='text-base text-gray-900'>
-									
-								</tfoot>
-              </table>
+							<div className='mt-5 overflow-x-auto'>
+								<div className='md:w-full space-y-5'>
+								{
+									payments.map((payment, index) => 
+										<div key={index}>
+											<div className='flex font-bold w-full'>
+												<div className='w-1/12'>{ index+1 }</div>
+												<div className='w-4/12'>{ payment.name }</div>
+												<div className='w-7/12 text-end'>IDR. { formatNumber(payment.value) }</div>
+											</div>
+											{
+												payment.categories.map((category, index) => <div>
+														<div className={`flex space-x-3 text-sm ${ category.category.is_cut ? 'text-red-600' : '' } ${index % 2 === 0 ? 'bg-slate-100' : ''}`} key={category.id}>
+															<div className='w-1/12'></div>
+															<div className='w-4/12'>{ category.category.name }</div>
+															<div className='w-3/12 text-end'>
+															{ 
+																category.category.has_hour 
+																? `IDR. ${ category.value === 0 ? 0 : formatNumber(category.value / category.qty)} x ${category.qty} ${category.category.unit}`
+																: '' 
+															}
+															</div>
+															<div className='w-4/12 text-end'>IDR. { formatNumber(category.value) }</div>
+													</div>
+												</div>
+												)
+											}
+										</div>
+									)
+								}
+								</div>
+							</div>
 
               {/* Footer */}
 							<div className='mt-20 w-full hidden justify-end print:flex'>

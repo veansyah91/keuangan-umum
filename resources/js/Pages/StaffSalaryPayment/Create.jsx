@@ -81,7 +81,7 @@ const dataDetails = (contacts, categories) => {
 export default function Create({
   organization, categories, newRef, date, cashAccounts, contacts, history
 }) {	
-  const { data, setData, post, errors } = useForm({
+  const { data, setData, post, errors, processing } = useForm({
     value: 0,
     organization_id : organization.id,
     no_ref: newRef,
@@ -95,10 +95,7 @@ export default function Create({
 	const [dateValue, setDateValue] = useState({
 		startDate: date,
 		endDate: date,
-	});	
-
-	
-	
+	});		
 
 	const [selectedContact, setSelectedContact] = useState({ id: null, name: '', position: '', no_ref:'' });
 	const [contactForm, setContactForm] = useState({});
@@ -680,7 +677,7 @@ export default function Create({
 					<div className='mt-6 flex justify-end'>
 						<SecondaryButton onClick={() => setShowModal(false)}>Batal</SecondaryButton>
 
-						<PrimaryButton className='ms-3'>Simpan</PrimaryButton>
+						<PrimaryButton className='ms-3' disabled={processing}>Simpan</PrimaryButton>
 					</div>
 				</form>
 			</Modal>
