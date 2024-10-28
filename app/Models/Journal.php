@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Journal extends Model
 {
@@ -28,6 +29,11 @@ class Journal extends Model
     public function ledgers(): HasMany
     {
         return $this->hasMany(Ledger::class);
+    }
+
+    public function ledger(): HasOne
+    {
+        return $this->hasOne(Ledger::class);
     }
 
     public function user(): BelongsTo

@@ -1,19 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 
-import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { IoArrowBackOutline } from 'react-icons/io5';
-import InputLabel from '@/Components/InputLabel';
 import formatNumber from '@/Utils/formatNumber';
-import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
-import TextInput from '@/Components/TextInput';
-import { NumericFormat } from 'react-number-format';
-import FormInput from '@/Components/FormInput';
 import { FaPrint, FaWhatsapp } from 'react-icons/fa';
 import dayjs from 'dayjs';
 
@@ -35,8 +29,8 @@ const Category = ({category, index}) => {
 }
 
 export default function Print({
-	organization, payment, details, user, payments
-}) {
+	organization, payment, user, payments
+}) {	
 	const handlePrint = () => {
 		window.print();
 	};
@@ -115,7 +109,7 @@ export default function Print({
 										<div key={index}>
 											<div className='flex font-bold w-full'>
 												<div className='w-1/12'>{ index+1 }</div>
-												<div className='w-4/12'>{ payment.name }</div>
+												<div className='w-4/12'>{ payment.name } ({ payment.staff.position })</div>
 												<div className='w-7/12 text-end'>IDR. { formatNumber(payment.value) }</div>
 											</div>
 											{
