@@ -481,7 +481,7 @@ export default function Index({
 											<option 
 												key={index} 
 											>{month}</option>
-										)
+										)	
 									}
 								</select>
 								{errors?.month && <span className='text-red-500 text-xs'>{errors.month}</span>}
