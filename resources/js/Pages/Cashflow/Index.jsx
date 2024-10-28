@@ -82,7 +82,23 @@ export default function Index({ organization }) {
 							</Link>
 						</div>
 					</section>  
-				</section>					
+				</section>	
+				<section className='text-center font-bold'>
+					<section className='pt-2 pb-10 space-y-3'>
+						<div className='text-center font-bold'>
+							Staff
+						</div>
+						<div className='flex justify-center gap-6'>
+							<Link href={route('cashflow.staff-salary-payment', organization.id)}>
+								<CardMenu 
+									bgColor={'bg-green-500'} 
+									icon={<LiaMoneyBillWaveSolid />} 
+									title={'Pembayaran Gaji Bulanan'} 
+								/>
+							</Link>
+						</div>
+					</section>  
+				</section>				
 			</ContainerDesktop>
 			{/* Desktop */}
 
