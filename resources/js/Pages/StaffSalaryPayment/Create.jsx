@@ -126,7 +126,7 @@ export default function Create({
 		router.reload({
 			only: ['newRef'],
 			data: {
-				date: dateValue.startDate,
+				date: dayjs(dateValue.startDate).format('YYYY-MM-DD'),
 			},
 			onSuccess: (page) => {
 				setData('no_ref', page.props.newRef);
@@ -540,7 +540,7 @@ export default function Create({
 							<div className='w-full sm:w-1/3 my-auto'>
 								<InputLabel
 									value={'No. Ref'}
-									htmlFor='id'
+									htmlFor='study_year'
 									className=' mx-auto my-auto'
 								/>
 							</div>
@@ -561,7 +561,7 @@ export default function Create({
 							<div className='w-full sm:w-1/3 my-auto'>
 								<InputLabel
 									value={'Tanggal'}
-									htmlFor='id'
+									htmlFor='study_year'
 									className=' mx-auto my-auto'
 								/>
 							</div>
@@ -584,7 +584,7 @@ export default function Create({
 							<div className='w-full sm:w-1/3 my-auto'>
 								<InputLabel
 									value={'Tahun Ajaran'}
-									htmlFor='id'
+									htmlFor='study_year'
 									className=' mx-auto my-auto'
 								/>
 							</div>
@@ -606,7 +606,7 @@ export default function Create({
 							<div className='w-full sm:w-1/3 my-auto'>
 								<InputLabel
 									value={'Bulan'}
-									htmlFor='id'
+									htmlFor='month'
 									className=' mx-auto my-auto'
 								/>
 							</div>
@@ -633,7 +633,7 @@ export default function Create({
 							<div className='w-full sm:w-1/3 my-auto'>
 								<InputLabel
 									value={'Total'}
-									htmlFor='id'
+									htmlFor='total'
 									className=' mx-auto my-auto'
 								/>
 							</div>
@@ -646,6 +646,7 @@ export default function Create({
 										className={`text-end w-full`}
 										prefix={'IDR. '}
 										disabled='disabled'
+										id='total'
 								/>
 								{errors?.value && <span className='text-red-500 text-xs'>{errors.value}</span>}
 							</div>
@@ -654,7 +655,7 @@ export default function Create({
 							<div className='w-full sm:w-1/3 my-auto'>
 								<InputLabel
 									value={'Akun Kas'}
-									htmlFor='id'
+									htmlFor='cash_account'
 									className=' mx-auto my-auto'
 								/>
 							</div>

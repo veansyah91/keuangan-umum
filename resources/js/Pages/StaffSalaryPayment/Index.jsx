@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -58,9 +58,8 @@ const yearList = () => {
 }
 
 export default function Index({
-  role, organization, payments, searchFilter, flash
-}) {
-	
+  role, organization, payments, searchFilter, flash, cashAccounts
+}) {	
 	const [search, setSearch] = useState(searchFilter || '');	
 	const [showEdit, setShowEdit] = useState(false);
 
@@ -69,7 +68,17 @@ export default function Index({
 		date: '',
 		no_ref: '',
 		bulan: '',
-		tahun: ''
+		tahun: '',
+		value: 0
+	});
+
+	const [selectedEditData, setSeletedEditData] = useState({
+		id: null,
+		date: '',
+		no_ref: '',
+		bulan: '',
+		tahun: '',
+		value: 0
 	});
 
 	const [dateValue, setDateValue] = useState({
@@ -77,17 +86,35 @@ export default function Index({
 		endDate: '',
 	});	
 
+	const [selectedCashAccount, setSelectedCashAccount] = useState({ id: null, name: '', code: '', is_cash: true });
+
 	const [debounceDateValue] = useDebounce(dateValue, 500);
 
 	const prevDate = usePrevious(dateValue);
-
-	const [refDate, setRefDate] = useState('');
 
 	useEffect(() => {
 		flash?.success && toast.success(flash.success, {
 			position: toast.POSITION.TOP_CENTER,
 		});
 	},[]);
+
+	// useEffect(() => {
+	// 	if (prevDate !== undefined) {
+	// 		reloadNewRef();
+	// 	}
+	// }, [debounceDateValue]);
+
+	const reloadNewRef = (newValue) => {
+		router.reload({
+			only: ['newRef'],
+			data: {
+				date: dayjs(newValue.startDate).format('YYYY-MM-DD'),
+			},
+			onSuccess: (page) => {
+				setData('no_ref', page.props.newRef);
+			},
+		});
+	};
 
 	const handelEdit = (dataEdit) => {
 		setDateValue({
@@ -99,18 +126,29 @@ export default function Index({
 			date: dataEdit.date,
 			no_ref: dataEdit.no_ref,
 			month: dataEdit.month,
-			study_year: dataEdit.study_year
+			study_year: dataEdit.study_year,
+			value: dataEdit.value
+		});
+		setSeletedEditData({
+			id: dataEdit.id,
+			date: dataEdit.date,
+			no_ref: dataEdit.no_ref,
+			month: dataEdit.month,
+			study_year: dataEdit.study_year,
+			value: dataEdit.value
 		});
 		setShowEdit(true);
+		setSelectedCashAccount({ id: dataEdit.journal.ledger.account.id, name: dataEdit.journal.ledger.account.name, code: dataEdit.journal.ledger.account.code, is_cash: true });
 	}
 
 	const handleDateValueChange = (newValue) => {
-		setDateValue(newValue);
+		setDateValue(newValue);		
 		setData('date', dayjs(newValue.startDate).format('YYYY-MM-DD'));
 	};
 
 	const closeShowEdit = () => {
 		setShowEdit(false);
+		setSelectedCashAccount({ id: null, name: '', code: '', is_cash: true });
 		reset();
 	}
 
@@ -307,7 +345,7 @@ export default function Index({
 							<div className='w-full sm:w-1/3 my-auto'>
 								<InputLabel
 									value={'No. Ref'}
-									htmlFor='id'
+									htmlFor='no_ref'
 									className=' mx-auto my-auto'
 								/>
 							</div>
@@ -328,7 +366,7 @@ export default function Index({
 							<div className='w-full sm:w-1/3 my-auto'>
 								<InputLabel
 									value={'Tanggal'}
-									htmlFor='id'
+									htmlFor='date'
 									className=' mx-auto my-auto'
 								/>
 							</div>
@@ -351,7 +389,7 @@ export default function Index({
 							<div className='w-full sm:w-1/3 my-auto'>
 								<InputLabel
 									value={'Tahun Ajaran'}
-									htmlFor='id'
+									htmlFor='study_year'
 									className=' mx-auto my-auto'
 								/>
 							</div>
@@ -365,7 +403,7 @@ export default function Index({
 								>
 									{
 										yearList().map(year =>
-											<option>{year}</option>
+											<option key={year}>{year}</option>
 										)
 									}
 								</select>
@@ -376,7 +414,7 @@ export default function Index({
 							<div className='w-full sm:w-1/3 my-auto'>
 								<InputLabel
 									value={'Bulan'}
-									htmlFor='id'
+									htmlFor='month'
 									className=' mx-auto my-auto'
 								/>
 							</div>
@@ -403,7 +441,7 @@ export default function Index({
 							<div className='w-full sm:w-1/3 my-auto'>
 								<InputLabel
 									value={'Total'}
-									htmlFor='id'
+									htmlFor='total'
 									className=' mx-auto my-auto'
 								/>
 							</div>
@@ -416,6 +454,7 @@ export default function Index({
 										className={`text-end w-full`}
 										prefix={'IDR. '}
 										disabled='disabled'
+										id='total'
 								/>
 								{errors?.value && <span className='text-red-500 text-xs'>{errors.value}</span>}
 							</div>
@@ -424,7 +463,7 @@ export default function Index({
 							<div className='w-full sm:w-1/3 my-auto'>
 								<InputLabel
 									value={'Akun Kas'}
-									htmlFor='id'
+									htmlFor='cash_account'
 									className=' mx-auto my-auto'
 								/>
 							</div>

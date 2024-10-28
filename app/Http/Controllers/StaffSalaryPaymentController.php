@@ -80,7 +80,15 @@ class StaffSalaryPaymentController extends Controller
 		return Inertia::render('StaffSalaryPayment/Index',[
 			'organization' => $organization,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+			'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),
+			'newRef' => Inertia::lazy(fn () => $this->newRef($organization, request('date'))),
 			'payments' => StaffSalaryPayment::where('organization_id', $organization['id'])
+																			->with('journal', function ($query){
+																				return $query->with('ledger', function ($query){
+																					return $query->with('account')
+																											->where('debit', '>', 0);
+																				});
+																			})
 																			->orderBy('date', 'desc')
 																			->paginate(50)->withQueryString(),
 		]);
