@@ -230,6 +230,60 @@ class StaffSalaryPaymentController extends Controller
 		return redirect(route('cashflow.staff-salary-payment', $organization['id']))->with('success', 'Pembayaran Gaji Staff Berhasil');
 	}
 
+	public function update(Request $request, Organization $organization, StaffSalaryPayment $payment)
+	{
+		$validated = $request->validate([
+			'value' => 'numeric|required',
+			'date' => 'required|date',
+			'no_ref' => 'string|required',
+			'month' => 'required|numeric',
+			'study_year' => 'required|string',
+			'cash_account_id' => [
+				'required',
+				'exists:accounts,id'
+			],
+		]);
+
+		$validated['description'] = 'Pembayaran Gaji Staf pada Bulan: ' . $validated['month'] . ', Tahun: ' . $validated['study_year'];
+		$user = Auth::user();
+
+		DB::transaction(function() use ($payment, $organization, $validated, $user) {
+			// update payment
+			$payment->update($validated);
+
+			// update journal
+			$journal = Journal::find($payment['journal_id']);
+			$journal->update([
+				'no_ref' => $validated['no_ref'],
+				'date' => $validated['date'],
+				'description' => $validated['description'],
+			]);
+
+			// update ledger
+			$ledger = Ledger::whereJournalId($journal['id'])
+												->where('debit', '>', 0)
+												->first();
+
+			$ledger->update([
+				'date' => $validated['date'],
+				'no_ref' => $validated['no_ref'],
+				'account_id' => $validated['cash_account_id'],
+				'description' => $validated['description'],
+			]);
+
+			$log = [
+				'description' => $validated['description'],
+				'date' => $validated['date'],
+				'no_ref' => $validated['no_ref'],
+				'value' => $validated['value'],
+			];
+	
+			$this->logRepository->store($organization['id'], strtoupper($user['name']).' telah mengubah DATA pada PEMBAYARAN GAJI STAF dengan DATA : '.json_encode($log));
+		});
+
+		return redirect()->back()->with('success', 'Pembayaran Gaji Staff Berhasil Diubah');
+	}
+
 	public function show(Organization $organization, $id)
 	{
 		$payment = StaffSalaryPayment::find($id);

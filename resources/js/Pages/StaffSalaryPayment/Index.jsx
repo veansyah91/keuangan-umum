@@ -51,7 +51,7 @@ const yearList = () => {
 	let arrayYear = [];
 
 	for (let index = 0; index < 15; index++) {
-		arrayYear = [...arrayYear, now - index];		
+		arrayYear = [...arrayYear, (now - index).toString()];		
 	}
 
 	return arrayYear;
@@ -62,14 +62,21 @@ export default function Index({
 }) {	
 	const [search, setSearch] = useState(searchFilter || '');	
 	const [showEdit, setShowEdit] = useState(false);
+	// const [showFilterModal, setShowFilterModal] = useState(false);
 
-	const { data, setData, reset, processing, errors } = useForm({
+	const { data, setData, reset, processing, errors, patch, setError } = useForm({
 		id: null,
 		date: '',
 		no_ref: '',
 		bulan: '',
 		tahun: '',
-		value: 0
+		value: 0,
+		cash_account_id:''
+	});
+
+	const [dataFilter, setDataFilter] = useState({
+		month: '',
+		study_year: ''
 	});
 
 	const [selectedEditData, setSeletedEditData] = useState({
@@ -98,17 +105,22 @@ export default function Index({
 		});
 	},[]);
 
-	// useEffect(() => {
-	// 	if (prevDate !== undefined) {
-	// 		reloadNewRef();
-	// 	}
-	// }, [debounceDateValue]);
+	useEffect(() => {
+		if (prevDate !== undefined) {
+			if (dayjs(dateValue.startDate).format('MM') !== dayjs(selectedEditData.date).format('MM')) {
+				reloadNewRef();				
+			} else {
+				setData('no_ref', selectedEditData.no_ref);
+			}
+			
+		}
+	}, [debounceDateValue]);
 
-	const reloadNewRef = (newValue) => {
+	const reloadNewRef = () => {
 		router.reload({
 			only: ['newRef'],
 			data: {
-				date: dayjs(newValue.startDate).format('YYYY-MM-DD'),
+				date: dayjs(dateValue.startDate).format('YYYY-MM-DD'),
 			},
 			onSuccess: (page) => {
 				setData('no_ref', page.props.newRef);
@@ -126,16 +138,18 @@ export default function Index({
 			date: dataEdit.date,
 			no_ref: dataEdit.no_ref,
 			month: dataEdit.month,
-			study_year: dataEdit.study_year,
-			value: dataEdit.value
+			study_year: dataEdit.study_year.toString(),
+			value: dataEdit.value,
+			cash_account_id: dataEdit.journal.ledger.account.id
 		});
 		setSeletedEditData({
 			id: dataEdit.id,
 			date: dataEdit.date,
 			no_ref: dataEdit.no_ref,
 			month: dataEdit.month,
-			study_year: dataEdit.study_year,
-			value: dataEdit.value
+			study_year: dataEdit.study_year.toString(),
+			value: dataEdit.value,
+			cash_account_id: dataEdit.journal.ledger.account.id
 		});
 		setShowEdit(true);
 		setSelectedCashAccount({ id: dataEdit.journal.ledger.account.id, name: dataEdit.journal.ledger.account.name, code: dataEdit.journal.ledger.account.code, is_cash: true });
@@ -150,9 +164,45 @@ export default function Index({
 		setShowEdit(false);
 		setSelectedCashAccount({ id: null, name: '', code: '', is_cash: true });
 		reset();
+		setError('cash_account_id', '');
 	}
 
-	const submitEdit = () => {
+	const handleSelectedCashAccount = (selected) => {
+		setSelectedCashAccount({ id: selected.id, name: selected.name, code: selected.code, is_cash: true });
+		setData('cash_account_id', selected.id);
+	};
+
+	const submitEdit = (e) => {
+		e.preventDefault();
+
+		patch(route('cashflow.staff-salary-payment.update', {organization: organization.id, payment: data.id}),{
+			onSuccess: ({props}) => {
+				const { flash } = props;
+
+				toast.success(flash.success, {
+					position: toast.POSITION.TOP_CENTER,
+				});
+
+				const url = new URL(window.location);
+
+				// Hapus parameter query tertentu, misalnya 'date'
+				url.searchParams.delete('date');
+
+				// Update URL tanpa reload halaman
+				window.history.replaceState(null, '', url);
+				
+				setShowEdit(false);
+				reset();
+			},
+			onError: errors => {
+				console.log(errors);				
+			}
+		})		
+	}
+
+	const handleSubmitFilter = (e) => {
+		e.preventDefault();
+
 
 	}
 
@@ -215,7 +265,7 @@ export default function Index({
 					</>
 				}
 				data={payments}
-				hasFilter={true}
+				hasFilter={false}
 				showFilter={() => setShowModalFilter(true)}
 			/>
 			<ContentMobile>
@@ -241,9 +291,9 @@ export default function Index({
 						)}
 					</div>
           <div className='my-auto w-4/12 flex gap-5 justify-end'>
-						<button className='py-3 px-3 border rounded-lg h-full' onClick={() => setShowModalFilter(true)}>
+						{/* <button className='py-3 px-3 border rounded-lg h-full' onClick={() => setShowModalFilter(true)}>
 								<IoFilter />
-						</button>	
+						</button>	 */}
 					</div>
 					<div className='w-3/12 border flex rounded-lg'>
 						<label htmlFor='search-input' className='my-auto ml-2'>
@@ -431,7 +481,7 @@ export default function Index({
 											<option 
 												key={index} 
 											>{month}</option>
-										)
+										)	
 									}
 								</select>
 								{errors?.month && <span className='text-red-500 text-xs'>{errors.month}</span>}
@@ -489,6 +539,12 @@ export default function Index({
 					</div>
 				</form>
 			</Modal>
+
+			{/* <Modal show={showFilterModal} onClose={() => setShowFilterModal(false)}>
+				<form onSubmit={handleSubmitFilter}>
+					
+				</form>
+			</Modal> */}
     </>
   )
 }
