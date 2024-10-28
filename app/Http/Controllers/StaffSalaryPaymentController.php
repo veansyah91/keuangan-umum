@@ -230,7 +230,6 @@ class StaffSalaryPaymentController extends Controller
 		return redirect(route('cashflow.staff-salary-payment', $organization['id']))->with('success', 'Pembayaran Gaji Staff Berhasil');
 	}
 
-<<<<<<< Updated upstream
 	public function update(Request $request, Organization $organization, StaffSalaryPayment $payment)
 	{
 		$validated = $request->validate([
@@ -285,8 +284,6 @@ class StaffSalaryPaymentController extends Controller
 		return redirect()->back()->with('success', 'Pembayaran Gaji Staff Berhasil Diubah');
 	}
 
-=======
->>>>>>> Stashed changes
 	public function show(Organization $organization, $id)
 	{
 		$payment = StaffSalaryPayment::find($id);
