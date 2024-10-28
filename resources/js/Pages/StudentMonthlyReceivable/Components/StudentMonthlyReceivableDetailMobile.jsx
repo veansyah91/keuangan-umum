@@ -4,9 +4,9 @@ import formatNumber from '@/Utils/formatNumber';
 import { Link } from '@inertiajs/react';
 import dayjs from 'dayjs';
 import React from 'react';
-import { IoCreateOutline, IoEllipsisVertical, IoTrash } from 'react-icons/io5';
+import { IoCreateOutline, IoEllipsisVertical, IoSearchOutline, IoTrash } from 'react-icons/io5';
 
-export default function StudentMonthlyReceivableDetailMobile({ receivable, className, role, handleEdit, handleDelete }) {	
+export default function StudentMobile({ receivable, className, role, handleEdit, handleDelete }) {	
 	return (
 		<>
 			<div className=' text-gray-900 py-2 px-3 border flex gap-5 justify-between'>

@@ -24,8 +24,8 @@ import { usePrevious } from 'react-use';
 import StudentMonthlyReceivableDetailMobile from './Components/StudentMonthlyReceivableDetailMobile';
 import StudentMonthlyReceivableDetailDesktop from './Components/StudentMonthlyReceivableDetailDesktop';
 
-export default function Show({ role, organization, receivables, searchFilter, receivable, contact }) {
-	// State
+export default function Show({ role, organization, receivables, searchFilter, receivable }) {
+    // State
     const { errors } = usePage().props;
 
     const [showSearch, setShowSearch] = useState(false);
@@ -74,106 +74,102 @@ export default function Show({ role, organization, receivables, searchFilter, re
         setTitleDeleteModal(`Hapus Piutang ${receivable.no_ref}`);
         setShowDeleteConfirmation(true);
         setData({
-					id: receivable.id,
-					receivable: receivable.receivable_id
+            id: receivable.id,
+            receivable: receivable.receivable_id
         });
     };
 
     const handleSubmitDelete = (e) => {
-			e.preventDefault();
+        e.preventDefault();
 
-			destroy(route('cashflow.student-monthly-receivable.delete', { organization: organization.id, receivable: data.receivable ,ledger: data.id }), {
-				onSuccess: () => {
-					setShowDeleteConfirmation(false);
-					toast.success(`Piutang Berhasil Dihapus`, {
-						position: toast.POSITION.TOP_CENTER,
-					});
-					reset();
-				},
-				onError: (error) => {
-					setShowDeleteConfirmation(false);
-					toast.error(error.message, {
-						position: toast.POSITION.TOP_CENTER,
-					});
-				},
-			});
+        destroy(route('cashflow.student-monthly-receivable.delete', { organization: organization.id, receivable: data.receivable ,ledger: data.id }), {
+            onSuccess: () => {
+                setShowDeleteConfirmation(false);
+                toast.success(`Piutang Berhasil Dihapus`, {
+                    position: toast.POSITION.TOP_CENTER,
+                });
+                reset();
+            },
+            onError: (error) => {
+                setShowDeleteConfirmation(false);
+                toast.error(error.message, {
+                    position: toast.POSITION.TOP_CENTER,
+                });
+            },
+        });
     };
 
     return (
         <>
-					{/* Mobile */}
-					<Head title='Piutang Iuran Siswa' />
-					<ToastContainer />
+            {/* Mobile */}
+            <Head title='Piutang Iuran Siswa' />
+            <ToastContainer />
 
-					{role !== 'viewer' && (
-						<Link href={route('cashflow.student-monthly-receivable.create', {
-													organization: organization.id,
-													contact: contact.name,
-													selectedContact: contact.id
-						})}>
-							<AddButtonMobile label={'Tambah'} />
-						</Link>
-					)}
+            {role !== 'viewer' && (
+							<Link href={route('cashflow.student-monthly-receivable.create', organization.id)}>
+								<AddButtonMobile label={'Tambah'} />
+							</Link>
+            )}
             
-					<TitleMobile
-						zIndex={'z-50'}
-						search={search}
-						setSearch={(e) => setSearch(e.target.value)}
-						pageBefore={
-							receivables.links[0].url ? (
-								<Link
-									href={route('cashflow.student-monthly-receivable.show', {
-										organization: organization.id,
-										receivable: receivable.id,
-										page: receivables.current_page - 1,
-										search: search
-									})}
-									preserveState
-									only={['receivables']}>
-									<IoPlayBack />
-								</Link>
-							) : (
-								<div className='text-gray-300'>
-									<IoPlayBack />
-								</div>
-							)
-						}
-						pageAfter={
-							receivables.links[receivables.links.length - 1].url ? (
-								<Link
-									href={route('cashflow.student-monthly-receivable.show', {
-										organization: organization.id,
-										receivable: receivable.id,
-										page: receivables.current_page + 1,
-										search: search
-									})}
-									only={['receivables']}
-									preserveState>
-									<IoPlayForward />
-								</Link>
-							) : (
-								<div className='text-gray-300'>
-									<IoPlayForward />
-								</div>
-							)
-						}
-						page={
-							<>
-								{receivables.current_page}/{receivables.last_page}
-							</>
-						}
-						data={receivables}
-					/>
-					<ContentMobile>
-						{receivables.data.map((receivable, index) => (
-							<StudentMonthlyReceivableDetailMobile
-								key={index}
-								receivable={receivable}
-								handleDelete={() => handleDelete(receivable)}
-								role={role}
-							/>
-						))}
-					</ContentMobile>
+            <TitleMobile
+							zIndex={'z-50'}
+							search={search}
+							setSearch={(e) => setSearch(e.target.value)}
+							pageBefore={
+								receivables.links[0].url ? (
+									<Link
+										href={route('cashflow.student-monthly-receivable.show', {
+											organization: organization.id,
+											receivable: receivable.id,
+											page: receivables.current_page - 1,
+											search: search
+										})}
+										preserveState
+										only={['receivables']}>
+										<IoPlayBack />
+									</Link>
+								) : (
+									<div className='text-gray-300'>
+										<IoPlayBack />
+									</div>
+								)
+							}
+							pageAfter={
+								receivables.links[receivables.links.length - 1].url ? (
+									<Link
+										href={route('cashflow.student-monthly-receivable.show', {
+											organization: organization.id,
+											receivable: receivable.id,
+											page: receivables.current_page + 1,
+											search: search
+										})}
+										only={['receivables']}
+										preserveState>
+										<IoPlayForward />
+									</Link>
+								) : (
+									<div className='text-gray-300'>
+										<IoPlayForward />
+									</div>
+								)
+							}
+							page={
+								<>
+									{receivables.current_page}/{receivables.last_page}
+								</>
+							}
+							data={receivables}
+            />
+            <ContentMobile>
+							{receivables.data.map((receivable, index) => (
+								<StudentMonthlyReceivableDetailMobile
+									key={index}
+									receivable={receivable}
+									handleDelete={() => handleDelete(receivable)}
+									role={role}
+								/>
+							))}
+            </ContentMobile>
             {/* Mobile */}
 
             {/* Desktop */}
@@ -182,11 +178,7 @@ export default function Show({ role, organization, receivables, searchFilter, re
 								<div className='my-auto w-7/12'>
 									{role !== 'viewer' && (
 										<div className='space-x-2'>
-											<Link href={route('cashflow.student-monthly-receivable.create', {
-												organization: organization.id,
-												contact: contact.name,
-												selectedContact: contact.id
-											})}>
+											<Link href={route('cashflow.student-monthly-receivable.create', organization.id)}>
 												<PrimaryButton className='py-3'>Tambah Data</PrimaryButton>
 											</Link>
 										</div>

@@ -227,11 +227,7 @@ export default function Index({
                 pageBefore={
                     fixedAssets.links[0].url ? (
                         <Link
-                            href={route('data-master.fixed-asset', {
-                                organization: organization.id,
-                                page: fixedAssets.current_page - 1,
-                                search: search,
-                            })}
+                            href={`/data-master/${organization.id}/fixed-assets?page=${fixedAssets.current_page - 1}&search=${search}`}
                             preserveState
                             only={['fixedAssets']}>
                             <IoPlayBack />
@@ -245,11 +241,7 @@ export default function Index({
                 pageAfter={
                     fixedAssets.links[fixedAssets.links.length - 1].url ? (
                         <Link
-                            href={route('data-master.fixed-asset', {
-                                organization: organization.id,
-                                page: fixedAssets.current_page + 1,
-                                search: search,
-                            })}
+                            href={`/data-master/${organization.id}/fixed-assets?page=${fixedAssets.current_page + 1}&search=${search}`}
                             only={['fixedAssets']}
                             preserveState>
                             <IoPlayForward />
@@ -341,11 +333,7 @@ export default function Index({
                         <div className='my-auto'>
                             {fixedAssets.links[0].url ? (
                                 <Link
-                                    href={route('data-master.fixed-asset', {
-                                        organization: organization.id,
-                                        page: fixedAssets.current_page - 1,
-                                        search: search,
-                                    })}
+                                    href={`/data-master/${organization.id}/fixed-assets?page=${fixedAssets.current_page - 1}&search=${search}`}
                                     preserveState
                                     only={['fixedAssets']}>
                                     <IoPlayBack />
@@ -362,11 +350,7 @@ export default function Index({
                         <div className='my-auto'>
                             {fixedAssets.links[fixedAssets.links.length - 1].url ? (
                                 <Link
-                                    href={route('data-master.fixed-asset', {
-                                        organization: organization.id,
-                                        page: fixedAssets.current_page + 1,
-                                        search: search,
-                                    })}
+                                    href={`/data-master/${organization.id}/fixed-assets?page=${fixedAssets.current_page + 1}&search=${search}`}
                                     only={['fixedAssets']}
                                     preserveState>
                                     <IoPlayForward />

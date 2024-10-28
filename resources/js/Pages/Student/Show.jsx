@@ -9,7 +9,6 @@ import { IoArrowBackOutline } from 'react-icons/io5';
 import dayjs from 'dayjs';
 import BadgeSuccess from '@/Components/Badges/BadgeSuccess';
 import BadgeDanger from '@/Components/Badges/BadgeDanger';
-import ShowData from './Components/ShowData';
 
 export default function Show({ organization, contact, student, levels }) {
     return (
@@ -122,20 +121,26 @@ export default function Show({ organization, contact, student, levels }) {
                             Riwayat Kelas
                         </div>
                         <div className='sm:w-1/2 sm:mx-auto px-3 sm:px-0 space-y-5'>
-                            <div className='flex flex-col sm:flex-row justify-between gap-1 font-bold'>
-                                <div className='w-2/5'>Tahun Kelas</div>
-                                <div className='w-2/5'>Kelas</div>
-                                <div className='w-1/5'></div>
+                            <div className='flex flex-col sm:flex-row justify-between gap-1'>
+                                <table className='table'>
+                                    <thead>
+                                        <tr className='font-slate-900'>
+                                            <th>Tahun Ajaran</th>
+                                            <th>Kelas</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {
+                                            levels.map((level, index) =>
+                                                <tr key={index}>
+                                                    <td>{level.year}</td>
+                                                    <td>{level.level}</td>
+                                                </tr>
+                                            )
+                                        }
+                                    </tbody>
+                                </table>
                             </div>
-                            {
-                                levels.map((level, index) => 
-                                    <ShowData 
-                                        level={level}
-                                        key={index}
-                                        organizationId={contact.organization_id}
-                                    />
-                                )
-                            }
                         </div>
                     </div>
                 </div>

@@ -122,7 +122,7 @@ export default function Edit({ organization, contact, student, level }) {
                                     id='phone'
                                     name='phone'
                                     className={`w-full ${errors?.phone && 'border-red-500'}`}
-                                    placeholder='08xxxxx / 62xxxxx'
+                                    placeholder='No. Handphone'
                                     value={data.phone}
                                     onChange={(e) => setData('phone', e.target.value.toUpperCase())}
                                 />

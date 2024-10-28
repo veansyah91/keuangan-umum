@@ -75,15 +75,13 @@ export default function Edit({
     // useEffect
     useEffect(() => {
         if (prevDate !== undefined) {
-            if (dateValue.startDate) {
-                let inputDateFormatted = dayjs(dateValue.startDate);
-                let tempInputDate = `${inputDateFormatted.month() + 1}-${inputDateFormatted.year()}`;
+            let inputDateFormatted = dayjs(dateValue.startDate);
+            let tempInputDate = `${inputDateFormatted.month() + 1}-${inputDateFormatted.year()}`;
 
-                let oldDateFormatted = dayjs(cashMutation.date);
-                let tempOldDate = `${oldDateFormatted.month() + 1}-${oldDateFormatted.year()}`;
+            let oldDateFormatted = dayjs(cashMutation.date);
+            let tempOldDate = `${oldDateFormatted.month() + 1}-${oldDateFormatted.year()}`;
 
-                tempInputDate !== tempOldDate ? reloadNewRef() : setData('no_ref', cashMutation.no_ref);
-            }
+            tempInputDate !== tempOldDate ? reloadNewRef() : setData('no_ref', cashMutation.no_ref);
         }
     }, [debounceDateValue]);
 
@@ -141,7 +139,7 @@ export default function Edit({
         router.reload({
             only: ['newRef'],
             data: {
-                date: dayjs(dateValue.startDate).format('YYYY-MM-DD'),
+                date: dateValue.startDate,
             },
             onSuccess: (page) => {
                 setData('no_ref', page.props.newRef);
@@ -161,7 +159,7 @@ export default function Edit({
 
     const handleDateValueChange = (newValue) => {
         setDateValue(newValue);
-        setData('date', dayjs(newValue.startDate).format('YYYY-MM-DD'));
+        setData('date', newValue.startDate);
     };
 
     const handleSelectedProgram = (selected) => {

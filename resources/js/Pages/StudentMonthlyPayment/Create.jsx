@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
 import { Head, Link, router, useForm } from '@inertiajs/react';
-import { useDebounce } from 'use-debounce';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -20,7 +19,6 @@ import Datepicker from 'react-tailwindcss-datepicker';
 import { NumericFormat } from 'react-number-format';
 import formatNumber from '@/Utils/formatNumber';
 import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
-import { usePrevious } from 'react-use';
 
 const monthList = () => {
   let monthListTemp = [];
@@ -42,6 +40,10 @@ const monthList = () => {
 const monthNow = () => {
   let month = dayjs().format('MM');
   return month;
+}
+
+const studyYearUpdate = (month, studyYear) => {
+  let splitStudyYear = studyYear.split('/');
 }
 
 export default function Create({ organization, newRef, contacts, date, categories, studyYears, cashAccounts, historyCategories }) {
@@ -71,22 +73,10 @@ export default function Create({ organization, newRef, contacts, date, categorie
     endDate: date,
   });
 
-  const [debounceDateValue] = useDebounce(dateValue, 500);
-  const prevDate = usePrevious(dateValue);
-
   // useEffect
   useEffect(() => {
     setDefault();
   },[]);
-
-  // useEffect
-  useEffect(() => {
-    if (prevDate !== undefined) {
-      if (dateValue.startDate) {
-        reloadNewRef();
-      }
-    }
-  }, [debounceDateValue]);
 
   // function
   const handleHistoryCategoryReload = (temp, contactId = null) => {
@@ -99,7 +89,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
       },
       onSuccess: ({ props }) => {
         const { historyCategories, historyPayment } = props;
-
+        
         let tempCategories = [];
         
         categories.filter((category, index) => {
@@ -181,25 +171,22 @@ export default function Create({ organization, newRef, contacts, date, categorie
   };
 
   const handleSelectedContact = (selected) => {
-    if (selected){
-      setSelectedContact({ id: selected.id, name: selected.name, phone: selected.phone });
-      
-      let temp = data;
-      temp = {
-        ...temp,
-        contact_id: selected.id,
-        description:`Kas Masuk / Pembayaran Iuran Bulanan dari ${selected.name.toUpperCase()} Bulan ${data.month}, Tahun Ajaran ${data.study_year}`,
-        student_id: selected.student.no_ref,
-        level: selected.last_level.level
-      };
+    setSelectedContact({ id: selected.id, name: selected.name, phone: selected.phone });
+    let temp = data;
+    temp = {
+      ...temp,
+      contact_id: selected.id,
+      description:`Kas Masuk / Pembayaran Iuran Bulanan dari ${selected.name.toUpperCase()} Bulan ${data.month}, Tahun Ajaran ${data.study_year}`,
+      student_id: selected.student.no_ref,
+      level: selected.levels[selected.levels.length - 1].level
+    };
 
-      handleHistoryCategoryReload(temp, selected.id);
-    }
+    handleHistoryCategoryReload(temp, selected.id);
   };
 
   const handleDateValueChange = (newValue) => {
     setDateValue(newValue);
-    setData('date', dayjs(newValue.startDate).format('YYYY-MM-DD'));
+    setData('date', newValue.startDate);
   };
 
   const handleChangeValue = (values, index) => {
@@ -265,25 +252,11 @@ export default function Create({ organization, newRef, contacts, date, categorie
   }
 
   const handleSelectedCashAccount = (selected) => {
-    if (selected) {
-      setSelectedCashAccount({ id: selected.id, name: selected.name, code: selected.code, is_cash: true });
-      setData('cash_account_id', selected.id);
-      setError('cash_account_id','');
-    }
-    
+    setSelectedCashAccount({ id: selected.id, name: selected.name, code: selected.code, is_cash: true });
+    setData('cash_account_id', selected.id);
+    setError('cash_account_id','');
   };
 
-  const reloadNewRef = () => {
-    router.reload({
-      only: ['newRef'],
-      data: {
-        date: dayjs(dateValue.startDate).format('YYYY-MM-DD'),
-      },
-      onSuccess: (page) => {
-        setData('no_ref', page.props.newRef);
-      },
-    });
-  };
   // const handleReloadLastPayment = (temp, contact_id) => {
   //   router.reload({
   //     only: ['lastPayment'],

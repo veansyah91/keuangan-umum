@@ -92,7 +92,7 @@ export default function Edit({ organization, categories, contact, contactCategor
                                     id='phone'
                                     name='phone'
                                     className='w-full'
-                                    placeholder='08xxxxx / 62xxxxx'
+                                    placeholder='No. Handphone'
                                     value={data.phone}
                                     onChange={(e) => setData('phone', e.target.value.toUpperCase())}
                                 />

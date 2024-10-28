@@ -203,13 +203,13 @@ export default function Cashflow({
     };
 
     const handleStartDateValueChange = (newValue) => {
-			setStartDateValue(newValue);
-			setStartDate(dayjs(newValue.endDate).format('YYYY-MM-DD'));
+        setStartDateValue(newValue);
+        setStartDate(newValue.startDate);
     };
 
     const handleEndDateValueChange = (newValue) => {
-			setEndDateValue(newValue);
-			setEndDate(dayjs(newValue.endDate).format('YYYY-MM-DD'));
+        setEndDateValue(newValue);
+        setEndDate(newValue.endDate);
     };
 
     const handleReload = () => {

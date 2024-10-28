@@ -220,11 +220,7 @@ export default function Index({ role, organization, departments, searchFilter, c
                 pageBefore={
                     departments.links[0].url ? (
                         <Link
-                            href={route('data-master.department', {
-                                organization: organization.id,
-                                page: departments.current_page - 1,
-                                search: search,
-                            })}
+                            href={`/data-master/departments?page=${departments.current_page - 1}&search=${search}`}
                             preserveState
                             only={['departments']}>
                             <IoPlayBack />
@@ -238,11 +234,7 @@ export default function Index({ role, organization, departments, searchFilter, c
                 pageAfter={
                     departments.links[departments.links.length - 1].url ? (
                         <Link
-                            href={route('data-master.department', {
-                                organization: organization.id,
-                                page: departments.current_page + 1,
-                                search: search,
-                            })}
+                            href={`/data-master/departments?page=${departments.current_page + 1}&search=${search}`}
                             only={['departments']}
                             preserveState>
                             <IoPlayForward />
@@ -318,11 +310,7 @@ export default function Index({ role, organization, departments, searchFilter, c
                         <div className='my-auto'>
                             {departments.links[0].url ? (
                                 <Link
-                                    href={route('data-master.department', {
-                                        organization: organization.id,
-                                        page: departments.current_page - 1,
-                                        search: search,
-                                    })}
+                                    href={`/data-master/${organization.id}/departments?page=${departments.current_page - 1}&search=${search}`}
                                     preserveState
                                     only={['departments']}>
                                     <IoPlayBack />
@@ -339,11 +327,7 @@ export default function Index({ role, organization, departments, searchFilter, c
                         <div className='my-auto'>
                             {departments.links[departments.links.length - 1].url ? (
                                 <Link
-                                    href={route('data-master.department', {
-                                        organization: organization.id,
-                                        page: departments.current_page + 1,
-                                        search: search,
-                                    })}
+                                    href={`/data-master/${organization.id}/departments?page=${departments.current_page + 1}&search=${search}`}
                                     only={['departments']}
                                     preserveState>
                                     <IoPlayForward />

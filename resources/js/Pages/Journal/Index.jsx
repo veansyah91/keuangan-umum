@@ -222,11 +222,7 @@ export default function Index({
                 pageBefore={
                     journals.links[0].url ? (
                         <Link
-                            href={route('data-ledger.journal', {
-                                organization: organization.id,
-                                page: journals.current_page - 1,
-                                search: search,
-                            })}
+                            href={`/data-ledger/journals?page=${journals.current_page - 1}&search=${search}`}
                             preserveState
                             only={['journals']}>
                             <IoPlayBack />
@@ -240,11 +236,7 @@ export default function Index({
                 pageAfter={
                     journals.links[journals.links.length - 1].url ? (
                         <Link
-                            href={route('data-ledger.journal', {
-                                organization: organization.id,
-                                page: journals.current_page + 1,
-                                search: search,
-                            })}                            
+                            href={`/data-ledger/journals?page=${journals.current_page + 1}&search=${search}`}
                             only={['journals']}
                             preserveState>
                             <IoPlayForward />
@@ -335,11 +327,7 @@ export default function Index({
                         <div className='my-auto'>
                             {journals.links[0].url ? (
                                 <Link
-                                    href={route('data-ledger.journal', {
-                                        organization: organization.id,
-                                        page: journals.current_page - 1,
-                                        search: search,
-                                    })}
+                                    href={`/data-ledger/${organization.id}/journals?page=${journals.current_page - 1}&search=${search}`}
                                     preserveState
                                     only={['journals']}>
                                     <IoPlayBack />
@@ -356,11 +344,7 @@ export default function Index({
                         <div className='my-auto'>
                             {journals.links[journals.links.length - 1].url ? (
                                 <Link
-                                    href={route('data-ledger.journal', {
-                                        organization: organization.id,
-                                        page: journals.current_page + 1,
-                                        search: search,
-                                    })}
+                                    href={`/data-ledger/${organization.id}/journals?page=${journals.current_page + 1}&search=${search}`}
                                     only={['journals']}
                                     preserveState>
                                     <IoPlayForward />
