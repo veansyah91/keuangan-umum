@@ -166,6 +166,21 @@ export default function Index({ organization }) {
 						</Link>
 					</div>
 				</div>
+
+				<div className='sm:hidden pt-5 bg-white '>
+					<div className='text-center font-bold'>
+						Staf
+					</div>
+					<div className='flex flex-wrap pt-2 px-2 mx-auto gap-2 w-full justify-center'>
+						<Link href={route('cashflow.staff-salary-payment', organization.id)}>
+							<CardMenu 
+								bgColor={'bg-green-500'} 
+								icon={<LiaMoneyBillWaveSolid />} 
+								title={'Pembayaran Gaji Bulanan'} 
+							/>
+						</Link>
+					</div>
+				</div>
 			</section>			
 			{/* Mobile */}
 		</>
