@@ -3,8 +3,11 @@
 namespace App\Models;
 
 use App\Models\Contact;
+use App\Models\Journal;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\StudentEntryPaymentCategory;
+use App\Models\StudentEntryReceivableLedger;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -22,6 +25,7 @@ class StudentEntryPayment extends Model
 		'value',
 		'date',
 		'study_year',
+		'receivable_value'
 	];
 
 	public function scopeFilter($query, $filters)
@@ -35,6 +39,18 @@ class StudentEntryPayment extends Model
 														});
 			});
 		});
+
+		$query->when($filters['start_date'] ?? false, function ($query, $start_date) {
+			return $query->where('date', '>=', $start_date);
+		});
+
+		$query->when($filters['end_date'] ?? false, function ($query, $end_date) {
+			return $query->where('date', '<=', $end_date);
+		});
+
+		$query->when($filters['studyYear'] ?? false, function ($query, $studyYear) {
+			return $query->where('study_year', $studyYear);
+		});
 	}
 
 	public function contact(): BelongsTo
@@ -45,5 +61,15 @@ class StudentEntryPayment extends Model
 	public function details(): BelongsToMany
 	{
 		return $this->belongsToMany(StudentEntryPaymentCategory::class, 's_yearly_payment_details', 'payment_id', 'student_payment_category_id')->withPivot('value');
+	}
+
+	public function receivables(): HasMany
+	{
+		return $this->hasMany(StudentEntryReceivableLedger::class, 'payment_id');
+	}
+
+	public function journal(): BelongsTo
+	{
+		return $this->belongsTo(Journal::class);
 	}
 }

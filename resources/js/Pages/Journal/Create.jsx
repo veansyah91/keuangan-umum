@@ -16,6 +16,7 @@ import { NumericFormat } from 'react-number-format';
 import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 import formatNumber from '@/Utils/formatNumber';
 import { Disclosure, Transition } from '@headlessui/react';
+import dayjs from 'dayjs';
 
 export default function Create({ organization, newRef, date, accounts, projects, programs, departments }) {
     // state
@@ -76,7 +77,9 @@ export default function Create({ organization, newRef, date, accounts, projects,
     // useUffect
     useEffect(() => {
         if (prevDate !== undefined) {
-            reloadNewRef();
+            if (dateValue.startDate) {
+                reloadNewRef();
+            }
         }
     }, [debounceDateValue]);
 
@@ -93,11 +96,11 @@ export default function Create({ organization, newRef, date, accounts, projects,
     }, [data]);
 
     // function
-    const reloadNewRef = () => {
+    const reloadNewRef = () => {        
         router.reload({
             only: ['newRef'],
             data: {
-                date: dateValue.startDate,
+                date: dayjs(dateValue.startDate).format('YYYY-MM-DD'),
             },
             onSuccess: (page) => {
                 setData('no_ref', page.props.newRef);
@@ -127,7 +130,7 @@ export default function Create({ organization, newRef, date, accounts, projects,
 
     const handleDateValueChange = (newValue) => {
         setDateValue(newValue);
-        setData('date', newValue.startDate);
+        setData('date', dayjs(newValue.startDate).format('YYYY-MM-DD'));
     };
 
     const handleDeleteAccount = (index) => {

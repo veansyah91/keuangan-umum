@@ -114,12 +114,12 @@ export default function Ledger({
 
     const handleStartDateValueChange = (newValue) => {
         setStartDateValue(newValue);
-        setStartDate(newValue.startDate);
+        setStartDate(dayjs(newValue.endDate).format('YYYY-MM-DD'));
     };
 
     const handleEndDateValueChange = (newValue) => {
         setEndDateValue(newValue);
-        setEndDate(newValue.endDate);
+        setEndDate(dayjs(newValue.endDate).format('YYYY-MM-DD'));
     };
 
     const handleReload = () => {
