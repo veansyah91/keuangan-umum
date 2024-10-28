@@ -111,11 +111,6 @@ class SalaryCategoryController extends Controller
                 'required',
                 'boolean'
             ],
-            'unit' => [
-                'nullable',
-                'string',
-                'in:jam,hari'
-            ],
         ]);
 
         if ($validator->fails()) {

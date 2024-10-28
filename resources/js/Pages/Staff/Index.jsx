@@ -228,7 +228,11 @@ export default function Index({ role, organization, contacts, category, searchFi
         pageBefore={
           contacts.links[0].url ? (
             <Link
-              href={`/data-master/${organization.id}/staff?page=${contacts.current_page - 1}&search=${search}`}
+              href={route('data-master.staff', {
+                organization: organization.id,
+                page: contacts.current_page - 1,
+                search: search,
+              })}
               preserveState
               only={['contacts']}>
               <IoPlayBack />
@@ -242,7 +246,11 @@ export default function Index({ role, organization, contacts, category, searchFi
         pageAfter={
           contacts.links[contacts.links.length - 1].url ? (
             <Link
-              href={`/data-master/${organization.id}/staff?page=${contacts.current_page + 1}&search=${search}`}
+              href={route('data-master.staff', {
+                organization: organization.id,
+                page: contacts.current_page + 1,
+                search: search,
+              })}
               only={['contacts']}
               preserveState>
               <IoPlayForward />
@@ -308,7 +316,11 @@ export default function Index({ role, organization, contacts, category, searchFi
             <div className='my-auto'>
               {contacts.links[0].url ? (
                 <Link
-                  href={`/admin/data-master/${organization.id}/staff?page=${contacts.current_page - 1}&search=${search}`}
+                  href={route('data-master.staff', {
+                    organization: organization.id,
+                    page: contacts.current_page - 1,
+                    search: search,
+                  })}
                   preserveState
                   only={['contacts']}>
                   <IoPlayBack />
@@ -325,7 +337,11 @@ export default function Index({ role, organization, contacts, category, searchFi
             <div className='my-auto'>
               {contacts.links[contacts.links.length - 1].url ? (
                 <Link
-                  href={`/admin/data-master/${organization.id}/staff?page=${contacts.current_page + 1}&search=${search}`}
+                  href={route('data-master.staff', {
+                    organization: organization.id,
+                    page: contacts.current_page + 1,
+                    search: search,
+                  })}
                   only={['contacts']}
                   preserveState>
                   <IoPlayForward />
@@ -415,7 +431,7 @@ export default function Index({ role, organization, contacts, category, searchFi
                   id='phone'
                   name='phone'
                   className={`w-full ${errors?.phone && 'border-red-500'}`}
-                  placeholder='No. Handphone'
+                  placeholder='08xxxxx / 62xxxxx'
                   value={data.phone}
                   onChange={(e) => setData('phone', e.target.value.toUpperCase())}
                 />

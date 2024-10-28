@@ -19,6 +19,8 @@ import Datepicker from 'react-tailwindcss-datepicker';
 import { NumericFormat } from 'react-number-format';
 import formatNumber from '@/Utils/formatNumber';
 import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
+import { useDebounce } from 'use-debounce';
+import { usePrevious } from 'react-use';
 
 const yearList = () => {
   const now = dayjs().year();
@@ -55,14 +57,14 @@ const monthNow = () => {
   return month;
 }
 
-export default function Create({ organization, newRef, contacts, date, categories, studyYears, accounts, lastPayment }) {
+export default function Create({ organization, newRef, contacts, date, categories, studyYears, accounts, lastPayment, selectedContactParam }) {  
   // state
   const [total, setTotal] = useState(0);
   const { data, setData, processing, post, errors, setError, reset } = useForm({
-    contact_id:null,
+    contact_id:selectedContactParam ? selectedContactParam.id : null,
     date:date,
-    level:'',
-    student_id:'',
+    level:selectedContactParam ? selectedContactParam.last_level.level : '',
+    student_id:selectedContactParam ? selectedContactParam.student.no_ref : '',
     no_ref:newRef,
     value:total,
     month:parseInt(monthNow()),
@@ -72,7 +74,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
     details: [],
   });  
 
-  const [selectedContact, setSelectedContact] = useState({ id: null, name: '', phone: '' });
+  const [selectedContact, setSelectedContact] = useState({ id: selectedContactParam ? selectedContactParam.id : null, name: selectedContactParam ? selectedContactParam.name : '', phone: selectedContactParam ? selectedContactParam.phone : '' });
   const [selectedAccount, setSelectedAccount] = useState({ id: null, name: '', code: '', is_cash: false });
 
   const [dateValue, setDateValue] = useState({
@@ -80,10 +82,21 @@ export default function Create({ organization, newRef, contacts, date, categorie
     endDate: date,
   });
 
+  const [debounceDateValue] = useDebounce(dateValue, 500);
+  const prevDate = usePrevious(dateValue);
+
   // useEffect
   useEffect(() => {
     setDefault(newRef);
   },[]);
+
+  useEffect(() => {
+    if (prevDate !== undefined) {
+      if (dateValue.startDate) {        
+        reloadNewRef();
+      }
+    }
+  }, [debounceDateValue]);
 
   // function
   const setDefault = (newRef) => {
@@ -101,10 +114,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
       ...tempData,
       value: tempTotal,
       details: temp,
-      contact_id:null,
       date:date,
-      level:'',
-      student_id:'',
       no_ref:newRef,
       month:parseInt(monthNow()),
       study_year:studyYear(),
@@ -119,10 +129,11 @@ export default function Create({ organization, newRef, contacts, date, categorie
     router.reload({
         only: ['newRef'],
         data: {
-            date: dateValue.startDate,
+          date: dayjs(dateValue.startDate).format('YYYY-MM-DD'),
         },
         onSuccess: ({ props }) => {
           const { newRef } = props;
+          
           let temp = data;
           temp = {
             ...data,
@@ -132,6 +143,10 @@ export default function Create({ organization, newRef, contacts, date, categorie
           
           setData(temp);
         },
+        onError: errors => {
+          console.log(errors);
+          
+        }
     });
 };
 
@@ -161,24 +176,28 @@ export default function Create({ organization, newRef, contacts, date, categorie
   };
 
   const handleSelectedContact = (selected) => {
-    setSelectedContact({ id: selected.id, name: selected.name, phone: selected.phone });
-    let temp = data;
-    temp = {
-      ...temp,
-      contact_id: selected.id,
-      description: `Piutang Iuran Bulanan dari ${selected.name.toUpperCase()}`,
-      student_id: selected.student.no_ref,
-      level: selected.levels[selected.levels.length - 1].level
-    };
-    // handleReloadLastPayment(temp, selected.id)
+    if (selected) {
+      setSelectedContact({ id: selected.id, name: selected.name, phone: selected.phone });
+      
+      let temp = data;
+      temp = {
+        ...temp,
+        contact_id: selected.id,
+        description: `Piutang Iuran Bulanan dari ${selected.name.toUpperCase()}`,
+        student_id: selected.student.no_ref,
+        level: selected.last_level.level
+      };
 
-    setData(temp);
+      // handleReloadLastPayment(temp, selected.id)
+
+      setData(temp);
+    }
   };
 
   const handleDateValueChange = (newValue) => {
     setDateValue(newValue);
-    setData('date', newValue.startDate);
-    reloadNewRef(newValue.startDate);
+    
+    setData('date', dayjs(newValue.startDate).format('YYYY-MM-DD'));
   };
 
   const handleChangeValue = (values, index) => {
@@ -203,9 +222,11 @@ export default function Create({ organization, newRef, contacts, date, categorie
   }
 
   const handleSelectedAccount = (selected) => {
-    setSelectedAccount({ id: selected.id, name: selected.name, code: selected.code, is_cash: false });
-    setData('credit_account', selected.id);
-    setError('credit_account','');
+    if (selected) {
+      setSelectedAccount({ id: selected.id, name: selected.name, code: selected.code, is_cash: false });
+      setData('credit_account', selected.id);
+      setError('credit_account','');
+    }
   };
 
   return (

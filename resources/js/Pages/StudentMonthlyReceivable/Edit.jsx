@@ -19,6 +19,8 @@ import Datepicker from 'react-tailwindcss-datepicker';
 import { NumericFormat } from 'react-number-format';
 import formatNumber from '@/Utils/formatNumber';
 import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
+import { useDebounce } from 'use-debounce';
+import { usePrevious } from 'react-use';
 
 const yearList = () => {
   const now = dayjs().year();
@@ -50,12 +52,8 @@ const monthList = () => {
   return monthListTemp;
 }
 
-const monthNow = () => {
-  let month = dayjs().format('MM');
-  return month;
-}
-
-export default function Edit({ organization, newRef, contacts, date, categories, accounts, payment, receivable, ledger, contact, lastLevel, details, creditAccount }) {
+export default function Edit({ organization, newRef, contacts, date, categories, accounts, payment, receivable, ledger, contact, lastLevel, details, creditAccount, selectedContactParam }) {
+   
   
   // state
   const [total, setTotal] = useState(0);
@@ -82,10 +80,21 @@ export default function Edit({ organization, newRef, contacts, date, categories,
     endDate: date,
   });
 
+  const [debounceDateValue] = useDebounce(dateValue, 500);
+  const prevDate = usePrevious(dateValue);
+
   // useEffect
   useEffect(() => {
     setDefault();
   },[]);
+
+  useEffect(() => {
+    if (prevDate !== undefined) {
+      if (dateValue.startDate) {        
+        reloadNewRef();
+      }
+    }
+  }, [debounceDateValue]);
 
   // function
   const setDefault = () => {
@@ -122,7 +131,7 @@ export default function Edit({ organization, newRef, contacts, date, categories,
     router.reload({
         only: ['newRef'],
         data: {
-            date: dateValue.startDate,
+          date: dayjs(dateValue.startDate).format('YYYY-MM-DD'),
         },
         onSuccess: ({ props }) => {
           const { newRef } = props;
@@ -136,7 +145,7 @@ export default function Edit({ organization, newRef, contacts, date, categories,
           setData(temp);
         },
     });
-};
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -161,24 +170,26 @@ export default function Edit({ organization, newRef, contacts, date, categories,
   };
 
   const handleSelectedContact = (selected) => {
+    if (selected) {    
+    
     setSelectedContact({ id: selected.id, name: selected.name, phone: selected.phone });
-    let temp = data;
-    temp = {
-      ...temp,
-      contact_id: selected.id,
-      description: `Piutang Iuran Bulanan dari ${selected.name.toUpperCase()}`,
-      student_id: selected.student.no_ref,
-      level: selected.levels[selected.levels.length - 1].level
-    };
-    // handleReloadLastPayment(temp, selected.id)
+      let temp = data;
+      temp = {
+        ...temp,
+        contact_id: selected.id,
+        description: `Piutang Iuran Bulanan dari ${selected.name.toUpperCase()}`,
+        student_id: selected.student.no_ref,
+        level: selected.levels[selected.levels.length - 1].level
+      };
+      // handleReloadLastPayment(temp, selected.id)
 
-    setData(temp);
+      setData(temp);
+    }
   };
 
   const handleDateValueChange = (newValue) => {
     setDateValue(newValue);
-    setData('date', newValue.startDate);
-    reloadNewRef(newValue.startDate);
+    setData('date', dayjs(newValue.startDate).format('YYYY-MM-DD'));
   };
 
   const handleChangeValue = (values, index) => {
@@ -203,9 +214,11 @@ export default function Edit({ organization, newRef, contacts, date, categories,
   }
 
   const handleSelectedAccount = (selected) => {
-    setSelectedAccount({ id: selected.id, name: selected.name, code: selected.code, is_cash: false });
-    setData('credit_account', selected.id);
-    setError('credit_account','');
+    if (selected) {    
+      setSelectedAccount({ id: selected.id, name: selected.name, code: selected.code, is_cash: false });
+      setData('credit_account', selected.id);
+      setError('credit_account','');
+    }
   };
 
   return (

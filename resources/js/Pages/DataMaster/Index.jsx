@@ -121,7 +121,7 @@ export default function Index({ organization }) {
 								<CardMenu 
 									bgColor={'bg-rose-700'} 
 									icon={<RiFileListLine />} 
-									title={'Rincian Penggajian'} 
+									title={'Komponen Penggajian'} 
 								/>
 							</Link>
 						</div>

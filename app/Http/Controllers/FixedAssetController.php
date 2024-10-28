@@ -68,7 +68,7 @@ class FixedAssetController extends Controller
     protected function newRef($organization, $dateRequest, $code)
     {
         $now = $this->now;
-        $date = $dateRequest ?? $now->isoFormat('YYYY-MM-DD');
+        $date = $dateRequest ?? $now->isoFormat('YYYY-M-DD');
         $dateRef = Carbon::create($date);
         $refHeader = $code.$dateRef->isoFormat('YYYY').$dateRef->isoFormat('MM');
         $newRef = $refHeader.'001';
@@ -125,7 +125,7 @@ class FixedAssetController extends Controller
             'organization' => $organization,
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'newRef' => $this->newRef($organization, request('date'), 'HT-'),
-            'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
+            'date' => request('date') ?? $this->now->isoFormat('YYYY-M-DD'),
             'accounts' => Account::filter(request(['account']))
                 ->whereIsActive(true)
                 ->whereOrganizationId($organization['id'])
@@ -209,7 +209,7 @@ class FixedAssetController extends Controller
 
         // cek tanggal
         // jika tanggal lebih tinggi dari hari sekarang, maka kirimkan error\
-        if ($validated['date'] > $this->now->isoFormat('YYYY-MM-DD')) {
+        if ($validated['date'] > $this->now->isoFormat('YYYY-M-DD')) {
             return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
         }
 
@@ -241,8 +241,8 @@ class FixedAssetController extends Controller
         $validated['accumulated_depreciation'] = $depreciationAccumulation ? $depreciationAccumulation['id'] : null;
         $validated['depreciation'] = $depreciationCost ? $depreciationCost['id'] : null;
 
-        if ($formatedMonths->diffInMonths($this->now) > 0) {
-            $validated['depreciation_accumulated'] = $formatedMonths->diffInMonths($this->now) < $validated['lifetime'] ? $validated['depreciation_value'] * $formatedMonths->diffInMonths($this->now) : $validated['value'];
+        if (floor($formatedMonths->diffInMonths($this->now)) > 0) {
+            $validated['depreciation_accumulated'] = floor($formatedMonths->diffInMonths($this->now)) < $validated['lifetime'] ? $validated['depreciation_value'] * floor($formatedMonths->diffInMonths($this->now)) : $validated['value'];
         }
 
         $data = [
@@ -265,7 +265,7 @@ class FixedAssetController extends Controller
 
         FixedAsset::create($data);
 
-        $validated['date'] = $this->now->isoFormat('YYYY-MM-DD');
+        $validated['date'] = $this->now->isoFormat('YYYY-M-DD');
 
         $validated['accounts'] = [
             [
@@ -385,7 +385,7 @@ class FixedAssetController extends Controller
             'fixedAssetCategory' => FixedAssetCategory::find($fixedAsset['fixed_asset_category_id']),
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'newRef' => $this->newRef($organization, request('date'), 'HT-'),
-            'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
+            'date' => request('date') ?? $this->now->isoFormat('YYYY-M-DD'),
             'accounts' => Account::filter(request(['account']))
                 ->whereIsActive(true)
                 ->whereOrganizationId($organization['id'])
@@ -505,7 +505,7 @@ class FixedAssetController extends Controller
 
         // cek tanggal
         // jika tanggal lebih tinggi dari hari sekarang, maka kirimkan error\
-        if ($validated['date'] > $this->now->isoFormat('YYYY-MM-DD')) {
+        if ($validated['date'] > $this->now->isoFormat('YYYY-M-DD')) {
             return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
         }
 
@@ -562,7 +562,6 @@ class FixedAssetController extends Controller
                 }
 
                 // akun beban penyusutan
-
                 if ($depreciationCostAccount) {
                     $depreciationCostAccount->update([
                         'name' => 'BEBAN PENYUSUTAN '.$validated['name'],
@@ -586,8 +585,8 @@ class FixedAssetController extends Controller
         $validated['no_ref'] = $validated['code'];
         $validated['description'] = 'PENGADAAN HARTA TETAP : '.$validated['name'];
 
-        if ($formatedMonths->diffInMonths($this->now) > 0) {
-            $validated['depreciation_accumulated'] = $formatedMonths->diffInMonths($this->now) < $validated['lifetime'] ? $validated['depreciation_value'] * $formatedMonths->diffInMonths($this->now) : $validated['value'];
+        if (floor($formatedMonths->diffInMonths($this->now)) > 0) {
+            $validated['depreciation_accumulated'] = floor($formatedMonths->diffInMonths($this->now)) < $validated['lifetime'] ? $validated['depreciation_value'] * floor($formatedMonths->diffInMonths($this->now)) : $validated['value'];
         }
 
         // update Fixed Asset
@@ -787,9 +786,9 @@ class FixedAssetController extends Controller
                 ], );
         }
 
-        $validated['date'] = $this->now->isoFormat('YYYY-MM-DD');
+        $validated['date'] = $this->now->isoFormat('YYYY-M-DD');
         $validated['description'] = 'PELEPASAN HARTA TETAP: '.$fixedAsset['name'];
-        $validated['no_ref'] = $this->newRef($organization, $this->now->isoFormat('YYYY-MM-DD'), 'DHT-');
+        $validated['no_ref'] = $this->newRef($organization, $this->now->isoFormat('YYYY-M-DD'), 'DHT-');
         $validated['value'] = $fixedAsset['value'];
         $validated['organization_id'] = $organization['id'];
         $validated['user_id'] = $user['id'];

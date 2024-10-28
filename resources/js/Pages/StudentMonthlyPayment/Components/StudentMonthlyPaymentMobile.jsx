@@ -58,7 +58,7 @@ export default function StudentMobile({ payment, role, handleDelete, handleEdit 
 								className='dropdown-content z-[50] menu p-2 shadow bg-base-100 rounded-box w-56'>
 								<li>
 									<Link 
-										href={route('cashflow.student-monthly-payment.show', {organization: payment.organization_id, id: payment.id})}
+										href={route('cashflow.student-monthly-payment.show', {organization: payment.organization_id, payment: payment.id})}
 									>
 										<LiaFileInvoiceSolid />
 											Detail / Cetak 

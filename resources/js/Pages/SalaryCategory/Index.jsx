@@ -29,6 +29,7 @@ import { NumericFormat } from 'react-number-format';
 
 export default function Index({ role, organization, salaryCategories, searchFilter }) {
   // State
+  
   const [showSearch, setShowSearch] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [showModalInput, setShowModalInput] = useState(false);
@@ -81,14 +82,14 @@ export default function Index({ role, organization, salaryCategories, searchFilt
     });
   };
   const handleDelete = (category) => {
-    setTitleDeleteModal(`Hapus Rincian Penggajian ${category.name} ?`);
+    setTitleDeleteModal(`Hapus Komponen Penggajian ${category.name} ?`);
     setShowDeleteConfirmation(true);
     setData('id', category.id);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     isUpdate
     ? patch(route('data-master.salary-category.update', {organization: organization.id, salaryCategory: data.id}), {
       onSuccess: ({ props }) => {
@@ -134,7 +135,7 @@ export default function Index({ role, organization, salaryCategories, searchFilt
     destroy(route('data-master.salary-category.destroy', { organization: organization.id, salaryCategory: data.id }), {
       onSuccess: () => {
         setShowDeleteConfirmation(false);
-        toast.success(`Rincian Penggajian Berhasil Dihapus`, {
+        toast.success(`Komponen Penggajian Berhasil Dihapus`, {
           position: toast.POSITION.TOP_CENTER,
         });
         reset();
@@ -160,7 +161,7 @@ export default function Index({ role, organization, salaryCategories, searchFilt
   const createData = () => {
     reset();
     setIsUpdate(false);
-    setModalInputLabel({title: 'Tambah Rincian', submit: 'Tambah'});
+    setModalInputLabel({title: 'Tambah Komponen', submit: 'Tambah'});
     setError('name', '');
     setShowModalInput(true);
   };
@@ -170,7 +171,7 @@ export default function Index({ role, organization, salaryCategories, searchFilt
     setError('name', '');
     setShowModalInput(true);
     setModalInputLabel({
-      title: 'Ubah Rincian',
+      title: 'Ubah Komponen',
       submit: 'Ubah'
     });
     setData({
@@ -186,7 +187,7 @@ export default function Index({ role, organization, salaryCategories, searchFilt
   return (
     <>
       {/* Mobile */}
-      <Head title='Data Rincian Penggajian' />
+      <Head title='Data Komponen Penggajian' />
       <ToastContainer />
 
       {role !== 'viewer' && (
@@ -199,7 +200,11 @@ export default function Index({ role, organization, salaryCategories, searchFilt
         pageBefore={
           salaryCategories.links[0].url ? (
             <Link
-              href={`/data-master/${organization.id}/salary-category?page=${salaryCategories.current_page - 1}&search=${search}`}
+              href={route('data-master.salary-category', {
+                organization: organization.id,
+                page: salaryCategories.current_page - 1,
+                search: search,
+              })}
               preserveState
               only={['salaryCategories']}>
               <IoPlayBack />
@@ -213,7 +218,11 @@ export default function Index({ role, organization, salaryCategories, searchFilt
         pageAfter={
           salaryCategories.links[salaryCategories.links.length - 1].url ? (
             <Link
-              href={`/data-master/${organization.id}/salary-category?page=${salaryCategories.current_page + 1}&search=${search}`}
+              href={route('data-master.salary-category', {
+                organization: organization.id,
+                page: salaryCategories.current_page + 1,
+                search: search,
+              })}
               only={['salaryCategories']}
               preserveState>
               <IoPlayForward />
@@ -262,7 +271,7 @@ export default function Index({ role, organization, salaryCategories, searchFilt
               id='search-input'
               name='search-input'
               type='search'
-              placeholder='Cari Rincian Penggajian'
+              placeholder='Cari Komponen Penggajian'
               className='w-full border-none focus:outline-none focus:ring-0'
               value={search || ''}
               onChange={(e) => setSearch(e.target.value)}
@@ -275,7 +284,11 @@ export default function Index({ role, organization, salaryCategories, searchFilt
             <div className='my-auto'>
               {salaryCategories.links[0].url ? (
                 <Link
-                  href={`/admin/data-master/${organization.id}/salary-category?page=${salaryCategories.current_page - 1}&search=${search}`}
+                  href={route('data-master.salary-category', {
+                    organization: organization.id,
+                    page: salaryCategories.current_page - 1,
+                    search: search,
+                  })}
                   preserveState
                   only={['salaryCategories']}>
                   <IoPlayBack />
@@ -292,7 +305,11 @@ export default function Index({ role, organization, salaryCategories, searchFilt
             <div className='my-auto'>
               {salaryCategories.links[salaryCategories.links.length - 1].url ? (
                 <Link
-                  href={`/admin/data-master/${organization.id}/salary-category?page=${salaryCategories.current_page + 1}&search=${search}`}
+                  href={route('data-master.salary-category', {
+                    organization: organization.id,
+                    page: salaryCategories.current_page + 1,
+                    search: search,
+                  })}
                   only={['salaryCategories']}
                   preserveState>
                   <IoPlayForward />
@@ -312,7 +329,7 @@ export default function Index({ role, organization, salaryCategories, searchFilt
               <table className='table table-pin-rows table-pin-cols text-base'>
                 <thead className='text-base text-gray-900'>
                   <tr className=''>
-                    <th className='bg-gray-200'>Nama Rincian</th>
+                    <th className='bg-gray-200'>Nama Komponen</th>
                     <th className='bg-gray-200 text-end'>Nilai (Default)</th>
                     <th className='bg-gray-200 text-center'>Status</th>
                     <th className='bg-gray-200'></th>
@@ -345,7 +362,7 @@ export default function Index({ role, organization, salaryCategories, searchFilt
           <div className='mt-5 space-y-5'>
             <div className='flex flex-col sm:flex-row w-full gap-1'>
               <div className='w-full sm:w-1/3 my-auto'>
-                <InputLabel htmlFor='name' value='Nama Rincian' className='mx-auto my-auto' />
+                <InputLabel htmlFor='name' value='Nama Komponen' className='mx-auto my-auto' />
               </div>
 
               <div className='sm:w-2/3 w-full'>
@@ -357,7 +374,7 @@ export default function Index({ role, organization, salaryCategories, searchFilt
                   className={`mt-1 w-full ${errors && errors.name && 'border-red-500'}`}
                   isFocused={true}
                   onChange={(e) => setData('name', e.target.value.toUpperCase())}
-                  placeholder='Nama Rincian'
+                  placeholder='Nama Komponen'
                 />
                 {errors && errors.name && (
                   <div className='-mb-3'>
@@ -408,7 +425,7 @@ export default function Index({ role, organization, salaryCategories, searchFilt
                 </div>
 
                 <div className='sm:w-2/3 w-full'>
-                <select className="select select-bordered w-full" value={data.unit} onChange={e => setData('unit', e.target.value)} id='unit'>
+                <select className="select select-bordered w-full" defaultValue={data.entry_year} onChange={e => setData('unit', parseInt(e.target.value))} id='unit'>
                     <option value={'jam'}>Jam</option>
                     <option value={'hari'}>Hari</option>
                   </select>
@@ -476,11 +493,11 @@ export default function Index({ role, organization, salaryCategories, searchFilt
 
 Index.layout = (page) => (
   <AuthenticatedLayout
-    header={<Header>Data Rincian Penggajian</Header>}
+    header={<Header>Data Komponen Penggajian</Header>}
     children={page}
     user={page.props.auth.user}
     organization={page.props.organization}
-    title='Data Rincian Penggajian'
+    title='Data Komponen Penggajian'
     backLink={
       <Link href={route('data-master', page.props.organization.id)}>
         <IoArrowBackOutline />
@@ -492,7 +509,7 @@ Index.layout = (page) => (
           <li className='font-bold'>
             <Link href={route('data-master', page.props.organization.id)}>Data Master</Link>
           </li>
-          <li>Data Rincian Penggajian</li>
+          <li>Data Komponen Penggajian</li>
         </ul>
       </div>
     }

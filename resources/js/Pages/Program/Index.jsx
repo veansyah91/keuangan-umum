@@ -211,7 +211,11 @@ export default function Index({ role, organization, programs, searchFilter, code
                 pageBefore={
                     programs.links[0].url ? (
                         <Link
-                            href={`/data-master/programs?page=${programs.current_page - 1}&search=${search}`}
+                            href={route('data-master.program', {
+                                organization: organization.id,
+                                page: programs.current_page - 1,
+                                search: search,
+                            })}
                             preserveState
                             only={['programs']}>
                             <IoPlayBack />
@@ -225,7 +229,11 @@ export default function Index({ role, organization, programs, searchFilter, code
                 pageAfter={
                     programs.links[programs.links.length - 1].url ? (
                         <Link
-                            href={`/data-master/programs?page=${programs.current_page + 1}&search=${search}`}
+                            href={route('data-master.program', {
+                                organization: organization.id,
+                                page: programs.current_page + 1,
+                                search: search,
+                            })}
                             only={['programs']}
                             preserveState>
                             <IoPlayForward />
@@ -301,7 +309,11 @@ export default function Index({ role, organization, programs, searchFilter, code
                         <div className='my-auto'>
                             {programs.links[0].url ? (
                                 <Link
-                                    href={`/data-master/${organization.id}/programs?page=${programs.current_page - 1}&search=${search}`}
+                                    href={route('data-master.program', {
+                                        organization: organization.id,
+                                        page: programs.current_page - 1,
+                                        search: search,
+                                    })}
                                     preserveState
                                     only={['programs']}>
                                     <IoPlayBack />
@@ -318,7 +330,11 @@ export default function Index({ role, organization, programs, searchFilter, code
                         <div className='my-auto'>
                             {programs.links[programs.links.length - 1].url ? (
                                 <Link
-                                    href={`/data-master/${organization.id}/programs?page=${programs.current_page + 1}&search=${search}`}
+                                    href={route('data-master.program', {
+                                        organization: organization.id,
+                                        page: programs.current_page + 1,
+                                        search: search,
+                                    })}
                                     only={['programs']}
                                     preserveState>
                                     <IoPlayForward />
