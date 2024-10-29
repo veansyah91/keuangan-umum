@@ -306,7 +306,7 @@ class StaffSalaryPaymentController extends Controller
 																				})
 																				->where('s_salary_payment_details.payment_id', $id)
 																				->select('s_salary_payment_details.contact_id', 'contacts.name', 'contact_staff.position', 'contact_staff.no_ref',DB::raw('SUM(value) as total'))
-																				->groupBy('s_salary_payment_details.contact_id','contact_staff.position', 'contact_staff.no_ref')
+																				->groupBy('s_salary_payment_details.contact_id','contact_staff.position', 'contact_staff.no_ref', 'contacts.name')
 																				->orderBy('contacts.name', 'asc')
 																				->paginate(50);
 
