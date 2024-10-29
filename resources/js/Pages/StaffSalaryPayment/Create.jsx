@@ -46,10 +46,10 @@ const monthList = () => {
 const contactResource = (contacts) => {
 	return contacts.map(contact => {
 		return {
-			id: contact.contact_id, 
-			name: contact.contact.name, 
-			position: contact.position, 
-			no_ref:contact.no_ref,
+			id: contact?.contact_id, 
+			name: contact?.contact?.name, 
+			position: contact?.position, 
+			no_ref:contact?.no_ref,
 		}
 	})
 }
@@ -57,21 +57,21 @@ const contactResource = (contacts) => {
 const dataDetails = (contacts, categories) => {
 	return contacts.map(contact => {
 		return {
-			id: contact.contact_id, 
-			name: contact.contact.name, 
-			position: contact.position, 
-			no_ref: contact.no_ref,
+			id: contact?.contact_id, 
+			name: contact?.contact?.name, 
+			position: contact?.position, 
+			no_ref: contact?.no_ref,
 			value: categories.reduce((acc, category) => acc + (category.has_hour ? 0 : category.value), 0),
 			categories: categories.map(category => {
 				return {
-					id: category.id,
-					name: category.name,
-					value: category.value,
-					unit: category.unit,
-					is_cut: category.is_cut ? true : false,
-					has_hour: category.has_hour ? true : false,
-					qty: category.has_hour ? 0 : 1,
-					total: category.has_hour ? 0 : category.value
+					id: category?.id,
+					name: category?.name,
+					value: category?.value,
+					unit: category?.unit,
+					is_cut: category?.is_cut ? true : false,
+					has_hour: category?.has_hour ? true : false,
+					qty: category?.has_hour ? 0 : 1,
+					total: category?.has_hour ? 0 : category.value
 				}
 			})
 		}
@@ -135,18 +135,18 @@ export default function Create({
 	};
 	const handleSetDetails = () => {		
 		setSelectedContact({
-			id: contacts[0].contact_id, 
-			name: contacts[0].contact.name, 
-			position: contacts[0].position, 
-			no_ref:contacts[0].no_ref
+			id: contacts[0]?.contact_id, 
+			name: contacts[0]?.contact.name, 
+			position: contacts[0]?.position, 
+			no_ref:contacts[0]?.no_ref
 		});
 		setContactForm({
-			id: data.details[0].id, 
-			name: data.details[0].name, 
-			position: data.details[0].position, 
-			no_ref:data.details[0].no_ref,
-			categories:data.details[0].categories,
-			value: data.details[0].categories.reduce((acc, category) => acc + (category.has_hour ? 0 : category.value), 0)
+			id: data?.details[0]?.id, 
+			name: data?.details[0]?.name, 
+			position: data?.details[0]?.position, 
+			no_ref:data?.details[0]?.no_ref,
+			categories:data?.details[0]?.categories,
+			value: data?.details[0]?.categories.reduce((acc, category) => acc + (category.has_hour ? 0 : category.value), 0)
 		});
 
 		// get value
@@ -300,12 +300,12 @@ export default function Create({
 		setData(tempData);
 
 		setContactForm({
-			id: tempData.details[step].id, 
-			name: tempData.details[step].name, 
-			position: tempData.details[step].position, 
-			no_ref:tempData.details[step].no_ref,
+			id: tempData?.details[step]?.id, 
+			name: tempData?.details[step]?.name, 
+			position: tempData?.details[step]?.position, 
+			no_ref:tempData?.details[step]?.no_ref,
 			categories:tempData.details[step].categories,
-			value: tempData.details[step].categories.reduce((acc, category) => acc + (category.has_hour ? 0 : category.value), 0)
+			value: tempData?.details[step]?.categories?.reduce((acc, category) => acc + (category.has_hour ? 0 : category.value), 0)
 		});
 	}
 
@@ -467,63 +467,74 @@ export default function Create({
 											<div className='my-auto'>Ambil Dari Data Sebelumnya</div>											 
 										</button>
 									</div>	
-									}																	
-									<div className='mt-5 overflow-x-auto'>
-										<div className='w-[750px] md:w-full'>
-											<div className='flex font-bold gap-3 border-b py-3'>
-												<div className='w-4/12'>Kategori</div>
-												<div className='w-2/12 text-end'>Jam/Hari</div>
-												<div className='w-3/12 text-end'>Nilai</div>
-												<div className='w-3/12 text-end'>Total</div>
-											</div>
-											{
-												contactForm.categories?.map((category, index) => 
-													<div className='flex gap-3 border-b py-3' key={index}>
-														<div className={`w-5/12 my-auto${category.is_cut ? ' text-red-500' : ''}`}>{ category.name }</div>
-														<div className='w-1/12 text-end'>
-															{
-																category.has_hour && <div className='gap-1'>
+									}		
+									{
+										contactForm?.categories?.length > 0 
+										? <div className='mt-5 overflow-x-auto'>
+												<div className='w-[750px] md:w-full'>
+													<div className='flex font-bold gap-3 border-b py-3'>
+														<div className='w-4/12'>Kategori</div>
+														<div className='w-2/12 text-end'>Jam/Hari</div>
+														<div className='w-3/12 text-end'>Nilai</div>
+														<div className='w-3/12 text-end'>Total</div>
+													</div>
+													{
+														contactForm.categories?.map((category, index) => 
+															<div className='flex gap-3 border-b py-3' key={index}>
+																<div className={`w-5/12 my-auto${category.is_cut ? ' text-red-500' : ''}`}>{ category.name }</div>
+																<div className='w-1/12 text-end'>
+																	{
+																		category.has_hour && <div className='gap-1'>
+																			<NumericFormat
+																				value={category.qty}
+																				customInput={TextInput}
+																				onValueChange={(values) => handleChangeHour(values, index)}
+																				thousandSeparator={true}
+																				className={`text-end w-full${category.is_cut ? ' text-red-500' : ''}`}
+																				prefix={''}
+																			/>
+																			<div className='my-auto hidden md:block text-xs'>{category.unit}</div>
+																		</div>
+																	}
+																</div>
+																<div className='w-3/12 text-end'>
 																	<NumericFormat
-																		value={category.qty}
+																		value={category.value}
 																		customInput={TextInput}
-																		onValueChange={(values) => handleChangeHour(values, index)}
+																		onValueChange={(values) => handleChangeValue(values, index)}
 																		thousandSeparator={true}
 																		className={`text-end w-full${category.is_cut ? ' text-red-500' : ''}`}
-																		prefix={''}
+																		prefix={'IDR. '}
 																	/>
-																	<div className='my-auto hidden md:block text-xs'>{category.unit}</div>
 																</div>
-															}
-														</div>
-														<div className='w-3/12 text-end'>
-															<NumericFormat
-																value={category.value}
-																customInput={TextInput}
-																onValueChange={(values) => handleChangeValue(values, index)}
-																thousandSeparator={true}
-																className={`text-end w-full${category.is_cut ? ' text-red-500' : ''}`}
-																prefix={'IDR. '}
-															/>
-														</div>
-														<div className='w-3/12 text-end'>
-															<NumericFormat
-																value={category.total}
-																customInput={TextInput}
-																thousandSeparator={true}
-																className={`text-end w-full${category.is_cut ? ' text-red-500' : ''}`}
-																prefix={'IDR. '}
-																disabled='disabled'
-															/>
-														</div>
+																<div className='w-3/12 text-end'>
+																	<NumericFormat
+																		value={category.total}
+																		customInput={TextInput}
+																		thousandSeparator={true}
+																		className={`text-end w-full${category.is_cut ? ' text-red-500' : ''}`}
+																		prefix={'IDR. '}
+																		disabled='disabled'
+																	/>
+																</div>
+															</div>
+														)
+													}
+													<div className='flex font-bold gap-3 border-b py-3'>
+														<div className='w-5/12'>Total</div>
+														<div className='w-7/12 text-end'>IDR. {formatNumber(contactForm.value)}</div>
 													</div>
-												)
-											}
-											<div className='flex font-bold gap-3 border-b py-3'>
-												<div className='w-5/12'>Total</div>
-												<div className='w-7/12 text-end'>IDR. {formatNumber(contactForm.value)}</div>
+												</div>
 											</div>
-										</div>
-									</div>
+										: <div className='text-center mt-5'>
+												<Link href={route('data-master.salary-category', {organization:organization.id})}>
+													<button className='border border-blue-500 text-blue-600 rounded-md px-5 py-1 font-bold hover:text-blue-400 hover:border-blue-400'>
+														<span>Tambah Kategori</span>														
+													</button>
+												</Link>
+											</div>
+									}															
+
 								</section>
 							</div>
 						</div>

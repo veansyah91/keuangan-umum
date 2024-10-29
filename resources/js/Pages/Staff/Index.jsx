@@ -45,7 +45,7 @@ const yearList = () => {
     return arrayYear;
 }	
 
-export default function Index({ role, organization, contacts, category, searchFilter }) {
+export default function Index({ role, organization, contacts, category, searchFilter, flash }) {
   // State
 	const [showSearch, setShowSearch] = useState(false);
 	const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
@@ -86,6 +86,12 @@ export default function Index({ role, organization, contacts, category, searchFi
 	const [debounceValue] = useDebounce(search, 500);
 
 	// useEffect
+  useEffect(() => {
+    flash?.error && toast.error(flash.error, {
+      position: toast.POSITION.TOP_CENTER,
+    });
+  },[]);
+
 	useEffect(() => {
 		if (prevSearch !== undefined) {
 			handleReloadPage();
@@ -175,8 +181,6 @@ export default function Index({ role, organization, contacts, category, searchFi
 	};
 
   const handleShow = (contact) => {
-    console.log(contact);
-
     setShowModalDetail(true);
     setData({
 			id : contact.id,

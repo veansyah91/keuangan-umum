@@ -106,6 +106,17 @@ class StaffSalaryPaymentController extends Controller
 			return redirect()->back()->withErrors(['message' => 'Silakan Buat Kategori Kontak STAF terlebih dahulu!']);
 		}
 
+		$contacts = ContactStaff::whereHas('contact', function ($query) use ($organization){
+																return $query->where('organization_id', $organization['id'])
+																						->where('is_active', true);
+															})
+															->with('contact')
+															->get();
+
+		if (count($contacts) < 1) {
+			return redirect(route('data-master.staff', $organization['id']))->with('error', 'Silakan Tambah Kontak STAF terlebih dahulu!');
+		}
+
 		return Inertia::render('StaffSalaryPayment/Create',[
 			'organization' => $organization,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
@@ -122,12 +133,7 @@ class StaffSalaryPaymentController extends Controller
 			'date' => request('date') ?? $this->now->isoFormat('YYYY-MM-DD'),
 			'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),
 			'studyYears' => StudentLevel::select('year')->distinct()->take(10)->get(),
-			'contacts' => ContactStaff::whereHas('contact', function ($query) use ($organization){
-																		return $query->where('organization_id', $organization['id'])
-																								->where('is_active', true);
-																	})
-																	->with('contact')
-																	->get()
+			'contacts' => $contacts
 		]);
 	}
 

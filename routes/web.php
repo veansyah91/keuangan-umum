@@ -368,16 +368,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
 			Route::patch('/student-entry-receivable-payment/{receivablePayment}', [StudentEntryReceivablePaymentController::class, 'update'])->name('cashflow.student-entry-receivable-payment.update');
 			Route::delete('/student-entry-receivable-payment/{receivablePayment}', [StudentEntryReceivablePaymentController::class, 'destroy'])->name('cashflow.student-entry-receivable-payment.delete');
 								
-            // staff salary
-            Route::get('/staff-salary-payment', [StaffSalaryPaymentController::class, 'index'])->name('cashflow.staff-salary-payment');
-            Route::get('/staff-salary-payment/create', [StaffSalaryPaymentController::class, 'create'])->name('cashflow.staff-salary-payment.create');
-            Route::post('/staff-salary-payment', [StaffSalaryPaymentController::class, 'store'])->name('cashflow.staff-salary-payment.store');
-            Route::get('/staff-salary-payment/{id}', [StaffSalaryPaymentController::class, 'show'])->name('cashflow.staff-salary-payment.show');
-            Route::patch('/staff-salary-payment/{payment}', [StaffSalaryPaymentController::class, 'update'])->name('cashflow.staff-salary-payment.update');
-            Route::get('/staff-salary-payment/{payment}/print', [StaffSalaryPaymentController::class, 'print'])->name('cashflow.staff-salary-payment.staff.print');
-            Route::get('/staff-salary-payment/{id}/{staff}', [StaffSalaryPaymentController::class, 'showStaff'])->name('cashflow.staff-salary-payment.staff');
-            Route::get('/staff-salary-payment/{id}/{staff}/edit', [StaffSalaryPaymentController::class, 'editStaff'])->name('cashflow.staff-salary-payment.staff.edit');
-            Route::patch('/staff-salary-payment/{payment}/{staff}', [StaffSalaryPaymentController::class, 'updateStaff'])->name('cashflow.staff-salary-payment.staff.update');
+			// staff salary
+			Route::get('/staff-salary-payment', [StaffSalaryPaymentController::class, 'index'])->name('cashflow.staff-salary-payment');
+			Route::get('/staff-salary-payment/create', [StaffSalaryPaymentController::class, 'create'])->name('cashflow.staff-salary-payment.create');
+			Route::post('/staff-salary-payment', [StaffSalaryPaymentController::class, 'store'])->name('cashflow.staff-salary-payment.store');
+			Route::get('/staff-salary-payment/{id}', [StaffSalaryPaymentController::class, 'show'])->name('cashflow.staff-salary-payment.show');
+			Route::patch('/staff-salary-payment/{payment}', [StaffSalaryPaymentController::class, 'update'])->name('cashflow.staff-salary-payment.update');
+			Route::get('/staff-salary-payment/{payment}/print', [StaffSalaryPaymentController::class, 'print'])->name('cashflow.staff-salary-payment.staff.print');
+			Route::get('/staff-salary-payment/{id}/{staff}', [StaffSalaryPaymentController::class, 'showStaff'])->name('cashflow.staff-salary-payment.staff');
+			Route::get('/staff-salary-payment/{id}/{staff}/edit', [StaffSalaryPaymentController::class, 'editStaff'])->name('cashflow.staff-salary-payment.staff.edit');
+			Route::patch('/staff-salary-payment/{payment}/{staff}', [StaffSalaryPaymentController::class, 'updateStaff'])->name('cashflow.staff-salary-payment.staff.update');
 
 		});
 
