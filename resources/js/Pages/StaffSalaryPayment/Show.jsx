@@ -217,6 +217,7 @@ export default function Show({ role, organization, details, payment, searchFilte
 									<tr className=''>
 										<th className='bg-gray-200'>No Ref</th>
 										<th className='bg-gray-200'>Nama</th>
+										<th className='bg-gray-200'>Jabatan</th>
 										<th className='bg-gray-200 text-end'>Nilai</th>
 										<th className='bg-gray-200'></th>
 									</tr>

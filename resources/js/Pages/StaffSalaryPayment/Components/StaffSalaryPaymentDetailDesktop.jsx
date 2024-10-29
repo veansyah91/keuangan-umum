@@ -5,12 +5,13 @@ import { IoCreateOutline, IoEllipsisVertical } from 'react-icons/io5';
 import { LiaFileInvoiceSolid } from 'react-icons/lia';
 
 export default function StaffSalaryPaymentDetailDesktop({ payment, role, detail, className }) {
-  
+
   return (
 		<>
 			<tr className={className}>
 				<td>{ detail.no_ref }</td>
 				<td>{ detail.name }</td>
+				<td>{ detail.position }</td>
 				<td className='text-end'>IDR {formatNumber(parseInt(detail.total))}</td>
         <td className='text-end'>
           {(role !== 'viewer') && (
