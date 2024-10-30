@@ -161,14 +161,16 @@ export default function Authenticated({
                                                     )}
 
                                                     {role === 'admin' && (
-                                                        <Dropdown.Link
-                                                            className={
-                                                                route().current('logs*') &&
-                                                                `border-l-2 border-[#4f8315]`
-                                                            }
-                                                            href={route('logs', organization?.id)}>
-                                                            Log Aktifitas
-                                                        </Dropdown.Link>
+                                                        <>
+                                                            <Dropdown.Link
+                                                                className={
+                                                                    route().current('logs*') &&
+                                                                    `border-l-2 border-[#4f8315]`
+                                                                }
+                                                                href={route('logs', organization?.id)}>
+                                                                Log Aktifitas
+                                                            </Dropdown.Link>
+                                                        </>
                                                     )}
 
                                                     <Dropdown.Link href={route('logout')} method='post' as='button'>
@@ -290,10 +292,16 @@ export default function Authenticated({
                                     <Link href={route('organization')}>Daftar Organisasi</Link>
                                 </li>
                                 {role === 'admin' && (
-                                    <li
-                                        className={`${route().current('logs*') ? 'border-l-2 border-[#4f8315] font-bold' : ''}`}>
-                                        <Link href={route('logs', organization?.id)}>Log Aktifitas</Link>
-                                    </li>
+                                    <>
+                                        <li
+                                            className={`${route().current('logs*') ? 'border-l-2 border-[#4f8315] font-bold' : ''}`}>
+                                            <Link href={route('logs', organization?.id)}>Log Aktifitas</Link>
+                                        </li>
+                                        <li
+                                            className={`${route().current('logs*') ? 'border-l-2 border-[#4f8315] font-bold' : ''}`}>
+                                            <Link href={route('logs', organization?.id)}>Log Aktifitas</Link>
+                                        </li>
+                                    </>
                                 )}
                                 <li>
                                     <Link href={route('logout')} method='post' as='button'>
