@@ -5,6 +5,7 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\LogController;
+use App\Http\Controllers\AddonsController;
 use App\Http\Controllers\CashinController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\AccountController;
@@ -154,6 +155,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 		// Log
 		Route::get('/logs/{organization}', LogController::class)->name('logs');
+		Route::get('/add-ons/{organization}', AddonsController::class)->name('add-ons');
 
 		// Data Master
 		Route::prefix('data-master/{organization}')->group(function () {
