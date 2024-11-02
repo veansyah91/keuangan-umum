@@ -3,13 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Organization;
-use App\Repositories\User\UserRepository;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
-use Inertia\Response;
+use App\Repositories\User\UserRepository;
 
-class AddonsController extends Controller
+class WhatsappBroadcastingController extends Controller
 {
 	protected $userRepository;
 
@@ -17,15 +14,11 @@ class AddonsController extends Controller
 	{
 		$this->userRepository = $userRepository;
 	}
-
-	/**
-	 * Handle the incoming request.
-	 */
-	public function __invoke(Request $request, Organization $organization): Response
+	
+	public function index(Organization $organization)
 	{
-		$user = Auth::user();
-
-		return Inertia::render('Addons/Index', [
+		
+		return Inertia::render('Addons/Whatsapp/index', [
 			'organization' => $organization,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 		]);

@@ -155,7 +155,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 		// Log
 		Route::get('/logs/{organization}', LogController::class)->name('logs');
-		Route::get('/add-ons/{organization}', AddonsController::class)->name('add-ons');
+
+		Route::prefix('add-ons/{organization}')->group(function () {
+			Route::get('/', AddonsController::class)->name('add-ons');
+
+			// whatsapp
+			
+		});
 
 		// Data Master
 		Route::prefix('data-master/{organization}')->group(function () {
