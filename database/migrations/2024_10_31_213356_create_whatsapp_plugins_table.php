@@ -16,10 +16,10 @@ return new class extends Migration
             $table->foreignUuid('organization_id')->constrained()->cascadeOnDelete();
 
             $table->string('phone'); // diisi oleh pengguna 
-            $table->date('expired_date'); // dilakukan pengecekan setiap hari, jika telah memasuki masa kadaluarsa, maka otomatis status is_active => false
-            $table->string('url');
-            $table->string('appKey');
-            $table->string('authkey');
+            $table->date('expired_date')->nullable(); // dilakukan pengecekan setiap hari, jika telah memasuki masa kadaluarsa, maka otomatis status is_active => false
+            $table->string('url')->nullable();
+            $table->string('appKey')->nullable();
+            $table->string('authkey')->nullable();
             $table->boolean('is_active')->default(false);
             $table->timestamps();
         });

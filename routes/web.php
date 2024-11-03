@@ -162,6 +162,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 			// whatsapp
 			Route::get('/whatsapp', [WhatsappBroadcastingController::class, 'index'])->name('add-ons.whatsapp');
+			Route::get('/whatsapp/status', [WhatsappBroadcastingController::class, 'status'])->name('add-ons.whatsapp.status');
 		});
 
 		// Data Master

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('organization_invoices', function (Blueprint $table) {
+        Schema::create('whatsapp_invoices', function (Blueprint $table) {
             $table->id();
             $table->string('no_ref');
             $table->enum('product', ['Bulanan', 'Tahunan']);
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('organization_invoices');
+        Schema::dropIfExists('whatsapp_invoices');
     }
 };

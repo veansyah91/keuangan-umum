@@ -6,9 +6,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { IoArrowBackOutline, IoFilter, IoPlayBack, IoPlayForward, IoSearchSharp } from 'react-icons/io5';
-import AddButtonMobile from '@/Components/AddButtonMobile';
-import PrimaryButton from '@/Components/PrimaryButton';
+import { IoArrowBackOutline, IoPlayBack, IoPlayForward, IoSearchSharp } from 'react-icons/io5';
 import ContainerDesktop from '@/Components/Desktop/ContainerDesktop';
 import TitleDesktop from '@/Components/Desktop/TitleDesktop';
 import PageNumber from '@/Components/PageNumber';
@@ -21,7 +19,6 @@ import { FaPrint } from 'react-icons/fa';
 import formatNumber from '@/Utils/formatNumber';
 import { usePrevious } from 'react-use';
 import { useDebounce } from 'use-debounce';
-// import StaffSalaryPaymentDetailDesktop from './Components/StaffSalaryPaymentDetailDesktop';
 
 export default function Show({ role, organization, details, payment, searchFilter, flash }) {
 	const [search, setSearch] = useState(searchFilter || '');	
