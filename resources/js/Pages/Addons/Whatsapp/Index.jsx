@@ -8,29 +8,29 @@ import { FaWhatsapp } from "react-icons/fa";
 import { toast, ToastContainer } from 'react-toastify';
 
 export default function Index({ organization }) {
-	const { errors } = usePage().props;
-
-	useEffect(() => {
-		errors && 
-		toast.error(errors.message, {
-			position: toast.POSITION.TOP_CENTER,
-		});
-	},[]);
-
-	return (
-		<>
+  return (
+    <>
 			<Head title='Add-ons' />
 			<ToastContainer />
 
 			{/* Desktop */}
 			<ContainerDesktop>
-				<section>
-					<div className='flex flex-wrap justify-center pt-5 pb-10 gap-5'>
-						<Link href={route('add-ons.whatsapp', organization.id)}>
-							<CardMenu bgColor={'bg-green-500'} icon={<FaWhatsapp />} title={'WhatsApp Broadcast'} />
-						</Link>
-					</div>
-				</section>
+        <div className='flex'>
+          <section className='w-1/12 my-auto'>
+            <Link href={route('add-ons', {organization: organization.id})}>
+              <button>Back</button>
+            </Link>
+          </section>
+          <section>
+            <div className='flex flex-wrap justify-center pt-5 pb-10 gap-5'>
+              <Link href={route('add-ons.whatsapp', organization.id)}>
+                <CardMenu bgColor={'bg-green-500'} icon={<FaWhatsapp />} title={'WhatsApp Broadcast'} />
+              </Link>
+            </div>
+          </section>
+
+        </div>
+				
 			</ContainerDesktop>
 			{/* Desktop */}
 
@@ -44,7 +44,7 @@ export default function Index({ organization }) {
 			</section>
 			{/* Mobile */}
 		</>
-	);
+  )
 }
 
 Index.layout = (page) => (
@@ -54,6 +54,6 @@ Index.layout = (page) => (
 		user={page.props.auth.user}
 		role={page.props.role}
 		organization={page.props.organization}
-		title='Add-ons'
+		title='WhatsApp'
 	/>
 );

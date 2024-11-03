@@ -44,6 +44,7 @@ use App\Http\Controllers\StaffSalaryPaymentController;
 use App\Http\Controllers\OrganizationInvoiceController;
 use App\Http\Controllers\StudentEntryPaymentController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\WhatsappBroadcastingController;
 use App\Http\Controllers\StudentMonthlyPaymentController;
 use App\Http\Controllers\Admin\OrganizationMenuController;
 use App\Http\Controllers\StudentEntryReceivableController;
@@ -160,7 +161,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 			Route::get('/', AddonsController::class)->name('add-ons');
 
 			// whatsapp
-			
+			Route::get('/whatsapp', [WhatsappBroadcastingController::class, 'index'])->name('add-ons.whatsapp');
 		});
 
 		// Data Master
