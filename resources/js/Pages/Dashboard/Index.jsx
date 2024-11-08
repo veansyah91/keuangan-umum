@@ -18,6 +18,7 @@ import CashflowChart from './Components/CashflowChart';
 const Index = ({ balance, startDate, endDate }) => {
     const { date, setDate } = useContext(AppContext);
     const [isLoading, setIsLoading] = useState(false);
+    
 
     useEffect(() => {
         setIsLoading(true);
@@ -224,7 +225,10 @@ const Index = ({ balance, startDate, endDate }) => {
                 />
 
                 {/* Arus Kas */}
-                <CashflowChart data={balance?.cashflowDay} />
+                {
+                    balance?.cashflowDay && <CashflowChart data={balance?.cashflowDay} />
+                }
+                
             </Container>
         </>
     );

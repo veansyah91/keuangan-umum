@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('appKey')->nullable();
             $table->string('authkey')->nullable();
             $table->boolean('is_active')->default(false);
+            $table->boolean('connection')->default(false);
             $table->timestamps();
         });
     }

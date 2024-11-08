@@ -26,8 +26,34 @@ import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
 import DangerButton from '@/Components/DangerButton';
 import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
+import { data } from 'autoprefixer';
+import { NumericFormat } from 'react-number-format';
+import TextInput from '@/Components/TextInput';
 
-export default function Setting() {
+function NoData () {
+	return(
+		<>
+
+		</>
+	)
+}
+
+export default function Setting({
+	status, organization
+}) {
+
+	const { data, setData, post, processing } = useForm({
+		'phone' : ''
+	})
+
+	const [showAddData, setShowAddData] = useState(false);
+
+	const handleChangeValue = (values) => {
+
+	}
+	const handleSubmit = (e) => {
+		
+	}
   return (
     <>
 			<Head title='Status WhatsApp Broadcast' />
@@ -37,11 +63,41 @@ export default function Setting() {
 				<div className='sm:mx-auto px-3 sm:px-5 bg-white py-2 sm:pt-0 space-y-5 md:space-y-0'>
 					<div className='sm:pt-0 pb-16 pt-12'>
 						<div className='bg-white py-2 px-2 sm:pt-0'>
-
+							<div className='mx-auto text-center py-5 space-y-3'>
+								<div>
+									Belum tertaut dengan WhatsApp
+								</div>
+								<button className='my-auto mx-auto bg-green-700 text-xl py-3 px-2 rounded-lg text-white font-bold' onClick={() => setShowAddData(true)}>
+									Tautkan WhatsApp
+								</button>
+							</div>
+							
 						</div>
 					</div>
 				</div>
 			</div>
+
+			{/* Delete */}
+			<Modal show={showAddData} onClose={() => setShowAddData(false)}>
+				<form onSubmit={handleSubmit} className='p-6' id='deleteForm' name='deleteForm'>
+					<h2 className='text-lg font-medium text-gray-900 text-center'>Tautkan WhatsApp</h2>
+
+					<div className='mt-6 '>
+						<div className='flex flex-col sm:flex-row w-full gap-1'>
+							
+						</div>
+
+					</div>
+
+					<div className='mt-6 flex justify-end'>
+						<SecondaryButton onClick={() => setShowAddData(false)}>Batal</SecondaryButton>
+
+						<PrimaryButton className='ms-3' disabled={processing}>
+								Tambah
+						</PrimaryButton>
+					</div>
+				</form>
+			</Modal>
     </>
   )
 }
