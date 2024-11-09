@@ -172,7 +172,7 @@ export default function Authenticated({
                                                             </Dropdown.Link>
                                                             <Dropdown.Link
                                                                 className={
-                                                                    route().current('logs*') &&
+                                                                    route().current('add-ons*') &&
                                                                     `border-l-2 border-[#4f8315]`
                                                                 }
                                                                 href={route('add-ons', organization?.id)}>
@@ -306,7 +306,7 @@ export default function Authenticated({
                                             <Link href={route('logs', organization?.id)}>Log Aktifitas</Link>
                                         </li>
                                         <li
-                                            className={`${route().current('logs*') ? 'border-l-2 border-[#4f8315] font-bold' : ''}`}>
+                                            className={`${route().current('add-ons*') ? 'border-l-2 border-[#4f8315] font-bold' : ''}`}>
                                             <Link href={route('add-ons', organization?.id)}>Add-ons</Link>
                                         </li>
                                     </>

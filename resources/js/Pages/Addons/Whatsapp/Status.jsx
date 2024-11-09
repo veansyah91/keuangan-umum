@@ -29,6 +29,7 @@ import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 import { data } from 'autoprefixer';
 import { NumericFormat } from 'react-number-format';
 import TextInput from '@/Components/TextInput';
+import InputLabel from '@/Components/InputLabel';
 
 function NoData () {
 	return(
@@ -42,7 +43,7 @@ export default function Setting({
 	status, organization
 }) {
 
-	const { data, setData, post, processing } = useForm({
+	const { data, setData, patch, processing } = useForm({
 		'phone' : ''
 	})
 
@@ -51,6 +52,7 @@ export default function Setting({
 	const handleChangeValue = (values) => {
 
 	}
+	
 	const handleSubmit = (e) => {
 		
 	}
@@ -84,7 +86,20 @@ export default function Setting({
 
 					<div className='mt-6 '>
 						<div className='flex flex-col sm:flex-row w-full gap-1'>
-							
+							<div className='w-full sm:w-1/3 my-auto'>
+								<InputLabel value={'No. Handphone'} htmlFor='phone' />
+							</div>
+							<div className='w-full sm:w-2/3'>
+								<NumericFormat
+										value={data.phone}
+										customInput={TextInput}
+										onValueChange={(values) => handleChangeValue(values)}
+										thousandSeparator={false}
+										className='text-start w-full border'
+										placeholder='628xxx'
+										prefix={''}
+								/>
+							</div>
 						</div>
 
 					</div>
@@ -93,7 +108,7 @@ export default function Setting({
 						<SecondaryButton onClick={() => setShowAddData(false)}>Batal</SecondaryButton>
 
 						<PrimaryButton className='ms-3' disabled={processing}>
-								Tambah
+								Tautkan
 						</PrimaryButton>
 					</div>
 				</form>
