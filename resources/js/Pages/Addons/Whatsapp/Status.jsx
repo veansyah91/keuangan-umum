@@ -54,7 +54,13 @@ export default function Setting({
 	}
 	
 	const handleSubmit = (e) => {
-		
+		e.preventDefault();
+
+		patch(route('add-ons.whatsapp.status.update', {organization: organization.id}), {
+			onSuccess: (props) => {
+				
+			}
+		})
 	}
   return (
     <>
@@ -79,7 +85,7 @@ export default function Setting({
 				</div>
 			</div>
 
-			{/* Delete */}
+			{/* Update Phone */}
 			<Modal show={showAddData} onClose={() => setShowAddData(false)}>
 				<form onSubmit={handleSubmit} className='p-6' id='deleteForm' name='deleteForm'>
 					<h2 className='text-lg font-medium text-gray-900 text-center'>Tautkan WhatsApp</h2>

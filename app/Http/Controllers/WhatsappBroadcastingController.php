@@ -41,4 +41,10 @@ class WhatsappBroadcastingController extends Controller
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 		]);
 	}
+
+	public function update(Request $request, Organization $organization)
+	{
+		dd($request);
+	}
+
 }
