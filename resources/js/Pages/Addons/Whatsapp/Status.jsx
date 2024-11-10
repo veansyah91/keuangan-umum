@@ -31,10 +31,19 @@ import { NumericFormat } from 'react-number-format';
 import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';
 
-function NoData () {
+function NoData ({
+	setShowAddData
+}) {
 	return(
 		<>
-
+			<div className='mx-auto text-center py-5 space-y-3'>
+				<div>
+					Belum tertaut dengan WhatsApp
+				</div>
+				<button className='my-auto mx-auto bg-green-700 text-xl py-3 px-2 rounded-lg text-white font-bold' onClick={setShowAddData}>
+					Tautkan WhatsApp
+				</button>
+			</div>
 		</>
 	)
 }
@@ -51,6 +60,10 @@ export default function Setting({
 
 	const handleChangeValue = (values) => {
 
+	}
+
+	const handleSetShowAddData = () => {
+		setShowAddData(true);
 	}
 	
 	const handleSubmit = (e) => {
@@ -71,14 +84,21 @@ export default function Setting({
 				<div className='sm:mx-auto px-3 sm:px-5 bg-white py-2 sm:pt-0 space-y-5 md:space-y-0'>
 					<div className='sm:pt-0 pb-16 pt-12'>
 						<div className='bg-white py-2 px-2 sm:pt-0'>
-							<div className='mx-auto text-center py-5 space-y-3'>
+							{/* cek apakah data sudah ada */}
+							{
+								!status 
+								&& <NoData 
+									setShowAddData={handleSetShowAddData}
+								/>
+							}
+							{/* <div className='mx-auto text-center py-5 space-y-3'>
 								<div>
 									Belum tertaut dengan WhatsApp
 								</div>
 								<button className='my-auto mx-auto bg-green-700 text-xl py-3 px-2 rounded-lg text-white font-bold' onClick={() => setShowAddData(true)}>
 									Tautkan WhatsApp
 								</button>
-							</div>
+							</div> */}
 							
 						</div>
 					</div>
