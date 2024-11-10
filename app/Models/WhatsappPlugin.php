@@ -8,4 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 class WhatsappPlugin extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'organization_id',
+        'phone',
+        'expired_date',
+        'url',
+        'appKey',
+        'authkey',
+        'is_active',
+        'connection'
+    ];
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Inertia\Inertia;
 use App\Models\Organization;
 use Illuminate\Http\Request;
+use App\Models\WhatsappPlugin;
 use App\Models\WhatsappInvoice;
 use Illuminate\Support\Facades\Auth;
 use App\Repositories\User\UserRepository;
@@ -32,7 +33,7 @@ class WhatsappBroadcastingController extends Controller
 	{
 		$user = Auth::user();
 
-		$status = WhatsappInvoice::where('organization_id', $organization['id'])
+		$status = WhatsappPlugin::where('organization_id', $organization['id'])
 															->first();
 		
 		return Inertia::render('Addons/Whatsapp/Status', [
@@ -44,7 +45,17 @@ class WhatsappBroadcastingController extends Controller
 
 	public function update(Request $request, Organization $organization)
 	{
-		dd($request);
+		$validated = $request->validate([
+			'phone' => 'required|string|unique:whatsapp_plugins'
+		]);
+
+		WhatsappPlugin::updateOrCreate([
+			'organization_id' => $organization['id']
+		],[
+			'phone' => $validated['phone']
+		]);
+
+		return redirect()->back()->with('success', 'No WhatsApp Berhasil Didaftarkan');
 	}
 
 }

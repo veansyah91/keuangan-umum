@@ -35,16 +35,46 @@ function NoData ({
 	setShowAddData
 }) {
 	return(
-		<>
-			<div className='mx-auto text-center py-5 space-y-3'>
-				<div>
-					Belum tertaut dengan WhatsApp
-				</div>
-				<button className='my-auto mx-auto bg-green-700 text-xl py-3 px-2 rounded-lg text-white font-bold' onClick={setShowAddData}>
-					Tautkan WhatsApp
-				</button>
+		<div className='mx-auto text-center py-5 space-y-3'>
+			<div>
+				Belum tertaut dengan WhatsApp
 			</div>
-		</>
+			<button className='my-auto mx-auto bg-green-700 text-xl py-3 px-2 rounded-lg text-white font-bold' onClick={setShowAddData}>
+				Tautkan WhatsApp
+			</button>
+		</div>
+	)
+}
+
+function WithData({
+	data
+}) {
+	return (
+		<div className='w-full flex pt-5 gap-2'>
+			<div className='w-5/12 space-y-3'>
+				<div className='flex gap-2'>
+					<div className='w-4/12'>No. Handphone</div>
+					<div className='w-1/12 text-end'>:</div>
+					<div className='w-7/12'>{data.phone}</div>
+				</div>
+				<div className='flex gap-2'>
+					<div className='w-4/12'>Tanggal Kadaluarsa</div>
+					<div className='w-1/12 text-end'>:</div>
+					<div className='w-7/12'>{data.expired_date}</div>
+				</div>
+				<div className='flex gap-2'>
+					<div className='w-4/12'>Status</div>
+					<div className='w-1/12 text-end'>:</div>
+					<div className='w-7/12'>{data.is_active ? 'Aktif' : 'Tidak Aktif' }</div>
+				</div>
+				<div className='flex gap-2'>
+					<div className='w-4/12'>Koneksi</div>
+					<div className='w-1/12 text-end'>:</div>
+					<div className='w-7/12'>{data.connection ? 'Aktif' : 'Tidak Aktif' }</div>
+				</div>
+			</div>
+		</div>
+
 	)
 }
 
@@ -53,13 +83,13 @@ export default function Setting({
 }) {
 
 	const { data, setData, patch, processing } = useForm({
-		'phone' : ''
+		'phone' : status ? status.phone : ''
 	})
 
 	const [showAddData, setShowAddData] = useState(false);
 
 	const handleChangeValue = (values) => {
-
+		setData('phone', values.value)
 	}
 
 	const handleSetShowAddData = () => {
@@ -70,8 +100,19 @@ export default function Setting({
 		e.preventDefault();
 
 		patch(route('add-ons.whatsapp.status.update', {organization: organization.id}), {
-			onSuccess: (props) => {
+			onSuccess: ({ props }) => {
+				const { flash } = props;
+
+				toast.success(flash.success, {
+					position: toast.POSITION.TOP_CENTER,
+				});
 				
+				setShowAddData(false);
+			},
+			onError: errors => {
+				toast.error(errors.phone, {
+					position: toast.POSITION.TOP_CENTER,
+				});
 			}
 		})
 	}
@@ -85,21 +126,21 @@ export default function Setting({
 					<div className='sm:pt-0 pb-16 pt-12'>
 						<div className='bg-white py-2 px-2 sm:pt-0'>
 							{/* cek apakah data sudah ada */}
+							{/* jika tidak ada status */}
 							{
 								!status 
 								&& <NoData 
 									setShowAddData={handleSetShowAddData}
 								/>
 							}
-							{/* <div className='mx-auto text-center py-5 space-y-3'>
-								<div>
-									Belum tertaut dengan WhatsApp
-								</div>
-								<button className='my-auto mx-auto bg-green-700 text-xl py-3 px-2 rounded-lg text-white font-bold' onClick={() => setShowAddData(true)}>
-									Tautkan WhatsApp
-								</button>
-							</div> */}
 							
+							{/* jika sudaj ada status */}
+							{
+								status
+								&& <WithData
+									data={status}
+								/>
+							}								
 						</div>
 					</div>
 				</div>

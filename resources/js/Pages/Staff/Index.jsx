@@ -435,7 +435,7 @@ export default function Index({ role, organization, contacts, category, searchFi
                   id='phone'
                   name='phone'
                   className={`w-full ${errors?.phone && 'border-red-500'}`}
-                  placeholder='08xxxxx / 62xxxxx'
+                  placeholder='628xxxx'
                   value={data.phone}
                   onChange={(e) => setData('phone', e.target.value.toUpperCase())}
                 />

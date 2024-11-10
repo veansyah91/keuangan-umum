@@ -27,7 +27,8 @@ const yearList = () => {
             ...arrayYear, index
         ];
     }
-    return parseInt(arrayYear);
+    
+    return arrayYear;
 }
 
 const levelArr = () => {
@@ -39,7 +40,7 @@ const levelArr = () => {
         ];
     }
 
-    return parseInt(levelArr);
+    return levelArr;
 }
 
 export default function Create({ organization, category }) {    
@@ -58,14 +59,12 @@ export default function Create({ organization, category }) {
         year:studyYear(),
         category: category.id,
     });
-
+    
     // useEffect
 
     // function
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(data);
-        
         
         post(route('data-master.students.post', organization.id), {
             onSuccess: () => {
@@ -122,7 +121,7 @@ export default function Create({ organization, category }) {
                                     id='phone'
                                     name='phone'
                                     className={`w-full ${errors?.phone && 'border-red-500'}`}
-                                    placeholder='08xxxxx / 62xxxxx'
+                                    placeholder='628xxxx'
                                     value={data.phone}
                                     onChange={(e) => setData('phone', e.target.value.toUpperCase())}
                                 />

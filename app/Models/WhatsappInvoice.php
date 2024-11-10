@@ -10,12 +10,11 @@ class WhatsappInvoice extends Model
     use HasFactory;
 
     protected $fillable = [
+        'no_ref',
+        'product', 
+        'description',
+        'status',
+        'price',
         'organization_id',
-        'phone', 
-        'expired_date',
-        'url',
-        'appKey',
-        'authKey',
-        'is_active'
     ];
 }
