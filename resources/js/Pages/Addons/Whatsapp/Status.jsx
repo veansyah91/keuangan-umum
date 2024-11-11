@@ -1,35 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import ContainerDesktop from '@/Components/Desktop/ContainerDesktop';
+import { Head, Link, useForm } from '@inertiajs/react';
 import {
     IoArrowBackOutline,
-    IoFilter,
-    IoPlayBack,
-    IoPlayForward,
-    IoSearchSharp,
-    IoTrashOutline,
 } from 'react-icons/io5';
 import { ToastContainer, toast } from 'react-toastify';
-import AddButtonMobile from '@/Components/AddButtonMobile';
-import TitleMobile from '@/Components/Mobiles/TitleMobile';
-import { useDebounce } from 'use-debounce';
-import { usePrevious } from 'react-use';
-import ContentMobile from '@/Components/Mobiles/ContentMobile';
-import TitleDesktop from '@/Components/Desktop/TitleDesktop';
 import PrimaryButton from '@/Components/PrimaryButton';
-import Datepicker from 'react-tailwindcss-datepicker';
-import PageNumber from '@/Components/PageNumber';
-import ContentDesktop from '@/Components/Desktop/ContentDesktop';
 import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
-import DangerButton from '@/Components/DangerButton';
-import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
-import { data } from 'autoprefixer';
 import { NumericFormat } from 'react-number-format';
 import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';
+import { FaPowerOff } from 'react-icons/fa';
+import { FaRegEdit } from 'react-icons/fa/index.esm';
 
 function NoData ({
 	setShowAddData
@@ -47,7 +31,7 @@ function NoData ({
 }
 
 function WithData({
-	data
+	data, handleShowAddDataModal
 }) {
 	return (
 		<div className='w-full flex pt-5 gap-2'>
@@ -55,7 +39,18 @@ function WithData({
 				<div className='flex gap-2'>
 					<div className='w-4/12'>No. Handphone</div>
 					<div className='w-1/12 text-end'>:</div>
-					<div className='w-7/12'>{data.phone}</div>
+					<div className='w-7/12 flex gap-2'>
+						<div>{data.phone}</div>
+						<div>
+							<button
+								className='text-gray-500 text-sm'
+								onClick={handleShowAddDataModal}
+							>
+								<FaRegEdit />
+							</button>
+						</div>
+						
+					</div>
 				</div>
 				<div className='flex gap-2'>
 					<div className='w-4/12'>Tanggal Kadaluarsa</div>
@@ -65,16 +60,21 @@ function WithData({
 				<div className='flex gap-2'>
 					<div className='w-4/12'>Status</div>
 					<div className='w-1/12 text-end'>:</div>
-					<div className='w-7/12'>{data.is_active ? 'Aktif' : 'Tidak Aktif' }</div>
+					<div className={`w-7/12 font-bold ${data.is_active ? 'text-green-500' : 'text-red-500'}`}>{data.is_active ? 'Aktif' : 'Tidak Aktif' }</div>
 				</div>
 				<div className='flex gap-2'>
 					<div className='w-4/12'>Koneksi</div>
 					<div className='w-1/12 text-end'>:</div>
-					<div className='w-7/12'>{data.connection ? 'Aktif' : 'Tidak Aktif' }</div>
+					<div className='w-7/12 my-auto'>
+					{
+						data.connection 
+						? 'Aktif' 
+						: <div className='my-auto text-red-500 flex gap-2'><div className='my-auto'><FaPowerOff /></div> <div>disconnected</div></div> 
+					}
+					</div>
 				</div>
 			</div>
 		</div>
-
 	)
 }
 
@@ -139,6 +139,7 @@ export default function Setting({
 								status
 								&& <WithData
 									data={status}
+									handleShowAddDataModal={() => setShowAddData(true)}
 								/>
 							}								
 						</div>
@@ -149,7 +150,11 @@ export default function Setting({
 			{/* Update Phone */}
 			<Modal show={showAddData} onClose={() => setShowAddData(false)}>
 				<form onSubmit={handleSubmit} className='p-6' id='deleteForm' name='deleteForm'>
-					<h2 className='text-lg font-medium text-gray-900 text-center'>Tautkan WhatsApp</h2>
+					<h2 className='text-lg font-medium text-gray-900 text-center'>
+						{
+							status ? 'Ubah No HP Tautan WhatsApp' : 'Tautkan WhatsApp'
+						}
+					</h2>
 
 					<div className='mt-6 '>
 						<div className='flex flex-col sm:flex-row w-full gap-1'>
@@ -158,24 +163,23 @@ export default function Setting({
 							</div>
 							<div className='w-full sm:w-2/3'>
 								<NumericFormat
-										value={data.phone}
-										customInput={TextInput}
-										onValueChange={(values) => handleChangeValue(values)}
-										thousandSeparator={false}
-										className='text-start w-full border'
-										placeholder='628xxx'
-										prefix={''}
+									value={data.phone}
+									customInput={TextInput}
+									onValueChange={(values) => handleChangeValue(values)}
+									thousandSeparator={false}
+									className='text-start w-full border'
+									placeholder='628xxx'
+									prefix={''}
 								/>
 							</div>
 						</div>
-
 					</div>
 
 					<div className='mt-6 flex justify-end'>
 						<SecondaryButton onClick={() => setShowAddData(false)}>Batal</SecondaryButton>
 
 						<PrimaryButton className='ms-3' disabled={processing}>
-								Tautkan
+							{ status ? 'Ubah' : 'Tautkan' }
 						</PrimaryButton>
 					</div>
 				</form>

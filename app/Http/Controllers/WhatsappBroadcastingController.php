@@ -7,6 +7,7 @@ use App\Models\Organization;
 use Illuminate\Http\Request;
 use App\Models\WhatsappPlugin;
 use App\Models\WhatsappInvoice;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use App\Repositories\User\UserRepository;
 
@@ -46,7 +47,13 @@ class WhatsappBroadcastingController extends Controller
 	public function update(Request $request, Organization $organization)
 	{
 		$validated = $request->validate([
-			'phone' => 'required|string|unique:whatsapp_plugins'
+			'phone' => [
+				'required',
+				'string',
+				Rule::unique('whatsapp_plugins')->where(function ($query) use ($organization) {
+					return $query->where('organization_id', "<>", $organization['id']);
+			}),
+			]
 		]);
 
 		WhatsappPlugin::updateOrCreate([

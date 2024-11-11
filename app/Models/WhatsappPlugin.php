@@ -17,6 +17,7 @@ class WhatsappPlugin extends Model
         'appKey',
         'authkey',
         'is_active',
-        'connection'
+        'connection',
+        'last_connection'
     ];
 }

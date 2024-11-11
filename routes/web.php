@@ -52,6 +52,7 @@ use App\Http\Controllers\StudentPaymentCategoryController;
 use App\Http\Controllers\Admin\AdminOrganizationController;
 use App\Http\Controllers\StudentMonthlyReceivableController;
 use App\Http\Controllers\StudentEntryPaymentCategoryController;
+use App\Http\Controllers\WhatsappBroadcastingInvoiceController;
 use App\Http\Controllers\StudentEntryReceivablePaymentController;
 use App\Http\Controllers\Admin\AdminOrganizationInvoiceController;
 
@@ -164,6 +165,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 			Route::get('/whatsapp', [WhatsappBroadcastingController::class, 'index'])->name('add-ons.whatsapp');
 			Route::get('/whatsapp/status', [WhatsappBroadcastingController::class, 'status'])->name('add-ons.whatsapp.status');
 			Route::patch('/whatsapp/status', [WhatsappBroadcastingController::class, 'update'])->name('add-ons.whatsapp.status.update');
+
+			// whatsapp invoice
+			Route::get('/whatsapp-invoice', [WhatsappBroadcastingInvoiceController::class, 'index'])->name('add-ons.whatsapp-invoice');
+			Route::get('/whatsapp-invoice/create', [WhatsappBroadcastingInvoiceController::class, 'create'])->name('add-ons.whatsapp-invoice.create');
+
 		});
 
 		// Data Master
