@@ -9,7 +9,7 @@ import { ToastContainer } from 'react-toastify';
 import { IoArrowBackOutline, IoSettingsSharp } from 'react-icons/io5';
 import { LiaFileInvoiceSolid } from 'react-icons/lia';
 
-export default function Index({ organization }) {
+export default function Index({ organization, status }) {	
   return (
     <>
 			<Head title='Add-ons' />
@@ -28,9 +28,15 @@ export default function Index({ organization }) {
               <Link href={route('add-ons.whatsapp.status', organization.id)}>
                 <CardMenu bgColor={'bg-slate-500'} icon={<IoSettingsSharp />} title={'Status'} />
               </Link>
-							<Link href={route('add-ons.whatsapp-invoice', organization.id)}>
-                <CardMenu bgColor={'bg-red-500'} icon={<LiaFileInvoiceSolid />} title={'Berlangganan'} />
-              </Link>
+							{
+								status && 
+								<>
+									<Link href={route('add-ons.whatsapp-invoice', organization.id)}>
+										<CardMenu bgColor={'bg-red-500'} icon={<LiaFileInvoiceSolid />} title={'Berlangganan'} />
+									</Link>
+								</>
+							}
+							
             </div>
           </section>
         </div>
@@ -44,9 +50,14 @@ export default function Index({ organization }) {
 					<Link href={route('add-ons.whatsapp.status', organization.id)}>
 						<CardMenu bgColor={'bg-slate-500'} icon={<IoSettingsSharp />} title={'Status'} />
 					</Link>
-					<Link href={route('add-ons.whatsapp-invoice', organization.id)}>
-						<CardMenu bgColor={'bg-red-500'} icon={<LiaFileInvoiceSolid />} title={'Berlangganan'} />
-					</Link>
+					{
+						status && 
+						<>
+							<Link href={route('add-ons.whatsapp-invoice', organization.id)}>
+								<CardMenu bgColor={'bg-red-500'} icon={<LiaFileInvoiceSolid />} title={'Berlangganan'} />
+							</Link>
+						</>
+					}
 				</div>
 			</section>
 			{/* Mobile */}

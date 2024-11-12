@@ -23,9 +23,13 @@ class WhatsappBroadcastingController extends Controller
 	public function index(Organization $organization)
 	{
 		$user = Auth::user();
+
+		$status = WhatsappPlugin::where('organization_id', $organization['id'])
+															->first();
 		
 		return Inertia::render('Addons/Whatsapp/Index', [
 			'organization' => $organization,
+			'status' => $status,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 		]);
 	}
