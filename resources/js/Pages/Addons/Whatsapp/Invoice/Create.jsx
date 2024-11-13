@@ -15,6 +15,8 @@ import PageNumber from '@/Components/PageNumber';
 import Container from './Components/Container';
 import Card from './Components/Card';
 import BadgeSuccess from '@/Components/Badges/BadgeSuccess';
+import BadgeGray from '@/Components/Badges/BadgeGray';
+import SuccessButton from '@/Components/SuccessButton';
 
 export default function Create({
   organization
@@ -23,10 +25,21 @@ export default function Create({
     product: 'Tahunan',
   });
 
-  const handleSubmit = (value) => {
+  const handleSelectProduct = (value) => {
     setData('product', value);
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    console.log(data);
+    post(route('add-ons.whatsapp-invoice.store', organization.id), {
+      onSuccess: ({ props }) => {
+        console.log(props);
+        
+      }
+    })
+  }
 
   return (
     <>
@@ -38,7 +51,7 @@ export default function Create({
 					<div className='sm:pt-0 pb-16 pt-12'>
 						<div className='py-2 px-2 sm:pt-0'>
               <Container>
-
+                <form onSubmit={handleSubmit}>
                 <div className='bg-white overflow-hidden shadow-sm sm:rounded-t-lg'>
                   <div className='sm:p-6 px-6 py-6 text-gray-800 text-center'>
                     <Header>Pilih Paket Berlangganan</Header>
@@ -50,6 +63,10 @@ export default function Create({
                     <Card.CardHeader>Bulanan</Card.CardHeader>
                     <Card.CardContent>
                       {/* price */}
+                      <div className='text-2xl line-through mb-5'>
+                       <div>Rp. 250.000 </div>
+                       <div><BadgeGray>Disc 60%</BadgeGray></div> 
+                      </div>
                       <div className='text-4xl'>Rp. 100.000</div>
                       <div className='italic text-sm'>Rp. 3.333 / hari</div>
 
@@ -57,7 +74,7 @@ export default function Create({
                       <div className='mt-3 text-gray-500'>Berakhir Pada </div>
                     </Card.CardContent>
                     <div className='mt-5'>
-                      <PrimaryButton onClick={(e) => handleSubmit('Bulanan')}>Pilih</PrimaryButton>
+                      <PrimaryButton onClick={(e) => handleSelectProduct('Bulanan')} type='button'>Pilih</PrimaryButton>
                     </div>
                   </Card>
 
@@ -67,6 +84,10 @@ export default function Create({
                     </Card.CardHeader>
                     <Card.CardContent>
                       {/* price */}
+                      <div className='text-2xl line-through mb-5'>
+                       <div>Rp. 2.500.000 </div>
+                       <div><BadgeGray>Disc 60%</BadgeGray></div> 
+                      </div>
                       <div className='text-4xl'>Rp. 1.000.000</div>
                       <div className='italic text-sm'>Rp. 2.778 / hari</div>
 
@@ -76,12 +97,21 @@ export default function Create({
                       </div>
                     </Card.CardContent>
                     <div className='mt-5'>
-                      <PrimaryButton onClick={() => handleSubmit('Tahunan')} type='button'>
+                      <PrimaryButton onClick={() => handleSelectProduct('Tahunan')} type='button'>
                         Pilih
                       </PrimaryButton>
                     </div>
                   </Card>
                 </div>
+
+                <div className='bg-white rounded-b-lg p-4 flex'>
+                    <div className='w-1/2'>
+                    </div>
+                    <div className='w-1/2 text-end'>
+                        <SuccessButton type={"submit"}>Buat Pesanan</SuccessButton>
+                    </div>
+                </div>
+                </form>
               </Container>
             </div>
           </div>

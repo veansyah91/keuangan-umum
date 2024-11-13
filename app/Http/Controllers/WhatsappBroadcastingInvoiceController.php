@@ -8,6 +8,7 @@ use App\Helpers\NewRef;
 use Carbon\CarbonImmutable;
 use App\Models\Organization;
 use Illuminate\Http\Request;
+use App\Models\WhatsappPlugin;
 use App\Models\WhatsappInvoice;
 use Illuminate\Support\Facades\Auth;
 use App\Models\StudentMonthlyPayment;
@@ -41,6 +42,11 @@ class WhatsappBroadcastingInvoiceController extends Controller
 		$this->now = CarbonImmutable::now();
 	}
 
+	public function nextMonth()
+	{
+		
+	}
+
 	protected function newRef($organization, $dateRequest = '')
 	{
 		$now = $this->now;
@@ -49,7 +55,7 @@ class WhatsappBroadcastingInvoiceController extends Controller
 		$refHeader = 'WI-'.$dateRef->isoFormat('YYYY').$dateRef->isoFormat('MM');
 		$newRef = $refHeader.'0001';
 
-		$payment = StudentMonthlyPayment::whereOrganizationId($organization['id'])
+		$payment = WhatsappInvoice::whereOrganizationId($organization['id'])
 				->where('no_ref', 'like', $refHeader.'%')
 				->orderBy('no_ref','desc')
 				->first();
@@ -79,9 +85,21 @@ class WhatsappBroadcastingInvoiceController extends Controller
 	{
 		$user = Auth::user();
 
+		$status = WhatsappPlugin::where('organization_id', $organization['id'])
+															->first();
+
+		$expiredDate = $this->now;
+		dd($expiredDate);
+		$expiredDate = new Carbon($status['expired_date']);
+
 		return Inertia::render('Addons/Whatsapp/Invoice/Create', [
 			'organization' => $organization,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 		]);
+	}
+
+	public function store(Request $request, Organization $organization)
+	{
+		dd($request);
 	}
 }
