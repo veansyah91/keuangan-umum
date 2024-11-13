@@ -17,13 +17,17 @@ import Card from './Components/Card';
 import BadgeSuccess from '@/Components/Badges/BadgeSuccess';
 import BadgeGray from '@/Components/Badges/BadgeGray';
 import SuccessButton from '@/Components/SuccessButton';
+import dayjs from 'dayjs';
 
 export default function Create({
-  organization
+  organization, expiredDate
 }) {
   const { data, setData, post, processing, errors, reset } = useForm({
     product: 'Tahunan',
   });
+
+  console.log(expiredDate);
+
 
   const handleSelectProduct = (value) => {
     setData('product', value);
@@ -71,7 +75,7 @@ export default function Create({
                       <div className='italic text-sm'>Rp. 3.333 / hari</div>
 
                       {/* Description */}
-                      <div className='mt-3 text-gray-500'>Berakhir Pada </div>
+                      <div className='mt-3 text-gray-500'>Berakhir Pada { dayjs(expiredDate.bulanan).locale('id').format('DD MMMM YYYY') }</div>
                     </Card.CardContent>
                     <div className='mt-5'>
                       <PrimaryButton onClick={(e) => handleSelectProduct('Bulanan')} type='button'>Pilih</PrimaryButton>
@@ -93,7 +97,7 @@ export default function Create({
 
                       {/* Description */}
                       <div className='mt-3 text-gray-500'>
-                        <div>Berakhir Pada {organization.expiredAdd12Month}</div>
+                        <div>Berakhir Pada { dayjs(expiredDate.tahunan).locale('id').format('DD MMMM YYYY') }</div>
                       </div>
                     </Card.CardContent>
                     <div className='mt-5'>

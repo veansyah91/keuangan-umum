@@ -10,6 +10,7 @@ use App\Models\Organization;
 use Illuminate\Http\Request;
 use App\Models\WhatsappPlugin;
 use App\Models\WhatsappInvoice;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use App\Models\StudentMonthlyPayment;
 use App\Repositories\Log\LogRepository;
@@ -42,9 +43,22 @@ class WhatsappBroadcastingInvoiceController extends Controller
 		$this->now = CarbonImmutable::now();
 	}
 
-	public function nextMonth()
+	public function expiredDate($status)
 	{
-		
+		$expiredDate = $this->now;
+
+		if ($status['expired_date']) {
+			$tempExpiredDate = new Carbon($status['expired_date']);
+
+			if ($tempExpiredDate > $expiredDate) {
+				$expiredDate = $tempExpiredDate;
+			}
+		}
+
+		return [
+			'bulanan' => $expiredDate->addMonth(),
+			'tahunan' => $expiredDate->addYear(),
+		];
 	}
 
 	protected function newRef($organization, $dateRequest = '')
@@ -88,18 +102,29 @@ class WhatsappBroadcastingInvoiceController extends Controller
 		$status = WhatsappPlugin::where('organization_id', $organization['id'])
 															->first();
 
-		$expiredDate = $this->now;
-		dd($expiredDate);
-		$expiredDate = new Carbon($status['expired_date']);
-
 		return Inertia::render('Addons/Whatsapp/Invoice/Create', [
 			'organization' => $organization,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+			'expiredDate' => $this->expiredDate($status)
 		]);
 	}
 
 	public function store(Request $request, Organization $organization)
 	{
-		dd($request);
+		$validated = $request->validate([
+			'product' => [
+                'required',
+                Rule::in(['Tahunan', 'Bulanan']),
+			],
+		]);
+		$validated['no_ref'] = $this->newRef($organization);
+		$validated['description'] = 'Perpanjangan Layanan WhatsApp Broadcasting Plugin';
+		$validated['status'] = 'pending';
+		$validated['price'] = $validated['product'] == 'Tahunan' ? 1000000 : 100000;
+		$validated['organization_id'] = $organization['id'];
+
+		
+		// WhatsappInvoice::create($validated);
+		dd($validated);
 	}
 }
