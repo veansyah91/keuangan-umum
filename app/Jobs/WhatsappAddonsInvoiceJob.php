@@ -13,16 +13,15 @@ class WhatsappAddonsInvoiceJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $message, $phone, $whatsAppRepository;
+    public $message, $phone;
 
     /**
      * Create a new job instance.
      */
-    public function __construct(WhatsAppRepository $whatsAppRepository, $message, $phone)
+    public function __construct($message, $phone)
     {
         $this->message = $message;
         $this->phone = $phone;
-        $this->whatsAppRepository = $whatsAppRepository;
     }
 
     /**
@@ -30,6 +29,8 @@ class WhatsappAddonsInvoiceJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $this->whatsAppRepository->sendOrganizationInvoice("6281276811842", "Pesan dari Keuangan Umum\n\nHormat Kami");
+        $whatsAppRepository = new WhatsAppRepository;
+
+        $whatsAppRepository->sendOrganizationInvoice($this->phone, "Pesan dari Keuangan Umum\n\nHormat Kami");
     }
 }

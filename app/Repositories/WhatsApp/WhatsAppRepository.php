@@ -6,11 +6,9 @@ class WhatsAppRepository implements WhatsAppRepositoryInterface
 {
   public function sendOrganizationInvoice($phone, $message)
   {
-
     \Log::info('Cron job Whatsapp Invoice dijalankan '.date('Y-m-d H:i:s'));
-    \Log::info('Hp : '.$phone.'\nPesan: ');
+    \Log::info('Hp : '.$phone.' Pesan: ' . $message);
 
-    return;
     $curl = curl_init();
 
     curl_setopt_array($curl, array(
@@ -34,7 +32,6 @@ class WhatsAppRepository implements WhatsAppRepositoryInterface
     $response = curl_exec($curl);
 
     curl_close($curl);
-    // echo $response;
-
+    \Log::info('Response WhatsApp Broadcasting: ' . $response);
   }
 }

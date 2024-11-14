@@ -4,5 +4,5 @@ namespace App\Repositories\WhatsApp;
 
 interface WhatsAppRepositoryInterface
 {
-    public function getData($organizationId);
+    public function sendOrganizationInvoice($phone, $message);
 }

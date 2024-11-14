@@ -13,6 +13,7 @@ use App\Models\WhatsappInvoice;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use App\Models\StudentMonthlyPayment;
+use App\Jobs\WhatsappAddonsInvoiceJob;
 use App\Repositories\Log\LogRepository;
 use App\Repositories\User\UserRepository;
 use App\Repositories\Account\AccountRepository;
@@ -123,7 +124,10 @@ class WhatsappBroadcastingInvoiceController extends Controller
 		$validated['price'] = $validated['product'] == 'Tahunan' ? 1000000 : 100000;
 		$validated['organization_id'] = $organization['id'];
 
-		
+		$status = WhatsappPlugin::where('organization_id', $organization['id'])
+															->first();
+
+		WhatsappAddonsInvoiceJob::dispatch('Pesan dari WhatsApp invoice', $status['phone']);
 		// WhatsappInvoice::create($validated);
 		dd($validated);
 	}
