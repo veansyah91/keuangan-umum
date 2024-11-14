@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
 import { Head, Link } from '@inertiajs/react';
-import { ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import { IoArrowBackOutline, IoFilter, IoPlayBack, IoPlayForward, IoSearchSharp } from 'react-icons/io5';
 import AddButtonMobile from '@/Components/AddButtonMobile';
 import TitleMobile from '@/Components/Mobiles/TitleMobile';
@@ -17,6 +17,7 @@ export default function Index({
   invoices,
   role,
   organization,
+  flash
 }) {
   const [search, setSearch] = useState('');
 
@@ -25,13 +26,19 @@ export default function Index({
     endDate: '',
   });
 
-const [debounceDateValue] = useDebounce(dateValue, 500);
+  const [debounceDateValue] = useDebounce(dateValue, 500);
 
   const handleDateValueChange = (newValue) => {
     setDateValue(newValue);
   }
+
+  useEffect(() => {
+		flash?.success && toast.success(flash.success, {
+			position: toast.POSITION.TOP_CENTER,
+		});
+	},[]);
+
   console.log(invoices);
-  
 
   return (
     <>

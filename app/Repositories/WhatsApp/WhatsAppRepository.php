@@ -4,11 +4,8 @@ namespace App\Repositories\WhatsApp;
 
 class WhatsAppRepository implements WhatsAppRepositoryInterface
 {
-  public function sendOrganizationInvoice($phone, $message)
+  public function sendMessage($data)
   {
-    \Log::info('Cron job Whatsapp Invoice dijalankan '.date('Y-m-d H:i:s'));
-    \Log::info('Hp : '.$phone.' Pesan: ' . $message);
-
     $curl = curl_init();
 
     curl_setopt_array($curl, array(
@@ -20,18 +17,13 @@ class WhatsAppRepository implements WhatsAppRepositoryInterface
       CURLOPT_FOLLOWLOCATION => true,
       CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
       CURLOPT_CUSTOMREQUEST => 'POST',
-      CURLOPT_POSTFIELDS => array(
-      'appkey' => env('WHATSAPP_APP_KEY'),
-      'authkey' => env('WHATSAPP_AUTH_KEY'),
-      'to' => $phone,
-      'message' => $message,
-      'sandbox' => 'false'
-      ),
+      CURLOPT_POSTFIELDS => $data,
     ));
 
     $response = curl_exec($curl);
 
     curl_close($curl);
-    \Log::info('Response WhatsApp Broadcasting: ' . $response);
+
+    return $response;
   }
 }

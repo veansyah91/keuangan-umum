@@ -8,7 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { IoArrowBackOutline } from 'react-icons/io5';
 import formatNumber from '@/Utils/formatNumber';
 import SecondaryButton from '@/Components/SecondaryButton';
-import { FaPrint, FaWhatsapp } from 'react-icons/fa';
+import { FaPrint } from 'react-icons/fa';
 import dayjs from 'dayjs';
 
 const Category = ({category, index}) => {

@@ -69,10 +69,10 @@ export default function Create({
                       {/* price */}
                       <div className='text-2xl line-through mb-5'>
                        <div>Rp. 250.000 </div>
-                       <div><BadgeGray>Disc 60%</BadgeGray></div> 
+                       <div><BadgeGray>Disc 54%</BadgeGray></div> 
                       </div>
-                      <div className='text-4xl'>Rp. 100.000</div>
-                      <div className='italic text-sm'>Rp. 3.333 / hari</div>
+                      <div className='text-4xl'>Rp. 115.000</div>
+                      <div className='italic text-sm'>Rp. 3.833 / hari</div>
 
                       {/* Description */}
                       <div className='mt-3 text-gray-500'>Berakhir Pada { dayjs(expiredDate.bulanan).locale('id').format('DD MMMM YYYY') }</div>

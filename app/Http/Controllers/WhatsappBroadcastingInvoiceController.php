@@ -90,7 +90,7 @@ class WhatsappBroadcastingInvoiceController extends Controller
 			'organization' => $organization,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'invoices' => WhatsappInvoice::whereOrganizationId($organization['id'])
-																->orderBy('date', 'desc')
+																->orderBy('created_at', 'desc')
 																->orderBy('no_ref', 'desc')
 																->paginate(50)->withQueryString()
 		]);
@@ -127,8 +127,27 @@ class WhatsappBroadcastingInvoiceController extends Controller
 		$status = WhatsappPlugin::where('organization_id', $organization['id'])
 															->first();
 
-		WhatsappAddonsInvoiceJob::dispatch('Pesan dari WhatsApp invoice', $status['phone']);
-		// WhatsappInvoice::create($validated);
-		dd($validated);
+		$invoice = WhatsappInvoice::create($validated);
+
+		$tempDate = new Carbon($invoice['created_at']);
+
+		$message = "*INVOICE PENAMBAHAN LAYANAN WHATSAPP BROADCASTING*\n-------------------------------------------------------\nTanggal: ". $tempDate ."\nNo. Ref: " . $validated['no_ref'] .
+		"\nProduk: " . $validated['product'] .
+		"\nHarga: IDR. " .  number_format($validated['price'], 0, '', '.') .
+		"\n-------------------------------------------------------\nSilakan melakukan pembayaran ke Rekening Berikut:\nNo. Rekening: " . env('BANK_ACCOUNT') . 
+		"\nNama Rekening: " . env('BANK_NAME') . 
+		"\nNama Bank: " . env('BANK') .
+		"\n-------------------------------------------------------\nSilakan kirim bukti transfer ke nomor ini jika telah melakukan pembayaran.\n\nKeuangan Umum\nkeuanganumum.com";
+
+		$data = array(
+      'appkey' => env('WHATSAPP_APP_KEY'),
+      'authkey' => env('WHATSAPP_AUTH_KEY'),
+      'to' => $status['phone'],
+      'message' => $message,
+      'sandbox' => 'false'
+		);
+
+		WhatsappAddonsInvoiceJob::dispatch($data);
+		return redirect(route('add-ons.whatsapp-invoice', $organization['id']))->with('success', 'Invoice Penambahan Layanan WhatsApp Broadcasting Berhasil Dibuat');
 	}
 }
