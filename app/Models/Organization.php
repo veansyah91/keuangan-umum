@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use App\Traits\UUID;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\WhatsappPlugin;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Organization extends Model
 {
@@ -56,6 +58,11 @@ class Organization extends Model
     public function fixedAssetCategory(): HasMany
     {
         return $this->hasMany(FixedAssetCategory::class);
+    }
+
+    public function whatsApp(): HasOne
+    {
+        return $this->hasOne(WhatsappPlugin::class);
     }
 
     public function scopeFilter($query, $filters)

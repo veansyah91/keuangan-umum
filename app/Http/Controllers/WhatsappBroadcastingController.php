@@ -54,9 +54,6 @@ class WhatsappBroadcastingController extends Controller
 			'phone' => [
 				'required',
 				'string',
-				Rule::unique('whatsapp_plugins')->where(function ($query) use ($organization) {
-					return $query->where('organization_id', "<>", $organization['id']);
-			}),
 			]
 		]);
 

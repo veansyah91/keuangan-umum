@@ -170,6 +170,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 			Route::get('/whatsapp-invoice', [WhatsappBroadcastingInvoiceController::class, 'index'])->name('add-ons.whatsapp-invoice');
 			Route::post('/whatsapp-invoice', [WhatsappBroadcastingInvoiceController::class, 'store'])->name('add-ons.whatsapp-invoice.store');
 			Route::get('/whatsapp-invoice/create', [WhatsappBroadcastingInvoiceController::class, 'create'])->name('add-ons.whatsapp-invoice.create');
+			Route::get('/whatsapp-invoice/{invoice}', [WhatsappBroadcastingInvoiceController::class, 'show'])->name('add-ons.whatsapp-invoice.show');
 
 		});
 

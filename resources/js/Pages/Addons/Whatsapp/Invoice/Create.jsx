@@ -36,11 +36,9 @@ export default function Create({
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    console.log(data);
     post(route('add-ons.whatsapp-invoice.store', organization.id), {
       onSuccess: ({ props }) => {
-        console.log(props);
-        
+        console.log(props); 
       }
     })
   }
@@ -112,7 +110,7 @@ export default function Create({
                     <div className='w-1/2'>
                     </div>
                     <div className='w-1/2 text-end'>
-                        <SuccessButton type={"submit"}>Buat Pesanan</SuccessButton>
+                        <SuccessButton type={"submit"} disabled={processing}>Buat Pesanan</SuccessButton>
                     </div>
                 </div>
                 </form>
@@ -148,7 +146,7 @@ Create.layout = (page) => (
             <Link href={route('add-ons.whatsapp', page.props.organization.id)}>WhatsApp Broadcast</Link>
           </li>
           <li className='font-bold'>
-            <Link href={route('add-ons.whatsapp-invoice', page.props.organization.id)}>Berlangganan</Link>
+            <Link href={route('add-ons.whatsapp-invoice', page.props.organization.id)}>Data Invoice</Link>
           </li>
           <li>Buat</li>
         </ul>

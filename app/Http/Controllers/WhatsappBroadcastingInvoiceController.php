@@ -90,6 +90,9 @@ class WhatsappBroadcastingInvoiceController extends Controller
 			'organization' => $organization,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'invoices' => WhatsappInvoice::whereOrganizationId($organization['id'])
+																->with('organization', function ($query){
+																	return $query->with('whatsApp');
+																})
 																->orderBy('created_at', 'desc')
 																->orderBy('no_ref', 'desc')
 																->paginate(50)->withQueryString()
@@ -149,5 +152,22 @@ class WhatsappBroadcastingInvoiceController extends Controller
 
 		WhatsappAddonsInvoiceJob::dispatch($data);
 		return redirect(route('add-ons.whatsapp-invoice', $organization['id']))->with('success', 'Invoice Penambahan Layanan WhatsApp Broadcasting Berhasil Dibuat');
+	}
+
+	public function show(Organization $organization, WhatsappInvoice $invoice)
+	{
+		$user = Auth::user();
+
+		return Inertia::render('Addons/Whatsapp/Invoice/Show', [
+			'organization' => $organization,
+			'invoice' => $invoice,
+			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+			'whatsappContact' => env('WHATSAPP_CONTACT'),
+			'bank' => [
+					'account' => env('BANK_ACCOUNT'),
+					'name' => env('BANK_NAME'),
+					'provider' => env('BANK'),
+			],
+		]);
 	}
 }

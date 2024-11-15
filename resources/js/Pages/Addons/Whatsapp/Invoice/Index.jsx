@@ -12,6 +12,8 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TitleDesktop from '@/Components/Desktop/TitleDesktop';
 import Datepicker from 'react-tailwindcss-datepicker';
 import PageNumber from '@/Components/PageNumber';
+import ContentDesktop from '@/Components/Desktop/ContentDesktop';
+import WhatsappComponentDesktop from './Components/WhatsappComponentDesktop';
 
 export default function Index({
   invoices,
@@ -196,6 +198,34 @@ export default function Index({
             </div>
           </div>
         </TitleDesktop>
+        <div className='sm:flex hidden gap-5'>
+          <div className='w-full'>
+            <ContentDesktop>
+              <table className='table table-pin-rows table-pin-cols text-base'>
+                <thead className='text-base text-gray-900'>
+                  <tr className=''>
+                    <th className='bg-gray-200'>Tanggal</th>
+                    <th className='bg-gray-200'>No. Ref</th>
+                    <th className='bg-gray-200'>Produk</th>
+                    <th className='bg-gray-200 text-end'>Nilai</th>
+                    <th className='bg-gray-200 text-center'>Status</th>
+                    <th className='bg-gray-200'></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {invoices.data.map((invoice, index) => (
+                    <WhatsappComponentDesktop
+                      key={index}
+                      invoice={invoice}
+                      className={`${index % 2 !== 0 && 'bg-gray-100'}`}
+                      role={role}
+                    />
+                  ))}
+                </tbody>
+              </table>
+            </ContentDesktop>
+          </div>
+        </div>
       </ContainerDesktop>
 
     </>
@@ -224,7 +254,7 @@ Index.layout = (page) => (
           <li className='font-bold'>
             <Link href={route('add-ons.whatsapp', page.props.organization.id)}>WhatsApp Broadcast</Link>
           </li>
-          <li>Berlangganan</li>
+          <li>Data Invoice</li>
         </ul>
 			</div>
 		}
