@@ -161,6 +161,7 @@ class WhatsappBroadcastingInvoiceController extends Controller
 		return Inertia::render('Addons/Whatsapp/Invoice/Show', [
 			'organization' => $organization,
 			'invoice' => $invoice,
+			'appName' => env('APP_NAME'),
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'whatsappContact' => env('WHATSAPP_CONTACT'),
 			'bank' => [

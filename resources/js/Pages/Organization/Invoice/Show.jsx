@@ -22,7 +22,7 @@ export default function Show({ organization, organizationInvoice, bank, whatsapp
     const [waLink] = useState('https://web.whatsapp.com/send');
     const [message] = useState(`
     *KONFIRMASI PEMBAYARAN PERPANJANG LAYANAN ${appName.toUpperCase()}*
-    %0A-------------------------------------------------------%0A*No Faktur:* ${organizationInvoice.no_ref}%0A*Jenis Layanan:* ${organizationInvoice.product.toUpperCase()}%0A*Tanggal Pengajuan:* ${organizationInvoice.date}%0A*Jumlah Bayar:* ${rupiah(organizationInvoice.price)}%0A-------------------------------------------------------%0A_Mohon Sertakan Bukti Transfer Agar Proses Konfirmasi Dilakukan Lebih Cepat_`);
+    %0A-------------------------------------------------------%0A*No Faktur:* ${organizationInvoice.no_ref}%0A*Jenis Layanan:* ${organizationInvoice.product.toUpperCase()}%0A*Tanggal Pengajuan:* ${organizationInvoice.date}%0A*Jumlah Bayar:* ${rupiah(organizationInvoice.price)}%0A-------------------------------------------------------%0A_Mohon Sertakan Bukti Transfer Apabila Telah Melakukan Membayaran Agar Proses Konfirmasi Dilakukan Lebih Cepat_`);
 
     const [waContent, setWaContent] = useState('');
 

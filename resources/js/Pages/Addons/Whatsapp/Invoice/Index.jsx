@@ -14,6 +14,8 @@ import Datepicker from 'react-tailwindcss-datepicker';
 import PageNumber from '@/Components/PageNumber';
 import ContentDesktop from '@/Components/Desktop/ContentDesktop';
 import WhatsappComponentDesktop from './Components/WhatsappComponentDesktop';
+import ContentMobile from '@/Components/Mobiles/ContentMobile';
+import WhatsappComponentMobile from './Components/WhatsappComponentMobile';
 
 export default function Index({
   invoices,
@@ -104,6 +106,16 @@ export default function Index({
         dateValue={dateValue}
         onChangeDate={handleDateValueChange}
       />
+      <ContentMobile>
+        {invoices.data.map((invoice, index) =>
+          <WhatsappComponentMobile
+            key={index}
+            invoice={invoice}
+            role={role}
+          />          
+        )}
+      </ContentMobile>
+      
 
       <ContainerDesktop>
         <TitleDesktop>
