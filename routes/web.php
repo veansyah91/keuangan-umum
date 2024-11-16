@@ -37,6 +37,7 @@ use App\Http\Controllers\AccountCategoryController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\ContactCategoryController;
 use App\Http\Controllers\Admin\UserMasterController;
+use App\Http\Controllers\Admin\AdminAddonsController;
 use App\Http\Controllers\Admin\AdminMasterController;
 use App\Http\Controllers\Admin\UserWithdrawController;
 use App\Http\Controllers\FixedAssetCategoryController;
@@ -120,6 +121,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 			Route::get('/organization-invoice', [AdminOrganizationInvoiceController::class, 'index'])->name('admin.organization.invoice.index');
 			Route::patch('/organization-invoice/{organizationInvoice}/payment-confirmation', [AdminOrganizationInvoiceController::class, 'paymentConfirmation'])->name('admin.organization.invoice.payment.confirmation');
+
+			// Add-ons
+			Route::prefix('add-ons')->group(function () {
+				Route::get('/', AdminAddonsController::class)->name('admin.add-ons');
+				
+			});
+
 		});
 	});
 

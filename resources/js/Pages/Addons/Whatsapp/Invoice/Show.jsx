@@ -3,7 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
 import { Head, Link } from '@inertiajs/react';
 import { toast } from 'react-toastify';
-import { IoArrowBackOutline, IoFilter, IoLogoWhatsapp, IoPrintOutline } from 'react-icons/io5';
+import { IoArrowBackOutline, IoLogoWhatsapp, IoPrintOutline } from 'react-icons/io5';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import SuccessButton from '@/Components/SuccessButton';
 import dayjs from 'dayjs';

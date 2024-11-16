@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
-class OrganizationMenuController extends Controller
+class AdminAddonsController extends Controller
 {
     /**
      * Handle the incoming request.
      */
     public function __invoke(Request $request)
     {
-        return Inertia::render('Admin/OrganizationMenu/Index');
+        return Inertia::render('Admin/Addons/Index');
     }
 }

@@ -3,7 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
 import { Head, Link, router } from '@inertiajs/react';
 import { toast, ToastContainer } from 'react-toastify';
-import { IoArrowBackOutline, IoFilter, IoPlayBack, IoPlayForward, IoSearchSharp } from 'react-icons/io5';
+import { IoArrowBackOutline, IoPlayBack, IoPlayForward, IoSearchSharp } from 'react-icons/io5';
 import AddButtonMobile from '@/Components/AddButtonMobile';
 import TitleMobile from '@/Components/Mobiles/TitleMobile';
 import { useDebounce } from 'use-debounce';
@@ -136,7 +136,6 @@ export default function Index({
           />          
         )}
       </ContentMobile>
-      
 
       <ContainerDesktop>
         <TitleDesktop>
@@ -149,9 +148,7 @@ export default function Index({
           </div>
 
           <div className='my-auto w-4/12 flex gap-5'>
-            <button className='py-2 px-3 border rounded-lg' onClick={() => setShowModalFilter(true)}>
-              <IoFilter />
-            </button>
+            
             <Datepicker
               value={dateValue}
               onChange={handleDateValueChange}

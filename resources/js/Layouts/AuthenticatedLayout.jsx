@@ -105,6 +105,11 @@ export default function Authenticated({
                                                     active={route().current('admin.organization*')}>
                                                     ORGANISASI
                                                 </NavLink>
+                                                <NavLink
+                                                    href={route('admin.add-ons')}
+                                                    active={route().current('admin.add-ons*')}>
+                                                    ADD-ONS
+                                                </NavLink>
                                             </div>
                                         ) : (
                                             <div className='hidden space-x-8 md:-my-px md:ms-10 md:flex'>
@@ -261,6 +266,10 @@ export default function Authenticated({
                                 <li
                                     className={`${route().current('admin.organization*') ? 'border-l-2 border-[#4f8315] font-bold' : ''}`}>
                                     <Link href={route('admin.organization.menu')}>Organisasi</Link>
+                                </li>
+                                <li
+                                    className={`${route().current('admin.add-ons*') ? 'border-l-2 border-[#4f8315] font-bold' : ''}`}>
+                                    <Link href={route('admin.add-ons')}>Addons</Link>
                                 </li>
                                 <hr />
                                 <li
