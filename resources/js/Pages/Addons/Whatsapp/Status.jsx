@@ -35,10 +35,10 @@ function WithData({
 }) {
 	return (
 		<div className='w-full flex pt-5 gap-2'>
-			<div className='w-5/12 space-y-3'>
-				<div className='flex gap-2'>
-					<div className='w-4/12'>No. Handphone</div>
-					<div className='w-1/12 text-end'>:</div>
+			<div className='md:w-5/12 w-full space-y-3'>
+				<div className='md:flex gap-2'>
+					<div className='md:w-4/12 font-bold'>No. Handphone <span className='md:hidden'>:</span> </div>
+					<div className='md:block hidden w-1/12 text-end'>:</div>
 					<div className='w-7/12 flex gap-2'>
 						<div>{data.phone}</div>
 						<div>
@@ -48,23 +48,22 @@ function WithData({
 							>
 								<FaRegEdit />
 							</button>
-						</div>
-						
+						</div>						
 					</div>
 				</div>
-				<div className='flex gap-2'>
-					<div className='w-4/12'>Tanggal Kadaluarsa</div>
-					<div className='w-1/12 text-end'>:</div>
-					<div className='w-7/12'>{data.expired_date}</div>
+				<div className='md:flex gap-2'>
+					<div className='md:w-4/12 w-full font-bold'>Tanggal Kadaluarsa <span className='md:hidden'>:</span></div>
+					<div className='md:block hidden w-1/12 text-end'>:</div>
+					<div className='w-7/12'>{data.expired_date ?? "-"}</div>
 				</div>
-				<div className='flex gap-2'>
-					<div className='w-4/12'>Status</div>
-					<div className='w-1/12 text-end'>:</div>
+				<div className='md:flex gap-2'>
+					<div className='md:w-4/12 font-bold'>Status <span className='md:hidden'>:</span></div>
+					<div className='hidden md:block w-1/12 text-end'>:</div>
 					<div className={`w-7/12 font-bold ${data.is_active ? 'text-green-500' : 'text-red-500'}`}>{data.is_active ? 'Aktif' : 'Tidak Aktif' }</div>
 				</div>
-				<div className='flex gap-2'>
-					<div className='w-4/12'>Koneksi</div>
-					<div className='w-1/12 text-end'>:</div>
+				<div className='md:flex gap-2'>
+					<div className='md:w-4/12 font-bold'>Koneksi <span className='md:hidden'>:</span></div>
+					<div className='hidden md:block w-1/12 text-end'>:</div>
 					<div className='w-7/12 my-auto'>
 					{
 						data.connection 

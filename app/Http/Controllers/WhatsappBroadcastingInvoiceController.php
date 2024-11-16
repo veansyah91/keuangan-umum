@@ -89,7 +89,8 @@ class WhatsappBroadcastingInvoiceController extends Controller
 		return Inertia::render('Addons/Whatsapp/Invoice/Index', [
 			'organization' => $organization,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
-			'invoices' => WhatsappInvoice::whereOrganizationId($organization['id'])
+			'invoices' => WhatsappInvoice::filter(request(['search', 'start_date', 'end_date']))
+																->whereOrganizationId($organization['id'])
 																->with('organization', function ($query){
 																	return $query->with('whatsApp');
 																})

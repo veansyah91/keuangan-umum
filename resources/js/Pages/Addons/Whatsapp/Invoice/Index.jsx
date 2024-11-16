@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { toast, ToastContainer } from 'react-toastify';
 import { IoArrowBackOutline, IoFilter, IoPlayBack, IoPlayForward, IoSearchSharp } from 'react-icons/io5';
 import AddButtonMobile from '@/Components/AddButtonMobile';
@@ -16,21 +16,24 @@ import ContentDesktop from '@/Components/Desktop/ContentDesktop';
 import WhatsappComponentDesktop from './Components/WhatsappComponentDesktop';
 import ContentMobile from '@/Components/Mobiles/ContentMobile';
 import WhatsappComponentMobile from './Components/WhatsappComponentMobile';
+import { usePrevious } from 'react-use';
 
 export default function Index({
   invoices,
   role,
   organization,
-  flash
+  flash,
+  searchFilter
 }) {
-  const [search, setSearch] = useState('');
-
   const [dateValue, setDateValue] = useState({
     startDate: '',
     endDate: '',
   });
 
   const [debounceDateValue] = useDebounce(dateValue, 500);
+  const [search, setSearch] = useState(searchFilter || '');
+  const [debounceValue] = useDebounce(search, 500);
+  const prevSearch = usePrevious(search);
 
   const handleDateValueChange = (newValue) => {
     setDateValue(newValue);
@@ -42,7 +45,25 @@ export default function Index({
 		});
 	},[]);
 
-  console.log(invoices);
+  // useEffect
+  useEffect(() => {
+    if (prevSearch !== undefined) {
+        handleReloadPage();
+    }
+  }, [debounceValue, debounceDateValue]);
+
+  // function
+  const handleReloadPage = () => {
+    router.reload({
+        only: ['invoices'],
+        data: {
+            search,
+            start_date: dateValue.startDate,
+            end_date: dateValue.endDate,
+        },
+        preserveState: true,
+    });
+};
 
   return (
     <>
@@ -239,7 +260,6 @@ export default function Index({
           </div>
         </div>
       </ContainerDesktop>
-
     </>
   )
 }
