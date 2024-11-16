@@ -7,5 +7,8 @@ use Illuminate\Http\Request;
 
 class AdminWhatsappBroadcastingController extends Controller
 {
-    //
+  public function index()
+	{
+		
+	}
 }
