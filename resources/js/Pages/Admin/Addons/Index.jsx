@@ -16,7 +16,7 @@ export default function Index() {
       {/* Desktop */}
       <ContainerDesktop>
         <div className='flex justify-center pt-5 pb-10 gap-2'>
-          <Link href={route('admin.organization.index')}>
+          <Link href={route('admin.add-ons.whatsapp')}>
             <CardMenu bgColor={'bg-green-500'} icon={<FaWhatsapp />} title={'WhatsApp Broadcast'} />
           </Link>
         </div>
@@ -25,7 +25,7 @@ export default function Index() {
 
       {/* Mobile */}
       <div className='sm:hidden flex flex-wrap pt-14 pb-5 px-2 mx-auto bg-white gap-2 w-full justify-center'>
-        <Link href={route('admin.organization.index')}>
+        <Link href={route('admin.add-ons.whatsapp')}>
           <CardMenu bgColor={'bg-green-500'} icon={<FaWhatsapp />} title={'WhatsApp Broadcast'} />
         </Link>
       </div>

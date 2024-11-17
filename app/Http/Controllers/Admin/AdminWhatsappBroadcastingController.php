@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
+use Inertia\Inertia;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class AdminWhatsappBroadcastingController extends Controller
 {
-  public function index()
-	{
-		
-	}
+  /**
+     * Handle the incoming request.
+     */
+    public function __invoke(Request $request)
+    {
+			return Inertia::render('Admin/Addons/Whatsapp/Index');
+    }
 }
