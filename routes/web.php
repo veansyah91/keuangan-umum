@@ -127,7 +127,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 				Route::get('/', AdminAddonsController::class)->name('admin.add-ons');
 
 				// whatsapp
-				Route::prefix('add-ons')->group(function () {
+				Route::prefix('whatsapp')->group(function () {
+					Route::get('/', AdminAddonsController::class)->name('admin.add-ons.whatsapp');
 					
 				});
 			});
