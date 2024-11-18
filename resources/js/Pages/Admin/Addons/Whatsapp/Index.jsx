@@ -6,6 +6,7 @@ import ContainerDesktop from '@/Components/Desktop/ContainerDesktop';
 import CardMenu from '@/Components/CardMenu';
 import { CiViewList } from "react-icons/ci";
 import { LiaFileInvoiceSolid } from 'react-icons/lia';
+import { IoArrowBackOutline } from 'react-icons/io5';
 
 export default function Index() {
   return (
@@ -15,7 +16,7 @@ export default function Index() {
       {/* Desktop */}
       <ContainerDesktop>
         <div className='flex justify-center pt-5 pb-10 gap-2'>
-          <Link href={route('admin.add-ons.whatsapp')}>
+          <Link href={route('admin.add-ons.whatsapp.data')}>
             <CardMenu bgColor={'bg-orange-500'} icon={<CiViewList />} title={'Data'} />
           </Link>
           <Link href={route('admin.add-ons.whatsapp')}>
@@ -27,7 +28,7 @@ export default function Index() {
 
       {/* Mobile */}
       <div className='sm:hidden flex flex-wrap pt-14 pb-5 px-2 mx-auto bg-white gap-2 w-full justify-center'>
-        <Link href={route('admin.add-ons.whatsapp')}>
+        <Link href={route('admin.add-ons.whatsapp.data')}>
           <CardMenu bgColor={'bg-orange-500'} icon={<CiViewList />} title={'Data'} />
         </Link>
         <Link href={route('admin.add-ons.whatsapp')}>
@@ -51,7 +52,12 @@ Index.layout = (page) => (
                 <li>Whatsapp Broadcasting Addons</li>
             </ul>
         </div>
-    }
+      }
+      backLink={
+        <Link href={route('admin.add-ons')}>
+            <IoArrowBackOutline />
+        </Link>
+      }
       children={page}
       user={page.props.auth.user}
       title='Whatsapp Broadcasting Addons'

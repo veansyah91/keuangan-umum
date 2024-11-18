@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Organization;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class WhatsappPlugin extends Model
 {
@@ -20,4 +22,17 @@ class WhatsappPlugin extends Model
         'connection',
         'last_connection'
     ];
+    
+    public function organization(): BelongsTo
+    {
+        return $this->belongsTo(Organization::class);
+    }
+
+    public function scopeFilter($query, $filters)
+    {
+        $query->when($filters['search'] ?? false, function ($query, $search) {
+            return $query->where('description', 'like', '%'.$search.'%')
+                ->orWhere('no_ref', 'like', '%'.$search.'%');
+        });
+    }
 }
