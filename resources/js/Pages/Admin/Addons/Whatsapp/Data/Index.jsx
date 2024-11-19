@@ -9,12 +9,13 @@ import ContainerDesktop from '@/Components/Desktop/ContainerDesktop';
 import TitleDesktop from '@/Components/Desktop/TitleDesktop';
 import PageNumber from '@/Components/PageNumber';
 import ContentDesktop from '@/Components/Desktop/ContentDesktop';
-import WhatsappInvoiceDesktop from './Components/WhatsappInvoiceDesktop';
+import WhatsappDataDesktop from './Components/WhatsappDataDesktop';
 import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
 import PrimaryButton from '@/Components/PrimaryButton';
 import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
+import { NumericFormat } from 'react-number-format';
 
 
 export default function Index(
@@ -29,18 +30,20 @@ export default function Index(
     'name' : '',
     'phone' : '',
     'appKey' : '',
-    'authKey' : ''
+    'authKey' : '',
+    'url' : '',
+    'id': null
   })
 
   // function
-  const handleEdit = (plugin) => {
-    console.log(plugin);
-    
+  const handleEdit = (plugin) => {    
     setData({
       name: plugin.organization.name,
+      url: plugin.url,
       phone: plugin.phone,
       appKey: plugin.appKey,
-      authKey: plugin.authKey
+      authKey: plugin.authKey,
+      id: plugin.id
     });
     setShowModalEdit(true);
   }
@@ -51,6 +54,13 @@ export default function Index(
 
   const handleSubmitEdit = (e) => {
     e.preventDefault();
+
+    patch(route('admin.add-ons.whatsapp.data.update', {plugin: data.id}), {
+      onSuccess: ({ props }) => {
+        console.log(props);
+        
+      }
+    })
 
   }
 
@@ -82,32 +92,32 @@ export default function Index(
             </div>
           )
         }
-          pageAfter={
-            whatsappPlugins.links[whatsappPlugins.links.length - 1].url ? (
-              <Link
-                href={route('admin.add-ons.whatsapp.data', {
-                  page: whatsappPlugins.current_page + 1,
-                  search: search,
-                })} 
-                only={['whatsappPlugins']}
-                preserveState>
-                <IoPlayForward />
-              </Link>
-            ) : (
-              <div className='text-gray-300'>
-                <IoPlayForward />
-              </div>
-            )
-          }
-          page={
-            <>
-              {whatsappPlugins.current_page}/{whatsappPlugins.last_page}
-            </>
-          }
-          data={whatsappPlugins}
-          hasFilter={true}
-          showFilter={() => setShowModalFilter(true)}
-          hasDate={false}
+        pageAfter={
+          whatsappPlugins.links[whatsappPlugins.links.length - 1].url ? (
+            <Link
+              href={route('admin.add-ons.whatsapp.data', {
+                page: whatsappPlugins.current_page + 1,
+                search: search,
+              })} 
+              only={['whatsappPlugins']}
+              preserveState>
+              <IoPlayForward />
+            </Link>
+          ) : (
+            <div className='text-gray-300'>
+              <IoPlayForward />
+            </div>
+          )
+        }
+        page={
+          <>
+            {whatsappPlugins.current_page}/{whatsappPlugins.last_page}
+          </>
+        }
+        data={whatsappPlugins}
+        hasFilter={true}
+        showFilter={() => setShowModalFilter(true)}
+        hasDate={false}
       />
       {/* Mobile */}
 
@@ -143,7 +153,7 @@ export default function Index(
             <div className='my-auto'>
               {whatsappPlugins.links[0].url ? (
                 <Link
-                  href={route('cashflow.cash-out', {
+                  href={route('admin.add-ons.whatsapp.data', {
                     page: whatsappPlugins.current_page - 1,
                     search: search,
                   })} 
@@ -163,7 +173,7 @@ export default function Index(
             <div className='my-auto'>
               {whatsappPlugins.links[whatsappPlugins.links.length - 1].url ? (
                 <Link
-                  href={route('cashflow.cash-out', {
+                  href={route('admin.add-ons.whatsapp.data', {
                     page: whatsappPlugins.current_page + 1,
                     search: search,
                   })} 
@@ -189,7 +199,7 @@ export default function Index(
                     <th className='bg-gray-200'>Organisasi</th>
                     <th className='bg-gray-200'>Handphone</th>
                     <th className='bg-gray-200'>Tanggal Expired</th>
-                    <th className='bg-gray-200'>App Key/Auth Key</th>
+                    <th className='bg-gray-200'>URL/App Key/Auth Key</th>
                     <th className='bg-gray-200'>Koneksi</th>
                     <th className='bg-gray-200'>Koneksi Terakhir</th>
                     <th className='bg-gray-200'>Status</th>
@@ -199,7 +209,7 @@ export default function Index(
                 <tbody>
                   {
                     whatsappPlugins.data.map((whatsappPlugin, index) => 
-                      <WhatsappInvoiceDesktop 
+                      <WhatsappDataDesktop 
                         key={index}
                         whatsappPlugin={whatsappPlugin}
                         className={`${index % 2 !== 0 && 'bg-gray-100'}`}
@@ -223,70 +233,92 @@ export default function Index(
           <h2 className='text-lg font-medium text-gray-900 text-center'>Ubah Data Whatsapp Broadcasting { data.name }</h2>
           <div className='mt-5 '>
             <div className='flex flex-col sm:flex-row w-full gap-1 mt-5'>
-                <div className='w-full sm:w-1/3 my-auto'>
-                  <InputLabel htmlFor='phone' value='No. Handphone' className='mx-auto my-auto' />
-                </div>
+              <div className='w-full sm:w-1/3 my-auto'>
+                <InputLabel htmlFor='phone' value='No. Handphone' className='mx-auto my-auto' />
+              </div>
 
-                <div className='sm:w-2/3 w-full'>
-                  <NumericFormat
-                    value={data.phone}
-                    customInput={TextInput}
-                    onValueChange={(values) => handleChangeValue(values)}
-                    thousandSeparator={false}
-                    className='text-start w-full border'
-                    placeholder='628xxx'
-                    prefix={''}
-                  />
-                  {errors && errors.phone && (
-                    <div className='-mb-3'>
-                      <div className='text-xs text-red-500'>{errors.phone}</div>
-                    </div>
-                  )}
-                </div>
+              <div className='sm:w-2/3 w-full'>
+                <NumericFormat
+                  value={data.phone}
+                  customInput={TextInput}
+                  onValueChange={(values) => handleChangeValue(values)}
+                  thousandSeparator={false}
+                  className='text-start w-full border'
+                  placeholder='628xxx'
+                  prefix={''}
+                />
+                {errors && errors.phone && (
+                  <div className='-mb-3'>
+                    <div className='text-xs text-red-500'>{errors.phone}</div>
+                  </div>
+                )}
+              </div>
             </div>
             <div className='flex flex-col sm:flex-row w-full gap-1 mt-5'>
-                <div className='w-full sm:w-1/3 my-auto'>
-                  <InputLabel htmlFor='app_key' value='App Key' className='mx-auto my-auto' />
-                </div>
+              <div className='w-full sm:w-1/3 my-auto'>
+                <InputLabel htmlFor='url' value='URL' className='mx-auto my-auto' />
+              </div>
 
-                <div className='sm:w-2/3 w-full'>
-                    <TextInput
-                        id='app_key'
-                        type='text'
-                        name='app_key'
-                        value={data.appKey || ''}
-                        className={`mt-1 w-full ${errors && errors.appKey && 'border-red-500'}`}
-                        onChange={(e) => setData('appKey', e.target.value.toString())}
-                        placeholder='App Key'
-                    />
-                    {errors && errors.appKey && (
-                      <div className='-mb-3'>
-                        <div className='text-xs text-red-500'>{errors.appKey}</div>
-                      </div>
-                    )}
-                </div>
+              <div className='sm:w-2/3 w-full'>
+                <TextInput
+                  id='url'
+                  type='text'
+                  name='url'
+                  value={data.url || ''}
+                  className={`mt-1 w-full ${errors && errors.url && 'border-red-500'}`}
+                  onChange={(e) => setData('url', e.target.value.toString())}
+                  placeholder='URL'
+                />
+                {errors && errors.url && (
+                  <div className='-mb-3'>
+                    <div className='text-xs text-red-500'>{errors.url}</div>
+                  </div>
+                )}
+              </div>
             </div>
             <div className='flex flex-col sm:flex-row w-full gap-1 mt-5'>
-                <div className='w-full sm:w-1/3 my-auto'>
-                  <InputLabel htmlFor='auth_key' value='App Key' className='mx-auto my-auto' />
-                </div>
+              <div className='w-full sm:w-1/3 my-auto'>
+                <InputLabel htmlFor='app_key' value='App Key' className='mx-auto my-auto' />
+              </div>
 
-                <div className='sm:w-2/3 w-full'>
-                    <TextInput
-                        id='auth_key'
-                        type='text'
-                        name='auth_key'
-                        value={data.authKey || ''}
-                        className={`mt-1 w-full ${errors && errors.authKey && 'border-red-500'}`}
-                        onChange={(e) => setData('authKey', e.target.value.toString())}
-                        placeholder='Auth Key'
-                    />
-                    {errors && errors.appKey && (
-                      <div className='-mb-3'>
-                        <div className='text-xs text-red-500'>{errors.appKey}</div>
-                      </div>
-                    )}
-                </div>
+              <div className='sm:w-2/3 w-full'>
+                <TextInput
+                  id='app_key'
+                  type='text'
+                  name='app_key'
+                  value={data.appKey || ''}
+                  className={`mt-1 w-full ${errors && errors.appKey && 'border-red-500'}`}
+                  onChange={(e) => setData('appKey', e.target.value.toString())}
+                  placeholder='App Key'
+                />
+                {errors && errors.appKey && (
+                  <div className='-mb-3'>
+                    <div className='text-xs text-red-500'>{errors.appKey}</div>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className='flex flex-col sm:flex-row w-full gap-1 mt-5'>
+              <div className='w-full sm:w-1/3 my-auto'>
+                <InputLabel htmlFor='auth_key' value='Auth Key' className='mx-auto my-auto' />
+              </div>
+
+              <div className='sm:w-2/3 w-full'>
+                <TextInput
+                  id='auth_key'
+                  type='text'
+                  name='auth_key'
+                  value={data.authKey || ''}
+                  className={`mt-1 w-full ${errors && errors.authKey && 'border-red-500'}`}
+                  onChange={(e) => setData('authKey', e.target.value.toString())}
+                  placeholder='Auth Key'
+                />
+                {errors && errors.appKey && (
+                  <div className='-mb-3'>
+                    <div className='text-xs text-red-500'>{errors.appKey}</div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 

@@ -58,6 +58,7 @@ use App\Http\Controllers\StudentEntryReceivablePaymentController;
 use App\Http\Controllers\Admin\AdminOrganizationInvoiceController;
 use App\Http\Controllers\Admin\AdminWhatsappBroadcastingController;
 use App\Http\Controllers\Admin\AdminWhatsappBroadcastingDataController;
+use App\Http\Controllers\Admin\AdminWhatsappBroadcastingInvoiceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -134,6 +135,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 					// Data
 					Route::get('/data', [AdminWhatsappBroadcastingDataController::class, 'index'])->name('admin.add-ons.whatsapp.data');
+					Route::patch('/data/{plugin}', [AdminWhatsappBroadcastingDataController::class, 'update'])->name('admin.add-ons.whatsapp.data.update');
+					
+					// Invoice
+					Route::get('/invoice', [AdminWhatsappBroadcastingInvoiceController::class, 'index'])->name('admin.add-ons.whatsapp.invoice');
 					
 				});
 			});

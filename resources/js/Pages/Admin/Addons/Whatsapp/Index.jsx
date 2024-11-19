@@ -19,7 +19,7 @@ export default function Index() {
           <Link href={route('admin.add-ons.whatsapp.data')}>
             <CardMenu bgColor={'bg-orange-500'} icon={<CiViewList />} title={'Data'} />
           </Link>
-          <Link href={route('admin.add-ons.whatsapp')}>
+          <Link href={route('admin.add-ons.whatsapp.invoice')}>
             <CardMenu bgColor={'bg-cyan-500'} icon={<LiaFileInvoiceSolid />} title={'Invoice'} />
           </Link>
         </div>
@@ -31,7 +31,7 @@ export default function Index() {
         <Link href={route('admin.add-ons.whatsapp.data')}>
           <CardMenu bgColor={'bg-orange-500'} icon={<CiViewList />} title={'Data'} />
         </Link>
-        <Link href={route('admin.add-ons.whatsapp')}>
+        <Link href={route('admin.add-ons.whatsapp.invoice')}>
             <CardMenu bgColor={'bg-cyan-500'} icon={<LiaFileInvoiceSolid />} title={'Invoice'} />
           </Link>
       </div>

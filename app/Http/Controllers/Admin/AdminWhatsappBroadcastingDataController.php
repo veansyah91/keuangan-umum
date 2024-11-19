@@ -17,4 +17,9 @@ class AdminWhatsappBroadcastingDataController extends Controller
 																					->withQueryString()
 		]);
 	}
+
+	public function update(WhatsappPlugin $plugin)
+	{
+		dd($plugin);
+	}
 }
