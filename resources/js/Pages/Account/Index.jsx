@@ -458,7 +458,7 @@ export default function Index({
                         </div>
                         <div className='flex flex-col sm:flex-row w-full gap-1 mt-5'>
                             <div className='w-full sm:w-1/3 my-auto'>
-                                <InputLabel htmlFor='name' value='Kode' className='mx-auto my-auto' />
+                                <InputLabel htmlFor='code' value='Kode' className='mx-auto my-auto' />
                             </div>
 
                             <div className='sm:w-2/3 w-full'>

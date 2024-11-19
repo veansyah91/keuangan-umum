@@ -151,7 +151,7 @@ class WhatsappBroadcastingInvoiceController extends Controller
       'sandbox' => 'false'
 		);
 
-		WhatsappAddonsInvoiceJob::dispatch($data);
+		WhatsappAddonsInvoiceJob::dispatch($data)->onQueue('whatsapp');
 		return redirect(route('add-ons.whatsapp-invoice', $organization['id']))->with('success', 'Invoice Penambahan Layanan WhatsApp Broadcasting Berhasil Dibuat');
 	}
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { IoArrowBackOutline, IoFilter, IoPlayBack, IoPlayForward, IoSearchSharp } from 'react-icons/io5';
 import { ToastContainer } from 'react-toastify';
 import TitleMobile from '@/Components/Mobiles/TitleMobile';
@@ -9,14 +9,50 @@ import ContainerDesktop from '@/Components/Desktop/ContainerDesktop';
 import TitleDesktop from '@/Components/Desktop/TitleDesktop';
 import PageNumber from '@/Components/PageNumber';
 import ContentDesktop from '@/Components/Desktop/ContentDesktop';
+import WhatsappInvoiceDesktop from './Components/WhatsappInvoiceDesktop';
+import Modal from '@/Components/Modal';
+import SecondaryButton from '@/Components/SecondaryButton';
+import PrimaryButton from '@/Components/PrimaryButton';
+import InputLabel from '@/Components/InputLabel';
+import TextInput from '@/Components/TextInput';
 
 
 export default function Index(
   { whatsappPlugins, searchFilter }
 ) {
-  console.log(whatsappPlugins);
   const [showModalFilter, setShowModalFilter] = useState(false);
   const [search, setSearch] = useState(searchFilter || '');
+
+  const [showModalEdit, setShowModalEdit] = useState(false);
+
+  const { data, setData, processing, patch, errors } = useForm({
+    'name' : '',
+    'phone' : '',
+    'appKey' : '',
+    'authKey' : ''
+  })
+
+  // function
+  const handleEdit = (plugin) => {
+    console.log(plugin);
+    
+    setData({
+      name: plugin.organization.name,
+      phone: plugin.phone,
+      appKey: plugin.appKey,
+      authKey: plugin.authKey
+    });
+    setShowModalEdit(true);
+  }
+
+  const handleChangeValue = (values) => {
+		setData('phone', values.value)
+	}
+
+  const handleSubmitEdit = (e) => {
+    e.preventDefault();
+
+  }
 
   
   return (
@@ -94,7 +130,7 @@ export default function Index(
               id='search-input'
               name='search-input'
               type='search'
-              placeholder='Cari Kas Keluar'
+              placeholder='Cari Data'
               className='w-full border-none focus:outline-none focus:ring-0'
               value={search || ''}
               onChange={(e) => setSearch(e.target.value)}
@@ -156,10 +192,22 @@ export default function Index(
                     <th className='bg-gray-200'>App Key/Auth Key</th>
                     <th className='bg-gray-200'>Koneksi</th>
                     <th className='bg-gray-200'>Koneksi Terakhir</th>
-                    <th className='bg-gray-200 text-center'>Status</th>
+                    <th className='bg-gray-200'>Status</th>
                     <th className='bg-gray-200'></th>
                   </tr>
                 </thead>
+                <tbody>
+                  {
+                    whatsappPlugins.data.map((whatsappPlugin, index) => 
+                      <WhatsappInvoiceDesktop 
+                        key={index}
+                        whatsappPlugin={whatsappPlugin}
+                        className={`${index % 2 !== 0 && 'bg-gray-100'}`}
+                        handleEdit={() => handleEdit(whatsappPlugin)}
+                      />
+                    )
+                  }
+                </tbody>
               </table>
 
             </ContentDesktop>
@@ -167,6 +215,91 @@ export default function Index(
         </div>
       </ContainerDesktop>
       {/* Desktop */}
+
+      {/* Modal */}
+      {/* Edit */}
+      <Modal show={showModalEdit} onClose={() => setShowModalEdit(false)}>
+        <form onSubmit={handleSubmitEdit} className='p-6' id='deleteForm' name='deleteForm'>
+          <h2 className='text-lg font-medium text-gray-900 text-center'>Ubah Data Whatsapp Broadcasting { data.name }</h2>
+          <div className='mt-5 '>
+            <div className='flex flex-col sm:flex-row w-full gap-1 mt-5'>
+                <div className='w-full sm:w-1/3 my-auto'>
+                  <InputLabel htmlFor='phone' value='No. Handphone' className='mx-auto my-auto' />
+                </div>
+
+                <div className='sm:w-2/3 w-full'>
+                  <NumericFormat
+                    value={data.phone}
+                    customInput={TextInput}
+                    onValueChange={(values) => handleChangeValue(values)}
+                    thousandSeparator={false}
+                    className='text-start w-full border'
+                    placeholder='628xxx'
+                    prefix={''}
+                  />
+                  {errors && errors.phone && (
+                    <div className='-mb-3'>
+                      <div className='text-xs text-red-500'>{errors.phone}</div>
+                    </div>
+                  )}
+                </div>
+            </div>
+            <div className='flex flex-col sm:flex-row w-full gap-1 mt-5'>
+                <div className='w-full sm:w-1/3 my-auto'>
+                  <InputLabel htmlFor='app_key' value='App Key' className='mx-auto my-auto' />
+                </div>
+
+                <div className='sm:w-2/3 w-full'>
+                    <TextInput
+                        id='app_key'
+                        type='text'
+                        name='app_key'
+                        value={data.appKey || ''}
+                        className={`mt-1 w-full ${errors && errors.appKey && 'border-red-500'}`}
+                        onChange={(e) => setData('appKey', e.target.value.toString())}
+                        placeholder='App Key'
+                    />
+                    {errors && errors.appKey && (
+                      <div className='-mb-3'>
+                        <div className='text-xs text-red-500'>{errors.appKey}</div>
+                      </div>
+                    )}
+                </div>
+            </div>
+            <div className='flex flex-col sm:flex-row w-full gap-1 mt-5'>
+                <div className='w-full sm:w-1/3 my-auto'>
+                  <InputLabel htmlFor='auth_key' value='App Key' className='mx-auto my-auto' />
+                </div>
+
+                <div className='sm:w-2/3 w-full'>
+                    <TextInput
+                        id='auth_key'
+                        type='text'
+                        name='auth_key'
+                        value={data.authKey || ''}
+                        className={`mt-1 w-full ${errors && errors.authKey && 'border-red-500'}`}
+                        onChange={(e) => setData('authKey', e.target.value.toString())}
+                        placeholder='Auth Key'
+                    />
+                    {errors && errors.appKey && (
+                      <div className='-mb-3'>
+                        <div className='text-xs text-red-500'>{errors.appKey}</div>
+                      </div>
+                    )}
+                </div>
+            </div>
+          </div>
+
+          <div className='mt-6 flex justify-end'>
+            <SecondaryButton onClick={() => setShowModalEdit(false)}>Batal</SecondaryButton>
+
+            <PrimaryButton className='ms-3' disabled={processing}>
+                Hapus
+            </PrimaryButton>
+          </div>
+        </form>
+      </Modal>
+      {/* Modal */}
     </>
   )
 }
