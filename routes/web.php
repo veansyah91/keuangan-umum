@@ -139,6 +139,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 					
 					// Invoice
 					Route::get('/invoice', [AdminWhatsappBroadcastingInvoiceController::class, 'index'])->name('admin.add-ons.whatsapp.invoice');
+					Route::patch('/invoice/{invoice}', [AdminWhatsappBroadcastingInvoiceController::class, 'confirmation'])->name('admin.add-ons.whatsapp.invoice.confirmation');
 					
 				});
 			});

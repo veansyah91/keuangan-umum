@@ -51,7 +51,7 @@ class AdminOrganizationInvoiceController extends Controller
 
         $user = Auth::user();
 
-        // // Update Organization Invoice
+        // Update Organization Invoice
         $organizationInvoice->update([
             'status' => 'paid',
             'accepted_by_user_id' => $user['id'],

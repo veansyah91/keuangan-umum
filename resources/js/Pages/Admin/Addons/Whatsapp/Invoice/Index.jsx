@@ -49,6 +49,13 @@ export default function Index({
   const updateOrganizationInvoiceStatus = (e) =>
   {
     e.preventDefault();
+
+    patch(route('admin.add-ons.whatsapp.invoice.confirmation', {invoice: data.id}), {
+      onSuccess: ({ props }) => {
+        console.log(props);
+        
+      }
+    })
   }
   return (
     <>
@@ -212,57 +219,57 @@ export default function Index({
 
       {/* Modal */}
       <Modal show={showModalUpdateStatus} onClose={() => setShowModalUpdateStatus(false)}>
-                <form onSubmit={updateOrganizationInvoiceStatus} className='p-6'>
-                    <h2 className='text-lg font-medium text-gray-900'>Konfirmasi Pembayaran Invoice Whatsapp Broadcasting</h2>
+        <form onSubmit={updateOrganizationInvoiceStatus} className='p-6'>
+          <h2 className='text-lg font-medium text-gray-900'>Konfirmasi Pembayaran Invoice Whatsapp Broadcasting</h2>
 
-                    <div className='mt-6 '>
-                        <div className='flex gap-2'>
-                            <div className='w-1/4 flex justify-between'>
-                                <div>No Ref</div>
-                                <div>:</div>
-                            </div>
-                            <div className='w-3/4'>{data.no_ref}</div>
-                        </div>
-                        <div className='flex gap-2'>
-                            <div className='w-1/4 flex justify-between'>
-                                <div>Organisasi</div>
-                                <div>:</div>
-                            </div>
-                            <div className='w-3/4'>{data.organization}</div>
-                        </div>
-                        <div className='flex gap-2'>
-                            <div className='w-1/4 flex justify-between'>
-                                <div>Produk</div>
-                                <div>:</div>
-                            </div>
-                            <div className='w-3/4'>{data.product}</div>
-                        </div>
-                        <div className='flex gap-2'>
-                            <div className='w-1/4 flex justify-between'>
-                                <div>Harga</div>
-                                <div>:</div>
-                            </div>
-                            <div className='w-3/4'>IDR. {formatNumber(data.price)}</div>
-                        </div>
-                    </div>
+          <div className='mt-6 '>
+            <div className='flex gap-2'>
+              <div className='w-1/4 flex justify-between'>
+                <div>No Ref</div>
+                <div>:</div>
+              </div>
+              <div className='w-3/4'>{data.no_ref}</div>
+            </div>
+            <div className='flex gap-2'>
+              <div className='w-1/4 flex justify-between'>
+                <div>Organisasi</div>
+                <div>:</div>
+              </div>
+              <div className='w-3/4'>{data.organization}</div>
+            </div>
+            <div className='flex gap-2'>
+              <div className='w-1/4 flex justify-between'>
+                <div>Produk</div>
+                <div>:</div>
+              </div>
+              <div className='w-3/4'>{data.product}</div>
+            </div>
+            <div className='flex gap-2'>
+              <div className='w-1/4 flex justify-between'>
+                <div>Harga</div>
+                <div>:</div>
+              </div>
+              <div className='w-3/4'>IDR. {formatNumber(data.price)}</div>
+            </div>
+          </div>
 
-                    <div className='mt-6 flex sm:flex-row flex-col-reverse gap-2 sm:gap-0 sm:justify-end'>
-                        <SecondaryButton onClick={() => setShowModalUpdateStatus(false)}>
-                            <div className='w-full'>Batal</div>
-                        </SecondaryButton>
+          <div className='mt-6 flex sm:flex-row flex-col-reverse gap-2 sm:gap-0 sm:justify-end'>
+            <SecondaryButton onClick={() => setShowModalUpdateStatus(false)}>
+              <div className='w-full'>Batal</div>
+            </SecondaryButton>
 
-                        {/* Mobile */}
-                        <PrimaryButton className='sm:hidden' disabled={processing}>
-                            <div className='w-full'>Konfirmasi Pembayaran</div>
-                        </PrimaryButton>
+            {/* Mobile */}
+            <PrimaryButton className='sm:hidden' disabled={processing}>
+              <div className='w-full'>Konfirmasi Pembayaran</div>
+            </PrimaryButton>
 
-                        {/* Desktop */}
-                        <PrimaryButton className='ms-3 hidden sm:block' disabled={processing}>
-                            Konfirmasi Pembayaran
-                        </PrimaryButton>
-                    </div>
-                </form>
-            </Modal>
+            {/* Desktop */}
+            <PrimaryButton className='ms-3 hidden sm:block' disabled={processing}>
+              Konfirmasi Pembayaran
+            </PrimaryButton>
+          </div>
+        </form>
+      </Modal>
       {/* Modal */}
     </>
   )
