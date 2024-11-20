@@ -24,15 +24,26 @@ export default function Index({
 
   const [showModalUpdateStatus, setShowModalUpdateStatus] = useState(false);
 
-
-  console.log(invoices);
   const { data, setData, processing, patch, errors } = useForm({
-    'id': null
+    'id': null,
+    'no_ref' : '',
+    'organization_name' : '',
+    'product': '',
+    'price': 0    
   })
 
   // function
   const handleEdit = (invoice) => {    
-
+    console.log(invoice);
+    
+    setShowModalUpdateStatus(true);
+    setData({
+    'id': invoice.id,
+    'no_ref' : invoice.no_ref,
+    'organization' : invoice.organization.name,
+    'product': invoice.product,
+    'price': invoice.price
+    });
   }
 
   const updateOrganizationInvoiceStatus = (e) =>
@@ -202,7 +213,7 @@ export default function Index({
       {/* Modal */}
       <Modal show={showModalUpdateStatus} onClose={() => setShowModalUpdateStatus(false)}>
                 <form onSubmit={updateOrganizationInvoiceStatus} className='p-6'>
-                    <h2 className='text-lg font-medium text-gray-900'>Konfirmasi Pembayaran</h2>
+                    <h2 className='text-lg font-medium text-gray-900'>Konfirmasi Pembayaran Invoice Whatsapp Broadcasting</h2>
 
                     <div className='mt-6 '>
                         <div className='flex gap-2'>
@@ -210,14 +221,14 @@ export default function Index({
                                 <div>No Ref</div>
                                 <div>:</div>
                             </div>
-                            <div className='w-3/4'>{data.noRef}</div>
+                            <div className='w-3/4'>{data.no_ref}</div>
                         </div>
                         <div className='flex gap-2'>
                             <div className='w-1/4 flex justify-between'>
                                 <div>Organisasi</div>
                                 <div>:</div>
                             </div>
-                            <div className='w-3/4'>{data.organizationName}</div>
+                            <div className='w-3/4'>{data.organization}</div>
                         </div>
                         <div className='flex gap-2'>
                             <div className='w-1/4 flex justify-between'>
