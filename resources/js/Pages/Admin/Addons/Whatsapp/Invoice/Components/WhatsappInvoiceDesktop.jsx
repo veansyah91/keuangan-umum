@@ -32,24 +32,28 @@ export default function WhatsappInvoiceDesktop(
         )}
       </td>
       <td className='text-end'>
-        <div className='dropdown dropdown-left'>
-          <div
-            tabIndex={0}
-            role='button'
-            className={`bg-inherit border-none hover:bg-gray-100 -z-50 text-gray-300'`}>
-            <IoEllipsisVertical />
+        {
+          invoice.status !== 'pending' 
+          ? null
+          :<div className='dropdown dropdown-left'>
+            <div
+              tabIndex={0}
+              role='button'
+              className={`bg-inherit border-none hover:bg-gray-100 -z-50 text-gray-300'`}>
+              <IoEllipsisVertical />
+            </div>
+            <ul
+              tabIndex={0}
+              className='dropdown-content z-[50] menu p-2 shadow bg-base-100 rounded-box w-56'>
+              <li>
+                <button onClick={handleEdit}>
+                  <FiEdit />
+                  Edit
+                </button>
+              </li>
+            </ul>
           </div>
-          <ul
-            tabIndex={0}
-            className='dropdown-content z-[50] menu p-2 shadow bg-base-100 rounded-box w-56'>
-            <li>
-              <button onClick={handleEdit}>
-                <FiEdit />
-                Edit
-              </button>
-            </li>
-          </ul>
-        </div>
+        }
       </td>
     </tr>
   )

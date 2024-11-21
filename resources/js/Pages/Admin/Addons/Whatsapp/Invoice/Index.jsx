@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import { IoArrowBackOutline, IoFilter, IoPlayBack, IoPlayForward, IoSearchSharp } from 'react-icons/io5';
 import { ToastContainer } from 'react-toastify';
 import TitleMobile from '@/Components/Mobiles/TitleMobile';
@@ -14,6 +14,8 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import Modal from '@/Components/Modal';
 import formatNumber from '@/Utils/formatNumber';
 import SecondaryButton from '@/Components/SecondaryButton';
+import { useDebounce } from 'use-debounce';
+import { usePrevious } from 'react-use';
 
 
 export default function Index({
@@ -30,9 +32,29 @@ export default function Index({
     'organization_name' : '',
     'product': '',
     'price': 0    
-  })
+  });
+
+  const [debounceValue] = useDebounce(search, 500);
+
+  const prevSearch = usePrevious(search);
+
+  // useEffect
+  useEffect(() => {
+    if (prevSearch !== undefined) {
+      handleReloadPage();
+    }
+  }, [debounceValue]);
 
   // function
+  const handleReloadPage = () => {
+    router.reload({
+      only: ['invoices'],
+      data: {
+        search,
+      },
+    });
+  };
+
   const handleEdit = (invoice) => {    
     setShowModalUpdateStatus(true);
     setData({

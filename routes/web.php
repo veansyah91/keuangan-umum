@@ -136,7 +136,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 					// Data
 					Route::get('/data', [AdminWhatsappBroadcastingDataController::class, 'index'])->name('admin.add-ons.whatsapp.data');
 					Route::patch('/data/{plugin}', [AdminWhatsappBroadcastingDataController::class, 'update'])->name('admin.add-ons.whatsapp.data.update');
-					Route::patch('/data/{plugin}', [AdminWhatsappBroadcastingDataController::class, 'connection'])->name('admin.add-ons.whatsapp.data.connection');
+					Route::patch('/data/{plugin}/connection', [AdminWhatsappBroadcastingDataController::class, 'connection'])->name('admin.add-ons.whatsapp.data.connection');
 					
 					// Invoice
 					Route::get('/invoice', [AdminWhatsappBroadcastingInvoiceController::class, 'index'])->name('admin.add-ons.whatsapp.invoice');

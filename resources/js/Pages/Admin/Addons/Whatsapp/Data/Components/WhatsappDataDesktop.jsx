@@ -5,7 +5,7 @@ import { IoEllipsisVertical } from 'react-icons/io5';
 import { RiSignalTowerLine } from 'react-icons/ri';
 
 export default function WhatsappDataDesktop(
-  {whatsappPlugin, handleEdit, className, handleCheckConnection}
+  {whatsappPlugin, handleEdit, className, handleCheckConnection, processing}
 ) {  
   return (
     <tr className={className}>
@@ -35,17 +35,22 @@ export default function WhatsappDataDesktop(
             tabIndex={0}
             className='dropdown-content z-[50] menu p-2 shadow bg-base-100 rounded-box w-56'>
             <li>
-              <button onClick={handleEdit}>
+              <button onClick={handleEdit} disabled={processing}>
                 <FiEdit />
                 Edit
               </button>
             </li>
-            <li>
-              <button onClick={handleCheckConnection}>
-                <RiSignalTowerLine />
-                Cek Koneksi
-              </button>
-            </li>
+            {
+              (whatsappPlugin.is_active && whatsappPlugin.appKey && whatsappPlugin.authkey)  
+              ? <li>
+                <button onClick={handleCheckConnection} disabled={processing}>
+                  <RiSignalTowerLine />
+                  Cek Koneksi
+                </button>
+              </li>
+              : null
+            }
+
           </ul>
         </div>
       </td>

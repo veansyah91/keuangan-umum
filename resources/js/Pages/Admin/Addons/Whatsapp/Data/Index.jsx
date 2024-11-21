@@ -46,11 +46,12 @@ export default function Index(
 		flash?.success && toast.success(flash.success, {
 			position: toast.POSITION.TOP_CENTER,
 		});
+    
 	},[]);
 
   useEffect(() => {
     if (prevSearch !== undefined) {
-        handleReloadPage();
+      handleReloadPage();
     }
   }, [debounceValue]);
 
@@ -76,7 +77,20 @@ export default function Index(
   }
 
   const handleCheckConnection = (plugin) => {
-    console.log(plugin);
+    patch(route('admin.add-ons.whatsapp.data.connection', {plugin: plugin.id}),{
+      onSuccess: ({ props }) => {
+        const { flash } = props;
+
+        flash?.success && toast.success(flash.success, {
+          position: toast.POSITION.TOP_CENTER,
+        });
+      },
+      onError: errors => {        
+        errors?.error && toast.error(errors.error, {
+          position: toast.POSITION.TOP_CENTER,
+        });
+      }
+    })
     
   }
 
@@ -166,9 +180,7 @@ export default function Index(
             
           </div>
           <div className='my-auto w-4/12 flex gap-5 justify-end'>
-            <button className='py-2 px-3 border rounded-lg' onClick={() => setShowModalFilter(true)}>
-              <IoFilter />
-            </button>
+            
           </div>
           <div className='w-3/12 border flex rounded-lg'>
             <label htmlFor='search-input' className='my-auto ml-2'>
@@ -253,6 +265,7 @@ export default function Index(
                         className={`${index % 2 !== 0 && 'bg-gray-100'}`}
                         handleEdit={() => handleEdit(whatsappPlugin)}
                         handleCheckConnection={() => handleCheckConnection(whatsappPlugin)}
+                        processing={processing}
                       />
                     )
                   }

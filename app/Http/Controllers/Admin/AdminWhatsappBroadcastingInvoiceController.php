@@ -16,9 +16,14 @@ class AdminWhatsappBroadcastingInvoiceController extends Controller
   public function index()
 	{
 		return Inertia::render('Admin/Addons/Whatsapp/Invoice/Index',[
-			'invoices' => WhatsappInvoice::with(['organization', 'acceptedBy'])
-																					->paginate(50)
-																					->withQueryString()
+			'invoices' => WhatsappInvoice::filter(request(['search', 'start_date', 'end_date']))
+																		->orWhereHas('organization', function ($query){
+																			return $query->where('name', 'like', '%'.request('search').'%')
+																										->orWhere('id', 'like', '%'.request('search').'%');
+																		})
+																		->with(['organization', 'acceptedBy'])
+																		->paginate(50)
+																		->withQueryString()
 		]);
 	}
 
