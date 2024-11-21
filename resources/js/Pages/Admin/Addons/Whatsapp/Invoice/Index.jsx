@@ -34,8 +34,6 @@ export default function Index({
 
   // function
   const handleEdit = (invoice) => {    
-    console.log(invoice);
-    
     setShowModalUpdateStatus(true);
     setData({
     'id': invoice.id,
@@ -53,7 +51,6 @@ export default function Index({
     patch(route('admin.add-ons.whatsapp.invoice.confirmation', {invoice: data.id}), {
       onSuccess: ({ props }) => {
         console.log(props);
-        
       }
     })
   }

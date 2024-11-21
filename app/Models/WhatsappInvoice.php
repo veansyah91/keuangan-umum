@@ -19,6 +19,7 @@ class WhatsappInvoice extends Model
         'status',
         'price',
         'organization_id',
+        'accepted_by_user_id'
     ];
 
     public function organization(): BelongsTo

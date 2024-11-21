@@ -2,9 +2,10 @@ import dayjs from 'dayjs';
 import React from 'react'
 import { FiEdit } from 'react-icons/fi';
 import { IoEllipsisVertical } from 'react-icons/io5';
+import { RiSignalTowerLine } from 'react-icons/ri';
 
 export default function WhatsappDataDesktop(
-  {whatsappPlugin, handleEdit, className}
+  {whatsappPlugin, handleEdit, className, handleCheckConnection}
 ) {  
   return (
     <tr className={className}>
@@ -17,11 +18,11 @@ export default function WhatsappDataDesktop(
       <td className=''>
         <div>URL: { whatsappPlugin.url ?? "-" }</div>
         <div>App Key: { whatsappPlugin.appKey ?? "-" }</div>
-        <div>Auth Key: { whatsappPlugin.authKey ?? "-" }</div>
+        <div>Auth Key: { whatsappPlugin.authkey ?? "-" }</div>
       </td>
       <td className={ whatsappPlugin.connection ? 'text-green-600' : 'text-red-600' }>{ whatsappPlugin.connection ? 'connected' : 'disconnected' }</td>
-      <td className=''>{ whatsappPlugin.expired_date ? dayjs(whatsappPlugin.expired_date).locale('id').format('DD MMMM YYYY') : '-' }</td>
-      <td className={ whatsappPlugin.status ? 'text-green-600' : 'text-red-600' }>{ whatsappPlugin.status ? 'Aktif' : 'Tidak Aktif'}</td>
+      <td className=''>{ whatsappPlugin.last_connection ? dayjs(whatsappPlugin.last_connection).locale('id').format('DD MMMM YYYY') : '-' }</td>
+      <td className={ whatsappPlugin.is_active ? 'text-green-600' : 'text-red-600' }>{ whatsappPlugin.is_active ? 'Aktif' : 'Tidak Aktif'}</td>
       <td className='text-end'>
         <div className='dropdown dropdown-left'>
           <div
@@ -37,6 +38,12 @@ export default function WhatsappDataDesktop(
               <button onClick={handleEdit}>
                 <FiEdit />
                 Edit
+              </button>
+            </li>
+            <li>
+              <button onClick={handleCheckConnection}>
+                <RiSignalTowerLine />
+                Cek Koneksi
               </button>
             </li>
           </ul>

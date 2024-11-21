@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import { IoArrowBackOutline, IoFilter, IoPlayBack, IoPlayForward, IoSearchSharp } from 'react-icons/io5';
-import { ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import TitleMobile from '@/Components/Mobiles/TitleMobile';
 import ContainerDesktop from '@/Components/Desktop/ContainerDesktop';
 import TitleDesktop from '@/Components/Desktop/TitleDesktop';
@@ -16,36 +16,68 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
 import { NumericFormat } from 'react-number-format';
+import { useDebounce } from 'use-debounce';
+import { usePrevious } from 'react-use';
 
 
 export default function Index(
-  { whatsappPlugins, searchFilter }
+  { whatsappPlugins, searchFilter, flash }
 ) {
   const [showModalFilter, setShowModalFilter] = useState(false);
   const [search, setSearch] = useState(searchFilter || '');
 
   const [showModalEdit, setShowModalEdit] = useState(false);
 
-  const { data, setData, processing, patch, errors } = useForm({
+  const { data, setData, processing, patch, errors, reset } = useForm({
     'name' : '',
     'phone' : '',
     'appKey' : '',
-    'authKey' : '',
+    'authkey' : '',
     'url' : '',
     'id': null
-  })
+  });
+
+  const [debounceValue] = useDebounce(search, 500);
+
+  const prevSearch = usePrevious(search);
+
+  // useEffect
+  useEffect(() => {
+		flash?.success && toast.success(flash.success, {
+			position: toast.POSITION.TOP_CENTER,
+		});
+	},[]);
+
+  useEffect(() => {
+    if (prevSearch !== undefined) {
+        handleReloadPage();
+    }
+  }, [debounceValue]);
 
   // function
+  const handleReloadPage = () => {
+    router.reload({
+      only: ['whatsappPlugins'],
+      data: {
+        search,
+      },
+    });
+  };
   const handleEdit = (plugin) => {    
     setData({
       name: plugin.organization.name,
       url: plugin.url,
       phone: plugin.phone,
       appKey: plugin.appKey,
-      authKey: plugin.authKey,
+      authkey: plugin.authkey,
       id: plugin.id
     });
     setShowModalEdit(true);
+  }
+
+  const handleCheckConnection = (plugin) => {
+    console.log(plugin);
+    
   }
 
   const handleChangeValue = (values) => {
@@ -57,8 +89,14 @@ export default function Index(
 
     patch(route('admin.add-ons.whatsapp.data.update', {plugin: data.id}), {
       onSuccess: ({ props }) => {
-        console.log(props);
-        
+        const { flash } = props;
+
+				toast.success(flash.success, {
+					position: toast.POSITION.TOP_CENTER,
+				});
+
+        reset();
+        setShowModalEdit(false);        
       }
     })
 
@@ -214,6 +252,7 @@ export default function Index(
                         whatsappPlugin={whatsappPlugin}
                         className={`${index % 2 !== 0 && 'bg-gray-100'}`}
                         handleEdit={() => handleEdit(whatsappPlugin)}
+                        handleCheckConnection={() => handleCheckConnection(whatsappPlugin)}
                       />
                     )
                   }
@@ -308,9 +347,9 @@ export default function Index(
                   id='auth_key'
                   type='text'
                   name='auth_key'
-                  value={data.authKey || ''}
-                  className={`mt-1 w-full ${errors && errors.authKey && 'border-red-500'}`}
-                  onChange={(e) => setData('authKey', e.target.value.toString())}
+                  value={data.authkey || ''}
+                  className={`mt-1 w-full ${errors && errors.authkey && 'border-red-500'}`}
+                  onChange={(e) => setData('authkey', e.target.value.toString())}
                   placeholder='Auth Key'
                 />
                 {errors && errors.appKey && (
@@ -326,7 +365,7 @@ export default function Index(
             <SecondaryButton onClick={() => setShowModalEdit(false)}>Batal</SecondaryButton>
 
             <PrimaryButton className='ms-3' disabled={processing}>
-                Hapus
+                Ubah
             </PrimaryButton>
           </div>
         </form>
