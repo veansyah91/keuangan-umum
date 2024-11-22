@@ -41,6 +41,8 @@ class StudentLevelUpdateCron extends Command
 		$now = Carbon::now();
         
         if ($now->month === 7) {
+            \Log::info('Cron job Student Level Update dijalankan '.date('Y-m-d H:i:s'));
+
             $contacts = Contact::whereHas('organization', function ($query){
                                     return $query->where('status','<>','deactive');
                                 })
