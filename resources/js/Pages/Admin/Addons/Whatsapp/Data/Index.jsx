@@ -21,7 +21,7 @@ import { usePrevious } from 'react-use';
 
 
 export default function Index(
-  { whatsappPlugins, searchFilter, flash }
+  { whatsappPlugins, searchFilter, statusFilter, connectionFilter, flash }
 ) {
   const [showModalFilter, setShowModalFilter] = useState(false);
   const [search, setSearch] = useState(searchFilter || '');
@@ -35,6 +35,11 @@ export default function Index(
     'authkey' : '',
     'url' : '',
     'id': null
+  });
+
+  const [dataFilter, setDataFilter] = useState({
+    status: statusFilter || '',
+    connection: connectionFilter || '',
   });
 
   const [debounceValue] = useDebounce(search, 500);
@@ -61,6 +66,8 @@ export default function Index(
       only: ['whatsappPlugins'],
       data: {
         search,
+        status: dataFilter.status,
+        connection: dataFilter.connection,
       },
     });
   };
@@ -97,6 +104,12 @@ export default function Index(
   const handleChangeValue = (values) => {
 		setData('phone', values.value)
 	}
+
+  const handleFilter = (e) => {
+    e.preventDefault();
+    setShowModalFilter(false);
+    handleReloadPage();
+  };
 
   const handleSubmitEdit = (e) => {
     e.preventDefault();
@@ -180,7 +193,9 @@ export default function Index(
             
           </div>
           <div className='my-auto w-4/12 flex gap-5 justify-end'>
-            
+            <button className='py-3 px-3 border rounded-lg' onClick={() => setShowModalFilter(true)}>
+              <IoFilter />
+            </button>
           </div>
           <div className='w-3/12 border flex rounded-lg'>
             <label htmlFor='search-input' className='my-auto ml-2'>
@@ -380,6 +395,49 @@ export default function Index(
             <PrimaryButton className='ms-3' disabled={processing}>
                 Ubah
             </PrimaryButton>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal show={showModalFilter} onClose={() => setShowModalFilter(false)}>
+        <form onSubmit={handleFilter} className='p-6'>
+          <h2 className='text-lg font-medium text-gray-900'>Filter Organisasi</h2>
+
+          <div className='mt-6 space-y-2'> 
+            <div className='flex w-full gap-1'>
+              <div className='w-3/12 my-auto'>Status</div>
+              <div className='w-8/12'>
+                <select
+                  className='w-full rounded-lg border-gray-300'
+                  onChange={(e) => setDataFilter({ status: e.target.value })}
+                  value={dataFilter.status}>
+                  <option value=''>Semua</option>
+                  <option value={true}>Aktif</option>
+                  <option value={false}>Tidak Aktif</option>
+                </select>
+              </div>
+              <div className='w-1/12 my-auto'></div>
+            </div>
+            <div className='flex w-full gap-1'>
+              <div className='w-3/12 my-auto'>Koneksi</div>
+              <div className='w-8/12'>
+                <select
+                  className='w-full rounded-lg border-gray-300'
+                  onChange={(e) => setDataFilter({ connection: e.target.value })}
+                  value={dataFilter.connection}>
+                  <option value=''>Semua</option>
+                  <option value={true}>Connected</option>
+                  <option value={false}>Disconnected</option>
+                </select>
+              </div>
+              <div className='w-1/12 my-auto'></div>
+            </div>
+          </div>
+
+          <div className='mt-6 flex justify-end'>
+            <SecondaryButton onClick={() => setShowModalFilter(false)}>Batal</SecondaryButton>
+
+            <PrimaryButton className='ms-3'>Filter</PrimaryButton>
           </div>
         </form>
       </Modal>

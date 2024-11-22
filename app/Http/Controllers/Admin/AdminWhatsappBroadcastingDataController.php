@@ -13,18 +13,16 @@ class AdminWhatsappBroadcastingDataController extends Controller
 {
 	public function index()
 	{
+		// dd((int)request('status') === 0);
 		$search = request('search');
 		return Inertia::render('Admin/Addons/Whatsapp/Data/Index',[
-			'whatsappPlugins' => WhatsappPlugin::where(function ($query) use ($search){
-																						return $query->where('phone', 'like', '%'.$search.'%');
-																					})
-																					->orWhereHas('organization', function ($query) use ($search){
-																						return $query->where('id', 'like', '%'.$search.'%')->orWhere('name', 'like', '%'.$search.'%');
-																					})
+			'whatsappPlugins' => WhatsappPlugin::filter(request(['search', 'status', 'connection']))
 																					->with('organization')																					
 																					->paginate(50)
 																					->withQueryString(),
-			'searchFilter' => $search
+			'searchFilter' => $search,
+			'statusFilter' => request('status'),
+			'connectionFilter' => request('connection'),	
 		]);
 	}
 

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
 import { Head, Link, router, useForm } from '@inertiajs/react';
-import { IoArrowBackOutline, IoFilter, IoPlayBack, IoPlayForward, IoSearchSharp } from 'react-icons/io5';
+import { IoArrowBackOutline, IoFilter, IoPlayBack, IoPlayForward, IoSearchSharp, IoTrash } from 'react-icons/io5';
 import { ToastContainer } from 'react-toastify';
 import TitleMobile from '@/Components/Mobiles/TitleMobile';
 import ContainerDesktop from '@/Components/Desktop/ContainerDesktop';
@@ -16,11 +16,18 @@ import formatNumber from '@/Utils/formatNumber';
 import SecondaryButton from '@/Components/SecondaryButton';
 import { useDebounce } from 'use-debounce';
 import { usePrevious } from 'react-use';
+import GeneralSelectInput from '@/Components/SelectInput/GeneralSelectInput';
+import Datepicker from 'react-tailwindcss-datepicker';
 
 
 export default function Index({
-  invoices, searchFilter
-}) {
+    organizations,
+    invoices, 
+    searchFilter, 
+    searchOrganization,
+    productFilter,
+    statusFilter,
+}) {  
   const [showModalFilter, setShowModalFilter] = useState(false);
   const [search, setSearch] = useState(searchFilter || '');
 
@@ -34,25 +41,59 @@ export default function Index({
     'price': 0    
   });
 
-  const [debounceValue] = useDebounce(search, 500);
+  const [dataFilter, setDataFilter] = useState({
+    status: statusFilter || '',
+    product: productFilter || '',
+  });
 
+  const [dateValue, setDateValue] = useState({
+    startDate: '',
+    endDate: '',
+  });
+
+  const [debounceValue] = useDebounce(search, 500);
+  const [debounceDateValue] = useDebounce(dateValue, 500);
   const prevSearch = usePrevious(search);
+
+  // Organization Select
+  const [selectedOrganization, setSelectedOrganization] = useState('');
+  const [queryOrganization, setQueryOrganization] = useState(searchOrganization || '');
 
   // useEffect
   useEffect(() => {
     if (prevSearch !== undefined) {
       handleReloadPage();
     }
-  }, [debounceValue]);
+  }, [debounceValue, debounceDateValue]);
 
   // function
+  const handleDateValueChange = (newValue) => {
+    setDateValue(newValue);
+  };
+
   const handleReloadPage = () => {
     router.reload({
       only: ['invoices'],
       data: {
         search,
+        start_date: dateValue.startDate,
+        end_date: dateValue.endDate,
+        status: dataFilter.status,
+        product: dataFilter.product,
+        organization_id: selectedOrganization.id,
       },
     });
+  };
+
+  const handleFilter = (e) => {
+    e.preventDefault();
+    setShowModalFilter(false);
+    handleReloadPage();
+  };
+
+  const handleDeleteOrganizationFilter = () => {
+    setSelectedOrganization('');
+    setQueryOrganization('');
   };
 
   const handleEdit = (invoice) => {    
@@ -76,6 +117,9 @@ export default function Index({
       }
     })
   }
+
+  
+
   return (
     <>
       <Head title='Invoice Whatsapp Plugins' />
@@ -143,6 +187,22 @@ export default function Index({
             <button className='py-2 px-3 border rounded-lg' onClick={() => setShowModalFilter(true)}>
               <IoFilter />
             </button>
+            <Datepicker
+                value={dateValue}
+                onChange={handleDateValueChange}
+                showShortcuts={true}
+                configs={{
+                    shortcuts: {
+                        today: 'Hari Ini',
+                        yesterday: 'Kemarin',
+                        past: (period) => `${period} Hari Terakhir`,
+                        currentMonth: 'Bulan Ini',
+                        pastMonth: 'Bulan Lalu',
+                        currentYear: 'Tahun Ini',
+                    },
+                }}
+                separator={'s.d'}
+            />
           </div>
           <div className='w-3/12 border flex rounded-lg'>
             <label htmlFor='search-input' className='my-auto ml-2'>
@@ -286,6 +346,50 @@ export default function Index({
             <PrimaryButton className='ms-3 hidden sm:block' disabled={processing}>
               Konfirmasi Pembayaran
             </PrimaryButton>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal show={showModalFilter} onClose={() => setShowModalFilter(false)}>
+        <form onSubmit={handleFilter} className='p-6'>
+          <h2 className='text-lg font-medium text-gray-900'>Filter Organisasi</h2>
+
+          <div className='mt-6 space-y-2'> 
+            <div className='flex w-full gap-1'>
+              <div className='w-3/12 my-auto'>Status</div>
+              <div className='w-8/12'>
+                <select
+                  className='w-full rounded-lg border-gray-300'
+                  onChange={(e) => setDataFilter({ status: e.target.value })}
+                  value={dataFilter.status}>
+                  <option value=''>Semua</option>
+                  <option value='pending'>Menunggu</option>
+                  <option value='paid'>Lunas</option>
+                  <option value='canceled'>Batal</option>
+                </select>
+              </div>
+              <div className='w-1/12 my-auto'></div>
+            </div>
+            <div className='flex w-full gap-1'>
+              <div className='w-3/12 my-auto'>Produk</div>
+              <div className='w-8/12'>
+                <select
+                  className='w-full rounded-lg border-gray-300'
+                  onChange={(e) => setDataFilter({ product: e.target.value })}
+                  value={dataFilter.product}>
+                  <option value=''>Semua</option>
+                  <option value='Bulanan'>Bulanan</option>
+                  <option value='Tahunan'>Tahunan</option>
+                </select>
+              </div>
+              <div className='w-1/12 my-auto'></div>
+            </div>
+          </div>
+
+          <div className='mt-6 flex justify-end'>
+            <SecondaryButton onClick={() => setShowModalFilter(false)}>Batal</SecondaryButton>
+
+            <PrimaryButton className='ms-3'>Filter</PrimaryButton>
           </div>
         </form>
       </Modal>
