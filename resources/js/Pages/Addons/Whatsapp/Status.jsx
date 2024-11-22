@@ -142,6 +142,23 @@ export default function Setting({
 								/>
 							}								
 						</div>
+						<div className='bg-white py-2 px-2 sm:pt-0 mt-10'>
+							<h2 className='font-bold underline'>Disclaimer</h2>				
+							<div>
+								<table>
+									<tbody>
+										<tr>
+											<td>1. </td>
+											<td>Whatsapp Broadcasting Plugin dari keuanganumum.com adalah unofficial</td>
+										</tr>
+									</tbody>
+								</table>
+								<ol>
+									<li>satu</li>
+									<li>satu</li>
+								</ol>
+							</div>			
+						</div>
 					</div>
 				</div>
 			</div>
