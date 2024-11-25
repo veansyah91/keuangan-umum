@@ -81,6 +81,9 @@ export default function Setting({
 	status, organization
 }) {
 
+	const admin = "6287839542505";
+  const waLink = 'https://web.whatsapp.com/send';
+
 	const { data, setData, patch, processing } = useForm({
 		'phone' : status ? status.phone : ''
 	})
@@ -115,6 +118,17 @@ export default function Setting({
 			}
 		})
 	}
+
+	const handleChangeNumber = () => {
+		let message = `
+			*KONFIRMASI PERUBAHAN NOMOR HANDPHONE*
+			 %0A-------------------------------------------------------%0A
+			 
+		`;
+
+
+	}
+
   return (
     <>
 			<Head title='Status WhatsApp Broadcast' />
@@ -148,15 +162,19 @@ export default function Setting({
 								<table>
 									<tbody>
 										<tr>
-											<td>1. </td>
-											<td>Whatsapp Broadcasting Plugin dari keuanganumum.com adalah unofficial</td>
+											<td className='w-[25px]'>•</td>
+											<td>Whatsapp Broadcasting Plugin dari keuanganumum.com adalah unofficial atau tidak terafiliasi dengan WhatsApp</td>
+										</tr>
+										<tr>
+											<td className='w-[25px]'>•</td>
+											<td>Whatsapp Broadcasting Plugin dari keuanganumum.com mengirimkan pesan secara <span className='italic'>asynchronous</span> untuk menghindari blokir dari WhatsApp</td>
+										</tr>
+										<tr>
+											<td className='w-[25px]'>•</td>
+											<td>Apabila terjadi perubahan nomor handphone hubungi <button onClick={handleChangeNumber} className='text-green-600 font-bold'>Admin 0878396542505</button></td>
 										</tr>
 									</tbody>
 								</table>
-								<ol>
-									<li>satu</li>
-									<li>satu</li>
-								</ol>
 							</div>			
 						</div>
 					</div>
