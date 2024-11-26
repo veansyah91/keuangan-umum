@@ -33,6 +33,9 @@ function NoData ({
 function WithData({
 	data, handleShowAddDataModal
 }) {
+	// const [data, processing] = useForm({
+	// 	id: null
+	// })
 	return (
 		<div className='w-full flex pt-5 gap-2'>
 			<div className='md:w-5/12 w-full space-y-3'>
@@ -59,7 +62,7 @@ function WithData({
 				<div className='md:flex gap-2'>
 					<div className='md:w-4/12 font-bold'>Status <span className='md:hidden'>:</span></div>
 					<div className='hidden md:block w-1/12 text-end'>:</div>
-					<div className={`w-7/12 font-bold ${data.is_active ? 'text-green-500' : 'text-red-500'}`}>{data.is_active ? 'Aktif' : 'Tidak Aktif' }</div>
+					<div className={`w-7/12 font-bold space-x-5`}><span className={data.is_active ? 'text-green-500' : 'text-red-500'}>{data.is_active ? 'Aktif' : 'Tidak Aktif' }</span> <button className='border py-1 px-2 rounded-md'>Cek Koneksi</button></div>
 				</div>
 				<div className='md:flex gap-2'>
 					<div className='md:w-4/12 font-bold'>Koneksi <span className='md:hidden'>:</span></div>
@@ -67,7 +70,7 @@ function WithData({
 					<div className='w-7/12 my-auto'>
 					{
 						data.connection 
-						? 'Aktif' 
+						? <div className='my-auto text-green-500 flex gap-2'><div className='my-auto'><FaPowerOff /></div> <div>connected</div></div>  
 						: <div className='my-auto text-red-500 flex gap-2'><div className='my-auto'><FaPowerOff /></div> <div>disconnected</div></div> 
 					}
 					</div>
@@ -123,10 +126,30 @@ export default function Setting({
 		let message = `
 			*KONFIRMASI PERUBAHAN NOMOR HANDPHONE*
 			 %0A-------------------------------------------------------%0A
-			 
+			 _*Detail Organisasi*_
+			 %0AID : ${organization.id}
+			 %0ANama : ${organization.name}
+			 %0ANo. HP : ${data.phone}
 		`;
 
+		let whatsapp = `${waLink}?phone=${admin}&text=${message}`;
 
+		window.open(whatsapp, '_blank');		
+	}
+
+	const handleConnectionProblem = () => {
+		let message = `
+			*KONEKSI TERPUTUS*
+			 %0A-------------------------------------------------------%0A
+			 _*Detail Organisasi*_
+			 %0AID : ${organization.id}
+			 %0ANama : ${organization.name}
+			 %0ANo. HP : ${data.phone}
+		`;
+
+		let whatsapp = `${waLink}?phone=${admin}&text=${message}`;
+
+		window.open(whatsapp, '_blank');		
 	}
 
   return (
@@ -171,7 +194,11 @@ export default function Setting({
 										</tr>
 										<tr>
 											<td className='w-[25px]'>•</td>
-											<td>Apabila terjadi perubahan nomor handphone hubungi <button onClick={handleChangeNumber} className='text-green-600 font-bold'>Admin 0878396542505</button></td>
+											<td>Apabila terjadi perubahan nomor handphone, hubungi <button onClick={handleChangeNumber} className='text-green-600 font-bold'>Admin 0878396542505</button></td>
+										</tr>
+										<tr>
+											<td className='w-[25px]'>•</td>
+											<td>Apabila koneksi terputus, hubungi <button onClick={handleConnectionProblem} className='text-green-600 font-bold'>Admin 0878396542505</button></td>
 										</tr>
 									</tbody>
 								</table>
