@@ -13,7 +13,6 @@ class AdminWhatsappBroadcastingDataController extends Controller
 {
 	public function index()
 	{
-		// dd((int)request('status') === 0);
 		$search = request('search');
 		return Inertia::render('Admin/Addons/Whatsapp/Data/Index',[
 			'whatsappPlugins' => WhatsappPlugin::filter(request(['search', 'status', 'connection']))
@@ -79,8 +78,6 @@ class AdminWhatsappBroadcastingDataController extends Controller
 				return redirect()->back()->with('success', "Perangkat Telah Dihubungkan dengan Whatsapp Broadcasting");
 			}			
 		} catch (\Throwable $th) {
-			//throw $th;
-			// dd($th);
 			return redirect()->back()->withErrors(['error' => "Perangkat gagal terhubung, silakan cek kembali nomor perangkat pada aplikasi pihak ketiga!!!"]);
 		}
 		

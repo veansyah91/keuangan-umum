@@ -31,11 +31,9 @@ function NoData ({
 }
 
 function WithData({
-	data, handleShowAddDataModal
+	status, handleShowAddDataModal, processing
 }) {
-	// const [data, processing] = useForm({
-	// 	id: null
-	// })
+	
 	return (
 		<div className='w-full flex pt-5 gap-2'>
 			<div className='md:w-5/12 w-full space-y-3'>
@@ -43,7 +41,7 @@ function WithData({
 					<div className='md:w-4/12 font-bold'>No. Handphone <span className='md:hidden'>:</span> </div>
 					<div className='md:block hidden w-1/12 text-end'>:</div>
 					<div className='w-7/12 flex gap-2'>
-						<div>{data.phone}</div>
+						<div>{status.phone}</div>
 						<div>
 							<button
 								className='text-gray-500 text-sm'
@@ -57,22 +55,25 @@ function WithData({
 				<div className='md:flex gap-2'>
 					<div className='md:w-4/12 w-full font-bold'>Tanggal Kadaluarsa <span className='md:hidden'>:</span></div>
 					<div className='md:block hidden w-1/12 text-end'>:</div>
-					<div className='w-7/12'>{data.expired_date ?? "-"}</div>
+					<div className='w-7/12'>{status.expired_date ?? "-"}</div>
 				</div>
 				<div className='md:flex gap-2'>
 					<div className='md:w-4/12 font-bold'>Status <span className='md:hidden'>:</span></div>
 					<div className='hidden md:block w-1/12 text-end'>:</div>
-					<div className={`w-7/12 font-bold space-x-5`}><span className={data.is_active ? 'text-green-500' : 'text-red-500'}>{data.is_active ? 'Aktif' : 'Tidak Aktif' }</span> <button className='border py-1 px-2 rounded-md'>Cek Koneksi</button></div>
+					<div className={`w-7/12 font-bold space-x-5`}><span className={status.is_active ? 'text-green-500' : 'text-red-500'}>{status.is_active ? 'Aktif' : 'Tidak Aktif' }</span></div>
 				</div>
 				<div className='md:flex gap-2'>
-					<div className='md:w-4/12 font-bold'>Koneksi <span className='md:hidden'>:</span></div>
-					<div className='hidden md:block w-1/12 text-end'>:</div>
-					<div className='w-7/12 my-auto'>
+					<div className='md:w-4/12 w-full font-bold'>Koneksi <span className='md:hidden'>:</span></div>
+					<div className='hidden md:block md:w-1/12 text-end'>:</div>
+					<div className='md:w-7/12 w-full my-auto flex gap-5'>
 					{
-						data.connection 
+						status.connection 
 						? <div className='my-auto text-green-500 flex gap-2'><div className='my-auto'><FaPowerOff /></div> <div>connected</div></div>  
 						: <div className='my-auto text-red-500 flex gap-2'><div className='my-auto'><FaPowerOff /></div> <div>disconnected</div></div> 
 					}
+					<div className='w-full'>
+						<button className='border py-1 px-2 rounded-md' disabled={processing}>Cek Koneksi</button>
+					</div>
 					</div>
 				</div>
 			</div>
@@ -174,8 +175,9 @@ export default function Setting({
 							{
 								status
 								&& <WithData
-									data={status}
+									status={status}
 									handleShowAddDataModal={() => setShowAddData(true)}
+									processing={processing}
 								/>
 							}								
 						</div>
