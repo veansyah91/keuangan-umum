@@ -80,6 +80,5 @@ class AdminWhatsappBroadcastingDataController extends Controller
 		} catch (\Throwable $th) {
 			return redirect()->back()->withErrors(['error' => "Perangkat gagal terhubung, silakan cek kembali nomor perangkat pada aplikasi pihak ketiga!!!"]);
 		}
-		
 	}
 }

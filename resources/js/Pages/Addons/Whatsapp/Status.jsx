@@ -31,7 +31,7 @@ function NoData ({
 }
 
 function WithData({
-	status, handleShowAddDataModal, processing
+	status, handleShowAddDataModal, processing, handleCheckConnection
 }) {
 	
 	return (
@@ -63,6 +63,11 @@ function WithData({
 					<div className={`w-7/12 font-bold space-x-5`}><span className={status.is_active ? 'text-green-500' : 'text-red-500'}>{status.is_active ? 'Aktif' : 'Tidak Aktif' }</span></div>
 				</div>
 				<div className='md:flex gap-2'>
+					<div className='md:w-4/12 w-full font-bold'>Koneksi Terakhir <span className='md:hidden'>:</span></div>
+					<div className='md:block hidden w-1/12 text-end'>:</div>
+					<div className='w-7/12'>{status.last_connection ?? "-"}</div>
+				</div>
+				<div className='md:flex gap-2'>
 					<div className='md:w-4/12 w-full font-bold'>Koneksi <span className='md:hidden'>:</span></div>
 					<div className='hidden md:block md:w-1/12 text-end'>:</div>
 					<div className='md:w-7/12 w-full my-auto flex gap-5'>
@@ -72,7 +77,13 @@ function WithData({
 						: <div className='my-auto text-red-500 flex gap-2'><div className='my-auto'><FaPowerOff /></div> <div>disconnected</div></div> 
 					}
 					<div className='w-full'>
-						<button className='border py-1 px-2 rounded-md' disabled={processing}>Cek Koneksi</button>
+						<button className='border py-1 px-2 rounded-md' onClick={handleCheckConnection} disabled={processing}>
+							{
+								processing 
+								?<span className="loading loading-dots loading-xs"></span>
+								:<span>Cek Koneksi</span>
+							}							
+							</button>
 					</div>
 					</div>
 				</div>
@@ -153,6 +164,23 @@ export default function Setting({
 		window.open(whatsapp, '_blank');		
 	}
 
+	const handleCheckConnection = () => {
+		patch(route('add-ons.whatsapp.status.check-connection', {organization: organization.id}), {
+			onSuccess: ({ props }) => {
+				const { flash } = props;
+
+        flash?.success && toast.success(flash.success, {
+          position: toast.POSITION.TOP_CENTER,
+        });
+			},
+			onError: errors => {
+				errors?.error && toast.error(errors.error, {
+          position: toast.POSITION.TOP_CENTER,
+        });
+			}
+		})
+	}
+
   return (
     <>
 			<Head title='Status WhatsApp Broadcast' />
@@ -178,6 +206,7 @@ export default function Setting({
 									status={status}
 									handleShowAddDataModal={() => setShowAddData(true)}
 									processing={processing}
+									handleCheckConnection={handleCheckConnection}
 								/>
 							}								
 						</div>

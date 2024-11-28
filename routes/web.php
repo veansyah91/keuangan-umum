@@ -190,6 +190,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 			Route::get('/whatsapp', [WhatsappBroadcastingController::class, 'index'])->name('add-ons.whatsapp');
 			Route::get('/whatsapp/status', [WhatsappBroadcastingController::class, 'status'])->name('add-ons.whatsapp.status');
 			Route::patch('/whatsapp/status', [WhatsappBroadcastingController::class, 'update'])->name('add-ons.whatsapp.status.update');
+			Route::patch('/whatsapp/check-connection', [WhatsappBroadcastingController::class, 'checkConnection'])->name('add-ons.whatsapp.status.check-connection');
 
 			// whatsapp invoice
 			Route::get('/whatsapp-invoice', [WhatsappBroadcastingInvoiceController::class, 'index'])->name('add-ons.whatsapp-invoice');

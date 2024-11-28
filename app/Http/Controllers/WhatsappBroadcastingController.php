@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Inertia\Inertia;
 use App\Models\Organization;
 use Illuminate\Http\Request;
@@ -10,6 +11,7 @@ use App\Models\WhatsappInvoice;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use App\Repositories\User\UserRepository;
+use App\Repositories\WhatsApp\WhatsAppRepository;
 
 class WhatsappBroadcastingController extends Controller
 {
@@ -64,6 +66,45 @@ class WhatsappBroadcastingController extends Controller
 		]);
 
 		return redirect()->back()->with('success', 'No WhatsApp Berhasil Didaftarkan');
+	}
+
+	public function checkConnection(Organization $organization)
+	{
+		$plugin = WhatsappPlugin::where('organization_id', $organization['id'])
+															->first();
+
+		// dd($plugin);
+		try {
+			$now = Carbon::now();
+
+			$message = "test connection";
+
+			$data = array(
+				'appkey' => $plugin['appKey'],
+				'authkey' => $plugin['authkey'],
+				'to' => '6287839542505',
+				'message' => $message,
+				'sandbox' => 'false'
+			);
+
+			$whatsAppRepository = new WhatsAppRepository;
+			$result = $whatsAppRepository->sendMessage($data);
+			
+			$data = json_decode($result);
+
+			if ($data->message_status === "Success") {
+				$plugin->update([
+					'connection' => true,
+					'last_connection' => $now
+				]);
+				return redirect()->back()->with('success', "Perangkat Telah Dihubungkan dengan Whatsapp Broadcasting");
+			}			
+		} catch (\Throwable $th) {
+			$plugin->update([
+				'connection' => false,
+			]);
+			return redirect()->back()->withErrors(['error' => "Perangkat gagal terhubung, silakan hubungi admin!!!"]);
+		}
 	}
 
 }
