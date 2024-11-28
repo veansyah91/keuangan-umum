@@ -84,7 +84,7 @@ function WithData({
 export default function Setting({
 	status, organization
 }) {
-
+	
 	const admin = "6287839542505";
   const waLink = 'https://web.whatsapp.com/send';
 
