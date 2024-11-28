@@ -11,7 +11,7 @@ export default function GeneralSelectInput({
     maxHeight = 'max-h-60',
     placeholder,
 }) {
-    let selectedData = selected;
+    let selectedData = selected;    
     return (
         <Combobox value={selected} onChange={setSelected}>
             <div className='relative mt-1'>
