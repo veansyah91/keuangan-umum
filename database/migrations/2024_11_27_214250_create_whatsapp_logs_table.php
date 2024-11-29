@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('whatsapp_logs', function (Blueprint $table) {
             $table->id();
+            $table->foreignUuid('organization_id')->constrained()->cascadeOnDelete();
+            $table->string('description');
+            $table->enum('status',['sent','waiting', 'failed'])->default('waiting');
             $table->timestamps();
         });
     }
