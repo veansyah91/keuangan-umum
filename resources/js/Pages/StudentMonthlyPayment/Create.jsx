@@ -303,7 +303,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
 
   return (
     <>
-      <Head title='Piutang Iuran Bulanan Siswa' />
+      <Head title='Ubah Pembayaran Iuran Bulanan Siswa' />
       <ToastContainer />
 
       <FormInput onSubmit={handleSubmit}>

@@ -13,6 +13,7 @@ use Carbon\CarbonImmutable;
 use App\Models\Organization;
 use App\Models\StudentLevel;
 use Illuminate\Http\Request;
+use App\Models\WhatsappPlugin;
 use App\Models\ContactCategory;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
@@ -139,8 +140,11 @@ class StudentMonthlyPaymentController extends Controller
 			}
 		}
 
+		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
+
 		return Inertia::render('StudentMonthlyPayment/Create',[
 			'organization' => $organization,
+			'whatsappPlugin' => $whatsappPlugin,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'categories' => StudentPaymentCategory::whereOrganizationId($organization['id'])
 																							->whereIsActive(true)
@@ -152,6 +156,7 @@ class StudentMonthlyPaymentController extends Controller
 			'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),
 			'historyPayment' => Inertia::lazy(fn () => $historyPayment),
 			'historyCategories' => Inertia::lazy(fn () => $historyCategories),
+
 		]);
 	}
 
