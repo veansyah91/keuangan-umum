@@ -225,6 +225,14 @@ export default function Setting({
 										</tr>
 										<tr>
 											<td className='w-[25px]'>•</td>
+											<td>Daftarkan nomor handphone yang sudah dipakai lama, hindari penggunakan nomor handphone yang baru diregistrasi</td>
+										</tr>
+										<tr>
+											<td className='w-[25px]'>•</td>
+											<td>Kami menyarankan menautkan nomor handphone yang telah diregistrasikan pada WhatsApp Business</td>
+										</tr>
+										<tr>
+											<td className='w-[25px]'>•</td>
 											<td>Apabila terjadi perubahan nomor handphone, hubungi <button onClick={handleChangeNumber} className='text-green-600 font-bold'>Admin 0878396542505</button></td>
 										</tr>
 										<tr>

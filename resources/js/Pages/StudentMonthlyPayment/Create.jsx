@@ -59,6 +59,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
     month:parseInt(monthNow()),
     study_year:studyYear(),
     description:'',
+    send_wa:true,
     details: [],
     cash_account_id: null
   });
@@ -150,7 +151,8 @@ export default function Create({ organization, newRef, contacts, date, categorie
       month:parseInt(monthNow()),
       study_year:studyYear(),
       description:'',
-      account_id: null
+      account_id: null,
+      send_wa: true
     }
     
     setData(tempData);
@@ -284,6 +286,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
       },
     });
   };
+  
   // const handleReloadLastPayment = (temp, contact_id) => {
   //   router.reload({
   //     only: ['lastPayment'],
@@ -540,9 +543,29 @@ export default function Create({ organization, newRef, contacts, date, categorie
                   <div className='absolute text-xs'>Kode: {selectedCashAccount.code}</div>
                 )}
                 {errors?.cash_account_id && <span className='text-red-500 text-xs'>{errors.cash_account_id}</span>}
-
               </div>
             </div>
+
+            <div className='w-4/12 mt-5 sm:mt-2'>
+              <div className='form-control '>
+                <label className='label cursor-pointer gap-2' htmlFor={`send_wa`}>
+                  <input
+                    type='checkbox'
+                    className='checkbox'
+                    id={`send_wa`}
+                    value={data.send_wa}
+                    onChange={() => setData('send_wa', !data.send_wa)}
+                    checked={data.send_wa}
+                  />
+                  <span className='label-text'>Kirim Bukti Via WhatsApp</span>
+                </label>
+              </div>
+              {errors && errors.send_wa && (
+                <div className='-mb-3'>
+                  <div className='text-xs text-red-500'>{errors.send_wa}</div>
+                </div>
+              )}
+            </div>          
 
             <div className='flex justify-end flex-col-reverse sm:flex-row gap-2 mt-5'>
               <div className='w-full sm:w-1/6 my-auto text-center'>
