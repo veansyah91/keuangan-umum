@@ -118,8 +118,6 @@ export default function Index({
                 selectedAccountCategory: selectedAccountCategory?.id,
             },
             onSuccess: (page) => {
-                console.log(page);
-                
                 setData({
                     ...data,
                     code:
