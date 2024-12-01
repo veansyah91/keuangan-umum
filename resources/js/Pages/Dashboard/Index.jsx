@@ -209,7 +209,7 @@ const Index = ({ balance, startDate, endDate }) => {
 
                 <CostRevenueChart
                     logo={<FaHandHoldingUsd />}
-                    dataChart={balance?.revenueDay}
+                    dataChart={balance? balance.revenueDay : {}}
                     title={'Pendapatan'}
                     type={'revenue'}
                     data={balance?.revenues}
@@ -217,14 +217,16 @@ const Index = ({ balance, startDate, endDate }) => {
 
                 <CostRevenueChart
                     logo={<FaHandHoldingUsd />}
-                    dataChart={balance?.costDay}
+                    dataChart={balance? balance.costDay : {}}
                     title={'Pengeluaran'}
                     type={'cost'}
                     data={balance?.costs}
                 />
 
                 {/* Arus Kas */}
-                <CashflowChart data={balance?.cashflowDay} />
+                <CashflowChart 
+                    data={balance ? balance.cashflowDay : {}} 
+                />
             </Container>
         </>
     );
