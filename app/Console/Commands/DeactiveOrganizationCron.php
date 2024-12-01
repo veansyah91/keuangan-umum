@@ -39,17 +39,12 @@ class DeactiveOrganizationCron extends Command
             $diff = $formatedMonths->diffInMonths($now);
 
             if ($diff > 2) {
-                \Log::info($diff);
                 $organization->update([
                     'status' => 'deactive',
                 ]);
                 // \Log::info($organization);
-
             }
-
         }
-
-        // \Log::info($organizations);
 
     }
 }
