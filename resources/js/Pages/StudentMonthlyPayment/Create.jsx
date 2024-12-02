@@ -44,8 +44,7 @@ const monthNow = () => {
   return month;
 }
 
-export default function Create({ organization, newRef, contacts, date, categories, studyYears, cashAccounts, historyCategories }) {
-  
+export default function Create({ organization, newRef, contacts, date, categories, studyYears, cashAccounts, historyCategories, whatsappPlugin }) {     
   // state
   const [total, setTotal] = useState(0);
   const { data, setData, processing, post, errors, setError, reset } = useForm({
@@ -192,7 +191,8 @@ export default function Create({ organization, newRef, contacts, date, categorie
         contact_id: selected.id,
         description:`Kas Masuk / Pembayaran Iuran Bulanan dari ${selected.name.toUpperCase()} Bulan ${data.month}, Tahun Ajaran ${data.study_year}`,
         student_id: selected.student.no_ref,
-        level: selected.last_level.level
+        level: selected.last_level.level,
+        send_wa: ( whatsappPlugin && selected.phone ) ? true : false
       };
 
       handleHistoryCategoryReload(temp, selected.id);
@@ -302,7 +302,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
                 
   //     }
   //   })
-  // }
+  // }  
 
   return (
     <>
@@ -537,7 +537,6 @@ export default function Create({ organization, newRef, contacts, date, categorie
                   placeholder='Cari Akun'
                   isError={errors.cash_account_id ? true : false}
                   id='account'
-                  contactFilter={''}
                 />
                 {selectedCashAccount?.code && (
                   <div className='absolute text-xs'>Kode: {selectedCashAccount.code}</div>
@@ -546,26 +545,29 @@ export default function Create({ organization, newRef, contacts, date, categorie
               </div>
             </div>
 
-            <div className='w-4/12 mt-5 sm:mt-2'>
-              <div className='form-control '>
-                <label className='label cursor-pointer gap-2' htmlFor={`send_wa`}>
-                  <input
-                    type='checkbox'
-                    className='checkbox'
-                    id={`send_wa`}
-                    value={data.send_wa}
-                    onChange={() => setData('send_wa', !data.send_wa)}
-                    checked={data.send_wa}
-                  />
-                  <span className='label-text'>Kirim Bukti Via WhatsApp</span>
-                </label>
-              </div>
-              {errors && errors.send_wa && (
-                <div className='-mb-3'>
-                  <div className='text-xs text-red-500'>{errors.send_wa}</div>
+            {
+              (whatsappPlugin && selectedContact.phone)
+              && <div className='md:w-3/12 w-2/3 mt-5 sm:mt-2'>
+                <div className='form-control '>
+                  <label className='label cursor-pointer' htmlFor={`send_wa`}>
+                    <input
+                      type='checkbox'
+                      className='checkbox'
+                      id={`send_wa`}
+                      value={data.send_wa}
+                      onChange={() => setData('send_wa', !data.send_wa)}
+                      checked={data.send_wa}
+                    />
+                    <span className='label-text'>Kirim Bukti Via WhatsApp</span>
+                  </label>
                 </div>
-              )}
-            </div>          
+                {errors && errors.send_wa && (
+                  <div className='-mb-3'>
+                    <div className='text-xs text-red-500'>{errors.send_wa}</div>
+                  </div>
+                )}
+              </div>  
+            }      
 
             <div className='flex justify-end flex-col-reverse sm:flex-row gap-2 mt-5'>
               <div className='w-full sm:w-1/6 my-auto text-center'>

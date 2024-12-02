@@ -17,8 +17,7 @@ import CashflowChart from './Components/CashflowChart';
 
 const Index = ({ balance, startDate, endDate }) => {
     const { date, setDate } = useContext(AppContext);
-    const [isLoading, setIsLoading] = useState(false);
-    
+    const [isLoading, setIsLoading] = useState(false);    
 
     useEffect(() => {
         setIsLoading(true);

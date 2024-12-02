@@ -144,7 +144,7 @@ class StudentMonthlyPaymentController extends Controller
 
 		return Inertia::render('StudentMonthlyPayment/Create',[
 			'organization' => $organization,
-			'whatsappPlugin' => $whatsappPlugin,
+			'whatsappPlugin' => $whatsappPlugin ? true : false,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'categories' => StudentPaymentCategory::whereOrganizationId($organization['id'])
 																							->whereIsActive(true)
@@ -218,7 +218,11 @@ class StudentMonthlyPaymentController extends Controller
 			'description' => [
 				'string',
 				'nullable'
-			]
+			],
+			'send_wa' => [
+				'boolean',
+				'required'
+			],
 		]);
 
 		$user = Auth::user();
