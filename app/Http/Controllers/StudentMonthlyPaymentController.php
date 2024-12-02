@@ -9,7 +9,9 @@ use App\Helpers\NewRef;
 use App\Models\Account;
 use App\Models\Contact;
 use App\Models\Journal;
+use App\Models\WhatsappLog;
 use Carbon\CarbonImmutable;
+use App\Helpers\PhoneNumber;
 use App\Models\Organization;
 use App\Models\StudentLevel;
 use Illuminate\Http\Request;
@@ -279,73 +281,94 @@ class StudentMonthlyPaymentController extends Controller
 			],
 		];		
 
-		if ($payment) {
-			DB::transaction(function() use ($organization, $payment, $validated){				
-				$journal = $this->journalRepository->store($validated);
-				$validated['journal_id'] = $journal['id'];
+		// if ($payment) {
+		// 	DB::transaction(function() use ($organization, $payment, $validated){				
+		// 		$journal = $this->journalRepository->store($validated);
+		// 		$validated['journal_id'] = $journal['id'];
 				
-				$payment->update([
-					'journal_id' => $validated['journal_id'],
-					'type' => 'now',
-					'date' => $validated['date']
-				]);
+		// 		$payment->update([
+		// 			'journal_id' => $validated['journal_id'],
+		// 			'type' => 'now',
+		// 			'date' => $validated['date']
+		// 		]);
 	
-				$receivable = StudentMonthlyReceivable::whereOrganizationId($organization['id'])
-																								->whereContactId($validated['contact_id'])
-																								->first();
+		// 		$receivable = StudentMonthlyReceivable::whereOrganizationId($organization['id'])
+		// 																						->whereContactId($validated['contact_id'])
+		// 																						->first();
 
-				$newValue = $receivable['value'] - $validated['value'];
-				$receivable->update([
-					'value' => $newValue
-				]);
+		// 		$newValue = $receivable['value'] - $validated['value'];
+		// 		$receivable->update([
+		// 			'value' => $newValue
+		// 		]);
 
-				$receivableLedger = StudentMonthlyReceivableLedger::wherePaymentId($payment['id'])->first();
+		// 		$receivableLedger = StudentMonthlyReceivableLedger::wherePaymentId($payment['id'])->first();
 
-				$receivableLedger->update([
-					'credit' => $validated['value'],
-					'paid_date' => $validated['date']
-				]);
-			});			
+		// 		$receivableLedger->update([
+		// 			'credit' => $validated['value'],
+		// 			'paid_date' => $validated['date']
+		// 		]);
+		// 	});			
+		// }
+
+		// // jika belum ada data payment buat data payment baru        
+		// if (!$payment) {
+		// 	// validasi input no_ref
+		// 	$payment = StudentMonthlyPayment::whereOrganizationId($organization['id'])
+		// 																		->where('no_ref', $validated['no_ref'])
+		// 																		->first();
+
+		// 	if ($payment) {
+		// 		return redirect()->back()->withErrors(['no_ref' => 'Data is existed']);
+		// 	}
+
+		// 	DB::transaction(function() use ($validated){
+		// 		$journal = $this->journalRepository->store($validated);
+
+		// 		$validated['journal_id'] = $journal['id'];
+
+		// 		if ($validated['type'] == 'receivable') {
+		// 			$validated['type'] = 'now';
+		// 		}
+	
+		// 		$payment = StudentMonthlyPayment::create($validated);
+	
+		// 		foreach ($validated['details'] as $detail) {
+		// 			if ($detail['value'] > 0) {
+		// 				$data = [
+		// 					'payment_id' => $payment['id'],
+		// 					'student_payment_category_id' => $detail['id'],
+		// 					'value' => $detail['value'],
+		// 				];
+	
+		// 				DB::table('s_monthly_payment_details')
+		// 					->insert($data);
+		// 			}
+		// 		}
+
+		// 		// throw new \Exception('Something went wrong');
+		// 	});			
+		// }      
+
+		// jika kirim notifikasi via wa = true maka kirimkan notifikasi
+		if ($validated['send_wa']) {
+			// $whatsAppLog = WhatsappLog::create([
+			// 	'organization_id' => $organization['id'],
+			// 	'contact_id' => $validated['contact_id'],
+			// 	'description' => 'mengirim notifikasi pembayaran iuran bulanan siswa',
+			// 	'status' => 'waiting'
+			// ]);
+
+			$contact = Contact::find($validated['contact_id']);
+
+			dd(PhoneNumber::setFormat($contact['phone']));
+		dd($validated);
+
+			$message = "
+				*PEMBAYARAN IURAN BULANAN*
+				\n-------------------------------------------------------
+				\nNama : " . $contact['name'] . "
+			";
 		}
-
-		// jika belum ada data payment buat data payment baru        
-		if (!$payment) {
-			// validasi input no_ref
-			$payment = StudentMonthlyPayment::whereOrganizationId($organization['id'])
-																				->where('no_ref', $validated['no_ref'])
-																				->first();
-
-			if ($payment) {
-				return redirect()->back()->withErrors(['no_ref' => 'Data is existed']);
-			}
-
-			DB::transaction(function() use ($validated){
-				$journal = $this->journalRepository->store($validated);
-
-				$validated['journal_id'] = $journal['id'];
-
-				if ($validated['type'] == 'receivable') {
-					$validated['type'] = 'now';
-				}
-	
-				$payment = StudentMonthlyPayment::create($validated);
-	
-				foreach ($validated['details'] as $detail) {
-					if ($detail['value'] > 0) {
-						$data = [
-							'payment_id' => $payment['id'],
-							'student_payment_category_id' => $detail['id'],
-							'value' => $detail['value'],
-						];
-	
-						DB::table('s_monthly_payment_details')
-							->insert($data);
-					}
-				}
-
-				// throw new \Exception('Something went wrong');
-			});			
-		}      
 
 		$log = [
 			'description' => $validated['description'],

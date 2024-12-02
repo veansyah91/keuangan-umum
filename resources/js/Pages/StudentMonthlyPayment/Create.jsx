@@ -547,7 +547,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
 
             {
               (whatsappPlugin && selectedContact.phone)
-              && <div className='md:w-3/12 w-2/3 mt-5 sm:mt-2'>
+              && <div className='md:w-1/3 w-2/3 mt-5'>
                 <div className='form-control '>
                   <label className='label cursor-pointer' htmlFor={`send_wa`}>
                     <input

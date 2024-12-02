@@ -175,6 +175,7 @@ return [
          * Helper Service Providers...
          */
         App\Providers\NewRefServiceProvider::class,
+        App\Providers\PhoneNumberServiceProvider::class,
     ])->toArray(),
 
     /*
