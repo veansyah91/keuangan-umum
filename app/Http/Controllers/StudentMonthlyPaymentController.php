@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 use App\Models\WhatsappPlugin;
 use App\Models\ContactCategory;
 use Illuminate\Validation\Rule;
+use App\Jobs\SendWhatsAppNotifJob;
 use Illuminate\Support\Facades\DB;
 use App\Models\SchoolAccountSetting;
 use Illuminate\Support\Facades\Auth;
@@ -281,93 +282,106 @@ class StudentMonthlyPaymentController extends Controller
 			],
 		];		
 
-		// if ($payment) {
-		// 	DB::transaction(function() use ($organization, $payment, $validated){				
-		// 		$journal = $this->journalRepository->store($validated);
-		// 		$validated['journal_id'] = $journal['id'];
+		if ($payment) {
+			DB::transaction(function() use ($organization, $payment, $validated){				
+				$journal = $this->journalRepository->store($validated);
+				$validated['journal_id'] = $journal['id'];
 				
-		// 		$payment->update([
-		// 			'journal_id' => $validated['journal_id'],
-		// 			'type' => 'now',
-		// 			'date' => $validated['date']
-		// 		]);
+				$payment->update([
+					'journal_id' => $validated['journal_id'],
+					'type' => 'now',
+					'date' => $validated['date']
+				]);
 	
-		// 		$receivable = StudentMonthlyReceivable::whereOrganizationId($organization['id'])
-		// 																						->whereContactId($validated['contact_id'])
-		// 																						->first();
+				$receivable = StudentMonthlyReceivable::whereOrganizationId($organization['id'])
+																								->whereContactId($validated['contact_id'])
+																								->first();
 
-		// 		$newValue = $receivable['value'] - $validated['value'];
-		// 		$receivable->update([
-		// 			'value' => $newValue
-		// 		]);
+				$newValue = $receivable['value'] - $validated['value'];
+				$receivable->update([
+					'value' => $newValue
+				]);
 
-		// 		$receivableLedger = StudentMonthlyReceivableLedger::wherePaymentId($payment['id'])->first();
+				$receivableLedger = StudentMonthlyReceivableLedger::wherePaymentId($payment['id'])->first();
 
-		// 		$receivableLedger->update([
-		// 			'credit' => $validated['value'],
-		// 			'paid_date' => $validated['date']
-		// 		]);
-		// 	});			
-		// }
+				$receivableLedger->update([
+					'credit' => $validated['value'],
+					'paid_date' => $validated['date']
+				]);
+			});			
+		}
 
-		// // jika belum ada data payment buat data payment baru        
-		// if (!$payment) {
-		// 	// validasi input no_ref
-		// 	$payment = StudentMonthlyPayment::whereOrganizationId($organization['id'])
-		// 																		->where('no_ref', $validated['no_ref'])
-		// 																		->first();
+		// jika belum ada data payment buat data payment baru        
+		if (!$payment) {
+			// validasi input no_ref
+			$payment = StudentMonthlyPayment::whereOrganizationId($organization['id'])
+																				->where('no_ref', $validated['no_ref'])
+																				->first();
 
-		// 	if ($payment) {
-		// 		return redirect()->back()->withErrors(['no_ref' => 'Data is existed']);
-		// 	}
+			if ($payment) {
+				return redirect()->back()->withErrors(['no_ref' => 'Data is existed']);
+			}
 
-		// 	DB::transaction(function() use ($validated){
-		// 		$journal = $this->journalRepository->store($validated);
+			DB::transaction(function() use ($validated){
+				$journal = $this->journalRepository->store($validated);
 
-		// 		$validated['journal_id'] = $journal['id'];
+				$validated['journal_id'] = $journal['id'];
 
-		// 		if ($validated['type'] == 'receivable') {
-		// 			$validated['type'] = 'now';
-		// 		}
+				if ($validated['type'] == 'receivable') {
+					$validated['type'] = 'now';
+				}
 	
-		// 		$payment = StudentMonthlyPayment::create($validated);
+				$payment = StudentMonthlyPayment::create($validated);
 	
-		// 		foreach ($validated['details'] as $detail) {
-		// 			if ($detail['value'] > 0) {
-		// 				$data = [
-		// 					'payment_id' => $payment['id'],
-		// 					'student_payment_category_id' => $detail['id'],
-		// 					'value' => $detail['value'],
-		// 				];
+				foreach ($validated['details'] as $detail) {
+					if ($detail['value'] > 0) {
+						$data = [
+							'payment_id' => $payment['id'],
+							'student_payment_category_id' => $detail['id'],
+							'value' => $detail['value'],
+						];
 	
-		// 				DB::table('s_monthly_payment_details')
-		// 					->insert($data);
-		// 			}
-		// 		}
+						DB::table('s_monthly_payment_details')
+							->insert($data);
+					}
+				}
 
-		// 		// throw new \Exception('Something went wrong');
-		// 	});			
-		// }      
+				// throw new \Exception('Something went wrong');
+			});			
+		}      
 
 		// jika kirim notifikasi via wa = true maka kirimkan notifikasi
 		if ($validated['send_wa']) {
-			// $whatsAppLog = WhatsappLog::create([
-			// 	'organization_id' => $organization['id'],
-			// 	'contact_id' => $validated['contact_id'],
-			// 	'description' => 'mengirim notifikasi pembayaran iuran bulanan siswa',
-			// 	'status' => 'waiting'
-			// ]);
+			$whatsAppLog = WhatsappLog::create([
+				'organization_id' => $organization['id'],
+				'contact_id' => $validated['contact_id'],
+				'description' => 'IURAN BULANAN SISWA',
+				'status' => 'waiting'
+			]);
 
-			$contact = Contact::find($validated['contact_id']);
+			$contact = Contact::with(['student', 'lastLevel'])->find($validated['contact_id']);
+			$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
 
-			dd(PhoneNumber::setFormat($contact['phone']));
-		dd($validated);
+			$tempDetail = '';
+			foreach ($validated['details'] as $key => $detail) {
+				if ($detail['value'] > 0) {
+					$tempDetail .= "\n" . ($key + 1) . ". " . $detail['name'] . ": IDR. " . number_format($detail['value'], 0, '', '.');
+				}
+			}
 
-			$message = "
-				*PEMBAYARAN IURAN BULANAN*
-				\n-------------------------------------------------------
-				\nNama : " . $contact['name'] . "
-			";
+			$tempDate = new Carbon($validated['date']);
+
+			$message = "*PEMBAYARAN IURAN BULANAN*\n-------------------------------------------------------\nNama : " . $contact['name'] . "\nNo. Siswa : " . $contact->student->no_ref . "\nTahun Masuk : " . $contact->student->entry_year . "\nKelas Sekarang : " . $contact->lastLevel->level . "\n-------------------------------------------------------\nNo. Ref : " . $validated['no_ref'] . "\nHari/Tanggal : " . $tempDate->isoFormat('D MMMM YYYY') . "\nBulan : " . $validated['month'] . "\nJumlah Bayar: IDR. " . number_format($validated['value'], 0, '', '.') . "\n\nDetail:" . $tempDetail . "\n\nTTD,\n " . strtoupper($organization['name']);
+
+			$data = array(
+				'appkey' => $whatsappPlugin['appKey'],
+				'authkey' => $whatsappPlugin['authkey'],
+				'to' => PhoneNumber::setFormat($contact['phone']),
+				'message' => $message,
+				'sandbox' => 'false'
+			);
+
+			SendWhatsAppNotifJob::dispatch($data, $whatsAppLog['id'])->onQueue('whatsapp');
 		}
 
 		$log = [

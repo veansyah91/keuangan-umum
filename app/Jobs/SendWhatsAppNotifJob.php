@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\WhatsappLog;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -31,5 +32,21 @@ class SendWhatsAppNotifJob implements ShouldQueue
     {
         $whatsAppRepository = new WhatsAppRepository;
         
+        $whatsAppLog = WhatsappLog::find($this->id);
+
+        $result = $whatsAppRepository->sendMessage($this->data);
+        $result_object = json_decode($result);
+
+        try {
+            if ($result_object->message_status === "Success") {
+                $whatsAppLog->update([
+                    'status' => 'sent'
+                ]);
+            }            
+        } catch (\Throwable $th) {
+            $whatsAppLog->update([
+                'status' => 'failed'
+            ]);
+        }
     }
 }
