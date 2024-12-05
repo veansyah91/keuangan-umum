@@ -13,6 +13,7 @@ use Carbon\CarbonImmutable;
 use App\Models\Organization;
 use App\Models\StudentLevel;
 use Illuminate\Http\Request;
+use App\Models\WhatsappPlugin;
 use App\Models\ContactCategory;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
@@ -287,6 +288,7 @@ class StudentMonthlyReceivableController extends Controller
   public function show(Organization $organization, StudentMonthlyReceivable $receivable)
   {
     $user = Auth::user();
+
 		
 		return Inertia::render('StudentMonthlyReceivable/Show',[
 			'organization' => $organization,
@@ -337,7 +339,6 @@ class StudentMonthlyReceivableController extends Controller
 
 	public function update(Request $request, Organization $organization, StudentMonthlyReceivable $receivable, StudentMonthlyReceivableLedger $ledger)
 	{
-
 		$validated = $request->validate([
 				'contact_id' => [
 						'required',
@@ -536,9 +537,11 @@ class StudentMonthlyReceivableController extends Controller
 	public function print(Organization $organization, StudentMonthlyReceivable $receivable)
 	{
 		$user = Auth::user();
+		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
 
 		return Inertia::render('StudentMonthlyReceivable/Print', [
 			'organization' => $organization,
+			'whatsappPlugin' => $whatsappPlugin ? true : false,
 			'receivable' => $receivable,
 			'receivables' => StudentMonthlyReceivableLedger::where('receivable_id', $receivable['id'])
 												->whereNull('paid_date')
@@ -554,6 +557,6 @@ class StudentMonthlyReceivableController extends Controller
 
 	public function sendWhatsApp(Organization $organization, StudentMonthlyReceivable $receivable)
 	{
-		
+		dd($receivable);
 	}
 }

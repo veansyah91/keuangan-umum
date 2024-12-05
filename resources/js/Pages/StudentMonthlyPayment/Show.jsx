@@ -19,7 +19,6 @@ export default function Show({ contact, organization, role, payment, user, whats
 
 	const handleSendWA = () => {
 		if (whatsappPlugin) {
-			console.log(whatsappPlugin);
 			post(route('cashflow.student-monthly-payment.send-whatsapp', {organization: organization.id, payment: payment.id}), {
 				onSuccess: ({ props }) => {
 					const { flash } = props;

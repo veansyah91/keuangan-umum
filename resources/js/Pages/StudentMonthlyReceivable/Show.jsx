@@ -24,7 +24,7 @@ import { usePrevious } from 'react-use';
 import StudentMonthlyReceivableDetailMobile from './Components/StudentMonthlyReceivableDetailMobile';
 import StudentMonthlyReceivableDetailDesktop from './Components/StudentMonthlyReceivableDetailDesktop';
 
-export default function Show({ role, organization, receivables, searchFilter, receivable, contact }) {
+export default function Show({ role, organization, receivables, searchFilter, receivable, contact }) {	
 	// State
     const { errors } = usePage().props;
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link, } from '@inertiajs/react';
+import { Head, Link, useForm, } from '@inertiajs/react';
 import { IoArrowBackOutline } from 'react-icons/io5';
 import dayjs from 'dayjs';
 import { FaPrint, FaWhatsapp } from 'react-icons/fa';
@@ -9,7 +9,8 @@ import SecondaryButton from '@/Components/SecondaryButton';
 import formatNumber from '@/Utils/formatNumber';
 import { toast, ToastContainer } from 'react-toastify';
 
-export default function Print({ organization, receivable, receivables, role, contact, user }) {	
+export default function Print({ organization, receivable, receivables, role, contact, user, whatsappPlugin }) {	
+	const { post } = useForm({});
 	const [waLink] = useState('https://web.whatsapp.com/send');
 
 	const handlePrint = () => {
@@ -17,6 +18,18 @@ export default function Print({ organization, receivable, receivables, role, con
 	};	
 
 	const handleSendWA = () => {
+		if (whatsappPlugin) {
+			post(route('cashflow.student-monthly-receivable.send-whatsapp', {organization: organization.id, receivable: receivable.id}), {
+				onSuccess: ({ props }) => {
+					const { flash } = props;
+	
+					toast.success(flash.success, {
+						position: toast.POSITION.TOP_CENTER,
+					});	
+				},
+			})
+			return;
+		}
 		// cek format contact phone
 		let phone = contact.phone;		
 
