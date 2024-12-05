@@ -37,6 +37,8 @@ class SendWhatsAppNotifJob implements ShouldQueue
         $result = $whatsAppRepository->sendMessage($this->data);
         $result_object = json_decode($result);
 
+        \Log::channel('whatsapp')->info('Status Pengiriman WhatsApp Broadcasting '.$result);
+
         try {
             if ($result_object->message_status === "Success") {
                 $whatsAppLog->update([

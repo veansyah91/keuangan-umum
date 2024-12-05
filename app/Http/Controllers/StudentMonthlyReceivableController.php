@@ -9,13 +9,16 @@ use App\Helpers\NewRef;
 use App\Models\Account;
 use App\Models\Contact;
 use App\Models\Journal;
+use App\Models\WhatsappLog;
 use Carbon\CarbonImmutable;
+use App\Helpers\PhoneNumber;
 use App\Models\Organization;
 use App\Models\StudentLevel;
 use Illuminate\Http\Request;
 use App\Models\WhatsappPlugin;
 use App\Models\ContactCategory;
 use Illuminate\Validation\Rule;
+use App\Jobs\SendWhatsAppNotifJob;
 use Illuminate\Support\Facades\DB;
 use App\Models\SchoolAccountSetting;
 use Illuminate\Support\Facades\Auth;
@@ -557,6 +560,44 @@ class StudentMonthlyReceivableController extends Controller
 
 	public function sendWhatsApp(Organization $organization, StudentMonthlyReceivable $receivable)
 	{
-		dd($receivable);
+		
+		$receivables = StudentMonthlyReceivableLedger::where('receivable_id', $receivable['id'])
+																										->whereNull('paid_date')
+																										->with('receivable')
+																										->orderBy('study_year', 'desc')
+																										->orderBy('month', 'desc')
+																										->get();
+
+		$whatsAppLog = WhatsappLog::create([
+			'organization_id' => $organization['id'],
+			'contact_id' => $receivable['contact_id'],
+			'description' => 'IURAN BULANAN SISWA',
+			'status' => 'waiting'
+		]);
+
+		$contact = Contact::with(['student', 'lastLevel'])->find($receivable['contact_id']);
+		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
+		$tempDetail = "\nDetail:";
+
+		foreach ($receivables as $key => $detail) {
+			$tempDetail .= "\nNo Ref: " . $detail['no_ref'] . "\nBulan: " . $detail['month'] . "\nTahun Ajaran: " . $detail['study_year'] . "\nJumlah: IDR. " . number_format($detail['debit'], 0, '', '.');
+		}
+
+		$message = "*TAGIHAN IURAN BULANAN*\n-------------------------------------------------------\nNama: " . $contact['name'] .
+		"\nNo. Siswa: " . $contact->student->no_ref .
+		"\nTahun Masuk: " . $contact->student->entry_year .
+		"\nKelas Sekarang: " . $contact->lastLevel->level . "\n" . $tempDetail .
+		"\n\nTTD,\n\n" . strtoupper($organization['name']);
+
+		$data = array(
+			'appkey' => $whatsappPlugin['appKey'],
+			'authkey' => $whatsappPlugin['authkey'],
+			'to' => PhoneNumber::setFormat($contact['phone']),
+			'message' => $message,
+			'sandbox' => 'false'
+		);
+
+		SendWhatsAppNotifJob::dispatch($data, $whatsAppLog['id'])->onQueue('whatsapp');
+		return redirect()->back()->with('success', 'Rincian Penagihan Tunggakan Iuran Bulanan telah diteruskan Via Whatsapp');
 	}
 }

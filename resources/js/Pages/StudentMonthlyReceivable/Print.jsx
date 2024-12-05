@@ -10,7 +10,7 @@ import formatNumber from '@/Utils/formatNumber';
 import { toast, ToastContainer } from 'react-toastify';
 
 export default function Print({ organization, receivable, receivables, role, contact, user, whatsappPlugin }) {	
-	const { post } = useForm({});
+	const { post, processing } = useForm({});
 	const [waLink] = useState('https://web.whatsapp.com/send');
 
 	const handlePrint = () => {
@@ -44,7 +44,7 @@ export default function Print({ organization, receivable, receivables, role, con
 			phone = "62" + phone.slice(1);
 		}
 
-		let detail = '';
+		let detail = 'Detail: %0A';
 
 		receivables.forEach(r => {
 			detail += `%0ANo Ref: ${r.no_ref}%0ABulan: ${r.month}%0ATahun Ajaran: ${r.study_year}%0AJumlah: IDR ${formatNumber(r.debit)}%0A`;
@@ -74,7 +74,7 @@ export default function Print({ organization, receivable, receivables, role, con
 						<div className='px-3 my-auto flex gap-3'>
 						</div>
 						<div className='text-end px-3 hidden sm:block space-x-5'>
-							<SecondaryButton onClick={handleSendWA}>
+							<SecondaryButton onClick={handleSendWA} disabled={processing}>
 								<div className='flex gap-2'>
 									<div className='my-auto'>
 										<FaWhatsapp/>
