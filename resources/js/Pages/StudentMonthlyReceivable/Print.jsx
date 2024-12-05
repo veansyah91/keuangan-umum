@@ -199,8 +199,11 @@ Print.layout = (page) => (
 					<li className='font-bold'>
 						<Link href={route('cashflow', page.props.organization.id)}>Arus Kas</Link>
 					</li>
-                    <li className='font-bold'>
+					<li className='font-bold'>
 						<Link href={route('cashflow.student-monthly-receivable', page.props.organization.id)}>Piutang Iuran Bulanan Siswa</Link>
+					</li>
+					<li className='font-bold'>
+						<Link href={route('cashflow.student-monthly-receivable.show', {organization: page.props.organization.id, receivable: page.props.receivable.id})}>Detail Piutang Iuran Bulanan Siswa</Link>
 					</li>
 					<li>Print Piutang Iuran Bulanan Siswa</li>
 				</ul>
