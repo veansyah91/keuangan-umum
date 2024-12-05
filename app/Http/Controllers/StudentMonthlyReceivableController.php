@@ -548,7 +548,12 @@ class StudentMonthlyReceivableController extends Controller
 												->get(),
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'contact' => Contact::with(['student', 'lastLevel'])->find($receivable['contact_id']),
-            'user' => $user
+			'user' => $user
 		]);
+	}
+
+	public function sendWhatsApp(Organization $organization, StudentMonthlyReceivable $receivable)
+	{
+		
 	}
 }

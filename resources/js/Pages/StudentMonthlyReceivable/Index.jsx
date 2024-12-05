@@ -22,13 +22,14 @@ import DangerButton from '@/Components/DangerButton';
 import { usePrevious } from 'react-use';
 import StudentMonthlyReceivableMobile from './Components/StudentMonthlyReceivableMobile';
 import StudentMonthlyReceivableDesktop from './Components/StudentMonthlyReceivableDesktop';
+import { FaWhatsapp } from 'react-icons/fa';
 
 export default function Index({ role, organization, receivables, searchFilter }) {
     
 	// State
 	const { errors } = usePage().props;
 
-	const [showSearch, setShowSearch] = useState(false);
+	const [showSendWaModal, setShowSendWaModal] = useState(false);
 	const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
 	const [search, setSearch] = useState(searchFilter || '');
@@ -177,6 +178,11 @@ export default function Index({ role, organization, receivables, searchFilter })
 								</Link>
 							</div>
 						)}
+					</div>
+					<div className='my-auto w-4/12 flex justify-end gap-5'>
+						<button className='py-3 px-3 border rounded-lg' >
+							<FaWhatsapp />
+						</button>
 					</div>
 					<div className='w-3/12 border flex rounded-lg'>
 						<label htmlFor='search-input' className='my-auto ml-2'>
