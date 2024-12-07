@@ -44,6 +44,7 @@ use App\Http\Controllers\FixedAssetCategoryController;
 use App\Http\Controllers\StaffSalaryPaymentController;
 use App\Http\Controllers\OrganizationInvoiceController;
 use App\Http\Controllers\StudentEntryPaymentController;
+use App\Http\Controllers\WhatsappLogActivityController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\WhatsappBroadcastingController;
 use App\Http\Controllers\StudentMonthlyPaymentController;
@@ -185,6 +186,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 		Route::prefix('add-ons/{organization}')->group(function () {
 			Route::get('/', AddonsController::class)->name('add-ons');
+			Route::get('/whatsapp-log', WhatsappLogActivityController::class)->name('add-ons.whatsapp-log');
 
 			// whatsapp
 			Route::get('/whatsapp', [WhatsappBroadcastingController::class, 'index'])->name('add-ons.whatsapp');
@@ -197,6 +199,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 			Route::post('/whatsapp-invoice', [WhatsappBroadcastingInvoiceController::class, 'store'])->name('add-ons.whatsapp-invoice.store');
 			Route::get('/whatsapp-invoice/create', [WhatsappBroadcastingInvoiceController::class, 'create'])->name('add-ons.whatsapp-invoice.create');
 			Route::get('/whatsapp-invoice/{invoice}', [WhatsappBroadcastingInvoiceController::class, 'show'])->name('add-ons.whatsapp-invoice.show');
+
+
 
 		});
 

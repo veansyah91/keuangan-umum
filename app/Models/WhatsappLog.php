@@ -28,4 +28,20 @@ class WhatsappLog extends Model
     {
         return $this->belongsTo(Contact::class);
     }
+
+    public function scopeFilter($query, $filters)
+    {
+        $query->when($filters['search'] ?? false, function ($query, $search) {
+            return $query->where('description', 'like', '%'.$search.'%')
+                ->orWhere('no_ref', 'like', '%'.$search.'%');
+        });
+
+        $query->when($filters['start_date'] ?? false, function ($query, $start_date) {
+            return $query->where('date', '>=', $start_date);
+        });
+
+        $query->when($filters['end_date'] ?? false, function ($query, $end_date) {
+            return $query->where('date', '<=', $end_date);
+        });
+    }
 }

@@ -361,7 +361,7 @@ class StudentMonthlyPaymentController extends Controller
 			$whatsAppLog = WhatsappLog::create([
 				'organization_id' => $organization['id'],
 				'contact_id' => $validated['contact_id'],
-				'description' => 'IURAN BULANAN SISWA',
+				'description' => 'PEMBAYARAN IURAN BULANAN SISWA',
 				'status' => 'waiting'
 			]);
 
@@ -676,7 +676,7 @@ class StudentMonthlyPaymentController extends Controller
 		$whatsAppLog = WhatsappLog::create([
 			'organization_id' => $organization['id'],
 			'contact_id' => $paymentWithDetail['contact_id'],
-			'description' => 'IURAN BULANAN SISWA',
+			'description' => 'PEMBAYARAN IURAN BULANAN SISWA',
 			'status' => 'waiting'
 		]);
 

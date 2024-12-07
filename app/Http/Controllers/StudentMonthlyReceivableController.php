@@ -575,7 +575,7 @@ class StudentMonthlyReceivableController extends Controller
 		$whatsAppLog = WhatsappLog::create([
 			'organization_id' => $organization['id'],
 			'contact_id' => $receivable['contact_id'],
-			'description' => 'IURAN BULANAN SISWA',
+			'description' => 'PENAGIHAN PIUTANG IURAN BULANAN SISWA',
 			'status' => 'waiting'
 		]);
 

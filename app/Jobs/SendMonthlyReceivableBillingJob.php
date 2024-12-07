@@ -43,7 +43,7 @@ class SendMonthlyReceivableBillingJob implements ShouldQueue
 					$whatsAppLog = WhatsappLog::create([
 						'organization_id' => $this->organization->id,
 						'contact_id' => $receivable['contact_id'],
-						'description' => 'IURAN BULANAN SISWA',
+						'description' => 'PENAGIHAN PIUTANG IURAN BULANAN SISWA',
 						'status' => 'waiting'
 					]);
 	

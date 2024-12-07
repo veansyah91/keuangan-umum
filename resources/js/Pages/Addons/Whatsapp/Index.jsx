@@ -7,6 +7,7 @@ import CardMenu from '@/Components/CardMenu';
 import { FaArrowCircleLeft } from "react-icons/fa";
 import { ToastContainer } from 'react-toastify';
 import { IoArrowBackOutline, IoSettingsSharp } from 'react-icons/io5';
+import { RxActivityLog } from "react-icons/rx";
 import { LiaFileInvoiceSolid } from 'react-icons/lia';
 
 export default function Index({ organization, status }) {	
@@ -34,6 +35,9 @@ export default function Index({ organization, status }) {
 									<Link href={route('add-ons.whatsapp-invoice', organization.id)}>
 										<CardMenu bgColor={'bg-red-500'} icon={<LiaFileInvoiceSolid />} title={'Berlangganan'} />
 									</Link>
+									<Link href={route('add-ons.whatsapp-log', organization.id)}>
+										<CardMenu bgColor={'bg-cyan-500'} icon={<RxActivityLog />} title={'Log Aktifitas'} />
+									</Link>
 								</>
 							}
 							
@@ -55,6 +59,9 @@ export default function Index({ organization, status }) {
 						<>
 							<Link href={route('add-ons.whatsapp-invoice', organization.id)}>
 								<CardMenu bgColor={'bg-red-500'} icon={<LiaFileInvoiceSolid />} title={'Berlangganan'} />
+							</Link>
+							<Link href={route('add-ons.whatsapp-log', organization.id)}>
+								<CardMenu bgColor={'bg-cyan-500'} icon={<RxActivityLog />} title={'Log Aktifitas'} />
 							</Link>
 						</>
 					}
