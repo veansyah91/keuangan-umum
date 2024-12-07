@@ -385,6 +385,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 			Route::get('/student-monthly-receivable/create', [StudentMonthlyReceivableController::class, 'create'])->name('cashflow.student-monthly-receivable.create');
 			Route::post('/student-monthly-receivable', [StudentMonthlyReceivableController::class, 'store'])->name('cashflow.student-monthly-receivable.store');
 			Route::post('/student-monthly-receivable/{receivable}/send-whatsapp', [StudentMonthlyReceivableController::class, 'sendWhatsApp'])->name('cashflow.student-monthly-receivable.send-whatsapp');
+			Route::post('/student-monthly-receivable/send-whatsapp-multi', [StudentMonthlyReceivableController::class, 'sendWhatsAppMulti'])->name('cashflow.student-monthly-receivable.send-whatsapp-multi');
 			Route::get('/student-monthly-receivable/{receivable}', [StudentMonthlyReceivableController::class, 'show'])->name('cashflow.student-monthly-receivable.show');
 			Route::get('/student-monthly-receivable/{receivable}/edit/{ledger}', [StudentMonthlyReceivableController::class, 'edit'])->name('cashflow.student-monthly-receivable.edit');
 			Route::get('/student-monthly-receivable/{receivable}/print', [StudentMonthlyReceivableController::class, 'print'])->name('cashflow.student-monthly-receivable.print');

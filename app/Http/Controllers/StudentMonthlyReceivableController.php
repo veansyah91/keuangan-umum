@@ -27,6 +27,7 @@ use App\Models\StudentPaymentCategory;
 use App\Repositories\Log\LogRepository;
 use App\Models\StudentMonthlyReceivable;
 use App\Repositories\User\UserRepository;
+use App\Jobs\SendMonthlyReceivableBillingJob;
 use App\Models\StudentMonthlyReceivableLedger;
 use App\Repositories\Account\AccountRepository;
 use App\Repositories\Contact\ContactRepository;
@@ -74,8 +75,11 @@ class StudentMonthlyReceivableController extends Controller
   {
     $user = Auth::user();
 
+		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
+
     return Inertia::render('StudentMonthlyReceivable/Index',[
       'organization' => $organization,
+      'whatsappPlugin' => $whatsappPlugin ? true : false,
       'receivables' => StudentMonthlyReceivable::filter(request(['search']))
                                   ->with('contact', function ($query) {
                                       $query->with('student', 'lastLevel');
@@ -343,66 +347,66 @@ class StudentMonthlyReceivableController extends Controller
 	public function update(Request $request, Organization $organization, StudentMonthlyReceivable $receivable, StudentMonthlyReceivableLedger $ledger)
 	{
 		$validated = $request->validate([
-				'contact_id' => [
-						'required',
-						'exists:contacts,id',
-				],
-				'date' => [
-						'required',
-						'date',
-				],
-				'level' => [
-						'required',
-						'numeric',
-				],
-				'student_id' => [
-						'string',
-						'nullable',
-				],
-				'no_ref' => [
-						'required',
-						'string',
-						Rule::unique('student_monthly_payments')->where(function ($query) use ($organization) {
-								return $query->where('organization_id', $organization['id']);
-						})->ignore($ledger['payment_id']),
-				],
-				'value' => [
-						'required',
-						'numeric',
-				],
-				'month' => [
-						'required',
-						'numeric',
-				],
-				'study_year' => [
-						'string',
-						'required',
-				],
-				'details' => [
-						'required',
-				],
-				'details.*.id' => [
-						'required',
-						'exists:student_payment_categories,id'
-				],
-				'details.*.name' => [
-						'required',
-						'string'
-				],
-				'details.*.value' => [
-						'required',
-						'numeric',
-						'min:0',
-				],
-				'description' => [
-						'string',
-						'nullable'
-				],
-				'credit_account' => [
-						'required',
-						'exists:accounts,id'
-				],
-			]);
+			'contact_id' => [
+					'required',
+					'exists:contacts,id',
+			],
+			'date' => [
+					'required',
+					'date',
+			],
+			'level' => [
+					'required',
+					'numeric',
+			],
+			'student_id' => [
+					'string',
+					'nullable',
+			],
+			'no_ref' => [
+					'required',
+					'string',
+					Rule::unique('student_monthly_payments')->where(function ($query) use ($organization) {
+							return $query->where('organization_id', $organization['id']);
+					})->ignore($ledger['payment_id']),
+			],
+			'value' => [
+					'required',
+					'numeric',
+			],
+			'month' => [
+					'required',
+					'numeric',
+			],
+			'study_year' => [
+					'string',
+					'required',
+			],
+			'details' => [
+					'required',
+			],
+			'details.*.id' => [
+					'required',
+					'exists:student_payment_categories,id'
+			],
+			'details.*.name' => [
+					'required',
+					'string'
+			],
+			'details.*.value' => [
+					'required',
+					'numeric',
+					'min:0',
+			],
+			'description' => [
+					'string',
+					'nullable'
+			],
+			'credit_account' => [
+					'required',
+					'exists:accounts,id'
+			],
+		]);
 
 		$user = Auth::user();
 		$validated['type'] = 'receivable';
@@ -580,7 +584,7 @@ class StudentMonthlyReceivableController extends Controller
 		$tempDetail = "\nDetail:";
 
 		foreach ($receivables as $key => $detail) {
-			$tempDetail .= "\nNo Ref: " . $detail['no_ref'] . "\nBulan: " . $detail['month'] . "\nTahun Ajaran: " . $detail['study_year'] . "\nJumlah: IDR. " . number_format($detail['debit'], 0, '', '.');
+			$tempDetail .= "\nNo Ref: " . $detail['no_ref'] . "\nBulan: " . $detail['month'] . "\nTahun Ajaran: " . $detail['study_year'] . "\nJumlah: IDR. " . number_format($detail['debit'], 0, '', '.') . "\n";
 		}
 
 		$message = "*TAGIHAN IURAN BULANAN*\n-------------------------------------------------------\nNama: " . $contact['name'] .
@@ -599,5 +603,11 @@ class StudentMonthlyReceivableController extends Controller
 
 		SendWhatsAppNotifJob::dispatch($data, $whatsAppLog['id'])->onQueue('whatsapp');
 		return redirect()->back()->with('success', 'Rincian Penagihan Tunggakan Iuran Bulanan telah diteruskan Via Whatsapp');
+	}
+
+	public function sendWhatsAppMulti(Organization $organization)
+	{
+		SendMonthlyReceivableBillingJob::dispatch($organization);
+		return redirect()->back()->with('success', 'Penagihan Tunggakan Iuran Bulanan telah diteruskan Via Whatsapp');
 	}
 }
