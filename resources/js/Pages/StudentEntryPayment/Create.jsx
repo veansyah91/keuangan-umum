@@ -190,7 +190,7 @@ export default function Create({
 
   return (
     <>
-      <Head title='Piutang Iuran Tahunan Siswa' />
+      <Head title='Pembayaran Iuran Tahunan Siswa' />
       <ToastContainer />
 
       <FormInput onSubmit={handleSubmit}>

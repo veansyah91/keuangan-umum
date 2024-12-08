@@ -69,7 +69,7 @@ export default function Index({ role, organization, payments, searchFilter, type
 
 	useEffect(() => {		
 		errors && errors.message &&
-		toast.error(<>{errors.message} <Link href={route('data-ledger.account-school', {organization: organization.id})} className='text-blue-600 font-bold'>Tambahkan</Link></>, {
+		toast.error(<>{errors.message} <Link href={route('data-master.contact-category', {organization: organization.id})} className='text-blue-600 font-bold'>Tambahkan</Link></>, {
 			position: toast.POSITION.TOP_CENTER,
 		});
 	},[]);

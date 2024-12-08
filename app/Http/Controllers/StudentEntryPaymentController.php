@@ -120,6 +120,8 @@ class StudentEntryPaymentController extends Controller
 			return redirect()->back()->withErrors(['message' => 'Silakan Buat Kategori Kontak SISWA terlebih dahulu!']);
 		}
 
+		$studyYears = StudentLevel::select('year')->orderBy('year', 'desc')->distinct()->take(10)->get()->toArray();
+
 		return Inertia::render('StudentEntryPayment/Create',[
 			'organization' => $organization,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
@@ -128,7 +130,7 @@ class StudentEntryPaymentController extends Controller
 																							->get(),
 			'newRef' => $this->newRef($organization, request('date')),
 			'date' => request('date') ?? $this->now->isoFormat('YYYY-M-DD'),
-			'studyYears' => StudentLevel::select('year')->distinct()->take(10)->get(),
+			'studyYears' => $studyYears,
 			'contacts' => $this->contactRepository->getStudents($organization['id'], $contactCategory['id'], request(['contact'])),
 			'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),
 		]);

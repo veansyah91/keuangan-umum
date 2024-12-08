@@ -65,6 +65,10 @@ class StudentContactController extends Controller
     {
         $user = Auth::user();
 
+        $studyYears = StudentLevel::select('year')->orderBy('year', 'desc')->distinct()->take(10)->get()->toArray();
+
+		// dd($studyYears);
+
         return Inertia::render('Student/Create',[
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'organization' => $organization,

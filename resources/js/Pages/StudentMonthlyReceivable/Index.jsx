@@ -25,8 +25,6 @@ import StudentMonthlyReceivableDesktop from './Components/StudentMonthlyReceivab
 import { FaWhatsapp } from 'react-icons/fa';
 
 export default function Index({ role, organization, receivables, searchFilter, whatsappPlugin }) {
-    
-	console.log(whatsappPlugin);
 	
 	// State
 	const { errors } = usePage().props;
@@ -59,7 +57,7 @@ export default function Index({ role, organization, receivables, searchFilter, w
 
 	useEffect(() => {
 		errors && errors.message &&
-		toast.error(<>{errors.message} <Link href={route('data-ledger.account-school', {organization: organization.id})} className='text-blue-600 font-bold'>Tambahkan</Link></>, {
+		toast.error(<>{errors.message} <Link href={route('data-master.contact-category', {organization: organization.id})} className='text-blue-600 font-bold'>Tambahkan</Link></>, {
 			position: toast.POSITION.TOP_CENTER,
 		});
 	},[]);
