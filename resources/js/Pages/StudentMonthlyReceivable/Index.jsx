@@ -324,7 +324,7 @@ export default function Index({ role, organization, receivables, searchFilter, w
 								</tr>
 								<tr>
 									<td className='w-[25px]'>•</td>
-									<td>Silakan melakukan pengecekan status pengiriman pada Log Aktifitas Whatsapp</td>
+									<td>Silakan melakukan pengecekan status pengiriman pada <Link href={route('add-ons.whatsapp-log', {organization: organization.id})} className='text-blue-600 font-bold'>Log Aktifitas Whatsapp</Link> </td>
 								</tr>
 							</tbody>
 						</table>

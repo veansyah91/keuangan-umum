@@ -32,16 +32,21 @@ class WhatsappLog extends Model
     public function scopeFilter($query, $filters)
     {
         $query->when($filters['search'] ?? false, function ($query, $search) {
-            return $query->where('description', 'like', '%'.$search.'%')
-                ->orWhere('no_ref', 'like', '%'.$search.'%');
+            return $query->where('description', 'like', '%'.$search.'%');
         });
 
         $query->when($filters['start_date'] ?? false, function ($query, $start_date) {
-            return $query->where('date', '>=', $start_date);
+            return $query->where('created_at', '>=', $start_date);
         });
 
         $query->when($filters['end_date'] ?? false, function ($query, $end_date) {
-            return $query->where('date', '<=', $end_date);
+            return $query->where('created_at', '<=', $end_date);
+        });
+
+        $query->when($filters['status'] ?? false, function ($query, $status) {
+            if ($status !== 'all') {
+                return $query->where('status', $status);
+            }
         });
     }
 }
