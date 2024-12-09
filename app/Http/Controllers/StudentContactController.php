@@ -63,17 +63,23 @@ class StudentContactController extends Controller
 
     public function create(Organization $organization)
     {
-        $user = Auth::user();
+			$user = Auth::user();
 
-        $studyYears = StudentLevel::select('year')->orderBy('year', 'desc')->distinct()->take(10)->get()->toArray();
+			$studyYears = StudentLevel::select('year')->orderBy('year', 'desc')->distinct()->take(10)->get()->toArray();
 
-		// dd($studyYears);
+			$explodeStudyYear = explode("/", $studyYears[0]['year']);
+			$tempStudyYear = (string)((int)$explodeStudyYear[1]) . "/" . (string)((int)$explodeStudyYear[1] + 1);
 
-        return Inertia::render('Student/Create',[
-            'role' => $this->userRepository->getRole($user['id'], $organization['id']),
-            'organization' => $organization,
-            'category' => ContactCategory::whereOrganizationId($organization['id'])->whereName('SISWA')->first()
-        ]);
+			array_unshift($studyYears, [
+				'year' => $tempStudyYear
+			]);
+
+			return Inertia::render('Student/Create',[
+				'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+				'organization' => $organization,
+				'studyYears' => $studyYears,
+				'category' => ContactCategory::whereOrganizationId($organization['id'])->whereName('SISWA')->first()
+			]);
     }
 
     public function store(Request $request, Organization $organization)
@@ -131,8 +137,18 @@ class StudentContactController extends Controller
 
         $studentLevel = StudentLevel::whereContactId($contact['id'])->get();
 
+        $studyYears = StudentLevel::select('year')->orderBy('year', 'desc')->distinct()->take(10)->get()->toArray();
+
+        $explodeStudyYear = explode("/", $studyYears[0]['year']);
+        $tempStudyYear = (string)((int)$explodeStudyYear[1]) . "/" . (string)((int)$explodeStudyYear[1] + 1);
+
+        array_unshift($studyYears, [
+            'year' => $tempStudyYear
+        ]);
+
         return Inertia::render('Student/Edit',[
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+            'studyYears' => $studyYears,
             'organization' => $organization,
             'contact' => $contact,
             'student' => ContactStudent::whereContactId($contact['id'])->first(),

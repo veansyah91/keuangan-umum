@@ -42,7 +42,7 @@ const levelArr = () => {
     return levelArr;
 }
 
-export default function Edit({ organization, contact, student, level }) {
+export default function Edit({ organization, contact, student, level, studyYears }) {
     // state
     const { data, setData, processing, patch, errors, setError, reset } = useForm({
         name: contact.name || '',
@@ -221,6 +221,36 @@ export default function Edit({ organization, contact, student, level }) {
                                 {errors?.level && <span className='text-red-500 text-xs'>{errors.level}</span>}
                             </div>
                         </div>
+
+                        <div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
+													<div className='w-full sm:w-1/3 my-auto'>
+														<InputLabel
+															value={'Tahun Ajaran'}
+															htmlFor='year'
+															className=' mx-auto my-auto'
+														/>
+													</div>
+
+													<div className='w-full sm:w-2/3'>
+														<select 
+															className="select select-bordered w-full" 
+															value={data.year} 
+															onChange={(e) => setData('year', e.target.value) } 
+															id='year'
+														>
+															{
+																studyYears.map((study_year, index) => 
+																	<option 
+																		key={index} 
+																	>{study_year.year}</option>
+																)
+															}
+														</select>
+														{errors?.study_year && <span className='text-red-500 text-xs'>{errors.study_year}</span>}
+												</div>
+											</div>
+
+											<div className='text-center mt-5 font-bold'>Lain-lain</div>
 
                         <div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
                             <div className='w-full sm:w-1/3 my-auto'>

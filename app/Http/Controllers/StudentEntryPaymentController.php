@@ -122,6 +122,13 @@ class StudentEntryPaymentController extends Controller
 
 		$studyYears = StudentLevel::select('year')->orderBy('year', 'desc')->distinct()->take(10)->get()->toArray();
 
+		$explodeStudyYear = explode("/", $studyYears[0]['year']);
+		$tempStudyYear = (string)((int)$explodeStudyYear[1]) . "/" . (string)((int)$explodeStudyYear[1] + 1);
+
+		array_unshift($studyYears, [
+			'year' => $tempStudyYear
+		]);
+
 		return Inertia::render('StudentEntryPayment/Create',[
 			'organization' => $organization,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),

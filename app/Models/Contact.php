@@ -78,6 +78,9 @@ class Contact extends Model
                 ->orWhere('address', 'like', '%'.$search.'%')
                 ->orWhereHas('contactCategories', function ($query) use ($search) {
                     $query->where('name', 'like', '%'.$search.'%');
+                })
+                ->orWhereHas('student', function ($query) use ($search){
+                    $query->where('no_ref', 'like', '%'.$search.'%');
                 });
         });
 
