@@ -23,7 +23,7 @@ import { usePrevious } from 'react-use';
 import { useDebounce } from 'use-debounce';
 
 export default function Create({
-  organization, newRef, contacts, date, categories, studyYears, cashAccounts,
+  organization, newRef, contacts, date, categories, studyYears, cashAccounts, whatsappPlugin
 }) {  
   const { data, setData, processing, post, errors, setError, reset } = useForm({
     contact_id:null,
@@ -37,7 +37,8 @@ export default function Create({
     description:'',
     details: [],
     cash_account_id: null,
-  });
+    send_wa:true,
+  });  
 
   const [selectedContact, setSelectedContact] = useState({ id: null, name: '', phone: '' });
   const [selectedCashAccount, setSelectedCashAccount] = useState({ id: null, name: '', code: '', is_cash: true });
@@ -87,7 +88,8 @@ export default function Create({
       no_ref:newRef,
       study_year:studyYear(),
       description:'',
-      cash_account_id: null
+      cash_account_id: null,
+      send_wa:true,
     }
     
     setData(tempData);
@@ -435,6 +437,30 @@ export default function Create({
             </div>
             }
             
+            
+            {
+              (whatsappPlugin && selectedContact.phone)
+              && <div className='md:w-1/3 w-2/3 mt-5'>
+                <div className='form-control '>
+                  <label className='label cursor-pointer' htmlFor={`send_wa`}>
+                    <input
+                      type='checkbox'
+                      className='checkbox'
+                      id={`send_wa`}
+                      value={data.send_wa}
+                      onChange={() => setData('send_wa', !data.send_wa)}
+                      checked={data.send_wa}
+                    />
+                    <span className='label-text'>Kirim Bukti Via WhatsApp</span>
+                  </label>
+                </div>
+                {errors && errors.send_wa && (
+                  <div className='-mb-3'>
+                    <div className='text-xs text-red-500'>{errors.send_wa}</div>
+                  </div>
+                )}
+              </div>  
+            }     
 
             <div className='flex justify-end flex-col-reverse sm:flex-row gap-2 mt-5'>
               <div className='w-full sm:w-1/6 my-auto text-center'>

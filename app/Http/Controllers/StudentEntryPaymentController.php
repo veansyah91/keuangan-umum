@@ -12,6 +12,7 @@ use Carbon\CarbonImmutable;
 use App\Models\Organization;
 use App\Models\StudentLevel;
 use Illuminate\Http\Request;
+use App\Models\WhatsappPlugin;
 use App\Models\ContactCategory;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
@@ -129,8 +130,11 @@ class StudentEntryPaymentController extends Controller
 			'year' => $tempStudyYear
 		]);
 
+		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
+
 		return Inertia::render('StudentEntryPayment/Create',[
 			'organization' => $organization,
+			'whatsappPlugin' => $whatsappPlugin ? true : false,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'categories' => StudentEntryPaymentCategory::whereOrganizationId($organization['id'])
 																							->whereIsActive(true)
