@@ -8,6 +8,7 @@ use App\Helpers\NewRef;
 use App\Models\Account;
 use App\Models\Contact;
 use App\Models\Journal;
+use App\Models\WhatsappLog;
 use Carbon\CarbonImmutable;
 use App\Models\Organization;
 use App\Models\StudentLevel;
@@ -199,6 +200,10 @@ class StudentEntryPaymentController extends Controller
 				'numeric',
 				'min:0',
 			],
+			'send_wa' => [
+				'required',
+				'boolean'
+			],
 			'no_ref' => [
 				'required',
 				'string',
@@ -297,6 +302,37 @@ class StudentEntryPaymentController extends Controller
 		}
 
 		DB::transaction(function () use ($validated, $organization, $user){
+			if ($validated['send_wa']) {
+				// $whatsAppLog = WhatsappLog::create([
+				// 	'organization_id' => $organization['id'],
+				// 	'contact_id' => $validated['contact_id'],
+				// 	'description' => 'PEMBAYARAN IURAN TAHUNAN SISWA',
+				// 	'status' => 'waiting'
+				// ]);
+
+				$contact = Contact::with(['student', 'lastLevel'])->find($validated['contact_id']);
+				$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
+
+				$tempDetail = '';
+				foreach ($validated['details'] as $key => $detail) {
+					if ($detail['value'] > 0) {
+						$tempDetail .= "\n" . ($key + 1) . ". " . $detail['name'] . ": IDR. " . number_format($detail['value'], 0, '', '.');
+					}
+				}
+
+				$tempDetail .= "\nTotal: IDR. " . number_format($validated['value'], 0, '', '.') .
+											 "\nJumlah Bayar: IDR. " . number_format($validated['paidValue'], 0, '', '.').
+											 "\nSisa: IDR. " . number_format($validated['receivable_value'], 0, '', '.');
+
+				$tempDate = new Carbon($validated['date']);
+
+
+				$message = "*PEMBAYARAN IURAN TAHUNAN*-------------------------------------------------------\nNama : " . $contact['name'] . "\nNo. Siswa : " . $contact->student->no_ref . "\nTahun Masuk : " . $contact->student->entry_year . "\nKelas Sekarang : " . $contact->lastLevel->level . "\n-------------------------------------------------------\nNo. Ref : " . $validated['no_ref'] . "\nHari/Tanggal : " . $tempDate->isoFormat('D MMMM YYYY') . "\nTahun Ajaran: " . $validated['study_year'] . "\n\nDETAIL:\n" . $tempDetail . "\n\nTTD,\n\n" . strtoupper($organization['name']);
+				dd($message);
+
+			}
+			dd($validated);
+
 			// buat jurnal
 				$journal = $this->journalRepository->store($validated);
 				$validated['journal_id'] = $journal['id'];

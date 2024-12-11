@@ -649,7 +649,6 @@ class StudentMonthlyPaymentController extends Controller
 		$this->logRepository->store($organization['id'], strtoupper($user['name']).' telah mengubah DATA pada PEMBAYARAN IURAN BULANAN dengan DATA : '.json_encode($log));
 
 		return redirect()->back()->with('success', 'Pembayaran Iuran Bulanan Berhasil Diubah');
-
 	}
 
 	public function show(Organization $organization, StudentMonthlyPayment $payment)
@@ -689,7 +688,6 @@ class StudentMonthlyPaymentController extends Controller
 				$tempDetail .= "\n" . ($key + 1) . ". " . $detail['name'] . ": IDR. " . number_format($detail->pivot->value, 0, '', '.');
 			}
 		}
-
 
 		$tempDate = new Carbon($paymentWithDetail['date']);
 
