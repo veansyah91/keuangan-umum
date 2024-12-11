@@ -10,12 +10,14 @@ use App\Models\Contact;
 use App\Models\Journal;
 use App\Models\WhatsappLog;
 use Carbon\CarbonImmutable;
+use App\Helpers\PhoneNumber;
 use App\Models\Organization;
 use App\Models\StudentLevel;
 use Illuminate\Http\Request;
 use App\Models\WhatsappPlugin;
 use App\Models\ContactCategory;
 use Illuminate\Validation\Rule;
+use App\Jobs\SendWhatsAppNotifJob;
 use Illuminate\Support\Facades\DB;
 use App\Models\StudentEntryPayment;
 use App\Models\SchoolAccountSetting;
@@ -302,37 +304,6 @@ class StudentEntryPaymentController extends Controller
 		}
 
 		DB::transaction(function () use ($validated, $organization, $user){
-			if ($validated['send_wa']) {
-				// $whatsAppLog = WhatsappLog::create([
-				// 	'organization_id' => $organization['id'],
-				// 	'contact_id' => $validated['contact_id'],
-				// 	'description' => 'PEMBAYARAN IURAN TAHUNAN SISWA',
-				// 	'status' => 'waiting'
-				// ]);
-
-				$contact = Contact::with(['student', 'lastLevel'])->find($validated['contact_id']);
-				$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
-
-				$tempDetail = '';
-				foreach ($validated['details'] as $key => $detail) {
-					if ($detail['value'] > 0) {
-						$tempDetail .= "\n" . ($key + 1) . ". " . $detail['name'] . ": IDR. " . number_format($detail['value'], 0, '', '.');
-					}
-				}
-
-				$tempDetail .= "\nTotal: IDR. " . number_format($validated['value'], 0, '', '.') .
-											 "\nJumlah Bayar: IDR. " . number_format($validated['paidValue'], 0, '', '.').
-											 "\nSisa: IDR. " . number_format($validated['receivable_value'], 0, '', '.');
-
-				$tempDate = new Carbon($validated['date']);
-
-
-				$message = "*PEMBAYARAN IURAN TAHUNAN*-------------------------------------------------------\nNama : " . $contact['name'] . "\nNo. Siswa : " . $contact->student->no_ref . "\nTahun Masuk : " . $contact->student->entry_year . "\nKelas Sekarang : " . $contact->lastLevel->level . "\n-------------------------------------------------------\nNo. Ref : " . $validated['no_ref'] . "\nHari/Tanggal : " . $tempDate->isoFormat('D MMMM YYYY') . "\nTahun Ajaran: " . $validated['study_year'] . "\n\nDETAIL:\n" . $tempDetail . "\n\nTTD,\n\n" . strtoupper($organization['name']);
-				dd($message);
-
-			}
-			dd($validated);
-
 			// buat jurnal
 				$journal = $this->journalRepository->store($validated);
 				$validated['journal_id'] = $journal['id'];
@@ -389,6 +360,43 @@ class StudentEntryPaymentController extends Controller
 					'study_year' => $validated['study_year'],
 				]);
 			}				
+
+			// send whatsapp
+			if ($validated['send_wa']) {
+				$whatsAppLog = WhatsappLog::create([
+					'organization_id' => $organization['id'],
+					'contact_id' => $validated['contact_id'],
+					'description' => 'PEMBAYARAN IURAN TAHUNAN SISWA',
+					'status' => 'waiting'
+				]);
+
+				$contact = Contact::with(['student', 'lastLevel'])->find($validated['contact_id']);
+				$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
+
+				$tempDetail = '';
+				foreach ($validated['details'] as $key => $detail) {
+					if ($detail['value'] > 0) {
+						$tempDetail .= "\n" . ($key + 1) . ". " . $detail['name'] . ": IDR. " . number_format($detail['value'], 0, '', '.');
+					}
+				}
+
+				$tempDetail .= "\nTotal: IDR. " . number_format($validated['value'], 0, '', '.') .
+											 "\nJumlah Bayar: IDR. " . number_format($validated['paidValue'], 0, '', '.').
+											 "\nSisa: IDR. " . number_format($validated['receivable_value'], 0, '', '.');
+
+				$tempDate = new Carbon($validated['date']);
+
+				$message = "*PEMBAYARAN IURAN TAHUNAN*-------------------------------------------------------\nNama : " . $contact['name'] . "\nNo. Siswa : " . $contact->student->no_ref . "\nTahun Masuk : " . $contact->student->entry_year . "\nKelas Sekarang : " . $contact->lastLevel->level . "\n-------------------------------------------------------\nNo. Ref : " . $validated['no_ref'] . "\nHari/Tanggal : " . $tempDate->isoFormat('D MMMM YYYY') . "\nTahun Ajaran: " . $validated['study_year'] . "\n\nDETAIL:" . $tempDetail . "\n\nTTD,\n\n" . strtoupper($organization['name']);
+				$data = array(
+					'appkey' => $whatsappPlugin['appKey'],
+					'authkey' => $whatsappPlugin['authkey'],
+					'to' => PhoneNumber::setFormat($contact['phone']),
+					'message' => $message,
+					'sandbox' => 'false'
+				);
+	
+				SendWhatsAppNotifJob::dispatch($data, $whatsAppLog['id'])->onQueue('whatsapp');
+			}
 
 			// buat log
 			$log = [
@@ -714,9 +722,12 @@ class StudentEntryPaymentController extends Controller
 		$user = Auth::user();
 
 		$paymentWithDetail = StudentEntryPayment::with('details')->find($payment['id']);
+		
+		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
 
 		return Inertia::render('StudentEntryPayment/Show',[
 			'organization' => $organization,
+			'whatsappPlugin' => $whatsappPlugin ? true : false,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'user' => $user,
 			'payment' => $paymentWithDetail,
@@ -781,5 +792,45 @@ class StudentEntryPaymentController extends Controller
 
 		return redirect()->back()->with('success', 'Pembayaran Iuran Tahunan Berhasil Dihapus');
 
+	}
+
+	public function sendWhatsapp(Request $request, Organization $organization, StudentEntryPayment $payment)
+	{
+		if ($request['send_wa']) {
+			$whatsAppLog = WhatsappLog::create([
+				'organization_id' => $organization['id'],
+				'contact_id' => $request['contact_id'],
+				'description' => 'PEMBAYARAN IURAN TAHUNAN SISWA',
+				'status' => 'waiting'
+			]);
+
+			$contact = Contact::with(['student', 'lastLevel'])->find($request['contact_id']);
+			$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
+
+			$tempDetail = '';
+			foreach ($request['details'] as $key => $detail) {
+				if ($detail['value'] > 0) {
+					$tempDetail .= "\n" . ($key + 1) . ". " . $detail['name'] . ": IDR. " . number_format($detail['value'], 0, '', '.');
+				}
+			}
+
+			$tempDetail .= "\nTotal: IDR. " . number_format($request['value'], 0, '', '.') .
+										 "\nJumlah Bayar: IDR. " . number_format($request['paidValue'], 0, '', '.').
+										 "\nSisa: IDR. " . number_format($request['receivable_value'], 0, '', '.');
+
+			$tempDate = new Carbon($request['date']);
+
+			$message = "*PEMBAYARAN IURAN TAHUNAN*\n-------------------------------------------------------\nNama : " . $contact['name'] . "\nNo. Siswa : " . $contact->student->no_ref . "\nTahun Masuk : " . $contact->student->entry_year . "\nKelas Sekarang : " . $contact->lastLevel->level . "\n-------------------------------------------------------\nNo. Ref : " . $request['no_ref'] . "\nHari/Tanggal : " . $tempDate->isoFormat('D MMMM YYYY') . "\nTahun Ajaran: " . $request['study_year'] . "\n\nDETAIL:" . $tempDetail . "\n\nTTD,\n\n" . strtoupper($organization['name']);
+			$data = array(
+				'appkey' => $whatsappPlugin['appKey'],
+				'authkey' => $whatsappPlugin['authkey'],
+				'to' => PhoneNumber::setFormat($contact['phone']),
+				'message' => $message,
+				'sandbox' => 'false'
+			);
+
+			SendWhatsAppNotifJob::dispatch($data, $whatsAppLog['id'])->onQueue('whatsapp');
+		}
+		return redirect()->back()->with('success', 'Rincian Pembayaran Iuran Tahunan telah diteruskan Via Whatsapp');
 	}
 }

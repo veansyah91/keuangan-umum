@@ -24,7 +24,7 @@ import { useDebounce } from 'use-debounce';
 import { usePrevious } from 'react-use';
 
 export default function Create({
-  organization, newRef, contacts, contact, date, selectedContactQuery, studyYears, cashAccounts, payments
+  organization, newRef, contacts, contact, date, selectedContactQuery, studyYears, cashAccounts, payments, whatsappPlugin
 }) {    
   const { data, setData, processing, post, errors, setError, reset } = useForm({
     contact_id:selectedContactQuery ? selectedContactQuery.id : null,
@@ -37,6 +37,7 @@ export default function Create({
     description: selectedContactQuery ? `Pembayaran Piutang Iuran Tahunan Oleh ${selectedContactQuery.name}` : '',
     payment_id: payments.length > 0 ? payments[0].id : null,
     cash_account_id: null,
+    send_wa:whatsappPlugin,
   });
 
   const [selectedContact, setSelectedContact] = useState({ id: selectedContactQuery ? selectedContactQuery.id: null, name: selectedContactQuery ? selectedContactQuery.name: '', phone: selectedContactQuery ? selectedContactQuery.phone: '' });

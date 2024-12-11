@@ -14,6 +14,7 @@ use Carbon\CarbonImmutable;
 use App\Models\Organization;
 use App\Models\StudentLevel;
 use Illuminate\Http\Request;
+use App\Models\WhatsappPlugin;
 use App\Models\ContactCategory;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
@@ -124,8 +125,11 @@ class StudentEntryReceivablePaymentController extends Controller
 			return redirect()->back()->withErrors(['message' => 'Silakan Buat Kategori Kontak SISWA terlebih dahulu!']);
 		}
 
+		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
+
 		return Inertia::render('StudentEntryReceivablePayment/Create',[
 			'organization' => $organization,
+			'whatsappPlugin' => $whatsappPlugin,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'newRef' => $this->newRef($organization, request('date')),
 			'date' => request('date') ?? $this->now->isoFormat('YYYY-M-DD'),

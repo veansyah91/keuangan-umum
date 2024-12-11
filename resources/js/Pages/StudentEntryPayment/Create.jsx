@@ -37,7 +37,7 @@ export default function Create({
     description:'',
     details: [],
     cash_account_id: null,
-    send_wa:true,
+    send_wa:whatsappPlugin,
   });  
 
   const [selectedContact, setSelectedContact] = useState({ id: null, name: '', phone: '' });

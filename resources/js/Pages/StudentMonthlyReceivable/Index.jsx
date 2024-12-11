@@ -25,7 +25,6 @@ import StudentMonthlyReceivableDesktop from './Components/StudentMonthlyReceivab
 import { FaWhatsapp } from 'react-icons/fa';
 
 export default function Index({ role, organization, receivables, searchFilter, whatsappPlugin }) {
-	
 	// State
 	const { errors } = usePage().props;
 
@@ -80,7 +79,7 @@ export default function Index({ role, organization, receivables, searchFilter, w
 	const handleSubmitSendWa = (e) => {
 		e.preventDefault();
 
-		post(route('cashflow.student-monthly-receivable.send-whatsapp-multi', {organization: organization.id}), {
+		post(route('cashflow.student-entry-receivable.send-whatsapp-multi', {organization: organization.id}), {
 			onSuccess: ({ props }) => {
 				setShowSendWaModal(false);
 
@@ -318,7 +317,7 @@ export default function Index({ role, organization, receivables, searchFilter, w
 							<tbody>
 								<tr>
 									<td className='w-[25px]'>•</td>
-									<td>Jangan terlalu sering melakukan pengiriman Penagihan Iuran Bulanan via Whatsapp, dikhawatirkan akan terbaca spam oleh pihak Whatsapp, cukup lakukan 1 x perbulan</td>
+									<td>Hindari terlalu sering melakukan pengiriman Penagihan Iuran Bulanan via Whatsapp, dikhawatirkan akan terbaca spam oleh pihak Whatsapp, cukup lakukan 1 - 2 x perbulan</td>
 								</tr>
 								<tr>
 									<td className='w-[25px]'>•</td>

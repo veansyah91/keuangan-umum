@@ -199,9 +199,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 			Route::post('/whatsapp-invoice', [WhatsappBroadcastingInvoiceController::class, 'store'])->name('add-ons.whatsapp-invoice.store');
 			Route::get('/whatsapp-invoice/create', [WhatsappBroadcastingInvoiceController::class, 'create'])->name('add-ons.whatsapp-invoice.create');
 			Route::get('/whatsapp-invoice/{invoice}', [WhatsappBroadcastingInvoiceController::class, 'show'])->name('add-ons.whatsapp-invoice.show');
-
-
-
 		});
 
 		// Data Master
@@ -400,6 +397,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 			Route::get('/student-entry-payment', [StudentEntryPaymentController::class, 'index'])->name('cashflow.student-entry-payment');
 			Route::get('/student-entry-payment/create', [StudentEntryPaymentController::class, 'create'])->name('cashflow.student-entry-payment.create');
 			Route::post('/student-entry-payment', [StudentEntryPaymentController::class, 'store'])->name('cashflow.student-entry-payment.store');
+			Route::post('/student-entry-payment/{payment}/send-whatsapp', [StudentEntryPaymentController::class, 'sendWhatsapp'])->name('cashflow.student-entry-payment.send-whatsapp');
 			Route::get('/student-entry-payment/{payment}', [StudentEntryPaymentController::class, 'show'])->name('cashflow.student-entry-payment.show');
 			Route::get('/student-entry-payment/{payment}/edit', [StudentEntryPaymentController::class, 'edit'])->name('cashflow.student-entry-payment.edit');
 			Route::patch('/student-entry-payment/{payment}', [StudentEntryPaymentController::class, 'update'])->name('cashflow.student-entry-payment.update');
@@ -410,6 +408,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 			Route::get('/student-entry-receivable/{studentEntryReceivable}', [StudentEntryReceivableController::class, 'show'])->name('cashflow.student-entry-receivable.show');
 			Route::get('/student-entry-receivable/{studentEntryReceivable}/print', [StudentEntryReceivableController::class, 'print'])->name('cashflow.student-entry-receivable.print');
 			Route::get('/student-entry-receivable/{payment}/print-per-paymant', [StudentEntryReceivableController::class, 'printPerPayment'])->name('cashflow.student-entry-receivable.print-per-payment');
+			Route::post('/student-entry-receivable/{studentEntryReceivable}/send-whatsapp', [StudentEntryReceivableController::class, 'sendWhatsapp'])->name('cashflow.student-entry-receivable.send-whatsapp');
+			Route::post('/student-entry-receivable/send-whatsapp-multi', [StudentEntryReceivableController::class, 'sendWhatsappMulti'])->name('cashflow.student-entry-receivable.send-whatsapp-multi');
 
 			// student entry receivable payment
 			Route::get('/student-entry-receivable-payment', [StudentEntryReceivablePaymentController::class, 'index'])->name('cashflow.student-entry-receivable-payment');
