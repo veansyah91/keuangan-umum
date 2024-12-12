@@ -10,13 +10,16 @@ use App\Models\Account;
 use App\Models\Contact;
 use App\Models\Journal;
 use App\Models\Cashflow;
+use App\Models\WhatsappLog;
 use Carbon\CarbonImmutable;
+use App\Helpers\PhoneNumber;
 use App\Models\Organization;
 use App\Models\StudentLevel;
 use Illuminate\Http\Request;
 use App\Models\WhatsappPlugin;
 use App\Models\ContactCategory;
 use Illuminate\Validation\Rule;
+use App\Jobs\SendWhatsAppNotifJob;
 use Illuminate\Support\Facades\DB;
 use App\Models\StudentEntryPayment;
 use App\Models\SchoolAccountSetting;
@@ -80,25 +83,27 @@ class StudentEntryReceivablePaymentController extends Controller
 	{
 		$user = Auth::user();
 		$search = request(['search']);
+		$studyYear = request(['studyYear']);
 		return Inertia::render('StudentEntryReceivablePayment/Index', [
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'searchFilter' => $search,
 			'organization' => $organization,
-			'studyYears' => StudentLevel::select('year')->distinct()->get(),
+			'studyYears' => StudentLevel::select('year')->orderBy('year', 'desc')->distinct()->get(),
 			'studyYear' => request('studyYear'),
-			'receivablePayments' => StudentEntryReceivableLedger::whereHas('payment', function ($query) use ($organization){
-												return $query->where('organization_id', $organization['id']);
-											})
-											->with('payment', function ($query) {
-												return $query->with('contact', function ($query){
-													return $query->with(['student', 'lastLevel']);
-												});
-											})									
-											->where('credit', '>', 0)
-											->orderBy('study_year', 'desc')
-											->orderBy('date', 'desc')
-											->orderBy('no_ref', 'desc')
-											->paginate(50)->withQueryString(),
+			'receivablePayments' => StudentEntryReceivableLedger::filter(request(['search', 'studyYear']))
+																														->whereHas('payment', function ($query) use ($organization){
+																															return $query->where('organization_id', $organization['id']);
+																														})
+																														->where('credit', '>', 0)						
+																														->with('payment', function ($query) {
+																															return $query->with('contact', function ($query){
+																																return $query->with(['student', 'lastLevel']);
+																															});
+																														})	
+																														->orderBy('study_year', 'desc')
+																														->orderBy('date', 'desc')
+																														->orderBy('no_ref', 'desc')
+																														->paginate(50)->withQueryString(),
 		]);
 	}
 
@@ -129,7 +134,7 @@ class StudentEntryReceivablePaymentController extends Controller
 
 		return Inertia::render('StudentEntryReceivablePayment/Create',[
 			'organization' => $organization,
-			'whatsappPlugin' => $whatsappPlugin,
+			'whatsappPlugin' => $whatsappPlugin ? true : false,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'newRef' => $this->newRef($organization, request('date')),
 			'date' => request('date') ?? $this->now->isoFormat('YYYY-M-DD'),
@@ -182,6 +187,10 @@ class StudentEntryReceivablePaymentController extends Controller
 			'cash_account_id' => [
 				'required',
 				'exists:accounts,id'
+			],
+			'send_wa' => [
+				'required',
+				'boolean'
 			],
 		]);
 
@@ -266,6 +275,33 @@ class StudentEntryReceivablePaymentController extends Controller
 				'study_year' => $payment['study_year'],
 			]);
 
+
+			// send whatsapp
+			if ($validated['send_wa']) {
+				$whatsAppLog = WhatsappLog::create([
+					'organization_id' => $organization['id'],
+					'contact_id' => $validated['contact_id'],
+					'description' => 'PEMBAYARAN PIUTANG IURAN TAHUNAN SISWA',
+					'status' => 'waiting'
+				]);
+
+				$contact = Contact::with(['student', 'lastLevel'])->find($validated['contact_id']);
+				$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
+
+				$tempDate = new Carbon($validated['date']);
+
+				$message = "*PEMBAYARAN ANGSURAN IURAN TAHUNAN*\n-------------------------------------------------------\nNama : " . $contact['name'] . "\nNo. Siswa : " . $contact->student->no_ref . "\nTahun Masuk : " . $contact->student->entry_year . "\nKelas Sekarang : " . $contact->lastLevel->level . "\n-------------------------------------------------------\nNo. Ref : " . $validated['no_ref'] . "\nHari/Tanggal : " . $tempDate->isoFormat('D MMMM YYYY') . "\nJumlah Bayar: IDR. " . number_format($validated['value'], 0, '', '.') . "\n\nTTD,\n\n" . strtoupper($organization['name']);
+				$data = array(
+					'appkey' => $whatsappPlugin['appKey'],
+					'authkey' => $whatsappPlugin['authkey'],
+					'to' => PhoneNumber::setFormat($contact['phone']),
+					'message' => $message,
+					'sandbox' => 'false'
+				);
+	
+				SendWhatsAppNotifJob::dispatch($data, $whatsAppLog['id'])->onQueue('whatsapp');
+			}
+
 			// buat log
 			$log = [
 				'description' => $validated['description'],
@@ -327,9 +363,11 @@ class StudentEntryReceivablePaymentController extends Controller
 	{
 		$user = Auth::user();
 		$receivablePaymentWithDetail = StudentEntryReceivableLedger::with('payment')->find($receivablePayment['id']);
+		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
 
 		return Inertia::render('StudentEntryReceivablePayment/Show',[
 			'organization' => $organization,
+			'whatsappPlugin' => $whatsappPlugin ? true : false,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'user' => $user,
 			'payment' => $receivablePaymentWithDetail,
@@ -502,5 +540,34 @@ class StudentEntryReceivablePaymentController extends Controller
 
 		return redirect()->back()->with('success', 'Pembayaran Piutang Iuran Tahunan Berhasil Dihapus');
 		
+	}
+
+	public function sendWhatsapp(Request $request, Organization $organization, StudentEntryReceivableLedger $receivablePayment)
+	{
+		$whatsAppLog = WhatsappLog::create([
+			'organization_id' => $organization['id'],
+			'contact_id' => $request['contact_id'],
+			'description' => 'PEMBAYARAN PIUTANG IURAN TAHUNAN SISWA',
+			'status' => 'waiting'
+		]);
+
+		$contact = Contact::with(['student', 'lastLevel'])->find($request['contact_id']);
+		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
+
+		$tempDate = new Carbon($receivablePayment['date']);
+
+		$message = "*PEMBAYARAN ANGSURAN IURAN TAHUNAN*\n-------------------------------------------------------\nNama : " . $contact['name'] . "\nNo. Siswa : " . $contact->student->no_ref . "\nTahun Masuk : " . $contact->student->entry_year . "\nKelas Sekarang : " . $contact->lastLevel->level . "\n-------------------------------------------------------\nNo. Ref : " . $receivablePayment['no_ref'] . "\nHari/Tanggal : " . $tempDate->isoFormat('D MMMM YYYY') . "\nJumlah Bayar: IDR. " . number_format($receivablePayment['credit'], 0, '', '.') . "\n\nTTD,\n\n" . strtoupper($organization['name']);
+		$data = array(
+			'appkey' => $whatsappPlugin['appKey'],
+			'authkey' => $whatsappPlugin['authkey'],
+			'to' => PhoneNumber::setFormat($contact['phone']),
+			'message' => $message,
+			'sandbox' => 'false'
+		);
+
+		SendWhatsAppNotifJob::dispatch($data, $whatsAppLog['id'])->onQueue('whatsapp');
+
+		return redirect()->back()->with('success', 'Rincian Pembayaran Piutang Iuran Tahunan telah diteruskan Via Whatsapp');
+
 	}
 }

@@ -127,6 +127,7 @@ export default function Create({
       date:date,
       no_ref:newRef,
       paidValue:0,
+      value:0,
       cash_account_id: null,
     }    
     setData(tempData);
@@ -424,6 +425,25 @@ export default function Create({
             </div>
             }            
 
+            {
+              (whatsappPlugin && selectedContact.phone)
+              && <div className='md:w-1/3 w-2/3 mt-5'>
+                <div className='form-control '>
+                  <label className='label cursor-pointer' htmlFor={`send_wa`}>
+                    <input
+                      type='checkbox'
+                      className='checkbox'
+                      id={`send_wa`}
+                      value={data.send_wa}
+                      onChange={() => setData('send_wa', !data.send_wa)}
+                      checked={data.send_wa}
+                    />
+                    <span className='label-text'>Kirim Bukti Via WhatsApp</span>
+                  </label>
+                </div>
+              </div>  
+            }  
+
             <div className='flex justify-end flex-col-reverse sm:flex-row gap-2 mt-5'>
               <div className='w-full sm:w-1/6 my-auto text-center'>
                 <Link href={route('cashflow.student-entry-receivable-payment', organization.id)}>
@@ -467,7 +487,7 @@ Create.layout = (page) => (
             <Link href={route('cashflow', page.props.organization.id)}>Arus Kas</Link>
           </li>
           <li className='font-bold'>
-            <Link href={route('cashflow.student-entry-receivable-payment', page.props.organization.id)}>Pembayaran Iuran Tahunan Siswa</Link>
+            <Link href={route('cashflow.student-entry-receivable-payment', page.props.organization.id)}>Pembayaran Piutang Iuran Tahunan Siswa</Link>
           </li>
           <li>Tambah Pembayaran</li>
         </ul>

@@ -386,7 +386,7 @@ class StudentEntryPaymentController extends Controller
 
 				$tempDate = new Carbon($validated['date']);
 
-				$message = "*PEMBAYARAN IURAN TAHUNAN*-------------------------------------------------------\nNama : " . $contact['name'] . "\nNo. Siswa : " . $contact->student->no_ref . "\nTahun Masuk : " . $contact->student->entry_year . "\nKelas Sekarang : " . $contact->lastLevel->level . "\n-------------------------------------------------------\nNo. Ref : " . $validated['no_ref'] . "\nHari/Tanggal : " . $tempDate->isoFormat('D MMMM YYYY') . "\nTahun Ajaran: " . $validated['study_year'] . "\n\nDETAIL:" . $tempDetail . "\n\nTTD,\n\n" . strtoupper($organization['name']);
+				$message = "*PEMBAYARAN IURAN TAHUNAN*\n-------------------------------------------------------\nNama : " . $contact['name'] . "\nNo. Siswa : " . $contact->student->no_ref . "\nTahun Masuk : " . $contact->student->entry_year . "\nKelas Sekarang : " . $contact->lastLevel->level . "\n-------------------------------------------------------\nNo. Ref : " . $validated['no_ref'] . "\nHari/Tanggal : " . $tempDate->isoFormat('D MMMM YYYY') . "\nTahun Ajaran: " . $validated['study_year'] . "\n\nDETAIL:" . $tempDetail . "\n\nTTD,\n\n" . strtoupper($organization['name']);
 				$data = array(
 					'appkey' => $whatsappPlugin['appKey'],
 					'authkey' => $whatsappPlugin['authkey'],

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link, } from '@inertiajs/react';
+import { Head, Link, useForm, } from '@inertiajs/react';
 import { IoArrowBackOutline } from 'react-icons/io5';
 import dayjs from 'dayjs';
 import { FaPrint, FaWhatsapp } from 'react-icons/fa';
@@ -9,7 +9,12 @@ import SecondaryButton from '@/Components/SecondaryButton';
 import formatNumber from '@/Utils/formatNumber';
 import { toast, ToastContainer } from 'react-toastify';
 
-export default function Show({ contact, organization, role, payment, user }) {	
+export default function Show({ contact, organization, role, payment, user, whatsappPlugin }) {		
+	const { post, processing } = useForm({
+		'contact_id' : contact.id,
+
+	});
+	
 	const [waLink] = useState('https://web.whatsapp.com/send');
 
 	const handlePrint = () => {
@@ -17,6 +22,19 @@ export default function Show({ contact, organization, role, payment, user }) {
 	};	
 
 	const handleSendWA = () => {
+		if (whatsappPlugin) {			
+			post(route('cashflow.student-entry-receivable-payment.send-whatsapp', {organization: organization.id, receivablePayment: payment.id}), {
+				onSuccess: ({ props }) => {
+					const { flash } = props;
+	
+					toast.success(flash.success, {
+						position: toast.POSITION.TOP_CENTER,
+					});	
+				},
+			})
+			return;
+		}
+		
 		// cek format contact phone
 		let phone = contact.phone;		    
 
@@ -33,7 +51,7 @@ export default function Show({ contact, organization, role, payment, user }) {
 
 		let detail = `*Jumlah Bayar: IDR. ${ formatNumber(payment.credit) }*%0A`;
 		
-		let message = `*PEMBAYARAN PIUTANG IURAN TAHUNAN*%0A-------------------------------------------------------%0A*Nama*: ${contact.name}%0A*No. Siswa*: ${contact.student.no_ref ?? '-'}%0A*Kelas Sekarang*: ${contact.last_level.level}%0A-------------------------------------------------------%0A*No Ref*: ${payment.no_ref}%0A*Tanggal*: ${dayjs(payment.date).locale('id').format('DD MMMM YYYY')}%0A${detail}%0A%0ATtd,%0A%0A*${organization.name}*`;
+		let message = `*PEMBAYARAN ANGSURAN IURAN TAHUNAN*%0A-------------------------------------------------------%0A*Nama*: ${contact.name}%0A*No. Siswa*: ${contact.student.no_ref ?? '-'}%0A*Kelas Sekarang*: ${contact.last_level.level}%0A-------------------------------------------------------%0A*No Ref*: ${payment.no_ref}%0A*Tanggal*: ${dayjs(payment.date).locale('id').format('DD MMMM YYYY')}%0A${detail}%0A%0ATtd,%0A%0A*${organization.name}*`;
 
 		let whatsapp = `${waLink}?phone=${phone}&text=${message}`
 
@@ -52,14 +70,18 @@ export default function Show({ contact, organization, role, payment, user }) {
 						<div className='px-3 my-auto flex gap-3'>
 						</div>
 						<div className='text-end px-3 hidden sm:block space-x-5'>
-							<SecondaryButton onClick={handleSendWA}>
-								<div className='flex gap-2'>
-									<div className='my-auto'>
-										<FaWhatsapp/>
+							{
+								contact.phone && 
+								<SecondaryButton onClick={handleSendWA} disabled={processing}>
+									<div className='flex gap-2'>
+										<div className='my-auto'>
+											<FaWhatsapp/>
+										</div>
+										<div className='my-auto'>Kirim WA</div>
 									</div>
-									<div className='my-auto'>Kirim WA</div>
-								</div>
-							</SecondaryButton>
+								</SecondaryButton>
+							}
+							
 							<SecondaryButton onClick={handlePrint}>
 								<div className='flex gap-2'>
 									<div className='my-auto'>

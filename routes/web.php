@@ -415,6 +415,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 			Route::get('/student-entry-receivable-payment', [StudentEntryReceivablePaymentController::class, 'index'])->name('cashflow.student-entry-receivable-payment');
 			Route::get('/student-entry-receivable-payment/create', [StudentEntryReceivablePaymentController::class, 'create'])->name('cashflow.student-entry-receivable-payment.create');
 			Route::get('/student-entry-receivable-payment/{receivablePayment}', [StudentEntryReceivablePaymentController::class, 'show'])->name('cashflow.student-entry-receivable-payment.show');
+			Route::post('/student-entry-receivable-payment/{receivablePayment}/send-whatsapp', [StudentEntryReceivablePaymentController::class, 'sendWhatsapp'])->name('cashflow.student-entry-receivable-payment.send-whatsapp');
 			Route::get('/student-entry-receivable-payment/{receivablePayment}/edit', [StudentEntryReceivablePaymentController::class, 'edit'])->name('cashflow.student-entry-receivable-payment.edit');
 			Route::post('/student-entry-receivable-payment', [StudentEntryReceivablePaymentController::class, 'store'])->name('cashflow.student-entry-receivable-payment.store');
 			Route::patch('/student-entry-receivable-payment/{receivablePayment}', [StudentEntryReceivablePaymentController::class, 'update'])->name('cashflow.student-entry-receivable-payment.update');

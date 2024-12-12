@@ -30,15 +30,23 @@ class StudentEntryReceivableLedger extends Model
 		return $this->belongsTo(StudentEntryPayment::class);
 	}
 
+	public function receivable(): BelongsTo
+	{
+		return $this->belongsTo(StudentEntryReceivable::class);
+	}
+
 	public function scopeFilter($query, $filters)
 	{
 		$query->when($filters['search'] ?? false, function ($query, $search) {
 			return $query->where('no_ref', 'like', '%'.$search.'%')
-										->orWhereHas('contact', function ($query) use ($search){
-											$query->where('name', 'like', '%'. $search .'%')
-														->orWhereHas('student', function ($query) use ($search){
-															$query->where('no_ref', 'like', '%'. $search .'%');
-														});
+										->orWhereHas('receivable', function ($query) use ($search){
+											return $query->whereHas('contact', function ($query) use ($search){
+												$query->where('name', 'like', '%'. $search .'%')
+															->orWhereHas('student', function ($query) use ($search){
+																$query->where('no_ref', 'like', '%'. $search .'%');
+															});
+											});
+											
 			});
 		});
 

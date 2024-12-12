@@ -74,14 +74,18 @@ export default function Print({ organization, receivable, receivables, role, con
 						<div className='px-3 my-auto flex gap-3'>
 						</div>
 						<div className='text-end px-3 hidden sm:block space-x-5'>
-							<SecondaryButton onClick={handleSendWA} disabled={processing}>
-								<div className='flex gap-2'>
-									<div className='my-auto'>
-										<FaWhatsapp/>
+							{
+								contact.phone && 
+								<SecondaryButton onClick={handleSendWA} disabled={processing}>
+									<div className='flex gap-2'>
+										<div className='my-auto'>
+											<FaWhatsapp/>
+										</div>
+										<div className='my-auto'>Kirim WA</div>
 									</div>
-									<div className='my-auto'>Kirim WA</div>
-								</div>
-							</SecondaryButton>
+								</SecondaryButton>
+							}
+							
 							<SecondaryButton onClick={handlePrint}>
 								<div className='flex gap-2'>
 									<div className='my-auto'>
