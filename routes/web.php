@@ -429,6 +429,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 			Route::patch('/staff-salary-payment/{payment}', [StaffSalaryPaymentController::class, 'update'])->name('cashflow.staff-salary-payment.update');
 			Route::get('/staff-salary-payment/{payment}/print', [StaffSalaryPaymentController::class, 'print'])->name('cashflow.staff-salary-payment.staff.print');
 			Route::get('/staff-salary-payment/{id}/{staff}', [StaffSalaryPaymentController::class, 'showStaff'])->name('cashflow.staff-salary-payment.staff');
+			Route::post('/staff-salary-payment/{id}/{staff}/send-whatsapp', [StaffSalaryPaymentController::class, 'sendWhatsapp'])->name('cashflow.staff-salary-payment.send-whatsapp');
 			Route::get('/staff-salary-payment/{id}/{staff}/edit', [StaffSalaryPaymentController::class, 'editStaff'])->name('cashflow.staff-salary-payment.staff.edit');
 			Route::patch('/staff-salary-payment/{payment}/{staff}', [StaffSalaryPaymentController::class, 'updateStaff'])->name('cashflow.staff-salary-payment.staff.update');
 

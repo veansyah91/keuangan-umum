@@ -12,7 +12,6 @@ import { toast, ToastContainer } from 'react-toastify';
 export default function Show({ contact, organization, role, payment, user, whatsappPlugin }) {		
 	const { post, processing } = useForm({
 		'contact_id' : contact.id,
-
 	});
 	
 	const [waLink] = useState('https://web.whatsapp.com/send');

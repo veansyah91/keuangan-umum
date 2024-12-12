@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 
 import { IoArrowBackOutline } from 'react-icons/io5';
 import formatNumber from '@/Utils/formatNumber';
 import SecondaryButton from '@/Components/SecondaryButton';
 import { FaPrint, FaWhatsapp } from 'react-icons/fa';
 import dayjs from 'dayjs';
+import { toast, ToastContainer } from 'react-toastify';
 
 const details = (categories, details, type = 'plus') => {
 	return categories.map(category => {
-		let findDetail = details.find(detail => detail.category_id === category.id);
-		
+		let findDetail = details.find(detail => detail.category_id === category.id);		
 		return {
 			id: category.id,
 			name: category.name,
@@ -27,18 +27,42 @@ const details = (categories, details, type = 'plus') => {
 }
 
 export default function ShowStaff({
-  organization, role, categories, payment, contact, user
-}) {	
+  organization, categories, payment, contact, user, whatsappPlugin
+}) {		
+	
   const [waLink] = useState('https://web.whatsapp.com/send');
 
-  const [detailPlus] = useState(details(categories, payment.details).filter(detail => !detail.is_cut));
-  const [detailMinus] = useState(details(categories, payment.details).filter(detail => detail.is_cut));  
+  const [detailPlus] = useState(details(categories, payment.details).filter(detail => !detail.is_cut && detail.total !== 0));
+  const [detailMinus] = useState(details(categories, payment.details).filter(detail => detail.is_cut && detail.total !== 0));  	
+
+	const { post, processing } = useForm({
+		'detailPlus' : details(categories, payment.details).filter(detail => !detail.is_cut && detail.total !== 0),
+		'detailMinus' : details(categories, payment.details).filter(detail => detail.is_cut && detail.total !== 0),
+		'total' : formatNumber(payment.details.reduce((acc, detail) => acc + detail.value, 0)),
+		'contact_id' : contact.id,
+		'date' : payment.date,
+		'month' : payment.month,
+		'studyYear' : payment.study_year
+	})
 
 	const handlePrint = () => {
 		window.print();
 	};	
 
 	const handleSendWA = () => {
+		if (whatsappPlugin) {			
+			post(route('cashflow.staff-salary-payment.send-whatsapp', {organization: organization.id, id: payment.id, staff: contact.id}), {
+				onSuccess: ({ props }) => {
+					const { flash } = props;
+	
+					toast.success(flash.success, {
+						position: toast.POSITION.TOP_CENTER,
+					});	
+				},
+			})
+			return;
+		}
+
 		// cek format contact phone
 		let phone = contact.phone;		
 
@@ -50,20 +74,20 @@ export default function ShowStaff({
 
 		detailPlus.forEach((d, index) => {
 			let unit = d.unit ? `${ d.qty } ${ d.unit } x IDR. ${ formatNumber(d.total/d.qty) } = ` : '';
-			detail += `%0A${index+1}. ${d.name} : IDR. ${ unit } ${formatNumber(d.total)}`;
+			detail += `%0A${index+1}. ${d.name} : ${ unit } IDR. ${formatNumber(d.total)}`;
 		});
 
 		if (detailMinus.length > 0) {
 			detail += '%0A*Potongan*';
 			detailMinus.forEach((d, index) => {
 				let unit = d.unit ? `${ d.qty } ${ d.unit } x IDR. ${ formatNumber(d.total/d.qty) } = ` : '';
-				detail += `%0A${index+1}. ${d.name} : IDR. ${ unit } ${formatNumber(d.total)}`;
+				detail += `%0A${index+1}. ${d.name} : ${ unit } IDR. ${formatNumber(d.total)}`;
 			});
 		}
 
-		detail += `%0A*Total: ${ formatNumber(payment.details.reduce((acc, detail) => acc + detail.value, 0)) }*`
+		detail += `%0A*Total: IDR. ${ formatNumber(payment.details.reduce((acc, detail) => acc + detail.value, 0)) }*`
 		
-		let message = `*PEMBAYARAN GAJI BULANAN*%0A-------------------------------------------------------%0A*Nama*: ${contact.name}%0A*No. Siswa*: ${contact.staff.no_ref ?? '-'}%0A*Tahun Masuk*: ${contact.staff.entry_year}%0A-------------------------------------------------------%0ATanggal*: ${dayjs(payment.date).locale('id').format('DD MMMM YYYY')}%0A*Bulan*: ${payment.month} (${payment.study_year})%0A*Total*: IDR. ${formatNumber(payment.details.reduce((acc, detail) => acc + detail.value, 0))}%0A%0A*DETAIL:*${detail}%0A%0A%0ATtd,%0A%0A%0A*${organization.name}*`;
+		let message = `*PEMBAYARAN GAJI BULANAN*%0A-------------------------------------------------------%0A*Nama*: ${contact.name}%0A*No. Staf*: ${contact.staff.no_ref ?? '-'}%0A*Jabatan*: ${contact.staff.position ?? '-'}%0A*Tahun Masuk*: ${contact.staff.entry_year}%0A-------------------------------------------------------%0A*Tanggal*: ${dayjs(payment.date).locale('id').format('DD MMMM YYYY')}%0A*Bulan*: ${payment.month} (${payment.study_year})%0A*Total*: IDR. ${formatNumber(payment.details.reduce((acc, detail) => acc + detail.value, 0))}%0A%0A*DETAIL:*${detail}%0A%0A%0ATtd,%0A%0A%0A*${organization.name}*`;
 
 		let whatsapp = `${waLink}?phone=${phone}&text=${message}`
 
@@ -76,14 +100,16 @@ export default function ShowStaff({
 				title={`Rincian Gaji Bulanan Staf ${contact.name} (${contact.staff.no_ref ?? '-'})`}
 			/>
 
+			<ToastContainer />
+
 			<div className='sm:pt-0 pb-16 pt-12'>
         <div className='bg-white py-2 sm:pt-0 px-5'>
           {/* Nav Title */}
 					<div className='flex sm:flex-row justify-between gap-2 print:hidden'>
 						<div className='px-3 my-auto flex gap-3'>
 						</div>
-						<div className='text-end px-3 hidden sm:block space-x-5'>
-							<SecondaryButton onClick={handleSendWA} disabled={!contact.phone}>
+						<div className='text-end px-3 hidden sm:block space-x-5'> 
+							<SecondaryButton onClick={handleSendWA} disabled={!contact.phone || processing}>
 								<div className='flex gap-2'>
 									<div className='my-auto'>
 										<FaWhatsapp/>
@@ -91,6 +117,7 @@ export default function ShowStaff({
 									<div className='my-auto'>Kirim WA</div>
 								</div>
 							</SecondaryButton>
+							
 							<SecondaryButton onClick={handlePrint}>
 								<div className='flex gap-2'>
 									<div className='my-auto'>
