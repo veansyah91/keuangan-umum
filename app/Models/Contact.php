@@ -9,6 +9,7 @@ use App\Models\StudentEntryPayment;
 use App\Models\StudentMonthlyPayment;
 use App\Models\StudentEntryReceivable;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\StaffSalaryPaymentDetail;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -64,6 +65,13 @@ class Contact extends Model
     public function studentMonthlyPayment(): HasMany
     {
         return $this->hasMany(StudentMonthlyPayment::class);
+    }
+
+    public function staffSalaryPayment(): HasMany
+    {
+        return $this->hasMany(StaffSalaryPaymentDetail::class)
+                    ->where('value', "<>", 0)
+                    ->orderBy('value', 'desc');
     }
 
     public function lastStudentMonthlyPayment(): HasOne

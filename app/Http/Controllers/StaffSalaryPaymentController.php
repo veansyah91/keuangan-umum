@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Repositories\Log\LogRepository;
 use App\Models\StaffSalaryPaymentDetail;
 use App\Repositories\User\UserRepository;
+use App\Jobs\SendSalaryNotifViaWhatsappJon;
 use App\Repositories\Account\AccountRepository;
 use App\Repositories\Contact\ContactRepository;
 use App\Repositories\Journal\JournalRepository;
@@ -459,24 +460,24 @@ class StaffSalaryPaymentController extends Controller
 	{
 		$user = Auth::user();
 
-		$payments = [];
-		$contacts = Contact::whereHas('staff')
-												->with('staff')
+		$payments = Contact::whereHas('staff')
+												->whereHas('staffSalaryPayment', function ($query) use ($payment){
+													return $query->where('payment_id', $payment['id']);
+												})
+												->with([
+														'staff',
+														'staffSalaryPayment' => function ($query) {
+															return $query->with('category');
+														}
+													])
 												->where('organization_id', $organization['id'])
 												->orderBy('name')
 												->get();
 
-		foreach ($contacts as $key => $contact) {
-			$tempDetail = StaffSalaryPaymentDetail::wherePaymentId($payment['id'])
-																				->whereContactId($contact['id'])
-																				->with('category')
-																				->get();
-			$payments[$key] = $contact;
-			$payments[$key]['value'] = $tempDetail->sum('value');
-			$payments[$key]['categories'] = $tempDetail;
-		}
+		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
 
 		return Inertia::render('StaffSalaryPayment/Print',[
+			'whatsappPlugin' => $whatsappPlugin ? true : false,
 			'organization' => $organization,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'payment' => $payment,
@@ -542,5 +543,11 @@ class StaffSalaryPaymentController extends Controller
 		SendWhatsAppNotifJob::dispatch($data, $whatsAppLog['id'])->onQueue('whatsapp');
 		
 		return redirect()->back()->with('success', 'Rincian Pembayaran Gaji Staf telah diteruskan Via Whatsapp');
+	}
+
+	public function sendWhatsappMulti(Request $request, Organization $organization, StaffSalaryPayment $payment)
+	{
+		SendSalaryNotifViaWhatsappJon::dispatch($organization, $payment)->onQueue('whatsapp');
+		return redirect()->back()->with('success', 'Notifikasi Gaji Staf telah diteruskan Via Whatsapp');
 	}
 }

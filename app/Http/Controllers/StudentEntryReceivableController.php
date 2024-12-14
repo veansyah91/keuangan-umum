@@ -112,7 +112,7 @@ class StudentEntryReceivableController extends Controller
 
 	public function sendWhatsappMulti(Organization $organization)
 	{
-		SendYearlyReceivableBillingJob::dispatch($organization);
+		SendYearlyReceivableBillingJob::dispatch($organization)->onQueue('whatsapp');
 		return redirect()->back()->with('success', 'Penagihan Tunggakan Iuran Tahunan telah diteruskan Via Whatsapp');
 	}
 

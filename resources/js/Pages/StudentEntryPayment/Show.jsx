@@ -76,6 +76,8 @@ export default function Show({ contact, organization, role, payment, user, whats
 				title={`Pembayaran Iuran Tahunan ${contact.name} (${contact.student.no_ref})`}
 			/>
 
+			<ToastContainer />			
+
 			<div className='sm:pt-0 pb-16 pt-12'>
 				<div className='bg-white py-2 sm:pt-0 px-5'>
 					{/* Nav Title */}
