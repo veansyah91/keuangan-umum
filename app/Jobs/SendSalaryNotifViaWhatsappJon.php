@@ -2,8 +2,13 @@
 
 namespace App\Jobs;
 
+use Carbon\Carbon;
 use App\Models\Contact;
+use App\Models\WhatsappLog;
+use App\Helpers\PhoneNumber;
 use Illuminate\Bus\Queueable;
+use App\Models\WhatsappPlugin;
+use App\Jobs\SendWhatsAppNotifJob;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -31,44 +36,80 @@ class SendSalaryNotifViaWhatsappJon implements ShouldQueue
 													return $query->where('payment_id', $temp_payment['id']);
 												})
 												->with([
-														'staff',
-														'staffSalaryPayment' => function ($query) {
-															return $query->with('category');
-														}
-													])
+													'staff',
+													'staffSalaryPayment' => function ($query) use ($temp_payment) {
+														return $query->where('payment_id', $temp_payment['id'])->with('category');
+													}
+												])
 												->where('organization_id', $this->organization['id'])
+												->whereNotNull('phone')
 												->orderBy('name')
 												->get();
 
+		$whatsappPlugin = WhatsappPlugin::where('organization_id', $this->organization->id)->first();
+
 		foreach ($payments as $payment) {
+			$whatsAppLog = WhatsappLog::create([
+				'organization_id' => $this->organization->id,
+				'contact_id' => $payment['id'],
+				'description' => 'PEMBAYARAN GAJI STAF',
+				'status' => 'waiting'
+			]);
+
 			$tempDetail = "";
+			$total = 0;
 
 			// detail plus
-			foreach ($payment['staffSalaryPayment'] as $key => $detail) {
-				if ($detail['value'] > 0) {
-					$unit = $detail['unit'] ? $detail['qty'] . " " . $detail['unit'] . " x IDR. " . number_format($detail['value'], 0, '', '.') . " = " : "";
+			$key = 1;
+			foreach ($payment['staffSalaryPayment'] as $detail) {
+				if ($detail->value > 0) {
+					$total += $detail->value;
+					$unit = $detail->category->unit ? $detail->qty . " " . $detail->category->unit . " x IDR. " . number_format($detail->value, 0, '', '.') . " = " : "";
 
-					$tempDetail .= "\n" . $key+1 . "." . $detail['name'] . ": " . $unit . number_format($detail['total'], 0, '', '.');	
-					\Log::channel('whatsapp')->info(gettype($detail));
-					// \Log::channel('whatsapp')->info($unit);
-
+					$tempDetail .= "\n" . $key++ . "." . $detail->category->name . ": " . $unit . number_format($detail->value, 0, '', '.');	
 				}
 
 			}
 
 			// detail plus
-			foreach ($payment['staffSalaryPayment'] as $key => $detail) {
-				if ($detail['value'] < 0) {
-					if ($key < 1) {
+			$key = 1;
+			foreach ($payment['staffSalaryPayment'] as $detail) {
+				if ($detail->value < 0) {
+					if ($key < 2) {
 						$tempDetail .= "\n*Potongan*";						
 					}
-					$unit = $detail['unit'] ? $detail['qty'] . " " . $detail['unit'] . " x IDR. " . number_format($detail['value'], 0, '', '.') . " = " : "";
+					$total += $detail->value;
+					$unit = $detail->category->unit ? $detail->qty . " " . $detail->category->unit . " x IDR. " . number_format($detail->value, 0, '', '.') . " = " : "";
 
-					$tempDetail .= "\n" . $key+1 . "." . $detail['name'] . ": " . $unit . number_format($detail['total'], 0, '', '.');					
+					$tempDetail .= "\n" . $key++ . "." . $detail->category->name . ": " . $unit . number_format($detail->value, 0, '', '.');					
 				}
 			}
 
-			// \Log::channel('whatsapp')->info($tempDetail);
+			$tempDetail .= "\nTotal: IDR. " . number_format($total, 0, '', '.');
+
+			$tempDate = new Carbon($payment['date']);
+
+			$message = "*TANDA TERIMA GAJI BULANAN*\n-------------------------------------------------------\nNama: " . $payment['name'] .
+			"\nNo. Staf: " . $payment->staff->no_ref . 
+			"\nJabatan: " . $payment->staff->position . 
+			"\nTahun Masuk: " . $payment->staff->entry_year . 
+			"\n-------------------------------------------------------\nHari/Tanggal: " . $tempDate->isoFormat('D MMMM YYYY') .
+			"\nBulan: " . $temp_payment['month'] . "(" . $temp_payment['study_year'] .")" .
+			"\nTotal: IDR. " . number_format($total, 0, '', '.') .
+			"\n\nDETAIL:" . $tempDetail . "\n\nTTD,\n\n" . strtoupper($this->organization['name'])
+			;
+
+			$data = array(
+				'appkey' => $whatsappPlugin['appKey'],
+				'authkey' => $whatsappPlugin['authkey'],
+				'to' => PhoneNumber::setFormat($payment['phone']),
+				'message' => $message,
+				'sandbox' => 'false'
+			);
+
+			// \Log::channel('whatsapp')->info($message);
+			SendWhatsAppNotifJob::dispatch($data, $whatsAppLog['id'])->onQueue('whatsapp')->delay(now()->addSeconds(rand(100, 200)));
+
 		}
 												
 	}

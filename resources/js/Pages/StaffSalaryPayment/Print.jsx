@@ -65,7 +65,7 @@ export default function Print({
 						<div className='px-3 my-auto flex gap-3'>
 						</div>
 						<div className='text-end px-3 hidden sm:block space-x-5'>
-							<SecondaryButton onClick={handleSendWA} disabled={processing}>
+							<SecondaryButton onClick={handleSendWA} disabled={processing || !whatsappPlugin}>
 								<div className='flex gap-2'>
 									<div className='my-auto'>
 										<FaWhatsapp/>

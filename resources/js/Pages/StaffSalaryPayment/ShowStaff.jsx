@@ -87,7 +87,7 @@ export default function ShowStaff({
 
 		detail += `%0A*Total: IDR. ${ formatNumber(payment.details.reduce((acc, detail) => acc + detail.value, 0)) }*`
 		
-		let message = `*PEMBAYARAN GAJI BULANAN*%0A-------------------------------------------------------%0A*Nama*: ${contact.name}%0A*No. Staf*: ${contact.staff.no_ref ?? '-'}%0A*Jabatan*: ${contact.staff.position ?? '-'}%0A*Tahun Masuk*: ${contact.staff.entry_year}%0A-------------------------------------------------------%0A*Tanggal*: ${dayjs(payment.date).locale('id').format('DD MMMM YYYY')}%0A*Bulan*: ${payment.month} (${payment.study_year})%0A*Total*: IDR. ${formatNumber(payment.details.reduce((acc, detail) => acc + detail.value, 0))}%0A%0A*DETAIL:*${detail}%0A%0A%0ATtd,%0A%0A%0A*${organization.name}*`;
+		let message = `*TANDA TERIMA GAJI BULANAN*%0A-------------------------------------------------------%0A*Nama*: ${contact.name}%0A*No. Staf*: ${contact.staff.no_ref ?? '-'}%0A*Jabatan*: ${contact.staff.position ?? '-'}%0A*Tahun Masuk*: ${contact.staff.entry_year}%0A-------------------------------------------------------%0A*Tanggal*: ${dayjs(payment.date).locale('id').format('DD MMMM YYYY')}%0A*Bulan*: ${payment.month} (${payment.study_year})%0A*Total*: IDR. ${formatNumber(payment.details.reduce((acc, detail) => acc + detail.value, 0))}%0A%0A*DETAIL:*${detail}%0A%0A%0ATtd,%0A%0A%0A*${organization.name}*`;
 
 		let whatsapp = `${waLink}?phone=${phone}&text=${message}`
 

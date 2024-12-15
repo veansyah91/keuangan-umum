@@ -466,8 +466,8 @@ class StaffSalaryPaymentController extends Controller
 												})
 												->with([
 														'staff',
-														'staffSalaryPayment' => function ($query) {
-															return $query->with('category');
+														'staffSalaryPayment' => function ($query) use ($payment) {
+															return $query->where('payment_id', $payment['id'])->with('category');
 														}
 													])
 												->where('organization_id', $organization['id'])

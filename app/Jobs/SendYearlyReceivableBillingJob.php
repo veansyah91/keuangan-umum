@@ -37,6 +37,8 @@ class SendYearlyReceivableBillingJob implements ShouldQueue
 		$receivables = StudentEntryReceivable::whereOrganizationId($this->organization->id)
 																				->where('value', '>', 0)
 																				->get();
+
+		$whatsappPlugin = WhatsappPlugin::where('organization_id', $this->organization->id)->first();
 		
 		foreach ($receivables as $receivable) {
 			$contact = Contact::with(['student', 'lastLevel'])->find($receivable['contact_id']);
@@ -49,8 +51,6 @@ class SendYearlyReceivableBillingJob implements ShouldQueue
 					'status' => 'waiting'
 				]);
 	
-				$whatsappPlugin = WhatsappPlugin::where('organization_id', $this->organization->id)->first();
-
 				$details = StudentEntryPayment::whereOrganizationId($this->organization->id)
 														->where('contact_id', $contact['id'])
 														->where('receivable_value', '>', 0)
