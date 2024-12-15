@@ -52,7 +52,6 @@ class DepreciationCron extends Command
      */
     public function handle()
     {
-        \Log::info('Depreciation Schedule Cron job dijalankan '.date('Y-m-d H:i:s'));
         try {
             \Log::info('Depreciation Schedule Cron job Berhasil di jalankan '.date('Y-m-d H:i:s'));
             $fixedAssets = FixedAsset::where('is_disposed', false)
@@ -95,7 +94,6 @@ class DepreciationCron extends Command
                     $validated['date'] = $now->isoFormat('YYYY-MM-DD');
                     $validated['value'] = $depreciationValue;
                     $validated['organization_id'] = $fixedAsset['organization_id'];
-                    $validated['user_id'] = $fixedAsset['user_id'];
                     $validated['accounts'] = [
                         [
                             'id' => $dep_acc['id'],

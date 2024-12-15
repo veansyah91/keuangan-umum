@@ -20,11 +20,13 @@ import StudentEntryReceivableMobile from './Components/StudentEntryReceivableMob
 import StudentEntryReceivableDesktop from './Components/StudentEntryReceivableDesktop';
 import { usePrevious } from 'react-use';
 import { useDebounce } from 'use-debounce';
+import { FaWhatsapp } from 'react-icons/fa';
 
-export default function Index({ organization, role, receivables, searchFilter, type }) {
-	
+export default function Index({ organization, role, receivables, searchFilter, type, whatsappPlugin }) {
+	const { post, processing } = useForm({});
 	const [search, setSearch] = useState(searchFilter || '');
 	const [showModalFilter, setShowModalFilter] = useState(false);
+	const [showSendWaModal, setShowSendWaModal] = useState(false);
 
 	const [dataFilter, setDataFilter] = useState({
 		type: type, // all, paid, unpaid
@@ -42,6 +44,23 @@ export default function Index({ organization, role, receivables, searchFilter, t
 			handleReloadPage(data);
 		}
 	}, [debounceValue]);
+
+	// function
+	const handleSubmitSendWa = (e) => {
+		e.preventDefault();
+
+		post(route('cashflow.student-entry-receivable.send-whatsapp-multi', {organization: organization.id}), {
+			onSuccess: ({ props }) => {
+				setShowSendWaModal(false);
+
+				const { flash } = props;
+	
+				toast.success(flash.success, {
+					position: toast.POSITION.TOP_CENTER,
+				});	
+			}
+		})
+	}
 
 	const handleFilter = (e) => {
 		e.preventDefault();
@@ -136,11 +155,15 @@ export default function Index({ organization, role, receivables, searchFilter, t
 						)}
 					</div>	
 					<div className='my-auto w-4/12 flex gap-5 justify-end'>
+						{
+							whatsappPlugin && <button className='py-3 px-3 border rounded-lg' onClick={_ => setShowSendWaModal(true)}>
+								<FaWhatsapp />
+							</button>
+						}
 						<button className='py-3 px-3 border rounded-lg h-full' onClick={() => setShowModalFilter(true)}>
 								<IoFilter />
-						</button>
-						
-				</div>
+						</button>						
+					</div>
 					<div className='w-3/12 border flex rounded-lg'>
 						<label htmlFor='search-input' className='my-auto ml-2'>
 							<IoSearchSharp />
@@ -258,6 +281,34 @@ export default function Index({ organization, role, receivables, searchFilter, t
 						<SecondaryButton onClick={() => setShowModalFilter(false)}>Batal</SecondaryButton>
 
 						<PrimaryButton className='ms-3'>Filter</PrimaryButton>
+					</div>
+				</form>
+			</Modal>
+
+			<Modal show={showSendWaModal} onClose={() => setShowSendWaModal(false)}>
+				<form onSubmit={handleSubmitSendWa} className='p-6'>
+					<h2 className='font-bold text-lg text-center'>Mengirim Tagihan Iuran Tahunan via Whatsapp Broadcasting</h2>
+					<div className='mt-5'>
+						<table>
+							<tbody>
+								<tr>
+									<td className='w-[25px]'>•</td>
+									<td>Hindari terlalu sering melakukan pengiriman Penagihan Iuran Tahunan via Whatsapp, dikhawatirkan akan terbaca spam oleh pihak Whatsapp, cukup lakukan 1 - 2 x perbulan</td>
+								</tr>
+								<tr>
+									<td className='w-[25px]'>•</td>
+									<td>Silakan melakukan pengecekan status pengiriman pada <Link href={route('add-ons.whatsapp-log', {organization: organization.id})} className='text-blue-600 font-bold'>Log Aktifitas Whatsapp</Link> </td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+
+					<div className='mt-6 flex justify-end'>
+						<SecondaryButton onClick={() => setShowSendWaModal(false)}>Batal</SecondaryButton>
+
+						<PrimaryButton className='ms-3' disabled={processing}>
+							Kirim 
+						</PrimaryButton>
 					</div>
 				</form>
 			</Modal>

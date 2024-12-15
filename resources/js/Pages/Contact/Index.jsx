@@ -40,6 +40,8 @@ export default function Index({ role, organization, contacts, searchFilter }) {
         id: 0,
     });
 
+    const [checkAll, setCheckAll] = useState(false);
+
     const prevSearch = usePrevious(search);
     const [debounceValue] = useDebounce(search, 500);
 
@@ -230,6 +232,16 @@ export default function Index({ role, organization, contacts, searchFilter }) {
                             <table className='table table-pin-rows table-pin-cols text-base'>
                                 <thead className='text-base text-gray-900'>
                                     <tr className=''>
+                                        <th className='bg-gray-200 text-center'>
+                                            {/* <input
+                                                type='checkbox'
+                                                className='checkbox'
+                                                id={`check_all`}
+                                                value={checkAll}
+                                                onChange={() => setCheckAll(!checkAll)}
+                                                checked={data.send_wa}
+                                            /> */}
+                                        </th>
                                         <th className='bg-gray-200'>Nama</th>
                                         <th className='bg-gray-200'>No. HP</th>
                                         <th className='bg-gray-200'>Alamat</th>

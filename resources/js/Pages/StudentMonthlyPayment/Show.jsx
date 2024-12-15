@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link, } from '@inertiajs/react';
+import { Head, Link, useForm, } from '@inertiajs/react';
 import { IoArrowBackOutline } from 'react-icons/io5';
 import dayjs from 'dayjs';
 import { FaPrint, FaWhatsapp } from 'react-icons/fa';
@@ -9,7 +9,8 @@ import SecondaryButton from '@/Components/SecondaryButton';
 import formatNumber from '@/Utils/formatNumber';
 import { toast, ToastContainer } from 'react-toastify';
 
-export default function Show({ contact, organization, role, payment, user }) {	
+export default function Show({ contact, organization, role, payment, user, whatsappPlugin }) {		
+	const { post, processing } = useForm({});
 	const [waLink] = useState('https://web.whatsapp.com/send');
 
 	const handlePrint = () => {
@@ -17,6 +18,19 @@ export default function Show({ contact, organization, role, payment, user }) {
 	};	
 
 	const handleSendWA = () => {
+		if (whatsappPlugin) {
+			post(route('cashflow.student-monthly-payment.send-whatsapp', {organization: organization.id, payment: payment.id}), {
+				onSuccess: ({ props }) => {
+					const { flash } = props;
+	
+					toast.success(flash.success, {
+						position: toast.POSITION.TOP_CENTER,
+					});	
+				},
+			})
+			return;
+		}
+
 		// cek format contact phone
 		let phone = contact.phone;		
 
@@ -58,14 +72,17 @@ export default function Show({ contact, organization, role, payment, user }) {
 						<div className='px-3 my-auto flex gap-3'>
 						</div>
 						<div className='text-end px-3 hidden sm:block space-x-5'>
-							<SecondaryButton onClick={handleSendWA}>
-								<div className='flex gap-2'>
-									<div className='my-auto'>
-										<FaWhatsapp/>
+							{
+								contact.phone &&
+								<SecondaryButton onClick={handleSendWA} disabled={processing}>
+									<div className='flex gap-2'>
+										<div className='my-auto'>
+											<FaWhatsapp/>
+										</div>
+										<div className='my-auto'>Kirim WA</div>
 									</div>
-									<div className='my-auto'>Kirim WA</div>
-								</div>
-							</SecondaryButton>
+								</SecondaryButton>
+							}
 							<SecondaryButton onClick={handlePrint}>
 								<div className='flex gap-2'>
 									<div className='my-auto'>

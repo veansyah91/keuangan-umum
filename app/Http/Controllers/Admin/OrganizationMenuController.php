@@ -13,7 +13,6 @@ class OrganizationMenuController extends Controller
      */
     public function __invoke(Request $request)
     {
-
-        return Inertia::render('Admin/Organization-Menu/Index');
+        return Inertia::render('Admin/OrganizationMenu/Index');
     }
 }

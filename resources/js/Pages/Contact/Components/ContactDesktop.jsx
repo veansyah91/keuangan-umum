@@ -5,6 +5,7 @@ import { IoCreateOutline, IoEllipsisVertical, IoTrash } from 'react-icons/io5';
 export default function ContactDesktop({ contact, className, role, handleDelete }) {
     return (
         <tr className={className}>
+            <td></td>
             <td>{contact.name}</td>
             <td>{contact.phone}</td>
             <td>{contact.address}</td>

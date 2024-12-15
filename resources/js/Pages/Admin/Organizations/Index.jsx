@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
     IoArrowBackOutline,
-    IoCalendarOutline,
     IoFilter,
     IoPlayBack,
     IoPlayForward,
@@ -9,9 +8,8 @@ import {
 } from 'react-icons/io5';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import TitleMobile from '@/Components/Mobiles/TitleMobile';
-import formatNumber from '@/Utils/formatNumber';
 import Datepicker from 'react-tailwindcss-datepicker';
 import ContentMobile from '@/Components/Mobiles/ContentMobile';
 import { useDebounce } from 'use-debounce';

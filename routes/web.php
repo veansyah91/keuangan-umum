@@ -5,6 +5,7 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\LogController;
+use App\Http\Controllers\AddonsController;
 use App\Http\Controllers\CashinController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\AccountController;
@@ -36,13 +37,16 @@ use App\Http\Controllers\AccountCategoryController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\ContactCategoryController;
 use App\Http\Controllers\Admin\UserMasterController;
+use App\Http\Controllers\Admin\AdminAddonsController;
 use App\Http\Controllers\Admin\AdminMasterController;
 use App\Http\Controllers\Admin\UserWithdrawController;
 use App\Http\Controllers\FixedAssetCategoryController;
 use App\Http\Controllers\StaffSalaryPaymentController;
 use App\Http\Controllers\OrganizationInvoiceController;
 use App\Http\Controllers\StudentEntryPaymentController;
+use App\Http\Controllers\WhatsappLogActivityController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\WhatsappBroadcastingController;
 use App\Http\Controllers\StudentMonthlyPaymentController;
 use App\Http\Controllers\Admin\OrganizationMenuController;
 use App\Http\Controllers\StudentEntryReceivableController;
@@ -50,8 +54,12 @@ use App\Http\Controllers\StudentPaymentCategoryController;
 use App\Http\Controllers\Admin\AdminOrganizationController;
 use App\Http\Controllers\StudentMonthlyReceivableController;
 use App\Http\Controllers\StudentEntryPaymentCategoryController;
+use App\Http\Controllers\WhatsappBroadcastingInvoiceController;
 use App\Http\Controllers\StudentEntryReceivablePaymentController;
 use App\Http\Controllers\Admin\AdminOrganizationInvoiceController;
+use App\Http\Controllers\Admin\AdminWhatsappBroadcastingController;
+use App\Http\Controllers\Admin\AdminWhatsappBroadcastingDataController;
+use App\Http\Controllers\Admin\AdminWhatsappBroadcastingInvoiceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -117,6 +125,27 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 			Route::get('/organization-invoice', [AdminOrganizationInvoiceController::class, 'index'])->name('admin.organization.invoice.index');
 			Route::patch('/organization-invoice/{organizationInvoice}/payment-confirmation', [AdminOrganizationInvoiceController::class, 'paymentConfirmation'])->name('admin.organization.invoice.payment.confirmation');
+
+			// Add-ons
+			Route::prefix('add-ons')->group(function () {
+				Route::get('/', AdminAddonsController::class)->name('admin.add-ons');
+
+				// whatsapp
+				Route::prefix('whatsapp')->group(function () {
+					Route::get('/', AdminWhatsappBroadcastingController::class)->name('admin.add-ons.whatsapp');
+
+					// Data
+					Route::get('/data', [AdminWhatsappBroadcastingDataController::class, 'index'])->name('admin.add-ons.whatsapp.data');
+					Route::patch('/data/{plugin}', [AdminWhatsappBroadcastingDataController::class, 'update'])->name('admin.add-ons.whatsapp.data.update');
+					Route::patch('/data/{plugin}/connection', [AdminWhatsappBroadcastingDataController::class, 'connection'])->name('admin.add-ons.whatsapp.data.connection');
+					
+					// Invoice
+					Route::get('/invoice', [AdminWhatsappBroadcastingInvoiceController::class, 'index'])->name('admin.add-ons.whatsapp.invoice');
+					Route::patch('/invoice/{invoice}', [AdminWhatsappBroadcastingInvoiceController::class, 'confirmation'])->name('admin.add-ons.whatsapp.invoice.confirmation');
+					
+				});
+			});
+
 		});
 	});
 
@@ -154,6 +183,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 		// Log
 		Route::get('/logs/{organization}', LogController::class)->name('logs');
+
+		Route::prefix('add-ons/{organization}')->group(function () {
+			Route::get('/', AddonsController::class)->name('add-ons');
+			Route::get('/whatsapp-log', WhatsappLogActivityController::class)->name('add-ons.whatsapp-log');
+
+			// whatsapp
+			Route::get('/whatsapp', [WhatsappBroadcastingController::class, 'index'])->name('add-ons.whatsapp');
+			Route::get('/whatsapp/status', [WhatsappBroadcastingController::class, 'status'])->name('add-ons.whatsapp.status');
+			Route::patch('/whatsapp/status', [WhatsappBroadcastingController::class, 'update'])->name('add-ons.whatsapp.status.update');
+			Route::patch('/whatsapp/check-connection', [WhatsappBroadcastingController::class, 'checkConnection'])->name('add-ons.whatsapp.status.check-connection');
+
+			// whatsapp invoice
+			Route::get('/whatsapp-invoice', [WhatsappBroadcastingInvoiceController::class, 'index'])->name('add-ons.whatsapp-invoice');
+			Route::post('/whatsapp-invoice', [WhatsappBroadcastingInvoiceController::class, 'store'])->name('add-ons.whatsapp-invoice.store');
+			Route::get('/whatsapp-invoice/create', [WhatsappBroadcastingInvoiceController::class, 'create'])->name('add-ons.whatsapp-invoice.create');
+			Route::get('/whatsapp-invoice/{invoice}', [WhatsappBroadcastingInvoiceController::class, 'show'])->name('add-ons.whatsapp-invoice.show');
+		});
 
 		// Data Master
 		Route::prefix('data-master/{organization}')->group(function () {
@@ -331,6 +377,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 			Route::get('/student-monthly-payment/{payment}/edit', [StudentMonthlyPaymentController::class, 'edit'])->name('cashflow.student-monthly-payment.edit');
 			Route::get('/student-monthly-payment/{payment}/show', [StudentMonthlyPaymentController::class, 'show'])->name('cashflow.student-monthly-payment.show');
 			Route::post('/student-monthly-payment', [StudentMonthlyPaymentController::class, 'store'])->name('cashflow.student-monthly-payment.post');
+			Route::post('/student-monthly-payment/{payment}/send-whatsapp', [StudentMonthlyPaymentController::class, 'sendWhatsApp'])->name('cashflow.student-monthly-payment.send-whatsapp');
 			Route::patch('/student-monthly-payment/{payment}', [StudentMonthlyPaymentController::class, 'update'])->name('cashflow.student-monthly-payment.update');
 			Route::delete('/student-monthly-payment/{payment}', [StudentMonthlyPaymentController::class, 'destroy'])->name('cashflow.student-monthly-payment.delete');
 
@@ -338,6 +385,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 			Route::get('/student-monthly-receivable', [StudentMonthlyReceivableController::class, 'index'])->name('cashflow.student-monthly-receivable');
 			Route::get('/student-monthly-receivable/create', [StudentMonthlyReceivableController::class, 'create'])->name('cashflow.student-monthly-receivable.create');
 			Route::post('/student-monthly-receivable', [StudentMonthlyReceivableController::class, 'store'])->name('cashflow.student-monthly-receivable.store');
+			Route::post('/student-monthly-receivable/{receivable}/send-whatsapp', [StudentMonthlyReceivableController::class, 'sendWhatsApp'])->name('cashflow.student-monthly-receivable.send-whatsapp');
+			Route::post('/student-monthly-receivable/send-whatsapp-multi', [StudentMonthlyReceivableController::class, 'sendWhatsAppMulti'])->name('cashflow.student-monthly-receivable.send-whatsapp-multi');
 			Route::get('/student-monthly-receivable/{receivable}', [StudentMonthlyReceivableController::class, 'show'])->name('cashflow.student-monthly-receivable.show');
 			Route::get('/student-monthly-receivable/{receivable}/edit/{ledger}', [StudentMonthlyReceivableController::class, 'edit'])->name('cashflow.student-monthly-receivable.edit');
 			Route::get('/student-monthly-receivable/{receivable}/print', [StudentMonthlyReceivableController::class, 'print'])->name('cashflow.student-monthly-receivable.print');
@@ -348,6 +397,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 			Route::get('/student-entry-payment', [StudentEntryPaymentController::class, 'index'])->name('cashflow.student-entry-payment');
 			Route::get('/student-entry-payment/create', [StudentEntryPaymentController::class, 'create'])->name('cashflow.student-entry-payment.create');
 			Route::post('/student-entry-payment', [StudentEntryPaymentController::class, 'store'])->name('cashflow.student-entry-payment.store');
+			Route::post('/student-entry-payment/{payment}/send-whatsapp', [StudentEntryPaymentController::class, 'sendWhatsapp'])->name('cashflow.student-entry-payment.send-whatsapp');
 			Route::get('/student-entry-payment/{payment}', [StudentEntryPaymentController::class, 'show'])->name('cashflow.student-entry-payment.show');
 			Route::get('/student-entry-payment/{payment}/edit', [StudentEntryPaymentController::class, 'edit'])->name('cashflow.student-entry-payment.edit');
 			Route::patch('/student-entry-payment/{payment}', [StudentEntryPaymentController::class, 'update'])->name('cashflow.student-entry-payment.update');
@@ -358,11 +408,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 			Route::get('/student-entry-receivable/{studentEntryReceivable}', [StudentEntryReceivableController::class, 'show'])->name('cashflow.student-entry-receivable.show');
 			Route::get('/student-entry-receivable/{studentEntryReceivable}/print', [StudentEntryReceivableController::class, 'print'])->name('cashflow.student-entry-receivable.print');
 			Route::get('/student-entry-receivable/{payment}/print-per-paymant', [StudentEntryReceivableController::class, 'printPerPayment'])->name('cashflow.student-entry-receivable.print-per-payment');
+			Route::post('/student-entry-receivable/{studentEntryReceivable}/send-whatsapp', [StudentEntryReceivableController::class, 'sendWhatsapp'])->name('cashflow.student-entry-receivable.send-whatsapp');
+			Route::post('/student-entry-receivable/send-whatsapp-multi', [StudentEntryReceivableController::class, 'sendWhatsappMulti'])->name('cashflow.student-entry-receivable.send-whatsapp-multi');
 
 			// student entry receivable payment
 			Route::get('/student-entry-receivable-payment', [StudentEntryReceivablePaymentController::class, 'index'])->name('cashflow.student-entry-receivable-payment');
 			Route::get('/student-entry-receivable-payment/create', [StudentEntryReceivablePaymentController::class, 'create'])->name('cashflow.student-entry-receivable-payment.create');
 			Route::get('/student-entry-receivable-payment/{receivablePayment}', [StudentEntryReceivablePaymentController::class, 'show'])->name('cashflow.student-entry-receivable-payment.show');
+			Route::post('/student-entry-receivable-payment/{receivablePayment}/send-whatsapp', [StudentEntryReceivablePaymentController::class, 'sendWhatsapp'])->name('cashflow.student-entry-receivable-payment.send-whatsapp');
 			Route::get('/student-entry-receivable-payment/{receivablePayment}/edit', [StudentEntryReceivablePaymentController::class, 'edit'])->name('cashflow.student-entry-receivable-payment.edit');
 			Route::post('/student-entry-receivable-payment', [StudentEntryReceivablePaymentController::class, 'store'])->name('cashflow.student-entry-receivable-payment.store');
 			Route::patch('/student-entry-receivable-payment/{receivablePayment}', [StudentEntryReceivablePaymentController::class, 'update'])->name('cashflow.student-entry-receivable-payment.update');
@@ -376,6 +429,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 			Route::patch('/staff-salary-payment/{payment}', [StaffSalaryPaymentController::class, 'update'])->name('cashflow.staff-salary-payment.update');
 			Route::get('/staff-salary-payment/{payment}/print', [StaffSalaryPaymentController::class, 'print'])->name('cashflow.staff-salary-payment.staff.print');
 			Route::get('/staff-salary-payment/{id}/{staff}', [StaffSalaryPaymentController::class, 'showStaff'])->name('cashflow.staff-salary-payment.staff');
+			Route::post('/staff-salary-payment/{id}/{staff}/send-whatsapp', [StaffSalaryPaymentController::class, 'sendWhatsapp'])->name('cashflow.staff-salary-payment.send-whatsapp');
+			Route::post('/staff-salary-payment/{payment}/send-whatsapp-multi', [StaffSalaryPaymentController::class, 'sendWhatsappMulti'])->name('cashflow.staff-salary-payment.send-whatsapp-multi');
 			Route::get('/staff-salary-payment/{id}/{staff}/edit', [StaffSalaryPaymentController::class, 'editStaff'])->name('cashflow.staff-salary-payment.staff.edit');
 			Route::patch('/staff-salary-payment/{payment}/{staff}', [StaffSalaryPaymentController::class, 'updateStaff'])->name('cashflow.staff-salary-payment.staff.update');
 

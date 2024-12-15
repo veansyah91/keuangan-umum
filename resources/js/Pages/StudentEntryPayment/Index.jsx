@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -24,8 +24,7 @@ import StudentEntryPaymentMobile from './Components/StudentEntryPaymentMobile';
 import StudentEntryPaymentDesktop from './Components/StudentEntryPaymentDesktop';
 import Datepicker from 'react-tailwindcss-datepicker';
 
-export default function Index({ organization, role, payments, searchFilter, studyYears, studyYear, startDate,
-	endDate }) {	
+export default function Index({ organization, role, payments, searchFilter, studyYears, studyYear, startDate, endDate, errors}) {	
 	const [search, setSearch] = useState(searchFilter || '');
 	const [titleDeleteModal, setTitleDeleteModal] = useState('');
 	const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
@@ -55,6 +54,12 @@ export default function Index({ organization, role, payments, searchFilter, stud
 	const [debounceDateValue] = useDebounce(dateValue, 500);
 
 	// useState
+	useEffect(() => {
+		errors && 
+		toast.error(errors.message, {
+			position: toast.POSITION.TOP_CENTER,
+		});
+	},[]);
 	useEffect(() => {
 		if (prevSearch !== undefined) {
 			handleReloadPage();
@@ -192,7 +197,14 @@ export default function Index({ organization, role, payments, searchFilter, stud
 					<div className='my-auto w-5/12'>
 						{role !== 'viewer' && (
 							<div className='space-x-2'>
-								<Link href={route('cashflow.student-entry-payment.create', organization.id)}>
+								<Link 
+									href={route('cashflow.student-entry-payment.create', organization.id)} 
+									onError={
+										errors => toast.error(errors.message, {
+											position: toast.POSITION.TOP_CENTER,
+										})
+									}
+								>
 									<PrimaryButton className='py-3'>Tambah Data</PrimaryButton>
 								</Link>
 							</div>

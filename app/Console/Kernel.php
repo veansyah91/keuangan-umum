@@ -39,7 +39,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('studentLevelUpdate:cron')
             ->timezone('Asia/Jakarta')
             ->monthlyOn(1, '00:00');
-        // ->everyMinute();
+            // ->everyMinute();
     }
 
     /**

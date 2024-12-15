@@ -11,9 +11,13 @@ export default function StudentDesktop({ contact, className, role, handleDelete 
         return  contact.levels[length-1];
     }
     
+    
     return (
         <tr className={className}>
-            <td>{contact.name}</td>
+            <td>
+                <div className='text-sm'>ID: {contact.student.no_ref}</div>
+                <div>{contact.name}</div>
+            </td>
             <td>{studentLevel().level} ({studentLevel().year})</td>
             <td>{contact.address}</td>
             <td>

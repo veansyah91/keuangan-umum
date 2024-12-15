@@ -9,13 +9,17 @@ use App\Helpers\NewRef;
 use App\Models\Account;
 use App\Models\Contact;
 use App\Models\Journal;
+use App\Models\WhatsappLog;
 use Carbon\CarbonImmutable;
+use App\Helpers\PhoneNumber;
 use App\Models\ContactStaff;
 use App\Models\Organization;
 use App\Models\StudentLevel;
 use Illuminate\Http\Request;
 use App\Models\SalaryCategory;
+use App\Models\WhatsappPlugin;
 use App\Models\ContactCategory;
+use App\Jobs\SendWhatsAppNotifJob;
 use App\Models\StaffSalaryPayment;
 use Illuminate\Support\Facades\DB;
 use App\Models\SchoolAccountSetting;
@@ -23,6 +27,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Repositories\Log\LogRepository;
 use App\Models\StaffSalaryPaymentDetail;
 use App\Repositories\User\UserRepository;
+use App\Jobs\SendSalaryNotifViaWhatsappJon;
 use App\Repositories\Account\AccountRepository;
 use App\Repositories\Contact\ContactRepository;
 use App\Repositories\Journal\JournalRepository;
@@ -434,8 +439,11 @@ class StaffSalaryPaymentController extends Controller
 
 		$user = Auth::user();
 		
+		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
+		
 		return Inertia::render('StaffSalaryPayment/ShowStaff', [
 			'organization' => $organization,
+			'whatsappPlugin' => $whatsappPlugin ? true : false,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'categories' => SalaryCategory::where('is_active', true)
 																			->where('organization_id', $organization['id'])																			
@@ -452,29 +460,94 @@ class StaffSalaryPaymentController extends Controller
 	{
 		$user = Auth::user();
 
-		$payments = [];
-		$contacts = Contact::whereHas('staff')
-												->with('staff')
+		$payments = Contact::whereHas('staff')
+												->whereHas('staffSalaryPayment', function ($query) use ($payment){
+													return $query->where('payment_id', $payment['id']);
+												})
+												->with([
+														'staff',
+														'staffSalaryPayment' => function ($query) use ($payment) {
+															return $query->where('payment_id', $payment['id'])->with('category');
+														}
+													])
 												->where('organization_id', $organization['id'])
 												->orderBy('name')
 												->get();
 
-		foreach ($contacts as $key => $contact) {
-			$tempDetail = StaffSalaryPaymentDetail::wherePaymentId($payment['id'])
-																				->whereContactId($contact['id'])
-																				->with('category')
-																				->get();
-			$payments[$key] = $contact;
-			$payments[$key]['value'] = $tempDetail->sum('value');
-			$payments[$key]['categories'] = $tempDetail;
-		}
+		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
 
 		return Inertia::render('StaffSalaryPayment/Print',[
+			'whatsappPlugin' => $whatsappPlugin ? true : false,
 			'organization' => $organization,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'payment' => $payment,
 			'payments' => $payments,
 			'user' => $user,
 		]);
+	}
+
+	public function sendWhatsapp(Request $request, Organization $organization, $id, $staff)
+	{
+		$payment = StaffSalaryPayment::find($id);
+		$contact = Contact::with('staff')->find($staff);
+		if (!$payment || !$contact) {
+			return abort(404);
+		}
+
+		$whatsAppLog = WhatsappLog::create([
+			'organization_id' => $organization['id'],
+			'contact_id' => $request['contact_id'],
+			'description' => 'PEMBAYARAN GAJI STAF',
+			'status' => 'waiting'
+		]);
+
+		$contact = Contact::with(['staff'])->find($request['contact_id']);
+
+		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
+
+		$tempDetail = '';
+
+		foreach ($request['detailPlus'] as $key => $detail) {
+			$unit = $detail['unit'] ? $detail['qty'] . " " . $detail['unit'] . " x IDR. " . number_format($detail['value'], 0, '', '.') . " = " : "";
+
+			$tempDetail .= "\n" . $key+1 . "." . $detail['name'] . ": " . $unit . number_format($detail['total'], 0, '', '.');
+		}
+
+		if (count($request['detailMinus']) > 0) {
+			$tempDetail .= "\n*Potongan*";
+
+			foreach ($request['detailMinus'] as $key => $detail) {
+				$unit = $detail['unit'] ? $detail['qty'] . " " . $detail['unit'] . " x IDR. " . number_format($detail['value'], 0, '', '.') . " = " : "";
+	
+				$tempDetail .= "\n" . $key+1 . "." . $detail['name'] . ": " . $unit . number_format($detail['total'], 0, '', '.');
+			}
+		}
+
+		$tempDetail .= "\n*Total*: IDR. " . $request['total'];
+
+		$tempDate = new Carbon($request['date']);
+
+		$message = "*PEMBAYARAN GAJI BULANAN*\n-------------------------------------------------------\nNama: " . $contact['name'] . "\nNo. Staf: " . $contact->staff->no_ref . "\nPosisi: " . $contact->staff->position . "\nTahun Masuk: " . $contact->staff->entry_year  . "\n-------------------------------------------------------\nHari/Tanggal: " . $tempDate->isoFormat('D MMMM YYYY') .
+		"\nBulan: " . $request['month'] . " (" . $request['studyYear'] . ")" .
+		"\nTotal: IDR. " . $request['total'] .
+		"\n\n*Detail*:" . $tempDetail ."\n\nTTD,\n\n" . strtoupper($organization['name']);
+
+		$data = array(
+			'appkey' => $whatsappPlugin['appKey'],
+			'authkey' => $whatsappPlugin['authkey'],
+			'to' => PhoneNumber::setFormat($contact['phone']),
+			'message' => $message,
+			'sandbox' => 'false'
+		);
+
+		SendWhatsAppNotifJob::dispatch($data, $whatsAppLog['id'])->onQueue('whatsapp');
+		
+		return redirect()->back()->with('success', 'Rincian Pembayaran Gaji Staf telah diteruskan Via Whatsapp');
+	}
+
+	public function sendWhatsappMulti(Request $request, Organization $organization, StaffSalaryPayment $payment)
+	{
+		SendSalaryNotifViaWhatsappJon::dispatch($organization, $payment)->onQueue('whatsapp');
+		return redirect()->back()->with('success', 'Notifikasi Gaji Staf telah diteruskan Via Whatsapp');
 	}
 }

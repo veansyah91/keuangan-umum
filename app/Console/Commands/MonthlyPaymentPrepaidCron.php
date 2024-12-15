@@ -60,7 +60,7 @@ class MonthlyPaymentPrepaidCron extends Command
 
 	public function handle()
 	{
-		\Log::info('Cron job Monthly Payment Prepaid dijalankan '.date('Y-m-d H:i:s'));
+		// \Log::info('Cron job pembaruan spp dibayar dimuka dijalankan '.date('Y-m-d H:i:s'));
 		$now = Carbon::now();
 			
 		// cek pembayaran yang dibayar di muka
@@ -106,7 +106,6 @@ class MonthlyPaymentPrepaidCron extends Command
 				'value' => $payment['value'],
 				'organization_id' => $payment['organization_id'],
 				'contact_id' => $payment['contact_id'],
-				'user_id' => $payment['contact_id'],
 				'created_by_id' => $payment['contact_id'],
 			];
 			

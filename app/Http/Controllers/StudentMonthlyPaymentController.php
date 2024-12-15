@@ -9,12 +9,16 @@ use App\Helpers\NewRef;
 use App\Models\Account;
 use App\Models\Contact;
 use App\Models\Journal;
+use App\Models\WhatsappLog;
 use Carbon\CarbonImmutable;
+use App\Helpers\PhoneNumber;
 use App\Models\Organization;
 use App\Models\StudentLevel;
 use Illuminate\Http\Request;
+use App\Models\WhatsappPlugin;
 use App\Models\ContactCategory;
 use Illuminate\Validation\Rule;
+use App\Jobs\SendWhatsAppNotifJob;
 use Illuminate\Support\Facades\DB;
 use App\Models\SchoolAccountSetting;
 use Illuminate\Support\Facades\Auth;
@@ -23,6 +27,7 @@ use App\Models\StudentPaymentCategory;
 use App\Repositories\Log\LogRepository;
 use App\Models\StudentMonthlyReceivable;
 use App\Repositories\User\UserRepository;
+use App\Models\StudentMonthlyPaymentDetail;
 use App\Models\StudentMonthlyReceivableLedger;
 use App\Repositories\Account\AccountRepository;
 use App\Repositories\Contact\ContactRepository;
@@ -50,6 +55,11 @@ class StudentMonthlyPaymentController extends Controller
 		$this->contactRepository = $contactRepository;
 		$this->accountRepository = $accountRepository;
 		$this->now = CarbonImmutable::now();
+	}
+
+	public function sendMessage()
+	{
+
 	}
 
 	protected function newRef($organization, $dateRequest = '')
@@ -139,8 +149,11 @@ class StudentMonthlyPaymentController extends Controller
 			}
 		}
 
+		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
+
 		return Inertia::render('StudentMonthlyPayment/Create',[
 			'organization' => $organization,
+			'whatsappPlugin' => $whatsappPlugin ? true : false,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'categories' => StudentPaymentCategory::whereOrganizationId($organization['id'])
 																							->whereIsActive(true)
@@ -152,6 +165,7 @@ class StudentMonthlyPaymentController extends Controller
 			'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),
 			'historyPayment' => Inertia::lazy(fn () => $historyPayment),
 			'historyCategories' => Inertia::lazy(fn () => $historyCategories),
+
 		]);
 	}
 
@@ -213,7 +227,11 @@ class StudentMonthlyPaymentController extends Controller
 			'description' => [
 				'string',
 				'nullable'
-			]
+			],
+			'send_wa' => [
+				'boolean',
+				'required'
+			],
 		]);
 
 		$user = Auth::user();
@@ -337,6 +355,40 @@ class StudentMonthlyPaymentController extends Controller
 				// throw new \Exception('Something went wrong');
 			});			
 		}      
+
+		// jika kirim notifikasi via wa = true maka kirimkan notifikasi
+		if ($validated['send_wa']) {
+			$whatsAppLog = WhatsappLog::create([
+				'organization_id' => $organization['id'],
+				'contact_id' => $validated['contact_id'],
+				'description' => 'PEMBAYARAN IURAN BULANAN SISWA',
+				'status' => 'waiting'
+			]);
+
+			$contact = Contact::with(['student', 'lastLevel'])->find($validated['contact_id']);
+			$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
+
+			$tempDetail = '';
+			foreach ($validated['details'] as $key => $detail) {
+				if ($detail['value'] > 0) {
+					$tempDetail .= "\n" . ($key + 1) . ". " . $detail['name'] . ": IDR. " . number_format($detail['value'], 0, '', '.');
+				}
+			}
+
+			$tempDate = new Carbon($validated['date']);
+
+			$message = "*PEMBAYARAN IURAN BULANAN*\n-------------------------------------------------------\nNama : " . $contact['name'] . "\nNo. Siswa : " . $contact->student->no_ref . "\nTahun Masuk : " . $contact->student->entry_year . "\nKelas Sekarang : " . $contact->lastLevel->level . "\n-------------------------------------------------------\nNo. Ref : " . $validated['no_ref'] . "\nHari/Tanggal : " . $tempDate->isoFormat('D MMMM YYYY') . "\nBulan : " . $validated['month'] . "\nJumlah Bayar: IDR. " . number_format($validated['value'], 0, '', '.') . "\n\nDetail:" . $tempDetail . "\n\nTTD,\n\n" . strtoupper($organization['name']);
+
+			$data = array(
+				'appkey' => $whatsappPlugin['appKey'],
+				'authkey' => $whatsappPlugin['authkey'],
+				'to' => PhoneNumber::setFormat($contact['phone']),
+				'message' => $message,
+				'sandbox' => 'false'
+			);
+
+			SendWhatsAppNotifJob::dispatch($data, $whatsAppLog['id'])->onQueue('whatsapp');
+		}
 
 		$log = [
 			'description' => $validated['description'],
@@ -597,7 +649,6 @@ class StudentMonthlyPaymentController extends Controller
 		$this->logRepository->store($organization['id'], strtoupper($user['name']).' telah mengubah DATA pada PEMBAYARAN IURAN BULANAN dengan DATA : '.json_encode($log));
 
 		return redirect()->back()->with('success', 'Pembayaran Iuran Bulanan Berhasil Diubah');
-
 	}
 
 	public function show(Organization $organization, StudentMonthlyPayment $payment)
@@ -606,13 +657,52 @@ class StudentMonthlyPaymentController extends Controller
 
 		$paymentWithDetail = StudentMonthlyPayment::with('details')->find($payment['id']);
 
+		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
+
 		return Inertia::render('StudentMonthlyPayment/Show',[
 			'organization' => $organization,
+			'whatsappPlugin' => $whatsappPlugin ? true : false,
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'user' => $user,
 			'payment' => $paymentWithDetail,
 			'contact' => Contact::with(['student', 'lastLevel'])->find($payment['contact_id']),
 		]);
+	}
+
+	public function sendWhatsApp(Organization $organization, StudentMonthlyPayment $payment)
+	{
+		$paymentWithDetail = StudentMonthlyPayment::with('details')->find($payment['id']);
+		$whatsAppLog = WhatsappLog::create([
+			'organization_id' => $organization['id'],
+			'contact_id' => $paymentWithDetail['contact_id'],
+			'description' => 'PEMBAYARAN IURAN BULANAN SISWA',
+			'status' => 'waiting'
+		]);
+
+		$contact = Contact::with(['student', 'lastLevel'])->find($paymentWithDetail['contact_id']);
+		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
+
+		$tempDetail = '';
+		foreach ($paymentWithDetail->details as $key => $detail) {
+			if ($detail->pivot->value > 0) {
+				$tempDetail .= "\n" . ($key + 1) . ". " . $detail['name'] . ": IDR. " . number_format($detail->pivot->value, 0, '', '.');
+			}
+		}
+
+		$tempDate = new Carbon($paymentWithDetail['date']);
+
+		$message = "*PEMBAYARAN IURAN BULANAN*\n-------------------------------------------------------\nNama : " . $contact['name'] . "\nNo. Siswa : " . $contact->student->no_ref . "\nTahun Masuk : " . $contact->student->entry_year . "\nKelas Sekarang : " . $contact->lastLevel->level . "\n-------------------------------------------------------\nNo. Ref : " . $paymentWithDetail['no_ref'] . "\nHari/Tanggal : " . $tempDate->isoFormat('D MMMM YYYY') . "\nBulan : " . $paymentWithDetail['month'] . "\nJumlah Bayar: IDR. " . number_format($paymentWithDetail['value'], 0, '', '.') . "\n\nDetail:" . $tempDetail . "\n\nTTD,\n\n" . strtoupper($organization['name']);
+
+		$data = array(
+			'appkey' => $whatsappPlugin['appKey'],
+			'authkey' => $whatsappPlugin['authkey'],
+			'to' => PhoneNumber::setFormat($contact['phone']),
+			'message' => $message,
+			'sandbox' => 'false'
+		);
+
+		SendWhatsAppNotifJob::dispatch($data, $whatsAppLog['id'])->onQueue('whatsapp');
+		return redirect()->back()->with('success', 'Rincian Pembayaran Iuran Bulanan telah diteruskan Via Whatsapp');
 	}
 
 	public function destroy(Organization $organization, StudentMonthlyPayment $payment)

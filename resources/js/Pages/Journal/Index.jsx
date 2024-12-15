@@ -82,8 +82,6 @@ export default function Index({
         data,
         setData,
         delete: destroy,
-        errors,
-        setError,
         processing,
         reset,
     } = useForm({

@@ -105,6 +105,11 @@ export default function Authenticated({
                                                     active={route().current('admin.organization*')}>
                                                     ORGANISASI
                                                 </NavLink>
+                                                <NavLink
+                                                    href={route('admin.add-ons')}
+                                                    active={route().current('admin.add-ons*')}>
+                                                    ADD-ONS
+                                                </NavLink>
                                             </div>
                                         ) : (
                                             <div className='hidden space-x-8 md:-my-px md:ms-10 md:flex'>
@@ -169,6 +174,14 @@ export default function Authenticated({
                                                                 }
                                                                 href={route('logs', organization?.id)}>
                                                                 Log Aktifitas
+                                                            </Dropdown.Link>
+                                                            <Dropdown.Link
+                                                                className={
+                                                                    route().current('add-ons*') &&
+                                                                    `border-l-2 border-[#4f8315]`
+                                                                }
+                                                                href={route('add-ons', organization?.id)}>
+                                                                Add-ons
                                                             </Dropdown.Link>
                                                         </>
                                                     )}
@@ -254,6 +267,10 @@ export default function Authenticated({
                                     className={`${route().current('admin.organization*') ? 'border-l-2 border-[#4f8315] font-bold' : ''}`}>
                                     <Link href={route('admin.organization.menu')}>Organisasi</Link>
                                 </li>
+                                <li
+                                    className={`${route().current('admin.add-ons*') ? 'border-l-2 border-[#4f8315] font-bold' : ''}`}>
+                                    <Link href={route('admin.add-ons')}>Addons</Link>
+                                </li>
                                 <hr />
                                 <li
                                     className={`${route().current('organizations*') ? 'border-l-2 border-[#4f8315] font-bold' : ''}`}>
@@ -298,8 +315,8 @@ export default function Authenticated({
                                             <Link href={route('logs', organization?.id)}>Log Aktifitas</Link>
                                         </li>
                                         <li
-                                            className={`${route().current('logs*') ? 'border-l-2 border-[#4f8315] font-bold' : ''}`}>
-                                            <Link href={route('logs', organization?.id)}>Log Aktifitas</Link>
+                                            className={`${route().current('add-ons*') ? 'border-l-2 border-[#4f8315] font-bold' : ''}`}>
+                                            <Link href={route('add-ons', organization?.id)}>Add-ons</Link>
                                         </li>
                                     </>
                                 )}

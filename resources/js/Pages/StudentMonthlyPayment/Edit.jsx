@@ -290,7 +290,7 @@ export default function Edit({ organization, newRef, contacts, date, categories,
 
   return (
     <>
-      <Head title='Piutang Iuran Bulanan Siswa' />
+      <Head title='Ubah Pembayaran Iuran Bulanan Siswa' />
       <ToastContainer />
 
       <FormInput onSubmit={handleSubmit}>

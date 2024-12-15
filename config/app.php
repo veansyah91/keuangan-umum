@@ -96,7 +96,7 @@ return [
     |
     */
 
-    'fallback_locale' => 'en',
+    'fallback_locale' => 'id',
 
     /*
     |--------------------------------------------------------------------------
@@ -109,7 +109,7 @@ return [
     |
     */
 
-    'faker_locale' => 'en_US',
+    'faker_locale' => 'id_ID',
 
     /*
     |--------------------------------------------------------------------------
@@ -175,6 +175,7 @@ return [
          * Helper Service Providers...
          */
         App\Providers\NewRefServiceProvider::class,
+        App\Providers\PhoneNumberServiceProvider::class,
     ])->toArray(),
 
     /*

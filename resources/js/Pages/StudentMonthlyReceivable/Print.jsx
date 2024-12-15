@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link, } from '@inertiajs/react';
+import { Head, Link, useForm, } from '@inertiajs/react';
 import { IoArrowBackOutline } from 'react-icons/io5';
 import dayjs from 'dayjs';
 import { FaPrint, FaWhatsapp } from 'react-icons/fa';
@@ -9,7 +9,8 @@ import SecondaryButton from '@/Components/SecondaryButton';
 import formatNumber from '@/Utils/formatNumber';
 import { toast, ToastContainer } from 'react-toastify';
 
-export default function Print({ organization, receivable, receivables, role, contact, user }) {	
+export default function Print({ organization, receivable, receivables, role, contact, user, whatsappPlugin }) {	
+	const { post, processing } = useForm({});
 	const [waLink] = useState('https://web.whatsapp.com/send');
 
 	const handlePrint = () => {
@@ -17,6 +18,18 @@ export default function Print({ organization, receivable, receivables, role, con
 	};	
 
 	const handleSendWA = () => {
+		if (whatsappPlugin) {
+			post(route('cashflow.student-monthly-receivable.send-whatsapp', {organization: organization.id, receivable: receivable.id}), {
+				onSuccess: ({ props }) => {
+					const { flash } = props;
+	
+					toast.success(flash.success, {
+						position: toast.POSITION.TOP_CENTER,
+					});	
+				},
+			})
+			return;
+		}
 		// cek format contact phone
 		let phone = contact.phone;		
 
@@ -31,7 +44,7 @@ export default function Print({ organization, receivable, receivables, role, con
 			phone = "62" + phone.slice(1);
 		}
 
-		let detail = '';
+		let detail = 'Detail: %0A';
 
 		receivables.forEach(r => {
 			detail += `%0ANo Ref: ${r.no_ref}%0ABulan: ${r.month}%0ATahun Ajaran: ${r.study_year}%0AJumlah: IDR ${formatNumber(r.debit)}%0A`;
@@ -61,14 +74,18 @@ export default function Print({ organization, receivable, receivables, role, con
 						<div className='px-3 my-auto flex gap-3'>
 						</div>
 						<div className='text-end px-3 hidden sm:block space-x-5'>
-							<SecondaryButton onClick={handleSendWA}>
-								<div className='flex gap-2'>
-									<div className='my-auto'>
-										<FaWhatsapp/>
+							{
+								contact.phone && 
+								<SecondaryButton onClick={handleSendWA} disabled={processing}>
+									<div className='flex gap-2'>
+										<div className='my-auto'>
+											<FaWhatsapp/>
+										</div>
+										<div className='my-auto'>Kirim WA</div>
 									</div>
-									<div className='my-auto'>Kirim WA</div>
-								</div>
-							</SecondaryButton>
+								</SecondaryButton>
+							}
+							
 							<SecondaryButton onClick={handlePrint}>
 								<div className='flex gap-2'>
 									<div className='my-auto'>
@@ -199,8 +216,11 @@ Print.layout = (page) => (
 					<li className='font-bold'>
 						<Link href={route('cashflow', page.props.organization.id)}>Arus Kas</Link>
 					</li>
-                    <li className='font-bold'>
+					<li className='font-bold'>
 						<Link href={route('cashflow.student-monthly-receivable', page.props.organization.id)}>Piutang Iuran Bulanan Siswa</Link>
+					</li>
+					<li className='font-bold'>
+						<Link href={route('cashflow.student-monthly-receivable.show', {organization: page.props.organization.id, receivable: page.props.receivable.id})}>Detail Piutang Iuran Bulanan Siswa</Link>
 					</li>
 					<li>Print Piutang Iuran Bulanan Siswa</li>
 				</ul>

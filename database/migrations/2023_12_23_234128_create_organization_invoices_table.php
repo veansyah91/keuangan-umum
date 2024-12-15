@@ -17,7 +17,7 @@ return new class extends Migration
             $table->enum('product', ['Bulanan', 'Tahunan']);
             $table->string('description')->nullable();
             $table->enum('status', ['paid', 'pending', 'canceled']);
-            $table->integer('price');
+            $table->bigInteger('price');
             $table->foreignUuid('organization_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });

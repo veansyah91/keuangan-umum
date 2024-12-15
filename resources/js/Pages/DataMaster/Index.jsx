@@ -6,7 +6,7 @@ import ContainerDesktop from '@/Components/Desktop/ContainerDesktop';
 import CardMenu from '@/Components/CardMenu';
 import { IoIdCardOutline, IoPeopleOutline } from 'react-icons/io5';
 import { MdChecklist } from 'react-icons/md';
-import { LiaClipboardListSolid, LiaMoneyBillWaveSolid } from 'react-icons/lia';
+import { LiaClipboardListSolid } from 'react-icons/lia';
 import { CgListTree } from 'react-icons/cg';
 import { TbBuildingCommunity } from 'react-icons/tb';
 import { BsBuildings } from 'react-icons/bs';

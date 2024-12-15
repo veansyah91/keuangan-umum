@@ -40,10 +40,9 @@ export default function Index({
     projects,
     programs,
     departments,
+    flash
 }) {
     // state
-    const { flash } = usePage().props;
-
     const [showModalFilter, setShowModalFilter] = useState(false);
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 

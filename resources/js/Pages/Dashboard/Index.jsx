@@ -17,7 +17,7 @@ import CashflowChart from './Components/CashflowChart';
 
 const Index = ({ balance, startDate, endDate }) => {
     const { date, setDate } = useContext(AppContext);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);    
 
     useEffect(() => {
         setIsLoading(true);
@@ -209,7 +209,7 @@ const Index = ({ balance, startDate, endDate }) => {
 
                 <CostRevenueChart
                     logo={<FaHandHoldingUsd />}
-                    dataChart={balance? balance.revenueDay : {}}
+                    dataChart={balance?.revenueDay}
                     title={'Pendapatan'}
                     type={'revenue'}
                     data={balance?.revenues}
@@ -217,16 +217,17 @@ const Index = ({ balance, startDate, endDate }) => {
 
                 <CostRevenueChart
                     logo={<FaHandHoldingUsd />}
-                    dataChart={balance? balance.costDay : {}}
+                    dataChart={balance?.costDay}
                     title={'Pengeluaran'}
                     type={'cost'}
                     data={balance?.costs}
                 />
 
                 {/* Arus Kas */}
-                <CashflowChart 
-                    data={balance ? balance.cashflowDay : {}} 
-                />
+                {
+                    balance?.cashflowDay && <CashflowChart data={balance?.cashflowDay} />
+                }
+                
             </Container>
         </>
     );

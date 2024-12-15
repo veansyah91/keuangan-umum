@@ -11,14 +11,14 @@ export default function GeneralSelectInput({
     maxHeight = 'max-h-60',
     placeholder,
 }) {
-    let selectedData = selected;    
+    let selectedData = selected;
     return (
         <Combobox value={selected} onChange={setSelected}>
             <div className='relative mt-1'>
                 <div className='relative w-full cursor-default overflow-hidden rounded-lg bg-white text-left border-gray-300 border focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-300 sm:text-sm '>
                     <Combobox.Input
                         className='w-full border-none py-3 pl-3 pr-10 leading-5 text-gray-800 focus:ring-0'
-                        displayValue={(selected) => selected?.name}
+                        displayValue={(selected) => selected.name}
                         onChange={(event) => setQuery(event.target.value.toUpperCase())}
                         placeholder={placeholder}
                         type='search'
@@ -57,7 +57,7 @@ export default function GeneralSelectInput({
                                                 }`}>
                                                 {d.name.toUpperCase()}
                                             </span>
-                                            {selectedData?.id == d.id ? (
+                                            {selectedData.id == d.id ? (
                                                 <span
                                                     className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
                                                         active ? 'text-white' : 'text-teal-600'

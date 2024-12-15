@@ -9,12 +9,16 @@ use App\Helpers\NewRef;
 use App\Models\Account;
 use App\Models\Contact;
 use App\Models\Journal;
+use App\Models\WhatsappLog;
 use Carbon\CarbonImmutable;
+use App\Helpers\PhoneNumber;
 use App\Models\Organization;
 use App\Models\StudentLevel;
 use Illuminate\Http\Request;
+use App\Models\WhatsappPlugin;
 use App\Models\ContactCategory;
 use Illuminate\Validation\Rule;
+use App\Jobs\SendWhatsAppNotifJob;
 use Illuminate\Support\Facades\DB;
 use App\Models\SchoolAccountSetting;
 use Illuminate\Support\Facades\Auth;
@@ -23,6 +27,7 @@ use App\Models\StudentPaymentCategory;
 use App\Repositories\Log\LogRepository;
 use App\Models\StudentMonthlyReceivable;
 use App\Repositories\User\UserRepository;
+use App\Jobs\SendMonthlyReceivableBillingJob;
 use App\Models\StudentMonthlyReceivableLedger;
 use App\Repositories\Account\AccountRepository;
 use App\Repositories\Contact\ContactRepository;
@@ -70,8 +75,11 @@ class StudentMonthlyReceivableController extends Controller
   {
     $user = Auth::user();
 
+		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
+
     return Inertia::render('StudentMonthlyReceivable/Index',[
       'organization' => $organization,
+      'whatsappPlugin' => $whatsappPlugin ? true : false,
       'receivables' => StudentMonthlyReceivable::filter(request(['search']))
                                   ->with('contact', function ($query) {
                                       $query->with('student', 'lastLevel');
@@ -287,6 +295,7 @@ class StudentMonthlyReceivableController extends Controller
   public function show(Organization $organization, StudentMonthlyReceivable $receivable)
   {
     $user = Auth::user();
+
 		
 		return Inertia::render('StudentMonthlyReceivable/Show',[
 			'organization' => $organization,
@@ -337,68 +346,67 @@ class StudentMonthlyReceivableController extends Controller
 
 	public function update(Request $request, Organization $organization, StudentMonthlyReceivable $receivable, StudentMonthlyReceivableLedger $ledger)
 	{
-
 		$validated = $request->validate([
-				'contact_id' => [
-						'required',
-						'exists:contacts,id',
-				],
-				'date' => [
-						'required',
-						'date',
-				],
-				'level' => [
-						'required',
-						'numeric',
-				],
-				'student_id' => [
-						'string',
-						'nullable',
-				],
-				'no_ref' => [
-						'required',
-						'string',
-						Rule::unique('student_monthly_payments')->where(function ($query) use ($organization) {
-								return $query->where('organization_id', $organization['id']);
-						})->ignore($ledger['payment_id']),
-				],
-				'value' => [
-						'required',
-						'numeric',
-				],
-				'month' => [
-						'required',
-						'numeric',
-				],
-				'study_year' => [
-						'string',
-						'required',
-				],
-				'details' => [
-						'required',
-				],
-				'details.*.id' => [
-						'required',
-						'exists:student_payment_categories,id'
-				],
-				'details.*.name' => [
-						'required',
-						'string'
-				],
-				'details.*.value' => [
-						'required',
-						'numeric',
-						'min:0',
-				],
-				'description' => [
-						'string',
-						'nullable'
-				],
-				'credit_account' => [
-						'required',
-						'exists:accounts,id'
-				],
-			]);
+			'contact_id' => [
+					'required',
+					'exists:contacts,id',
+			],
+			'date' => [
+					'required',
+					'date',
+			],
+			'level' => [
+					'required',
+					'numeric',
+			],
+			'student_id' => [
+					'string',
+					'nullable',
+			],
+			'no_ref' => [
+					'required',
+					'string',
+					Rule::unique('student_monthly_payments')->where(function ($query) use ($organization) {
+							return $query->where('organization_id', $organization['id']);
+					})->ignore($ledger['payment_id']),
+			],
+			'value' => [
+					'required',
+					'numeric',
+			],
+			'month' => [
+					'required',
+					'numeric',
+			],
+			'study_year' => [
+					'string',
+					'required',
+			],
+			'details' => [
+					'required',
+			],
+			'details.*.id' => [
+					'required',
+					'exists:student_payment_categories,id'
+			],
+			'details.*.name' => [
+					'required',
+					'string'
+			],
+			'details.*.value' => [
+					'required',
+					'numeric',
+					'min:0',
+			],
+			'description' => [
+					'string',
+					'nullable'
+			],
+			'credit_account' => [
+					'required',
+					'exists:accounts,id'
+			],
+		]);
 
 		$user = Auth::user();
 		$validated['type'] = 'receivable';
@@ -536,9 +544,11 @@ class StudentMonthlyReceivableController extends Controller
 	public function print(Organization $organization, StudentMonthlyReceivable $receivable)
 	{
 		$user = Auth::user();
+		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
 
 		return Inertia::render('StudentMonthlyReceivable/Print', [
 			'organization' => $organization,
+			'whatsappPlugin' => $whatsappPlugin ? true : false,
 			'receivable' => $receivable,
 			'receivables' => StudentMonthlyReceivableLedger::where('receivable_id', $receivable['id'])
 												->whereNull('paid_date')
@@ -548,7 +558,56 @@ class StudentMonthlyReceivableController extends Controller
 												->get(),
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'contact' => Contact::with(['student', 'lastLevel'])->find($receivable['contact_id']),
-            'user' => $user
+			'user' => $user
 		]);
+	}
+
+	public function sendWhatsApp(Organization $organization, StudentMonthlyReceivable $receivable)
+	{
+		
+		$receivables = StudentMonthlyReceivableLedger::where('receivable_id', $receivable['id'])
+																										->whereNull('paid_date')
+																										->with('receivable')
+																										->orderBy('study_year', 'desc')
+																										->orderBy('month', 'desc')
+																										->get();
+
+		$whatsAppLog = WhatsappLog::create([
+			'organization_id' => $organization['id'],
+			'contact_id' => $receivable['contact_id'],
+			'description' => 'PENAGIHAN PIUTANG IURAN BULANAN SISWA',
+			'status' => 'waiting'
+		]);
+
+		$contact = Contact::with(['student', 'lastLevel'])->find($receivable['contact_id']);
+		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
+		$tempDetail = "\nDetail:";
+
+		foreach ($receivables as $key => $detail) {
+			$tempDetail .= "\nNo Ref: " . $detail['no_ref'] . "\nBulan: " . $detail['month'] . "\nTahun Ajaran: " . $detail['study_year'] . "\nJumlah: IDR. " . number_format($detail['debit'], 0, '', '.') . "\n";
+		}
+
+		$message = "*TAGIHAN IURAN BULANAN*\n-------------------------------------------------------\nNama: " . $contact['name'] .
+		"\nNo. Siswa: " . $contact->student->no_ref .
+		"\nTahun Masuk: " . $contact->student->entry_year .
+		"\nKelas Sekarang: " . $contact->lastLevel->level . "\n" . $tempDetail .
+		"\n\nTTD,\n\n" . strtoupper($organization['name']);
+
+		$data = array(
+			'appkey' => $whatsappPlugin['appKey'],
+			'authkey' => $whatsappPlugin['authkey'],
+			'to' => PhoneNumber::setFormat($contact['phone']),
+			'message' => $message,
+			'sandbox' => 'false'
+		);
+
+		SendWhatsAppNotifJob::dispatch($data, $whatsAppLog['id'])->onQueue('whatsapp');
+		return redirect()->back()->with('success', 'Rincian Penagihan Tunggakan Iuran Bulanan telah diteruskan Via Whatsapp');
+	}
+
+	public function sendWhatsAppMulti(Organization $organization)
+	{
+		SendMonthlyReceivableBillingJob::dispatch($organization)->onQueue('whatsapp');
+		return redirect()->back()->with('success', 'Penagihan Tunggakan Iuran Bulanan telah diteruskan Via Whatsapp');
 	}
 }

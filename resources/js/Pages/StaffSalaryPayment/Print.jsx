@@ -1,7 +1,7 @@
 import React from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -10,6 +10,7 @@ import formatNumber from '@/Utils/formatNumber';
 import SecondaryButton from '@/Components/SecondaryButton';
 import { FaPrint, FaWhatsapp } from 'react-icons/fa';
 import dayjs from 'dayjs';
+import { toast, ToastContainer } from 'react-toastify';
 
 const Category = ({category, index}) => {
 	return(
@@ -29,8 +30,22 @@ const Category = ({category, index}) => {
 }
 
 export default function Print({
-	organization, payment, user, payments
+	organization, payment, user, payments, whatsappPlugin
 }) {	
+	const { post, processing } = useForm();
+
+	const handleSendWA = () => {
+		post(route('cashflow.staff-salary-payment.send-whatsapp-multi', {organization:organization, payment:payment.id}), {
+			onSuccess: ({ props }) => {
+								const { flash } = props;
+				
+								toast.success(flash.success, {
+									position: toast.POSITION.TOP_CENTER,
+								});	
+							},
+		})
+	}
+	
 	const handlePrint = () => {
 		window.print();
 	};
@@ -41,6 +56,8 @@ export default function Print({
 				title={`Cetak Pembayaran Gaji Bulan: ${payment.month}, Tahun: ${payment.study_year})`}
 			/>
 
+			<ToastContainer />			
+
 			<div className='sm:pt-0 pb-16 pt-12'>
 				<div className='bg-white py-2 sm:pt-0 px-5'>
           {/* Nav Title */}
@@ -48,6 +65,14 @@ export default function Print({
 						<div className='px-3 my-auto flex gap-3'>
 						</div>
 						<div className='text-end px-3 hidden sm:block space-x-5'>
+							<SecondaryButton onClick={handleSendWA} disabled={processing || !whatsappPlugin}>
+								<div className='flex gap-2'>
+									<div className='my-auto'>
+										<FaWhatsapp/>
+									</div>
+									<div className='my-auto'>Kirim WA</div>
+								</div>
+							</SecondaryButton>
 							<SecondaryButton onClick={handlePrint}>
 								<div className='flex gap-2'>
 									<div className='my-auto'>
@@ -110,10 +135,12 @@ export default function Print({
 											<div className='flex font-bold w-full'>
 												<div className='w-1/12'>{ index+1 }</div>
 												<div className='w-4/12'>{ payment.name } ({ payment.staff.position })</div>
-												<div className='w-7/12 text-end'>IDR. { formatNumber(payment.value) }</div>
+												<div className='w-7/12 text-end'>
+													IDR. { formatNumber(payment.staff_salary_payment.reduce((acc, item) => acc + item.value, 0)) }
+												</div>
 											</div>
 											{
-												payment.categories.map((category, index) =>
+												payment.staff_salary_payment.map((category, index) =>
 													<Category 
 														category={category}
 														key={category.id}

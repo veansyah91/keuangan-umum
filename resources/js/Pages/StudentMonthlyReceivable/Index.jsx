@@ -22,13 +22,13 @@ import DangerButton from '@/Components/DangerButton';
 import { usePrevious } from 'react-use';
 import StudentMonthlyReceivableMobile from './Components/StudentMonthlyReceivableMobile';
 import StudentMonthlyReceivableDesktop from './Components/StudentMonthlyReceivableDesktop';
+import { FaWhatsapp } from 'react-icons/fa';
 
-export default function Index({ role, organization, receivables, searchFilter }) {
-    
+export default function Index({ role, organization, receivables, searchFilter, whatsappPlugin }) {
 	// State
 	const { errors } = usePage().props;
 
-	const [showSearch, setShowSearch] = useState(false);
+	const [showSendWaModal, setShowSendWaModal] = useState(false);
 	const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
 	const [search, setSearch] = useState(searchFilter || '');
@@ -39,6 +39,7 @@ export default function Index({ role, organization, receivables, searchFilter })
 		delete: destroy,
 		processing,
 		reset,
+		post
 	} = useForm({
 		id: 0,
 	});
@@ -55,7 +56,7 @@ export default function Index({ role, organization, receivables, searchFilter })
 
 	useEffect(() => {
 		errors && errors.message &&
-		toast.error(<>{errors.message} <Link href={route('data-ledger.account-school', {organization: organization.id})} className='text-blue-600 font-bold'>Tambahkan</Link></>, {
+		toast.error(<>{errors.message} <Link href={route('data-master.contact-category', {organization: organization.id})} className='text-blue-600 font-bold'>Tambahkan</Link></>, {
 			position: toast.POSITION.TOP_CENTER,
 		});
 	},[]);
@@ -74,6 +75,22 @@ export default function Index({ role, organization, receivables, searchFilter })
 		setShowDeleteConfirmation(true);
 		setData('id', receivable.id);
 	};
+
+	const handleSubmitSendWa = (e) => {
+		e.preventDefault();
+
+		post(route('cashflow.student-entry-receivable.send-whatsapp-multi', {organization: organization.id}), {
+			onSuccess: ({ props }) => {
+				setShowSendWaModal(false);
+
+				const { flash } = props;
+	
+				toast.success(flash.success, {
+					position: toast.POSITION.TOP_CENTER,
+				});	
+			}
+		})
+	}
 
 	const handleSubmitDelete = (e) => {
 		e.preventDefault();
@@ -178,6 +195,14 @@ export default function Index({ role, organization, receivables, searchFilter })
 							</div>
 						)}
 					</div>
+					<div className='my-auto w-4/12 flex justify-end gap-5'>
+						{
+							whatsappPlugin && <button className='py-3 px-3 border rounded-lg' onClick={_ => setShowSendWaModal(true)}>
+								<FaWhatsapp />
+							</button>
+						}
+						
+					</div>
 					<div className='w-3/12 border flex rounded-lg'>
 						<label htmlFor='search-input' className='my-auto ml-2'>
 							<IoSearchSharp />
@@ -280,6 +305,34 @@ export default function Index({ role, organization, receivables, searchFilter })
 						<DangerButton className='ms-3' disabled={processing}>
 							Hapus
 						</DangerButton>
+					</div>
+				</form>
+			</Modal>
+
+			<Modal show={showSendWaModal} onClose={() => setShowSendWaModal(false)}>
+				<form onSubmit={handleSubmitSendWa} className='p-6'>
+					<h2 className='font-bold text-lg text-center'>Mengirim Tagihan Iuran Bulanan via Whatsapp Broadcasting</h2>
+					<div className='mt-5'>
+						<table>
+							<tbody>
+								<tr>
+									<td className='w-[25px]'>•</td>
+									<td>Hindari terlalu sering melakukan pengiriman Penagihan Iuran Bulanan via Whatsapp, dikhawatirkan akan terbaca spam oleh pihak Whatsapp, cukup lakukan 1 - 2 x perbulan</td>
+								</tr>
+								<tr>
+									<td className='w-[25px]'>•</td>
+									<td>Silakan melakukan pengecekan status pengiriman pada <Link href={route('add-ons.whatsapp-log', {organization: organization.id})} className='text-blue-600 font-bold'>Log Aktifitas Whatsapp</Link> </td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+
+					<div className='mt-6 flex justify-end'>
+						<SecondaryButton onClick={() => setShowSendWaModal(false)}>Batal</SecondaryButton>
+
+						<PrimaryButton className='ms-3' disabled={processing}>
+							Kirim 
+						</PrimaryButton>
 					</div>
 				</form>
 			</Modal>

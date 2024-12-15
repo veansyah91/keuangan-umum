@@ -28,7 +28,7 @@ class AdminOrganizationInvoiceController extends Controller
             ->get()
             ->take(10);
 
-        return Inertia::render('Admin/Organization-Invoice/Index', [
+        return Inertia::render('Admin/OrganizationInvoice/Index', [
             'organizationInvoices' => $organizationInvoices,
             'organizations' => $organizations,
             'searchOrganization' => request('searchOrganization'),
@@ -51,7 +51,7 @@ class AdminOrganizationInvoiceController extends Controller
 
         $user = Auth::user();
 
-        // // Update Organization Invoice
+        // Update Organization Invoice
         $organizationInvoice->update([
             'status' => 'paid',
             'accepted_by_user_id' => $user['id'],
