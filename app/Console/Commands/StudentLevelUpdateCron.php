@@ -40,7 +40,7 @@ class StudentLevelUpdateCron extends Command
     {
 		$now = Carbon::now();
         
-        // if ($now->month === 7) {
+        if ($now->month === 7) {
             $contacts = Contact::whereHas('organization', function ($query){
                                     return $query->where('status','<>','deactive');
                                 })
@@ -61,6 +61,6 @@ class StudentLevelUpdateCron extends Command
                     ]);
                 }                
             }
-        // }
+        }
     }
 }

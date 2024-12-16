@@ -69,7 +69,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         //dispactches the job to the queue passing it this User object
         
-        QueuedPasswordResetJob::dispatch($this, $token);
+        QueuedPasswordResetJob::dispatch($this, $token)->onConnection('redis');
     }
 
     protected $casts = [
