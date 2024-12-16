@@ -52,7 +52,7 @@ class User extends Authenticatable implements MustVerifyEmail
     // public function sendEmailVerificationNotification()
     // {
     //     //dispactches the job to the queue passing it this User object
-    //      QueuedVerifyEmailJob::dispatch($this);
+    //     QueuedVerifyEmailJob::dispatch($this)->onConnection('redis');
     // }
 
     public function sendEmailVerificationNotification()
@@ -67,8 +67,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function sendPasswordResetNotification($token)
     {
-        //dispactches the job to the queue passing it this User object
-        
+        //dispactches the job to the queue passing it this User object        
         QueuedPasswordResetJob::dispatch($this, $token)->onConnection('redis');
     }
 
