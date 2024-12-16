@@ -6,6 +6,7 @@ use App\Models\Affiliation;
 use Laravel\Sanctum\HasApiTokens;
 use App\Jobs\QueuedVerifyEmailJob;
 use App\Jobs\QueuedPasswordResetJob;
+use Illuminate\Support\Facades\Redis;
 use App\Notifications\VerifyEmailQueued;
 use Illuminate\Notifications\Notifiable;
 use App\Notifications\ResetPasswordQueued;
@@ -67,6 +68,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendPasswordResetNotification($token)
     {
         //dispactches the job to the queue passing it this User object
+        
         QueuedPasswordResetJob::dispatch($this, $token);
     }
 
