@@ -24,7 +24,7 @@ export default function ForgotPassword({ status }) {
                 mengatur kembali password anda.
             </div>
 
-            {status && <div className='mb-4 font-medium text-sm text-green-600'>{status}</div>}
+            {status && <div className='mb-4 font-medium text-sm text-green-600'>Email permintaan perubahan password telah dikirim ke email anda, silakan cek pada email anda</div>}
 
             <form onSubmit={submit}>
                 <TextInput
