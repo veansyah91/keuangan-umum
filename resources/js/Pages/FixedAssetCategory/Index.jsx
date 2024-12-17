@@ -128,7 +128,13 @@ export default function Index({ role, organization, fixedAssetCategories, status
                         position: toast.POSITION.TOP_CENTER,
                     });
                 },
-            }
+                onError: errors => {
+                    setShowDeleteConfirmation(false);
+                    toast.error(errors.message, {
+                        position: toast.POSITION.TOP_CENTER,
+                    });
+                }
+            },
         );
     };
 

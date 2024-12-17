@@ -242,32 +242,32 @@ class OrganizationController extends Controller
         ],
         [
             'category_name' => 'HARTA TETAP BERWUJUD',
-            'code' => '170100000',
+            'code' => '170001000',
             'name' => 'BANGUNAN',
         ],
         [
             'category_name' => 'AKUMULASI PENYUSUTAN HARTA TETAP BERWUJUD',
-            'code' => '171100000',
+            'code' => '171001000',
             'name' => 'AKUMULASI PENYUSUTAN BANGUNAN',
         ],
         [
             'category_name' => 'HARTA TETAP BERWUJUD',
-            'code' => '170200000',
+            'code' => '170002000',
             'name' => 'KENDARAAN',
         ],
         [
             'category_name' => 'AKUMULASI PENYUSUTAN HARTA TETAP BERWUJUD',
-            'code' => '171200000',
+            'code' => '171002000',
             'name' => 'AKUMULASI PENYUSUTAN KENDARAAN',
         ],
         [
             'category_name' => 'HARTA TETAP BERWUJUD',
-            'code' => '170300000',
+            'code' => '170003000',
             'name' => 'MESIN DAN PERALATAN',
         ],
         [
             'category_name' => 'AKUMULASI PENYUSUTAN HARTA TETAP BERWUJUD',
-            'code' => '171300000',
+            'code' => '1710003000',
             'name' => 'AKUMULASI PENYUSUTAN MESIN DAN PERALATAN',
         ],
         [
