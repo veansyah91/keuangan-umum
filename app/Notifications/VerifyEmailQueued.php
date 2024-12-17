@@ -12,10 +12,10 @@ class VerifyEmailQueued extends VerifyEmail implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct()
-    {
-        $this->onConnection('redis');
-    }
+    // public function __construct()
+    // {
+    //     $this->onConnection('redis');
+    // }
 
     /**
      * Create a new notification instance.

@@ -68,7 +68,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendPasswordResetNotification($token)
     {
         //dispactches the job to the queue passing it this User object        
-        QueuedPasswordResetJob::dispatch($this, $token)->onConnection('redis');
+        QueuedPasswordResetJob::dispatch($this, $token);
     }
 
     protected $casts = [
