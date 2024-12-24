@@ -12,12 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('organization_menu', function (Blueprint $table) {
-            $table->id();
+            
             $table->foreignUuid('organization_id')->constrained()->cascadeOnDelete();
+
             $table->unsignedBigInteger('menu_id');
             $table->foreign('menu_id')->references('id')->on('menus');
+
             $table->boolean('is_active')->default(true);
-            $table->timestamps();
         });
     }
 
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('organization_menus');
+        Schema::dropIfExists('organization_menu');
     }
 };
