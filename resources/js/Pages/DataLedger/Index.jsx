@@ -7,6 +7,7 @@ import CardMenu from '@/Components/CardMenu';
 import { PiNotebook } from 'react-icons/pi';
 import { LiaClipboardListSolid } from 'react-icons/lia';
 import { RiBookletLine } from 'react-icons/ri';
+import { IoMdList } from 'react-icons/io';
 
 export default function Index({ organization }) {
 	return (
@@ -14,27 +15,36 @@ export default function Index({ organization }) {
 			<Head title='Data Akun' />
 			{/* Desktop */}
 			<ContainerDesktop>
-				<div className='mx-auto w-full text-center font-bold'>Akun-Akun</div>
-				<div className='flex justify-center pt-5 pb-10 gap-5'>
-					<Link href={route('data-ledger.account-category', organization.id)}>
-						<CardMenu
-							bgColor={'bg-cyan-500'}
-							icon={<LiaClipboardListSolid />}
-							title={'Data Kategori Akun'}
-						/>
-					</Link>
-					<Link href={route('data-ledger.account', organization.id)}>
-						<CardMenu bgColor={'bg-orange-500'} icon={<PiNotebook />} title={'Daftar Akun'} />
-					</Link>			
-					<Link href={route('data-ledger.account-school', organization.id)}>
-						<CardMenu bgColor={'bg-slate-500'} icon={<PiNotebook />} title={'Daftar Akun Sekolah'} />
-					</Link>					
-				</div>
-				<div className='flex justify-center pt-5 pb-10 gap-5'>
-					<Link href={route('data-ledger.journal', organization.id)}>
-						<CardMenu bgColor={'bg-emerald-500'} icon={<RiBookletLine />} title={'Jurnal Umum'} />
-					</Link>
-				</div>
+				<section>	
+					<div className='mx-auto w-full text-center font-bold'>Akun-Akun</div>
+					<div className='flex justify-center pt-5 pb-10 gap-5'>
+						<Link href={route('data-ledger.account-category', organization.id)}>
+							<CardMenu
+								bgColor={'bg-cyan-500'}
+								icon={<LiaClipboardListSolid />}
+								title={'Data Kategori Akun'}
+							/>
+						</Link>
+						<Link href={route('data-ledger.account', organization.id)}>
+							<CardMenu bgColor={'bg-orange-500'} icon={<PiNotebook />} title={'Daftar Akun'} />
+						</Link>				
+					</div>
+					<div className='mx-auto w-full text-center font-bold'>Sekolah</div>
+					<div className='flex justify-center pt-5 pb-10 gap-5'>		
+						<Link href={route('data-ledger.account-school', organization.id)}>
+							<CardMenu bgColor={'bg-slate-500'} icon={<IoMdList />} title={'Daftar Akun Sekolah'} />
+						</Link>					
+					</div>
+				</section>
+				<section>
+					<div className='mx-auto w-full text-center font-bold'>Jurnal</div>
+
+					<div className='flex justify-center pt-5 pb-10 gap-5'>
+						<Link href={route('data-ledger.journal', organization.id)}>
+							<CardMenu bgColor={'bg-emerald-500'} icon={<RiBookletLine />} title={'Jurnal Umum'} />
+						</Link>
+					</div>
+				</section>
 			</ContainerDesktop>
 			{/* Desktop */}
 
