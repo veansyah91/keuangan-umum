@@ -58,11 +58,8 @@ export default function Index({ organization }) {
 					<Link href={route('data-ledger.account', organization.id)}>
 						<CardMenu bgColor={'bg-orange-500'} icon={<PiNotebook />} title={'Data Akun'} />
 					</Link>
-					<Link href={route('data-ledger.account-school', organization.id)}>
-						<CardMenu bgColor={'bg-slate-500'} icon={<PiNotebook />} title={'Daftar Akun Sekolah'} />
-					</Link>	
 				</div>
-				<div className='mx-auto w-full text-center font-bold'>Sekolah</div>
+				<div className='mx-auto w-full text-center font-bold pt-2'>Sekolah</div>
 				<div className='flex flex-wrap gap-2 w-full justify-center'>
 					<Link href={route('data-ledger.account-school', organization.id)}>
 						<CardMenu bgColor={'bg-slate-500'} icon={<IoMdList />} title={'Daftar Akun Sekolah'} />
