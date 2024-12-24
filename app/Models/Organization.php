@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Menu;
 use App\Traits\UUID;
 use App\Models\WhatsappPlugin;
 use Illuminate\Database\Eloquent\Model;
@@ -38,6 +39,11 @@ class Organization extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class)->withPivot('role', 'is_waiting');
+    }
+
+    public function menus(): BelongsToMany
+    {
+        return $this->belongsToMany(Menu::class)->withPivot('is_sctive');
     }
 
     public function accountCategory(): HasMany
