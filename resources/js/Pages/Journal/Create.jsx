@@ -165,15 +165,16 @@ export default function Create({ organization, newRef, date, accounts, projects,
     const handleSelectedAccount = (selected, index) => {
         const temp = [...selectedAccount];
         temp[index] = selected;
+        
         setSelectedAccount(temp);
 
         const tempData = [...data.accounts];
         tempData[index] = {
             ...tempData[index],
-            id: temp[index].id,
-            code: temp[index].code,
-            name: temp[index].name,
-            is_cash: temp[index].is_cash,
+            id: temp[index]?.id,
+            code: temp[index]?.code,
+            name: temp[index]?.name,
+            is_cash: temp[index]?.is_cash,
         };
         setData('accounts', tempData);
 

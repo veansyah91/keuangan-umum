@@ -254,42 +254,41 @@ class StudentMonthlyPaymentController extends Controller
 		}
 
 		$schoolAccount = SchoolAccountSetting::whereOrganizationId($organization['id'])->first();
-		$creditAccount = Account::find($schoolAccount['revenue_student']);
-
-		if ($validated['type'] == 'prepaid') 
-		{
-			// buat penjurnalan pembayaran iuran bulanan dibayar dimuka
-			$creditAccount = Account::find($schoolAccount['prepaid_student']);
-
-		} elseif ($validated['type'] == 'receivable')
-		{
-			// cek apakah ada piutang siswa di bulan yang akan dilakukan pembayaran
-			$creditAccount = Account::find($schoolAccount['receivable_monthly_student']);
-		}
-
+		$creditAccount = Account::find($schoolAccount['revenue_student']);	
 		$cashAccount = Account::find($validated['cash_account_id']);
 
-		$validated['accounts'] = [
-			[
-				'id' => $cashAccount['id'],
-				'name' => $cashAccount['name'],
-				'code' => $cashAccount['code'],
-				'is_cash' => 1,
-				'debit' => $validated['value'],
-				'credit' => 0,
-			],
-			[
-				'id' => $creditAccount['id'],
-				'name' => $creditAccount['name'],
-				'code' => $creditAccount['code'],
-				'is_cash' => 0,
-				'debit' => 0,
-				'credit' => $validated['value'],
-			],
-		];		
-
 		if ($payment) {
-			DB::transaction(function() use ($organization, $payment, $validated){				
+			DB::transaction(function() use ($organization, $payment, $validated, $cashAccount, $creditAccount){				
+				if ($validated['type'] == 'prepaid') 
+				{
+					// buat penjurnalan pembayaran iuran bulanan dibayar dimuka
+					$creditAccount = Account::find($schoolAccount['prepaid_student']);
+
+				} elseif ($validated['type'] == 'receivable')
+				{
+					// cek apakah ada piutang siswa di bulan yang akan dilakukan pembayaran
+					$creditAccount = Account::find($schoolAccount['receivable_monthly_student']);
+				}
+
+				$validated['accounts'] = [
+					[
+						'id' => $cashAccount['id'],
+						'name' => $cashAccount['name'],
+						'code' => $cashAccount['code'],
+						'is_cash' => 1,
+						'debit' => $validated['value'],
+						'credit' => 0,
+					],
+					[
+						'id' => $creditAccount['id'],
+						'name' => $creditAccount['name'],
+						'code' => $creditAccount['code'],
+						'is_cash' => 0,
+						'debit' => 0,
+						'credit' => $validated['value'],
+					],
+				];	
+
 				$journal = $this->journalRepository->store($validated);
 				$validated['journal_id'] = $journal['id'];
 				
@@ -328,7 +327,25 @@ class StudentMonthlyPaymentController extends Controller
 				return redirect()->back()->withErrors(['no_ref' => 'Data is existed']);
 			}
 
-			DB::transaction(function() use ($validated){
+			DB::transaction(function() use ($validated, $cashAccount, $creditAccount){
+				$validated['accounts'] = [
+					[
+						'id' => $cashAccount['id'],
+						'name' => $cashAccount['name'],
+						'code' => $cashAccount['code'],
+						'is_cash' => 1,
+						'debit' => $validated['value'],
+						'credit' => 0,
+					],
+					[
+						'id' => $creditAccount['id'],
+						'name' => $creditAccount['name'],
+						'code' => $creditAccount['code'],
+						'is_cash' => 0,
+						'debit' => 0,
+						'credit' => $validated['value'],
+					],
+				];
 				$journal = $this->journalRepository->store($validated);
 
 				$validated['journal_id'] = $journal['id'];
