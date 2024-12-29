@@ -178,16 +178,16 @@ class StaffSalaryPaymentController extends Controller
 				'name' => $creditAccount['name'],
 				'code' => $creditAccount['code'],
 				'is_cash' => 1,
-				'debit' => $validated['value'],
-				'credit' => 0,
+				'credit' => $validated['value'],
+				'debit' => 0,
 			],
 			[
 				'id' => $debitAccount['id'],
 				'name' => $debitAccount['name'],
 				'code' => $debitAccount['code'],
 				'is_cash' => 0,
-				'debit' => 0,
-				'credit' => $validated['value'],
+				'credit' => 0,
+				'debit' => $validated['value'],
 			],
 		];		
 
