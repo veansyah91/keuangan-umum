@@ -336,8 +336,9 @@ class CashinController extends Controller
             ->first();
 
         if ($user['id'] !== $cashIn['created_by_id'] && $organizationUser->organizations[0]->pivot->role !== 'admin') {
-            return redirect(route('cashflow.journal', $organization['id']))->with('error', 'Anda Tidak Memiliki Hak Akses');
+            return redirect()->back()->withErrors(['error' => 'Anda Tidak Memiliki Hak Akses']);
         }
+    
 
         $validated = $request->validate([
             'date' => [
@@ -474,7 +475,7 @@ class CashinController extends Controller
             })
             ->first();
 
-        if ($user['id'] !== $cashIn['user_id'] && $organizationUser->organizations[0]->pivot->role !== 'admin') {
+        if ($user['id'] !== $cashIn['created_by_id'] && $organizationUser->organizations[0]->pivot->role !== 'admin') {
             return redirect(route('cashflow.cash-in', $organization['id']))->withErrors(['error' => 'Anda Tidak Memiliki Hak Akses']);
         }
 
