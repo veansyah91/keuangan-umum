@@ -478,19 +478,26 @@ class CashinController extends Controller
             return redirect(route('cashflow.cash-in', $organization['id']))->with('error', 'Anda Tidak Memiliki Hak Akses');
         }
 
-        $journal = Journal::find($cashIn['journal_id']);
-        $journal->delete();
+        try {
+            $journal = Journal::find($cashIn['journal_id']);
+            $journal->delete();
 
-        $log = [
-            'description' => $cashIn['description'],
-            'date' => $cashIn['date'],
-            'no_ref' => $cashIn['no_ref'],
-            'value' => $cashIn['value'],
-        ];
+            $log = [
+                'description' => $cashIn['description'],
+                'date' => $cashIn['date'],
+                'no_ref' => $cashIn['no_ref'],
+                'value' => $cashIn['value'],
+            ];
 
-        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menghapus DATA pada KAS MASUK, yaitu DATA : '.json_encode($log));
+            $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menghapus DATA pada KAS MASUK, yaitu DATA : '.json_encode($log));
 
-        return redirect(route('cashflow.cash-in', $organization['id']));
+            return redirect(route('cashflow.cash-in', $organization['id']));
+        } catch (\Throwable $th) {
+            \Log::info($th);
+            return redirect()->back()->with('error', 'Anda Tidak Memiliki Hak Akses');
+        }
+
+        
 
     }
 }

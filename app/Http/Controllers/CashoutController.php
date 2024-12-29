@@ -482,18 +482,25 @@ class CashoutController extends Controller
             return redirect(route('cashflow.cash-in', $organization['id']))->with('error', 'Anda Tidak Memiliki Hak Akses');
         }
 
-        $journal = Journal::find($cashOut['journal_id']);
-        $journal->delete();
+        try {
+            $journal = Journal::find($cashOut['journal_id']);
+            $journal->delete();
 
-        $log = [
-            'description' => $cashOut['description'],
-            'date' => $cashOut['date'],
-            'no_ref' => $cashOut['no_ref'],
-            'value' => $cashOut['value'],
-        ];
+            $log = [
+                'description' => $cashOut['description'],
+                'date' => $cashOut['date'],
+                'no_ref' => $cashOut['no_ref'],
+                'value' => $cashOut['value'],
+            ];
 
-        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menghapus DATA pada KAS KELUAR, yaitu DATA : '.json_encode($log));
+            $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menghapus DATA pada KAS KELUAR, yaitu DATA : '.json_encode($log));
 
-        return redirect(route('cashflow.cash-out', $organization['id']));
+            return redirect(route('cashflow.cash-out', $organization['id']));
+        } catch (\Throwable $th) {
+            \Log::info($th);
+            return redirect()->back()->with('error', 'Anda Tidak Memiliki Hak Akses');
+        }
+
+        
     }
 }
