@@ -479,7 +479,7 @@ class CashoutController extends Controller
             ->first();
 
         if ($user['id'] !== $cashOut['user_id'] && $organizationUser->organizations[0]->pivot->role !== 'admin') {
-            return redirect(route('cashflow.cash-in', $organization['id']))->with('error', 'Anda Tidak Memiliki Hak Akses');
+            return redirect(route('cashflow.cash-out', $organization['id']))->with('error', 'Anda Tidak Memiliki Hak Akses');
         }
 
         try {
