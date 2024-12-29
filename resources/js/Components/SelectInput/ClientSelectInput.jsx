@@ -66,7 +66,7 @@ export default function ClientSelectInput({
                         ) : (
                             data.map((d) => (
                                 <Combobox.Option
-                                    key={d.id}
+                                    key={d?.id}
                                     className={({ active }) =>
                                         `relative flex cursor-default select-none py-2 pl-10 pr-4 ${
                                             active ? 'bg-teal-600 text-white' : 'text-slate-900'
