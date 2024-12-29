@@ -185,6 +185,13 @@ export default function Index({
                 });
                 setShowDeleteConfirmation(false);
             },
+            onError: errors => {
+                reset();
+                toast.error(errors.error, {
+                    position: toast.POSITION.TOP_CENTER,
+                });
+                setShowDeleteConfirmation(false);
+            }
         });
     };
 

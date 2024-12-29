@@ -1,0 +1,1 @@
+import{j as t}from"./app-88c87f32.js";function i({children:e,width:n=""}){return t.jsx("span",{className:`text-center inline-flex items-center rounded-md bg-cyan-50 px-2 py-1 text-xs font-medium text-cyan-700 ring-1 ring-inset ring-cyan-600/10 ${n}`,children:e})}export{i as B};

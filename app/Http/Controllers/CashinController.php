@@ -475,7 +475,7 @@ class CashinController extends Controller
             ->first();
 
         if ($user['id'] !== $cashIn['user_id'] && $organizationUser->organizations[0]->pivot->role !== 'admin') {
-            return redirect(route('cashflow.cash-in', $organization['id']))->with('error', 'Anda Tidak Memiliki Hak Akses');
+            return redirect(route('cashflow.cash-in', $organization['id']))->withErrors(['error' => 'Anda Tidak Memiliki Hak Akses']);
         }
 
         try {
@@ -494,7 +494,7 @@ class CashinController extends Controller
             return redirect(route('cashflow.cash-in', $organization['id']));
         } catch (\Throwable $th) {
             \Log::info($th);
-            return redirect()->back()->with('error', 'Anda Tidak Memiliki Hak Akses');
+            return redirect()->back()->with(['error' => "Something's wrong"]);
         }
 
         
