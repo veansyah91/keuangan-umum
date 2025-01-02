@@ -457,6 +457,8 @@ class StudentEntryReceivablePaymentController extends Controller
 			]
 		];
 
+		dd($receivablePayment);
+
 		DB::transaction(function () use ($validated, $receivablePayment, $organization, $user) {
 			// ubah data pada sisa piutang pada pembayaran
 			$payment = StudentEntryPayment::find($validated['payment_id']);

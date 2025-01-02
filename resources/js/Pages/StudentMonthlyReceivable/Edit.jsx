@@ -67,14 +67,12 @@ export default function Edit({ organization, newRef, contacts, date, categories,
     month:ledger.month,
     study_year:ledger.study_year,
     description:ledger.description,
-    credit_account: creditAccount.id,
     details: [],
     id: ledger.id
   });  
 
   const [selectedContact, setSelectedContact] = useState({ id: contact.id, name: contact.name, phone: contact.phone });
-  const [selectedAccount, setSelectedAccount] = useState({ id: creditAccount.id, name: creditAccount.name, code: creditAccount.code, is_cash: false });
-
+  
   const [dateValue, setDateValue] = useState({
     startDate: date,
     endDate: date,
@@ -212,14 +210,6 @@ export default function Edit({ organization, newRef, contacts, date, categories,
   const handleChangeMonth = (e) => {    
     setData('month', parseInt(e.target.value));
   }
-
-  const handleSelectedAccount = (selected) => {
-    if (selected) {    
-      setSelectedAccount({ id: selected.id, name: selected.name, code: selected.code, is_cash: false });
-      setData('credit_account', selected.id);
-      setError('credit_account','');
-    }
-  };
 
   return (
     <>
@@ -432,34 +422,6 @@ export default function Edit({ organization, newRef, contacts, date, categories,
 
               <div className='w-full md:w-2/3 text-end'>
                 Rp. {formatNumber(data.value)}
-              </div>
-            </div>
-
-            <div className='flex flex-col sm:flex-row justify-between gap-1 mt-5 sm:mt-2'>
-              <div className='w-full sm:w-1/3 my-auto'>
-                <InputLabel
-                  value={'Akun Kredit'}
-                  htmlFor='account'
-                  className=' mx-auto my-auto'
-                />
-              </div>
-
-              <div className='w-full sm:w-2/3'>
-                <ClientSelectInput
-                  resources={accounts}
-                  selected={selectedAccount}
-                  setSelected={(selected) => handleSelectedAccount(selected)}
-                  maxHeight='max-h-40'
-                  placeholder='Cari Akun'
-                  isError={errors.cash_account_id ? true : false}
-                  id='account'
-                  contactFilter={''}
-                />
-                {selectedAccount?.code && (
-                  <div className='absolute text-xs'>Kode: {selectedAccount.code}</div>
-                )}
-                {errors?.cash_account_id && <span className='text-red-500 text-xs'>{errors.cash_account_id}</span>}
-
               </div>
             </div>
 

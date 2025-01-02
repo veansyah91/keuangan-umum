@@ -25,7 +25,7 @@ import { usePrevious } from 'react-use';
 
 export default function Create({
   organization, newRef, contacts, contact, date, selectedContactQuery, studyYears, cashAccounts, payments, whatsappPlugin
-}) {    
+}) {      
   const { data, setData, processing, post, errors, setError, reset } = useForm({
     contact_id:selectedContactQuery ? selectedContactQuery.id : null,
     date:date,
@@ -359,7 +359,7 @@ export default function Create({
               </div>
 
               <div className='w-full sm:w-2/3 text-end'>
-                Rp. {formatNumber(data.value)}
+                Rp. {formatNumber(payments.length > 0 ? payments[0].receivable_value : data.value)}
               </div>
             </div>
 
@@ -391,7 +391,7 @@ export default function Create({
               </div>
 
               <div className='w-full sm:w-2/3 text-end'>
-                Rp. {formatNumber(data.value - data.paidValue)}
+                Rp. {formatNumber((payments.length > 0 ? payments[0].receivable_value : data.value) - data.paidValue)}
               </div>
             </div>
 

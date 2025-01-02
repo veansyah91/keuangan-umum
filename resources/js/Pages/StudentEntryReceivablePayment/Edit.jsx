@@ -424,7 +424,7 @@ export default function Edit({
               {
                 ((data.value - data.paidValue) >= 0 && data.cash_account_id) && <div className='w-full sm:w-1/6 text-center'>
                   <PrimaryButton className='w-full' disabled={processing}>
-                    <div className='text-center w-full'>Simpan</div>
+                    <div className='text-center w-full'>Ubah</div>
                   </PrimaryButton>
                 </div>
               }
