@@ -101,9 +101,9 @@ class StudentMonthlyPaymentController extends Controller
 																	})
 																	->with('receivableLedger')
 																	->whereOrganizationId($organization['id'])
+																	->orderBy('date', 'desc')
 																	->orderBy('study_year', 'desc')
 																	->orderBy('month', 'desc')
-																	->orderBy('date', 'desc')
 																	->paginate(50)->withQueryString(),
 				'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 				'type' => request('type') ?? 'now',

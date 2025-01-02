@@ -201,6 +201,8 @@ class StudentMonthlyReceivableController extends Controller
                                       ->where('study_year', $validated['study_year'])
                                       ->first();
 
+                                      dd($payment);
+
     if ($payment) {
         return redirect()->back()->withErrors(['error' => 'Data is existed']);
     }
@@ -244,50 +246,54 @@ class StudentMonthlyReceivableController extends Controller
       ],
     ];
     
-    // buat data pada table piutang bulanan
-    // cek apakah sudah ada data
-    // jika sudah ada, maka tambahkan lalu update sisa (value) 
-    // jika belum ada maka buat data baru
-    $receivable = StudentMonthlyReceivable::whereOrganizationId($organization['id'])
-                                            ->whereContactId($validated['contact_id'])
-                                            ->first();
+    
 
-    if($receivable)
-    {
-        $temp_receivable = $receivable['value'];
-        $receivable->update([
-            'value' => $temp_receivable + $validated['value']
+    DB::transaction(function() use ($validated, $payment, $organization, $user) {
+        // buat data pada table piutang bulanan
+        // cek apakah sudah ada data
+        // jika sudah ada, maka tambahkan lalu update sisa (value) 
+        // jika belum ada maka buat data baru
+        $receivable = StudentMonthlyReceivable::whereOrganizationId($organization['id'])
+                                                ->whereContactId($validated['contact_id'])
+                                                ->first();
+
+        if($receivable)
+        {
+            $temp_receivable = $receivable['value'];
+            $receivable->update([
+                'value' => $temp_receivable + $validated['value']
+            ]);
+        } else {
+            $receivable = StudentMonthlyReceivable::create($validated);
+        }
+
+        $journal = $this->journalRepository->store($validated);
+
+        $validated['journal_id'] = $journal['id'];
+
+        $receivableLedger = StudentMonthlyReceivableLedger::create([
+            'receivable_id' => $receivable['id'],
+            'debit' => $validated['value'],
+            'credit' => 0,
+            'no_ref' => $validated['no_ref'],
+            'description' => $validated['description'],
+            'date' => $validated['date'],
+            'study_year' => $validated['study_year'],
+            'month' => $validated['month'],
+            'journal_id' => $validated['journal_id'],
+            'created_by_id' => $validated['created_by_id'],
+            'payment_id' => $payment['id'],
         ]);
-    } else {
-        $receivable = StudentMonthlyReceivable::create($validated);
-    }
 
-    $journal = $this->journalRepository->store($validated);
+        $log = [
+            'description' => $validated['description'],
+            'date' => $validated['date'],
+            'no_ref' => $validated['no_ref'],
+            'value' => $validated['value'],
+        ];
 
-    $validated['journal_id'] = $journal['id'];
-
-    $receivableLedger = StudentMonthlyReceivableLedger::create([
-        'receivable_id' => $receivable['id'],
-        'debit' => $validated['value'],
-        'credit' => 0,
-        'no_ref' => $validated['no_ref'],
-        'description' => $validated['description'],
-        'date' => $validated['date'],
-        'study_year' => $validated['study_year'],
-        'month' => $validated['month'],
-        'journal_id' => $validated['journal_id'],
-        'created_by_id' => $validated['created_by_id'],
-        'payment_id' => $payment['id'],
-    ]);
-
-    $log = [
-        'description' => $validated['description'],
-        'date' => $validated['date'],
-        'no_ref' => $validated['no_ref'],
-        'value' => $validated['value'],
-    ];
-
-    $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menambahkan DATA pada PIUTANG IURAN BULANAN dengan DATA : '.json_encode($log));
+        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menambahkan DATA pada PIUTANG IURAN BULANAN dengan DATA : '.json_encode($log));
+    });
 
     return redirect(route('cashflow.student-monthly-receivable.create', $organization['id']))->with('success', 'Piutang Iuran Bulanan Berhasil Ditambahkan');
   }
