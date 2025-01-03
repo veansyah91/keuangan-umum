@@ -1,0 +1,1 @@
+import{j as r}from"./app-5a32895a.js";import{d as a}from"./dayjs.min-75afdc15.js";function i({logItem:t,className:s,...e}){return r.jsxs("tr",{className:s,...e,children:[r.jsx("td",{children:t.message}),r.jsx("td",{children:a(t.created_at).format("MMM DD, YYYY")})]})}export{i as default};

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Journal;
 use App\Models\StudentEntryPayment;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -33,6 +34,11 @@ class StudentEntryReceivableLedger extends Model
 	public function receivable(): BelongsTo
 	{
 		return $this->belongsTo(StudentEntryReceivable::class);
+	}
+
+	public function journal(): BelongsTo
+	{
+			return $this->belongsTo(Journal::class);
 	}
 
 	public function scopeFilter($query, $filters)

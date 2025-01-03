@@ -457,12 +457,10 @@ class StudentEntryReceivablePaymentController extends Controller
 			]
 		];
 
-		dd($receivablePayment);
-
 		DB::transaction(function () use ($validated, $receivablePayment, $organization, $user) {
 			// ubah data pada sisa piutang pada pembayaran
 			$payment = StudentEntryPayment::find($validated['payment_id']);
-			
+		
 			$tempPaymentValue = $payment['receivable_value'] + $receivablePayment['credit'] - $validated['paidValue'];
 			$payment->update([
 				'receivable_value' => $tempPaymentValue
@@ -487,7 +485,7 @@ class StudentEntryReceivablePaymentController extends Controller
 
 			// ubah pada jurnal
 			$validated['value'] = $validated['paidValue'];
-			$this->journalRepository->update($validated, $payment->journal);
+			$this->journalRepository->update($validated, $receivablePayment->journal);
 
 			// buat log
 			$log = [
