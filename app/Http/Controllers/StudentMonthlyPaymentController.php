@@ -258,7 +258,7 @@ class StudentMonthlyPaymentController extends Controller
 		$cashAccount = Account::find($validated['cash_account_id']);
 
 		if ($payment) {
-			DB::transaction(function() use ($organization, $payment, $validated, $cashAccount, $creditAccount){				
+			DB::transaction(function() use ($organization, $payment, $validated, $cashAccount, $creditAccount, $schoolAccount){				
 				if ($validated['type'] == 'prepaid') 
 				{
 					// buat penjurnalan pembayaran iuran bulanan dibayar dimuka
