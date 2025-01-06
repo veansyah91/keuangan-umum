@@ -102,6 +102,7 @@ class StudentMonthlyPaymentController extends Controller
 																	->with('receivableLedger')
 																	->whereOrganizationId($organization['id'])
 																	->orderBy('date', 'desc')
+																	->orderBy('no_ref')
 																	->orderBy('study_year', 'desc')
 																	->orderBy('month', 'desc')
 																	->paginate(50)->withQueryString(),
