@@ -26,9 +26,6 @@ export default function Create({
     product: 'Tahunan',
   });
 
-  console.log(expiredDate);
-
-
   const handleSelectProduct = (value) => {
     setData('product', value);
   };
@@ -66,11 +63,11 @@ export default function Create({
                     <Card.CardContent>
                       {/* price */}
                       <div className='text-2xl line-through mb-5'>
-                       <div>Rp. 250.000 </div>
-                       <div><BadgeGray>Disc 54%</BadgeGray></div> 
+                       <div>Rp. 120.000 </div>
+                       <div><BadgeGray>Disc 58%</BadgeGray></div> 
                       </div>
-                      <div className='text-4xl'>Rp. 115.000</div>
-                      <div className='italic text-sm'>Rp. 3.833 / hari</div>
+                      <div className='text-4xl'>Rp. 50.000</div>
+                      <div className='italic text-sm'>Rp. 1.667/ hari</div>
 
                       {/* Description */}
                       <div className='mt-3 text-gray-500'>Berakhir Pada { dayjs(expiredDate.bulanan).locale('id').format('DD MMMM YYYY') }</div>
@@ -87,11 +84,11 @@ export default function Create({
                     <Card.CardContent>
                       {/* price */}
                       <div className='text-2xl line-through mb-5'>
-                       <div>Rp. 2.500.000 </div>
-                       <div><BadgeGray>Disc 60%</BadgeGray></div> 
+                       <div>Rp. 1.200.000 </div>
+                       <div><BadgeGray>Disc 63%</BadgeGray></div> 
                       </div>
-                      <div className='text-4xl'>Rp. 1.000.000</div>
-                      <div className='italic text-sm'>Rp. 2.778 / hari</div>
+                      <div className='text-4xl'>Rp. 450.000</div>
+                      <div className='italic text-sm'>Rp. 1.250 / hari</div>
 
                       {/* Description */}
                       <div className='mt-3 text-gray-500'>

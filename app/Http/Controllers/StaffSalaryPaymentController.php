@@ -532,12 +532,19 @@ class StaffSalaryPaymentController extends Controller
 		"\nTotal: IDR. " . $request['total'] .
 		"\n\n*Detail*:" . $tempDetail ."\n\nTTD,\n\n" . strtoupper($organization['name']);
 
+		// $data = array(
+		// 	'appkey' => $whatsappPlugin['appKey'],
+		// 	'authkey' => $whatsappPlugin['authkey'],
+		// 	'to' => PhoneNumber::setFormat($contact['phone']),
+		// 	'message' => $message,
+		// 	'sandbox' => 'false'
+		// );
+
 		$data = array(
 			'appkey' => $whatsappPlugin['appKey'],
 			'authkey' => $whatsappPlugin['authkey'],
-			'to' => PhoneNumber::setFormat($contact['phone']),
+			'target' => PhoneNumber::setFormat($contact['phone']),
 			'message' => $message,
-			'sandbox' => 'false'
 		);
 
 		SendWhatsAppNotifJob::dispatch($data, $whatsAppLog['id'])->onQueue('whatsapp');
