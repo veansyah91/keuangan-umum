@@ -100,14 +100,10 @@ export default function Setting({
   const waLink = 'https://web.whatsapp.com/send';
 
 	const { data, setData, patch, processing, errors } = useForm({
-		'token' : status ? status.token : ''
+		'appKey' : status ? status.appKey : ''
 	})
 
 	const [showAddData, setShowAddData] = useState(false);
-
-	const handleChangeValue = (values) => {
-		setData('token', values.value)
-	}
 
 	const handleSetShowAddData = () => {
 		setShowAddData(true);
@@ -134,40 +130,7 @@ export default function Setting({
 		})
 	}
 
-	const handleChangeNumber = () => {
-		let message = `
-			*KONFIRMASI PERUBAHAN NOMOR HANDPHONE*
-			 %0A-------------------------------------------------------%0A
-			 _*Detail Organisasi*_
-			 %0AID : ${organization.id}
-			 %0ANama : ${organization.name}
-			 %0ANo. HP : ${data.phone}
-		`;
-
-		let whatsapp = `${waLink}?phone=${admin}&text=${message}`;
-
-		window.open(whatsapp, '_blank');		
-	}
-
-	const handleConnectionProblem = () => {
-		let message = `
-			*KONEKSI TERPUTUS*
-			 %0A-------------------------------------------------------%0A
-			 _*Detail Organisasi*_
-			 %0AID : ${organization.id}
-			 %0ANama : ${organization.name}
-			 %0ANo. HP : ${data.phone}
-		`;
-
-		let whatsapp = `${waLink}?phone=${admin}&text=${message}`;
-
-		window.open(whatsapp, '_blank');		
-	}
-
 	const handleCheckConnection = () => {
-		console.log(data);
-		
-		return
 		patch(route('add-ons.whatsapp.status.check-connection', {organization: organization.id}), {
 			onSuccess: ({ props }) => {
 				const { flash } = props;
@@ -220,7 +183,7 @@ export default function Setting({
 									<tbody>
 										<tr>
 											<td className='w-[25px]'>•</td>
-											<td>Whatsapp Broadcasting Plugin dari keuanganumum.com adalah unofficial atau tidak terafiliasi dengan WhatsApp</td>
+											<td>Whatsapp Broadcasting Plugin dari keuanganumum.com menggunakan <a href="https://fonnte.com/" className='text-[#182b4d] font-bold hover:underline' target="_blank" rel="noopener noreferrer">Fonnte</a> sebagai Whatsapp API Gateway, silakan registrasi dan berlangganan sesuai dengan kebutuhan Anda</td>
 										</tr>
 										<tr>
 											<td className='w-[25px]'>•</td>
@@ -233,14 +196,6 @@ export default function Setting({
 										<tr>
 											<td className='w-[25px]'>•</td>
 											<td>Kami menyarankan menautkan nomor handphone yang telah diregistrasikan pada WhatsApp Business</td>
-										</tr>
-										<tr>
-											<td className='w-[25px]'>•</td>
-											<td>Apabila terjadi perubahan nomor handphone, hubungi <button onClick={handleChangeNumber} className='text-green-600 font-bold'>Admin 0878396542505</button></td>
-										</tr>
-										<tr>
-											<td className='w-[25px]'>•</td>
-											<td>Apabila koneksi terputus, hubungi <button onClick={handleConnectionProblem} className='text-green-600 font-bold'>Admin 0878396542505</button></td>
 										</tr>
 									</tbody>
 								</table>
@@ -268,10 +223,10 @@ export default function Setting({
 								<TextInput
 									id='token'
 									name='Token'
-									className={`w-full ${errors?.token && 'border-red-500'}`}
-									placeholder='No. Ref'
-									value={data.token || ''}
-									onChange={(e) => setData('token', e.target.value)}
+									className={`w-full ${errors?.appKey && 'border-red-500'}`}
+									placeholder='Token'
+									value={data.appKey || ''}
+									onChange={(e) => setData('appKey', e.target.value)}
 								/>
 							</div>
 						</div>
