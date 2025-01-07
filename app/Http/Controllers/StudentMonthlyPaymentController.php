@@ -102,6 +102,7 @@ class StudentMonthlyPaymentController extends Controller
 																	->with('receivableLedger')
 																	->whereOrganizationId($organization['id'])
 																	->orderBy('date', 'desc')
+																	->orderBy('no_ref', 'desc')
 																	->orderBy('study_year', 'desc')
 																	->orderBy('month', 'desc')
 																	->paginate(50)->withQueryString(),
@@ -258,7 +259,7 @@ class StudentMonthlyPaymentController extends Controller
 		$cashAccount = Account::find($validated['cash_account_id']);
 
 		if ($payment) {
-			DB::transaction(function() use ($organization, $payment, $validated, $cashAccount, $creditAccount){				
+			DB::transaction(function() use ($organization, $payment, $validated, $cashAccount, $creditAccount, $schoolAccount){				
 				if ($validated['type'] == 'prepaid') 
 				{
 					// buat penjurnalan pembayaran iuran bulanan dibayar dimuka
