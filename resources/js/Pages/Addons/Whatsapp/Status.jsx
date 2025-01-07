@@ -38,10 +38,10 @@ function WithData({
 		<div className='w-full flex pt-5 gap-2'>
 			<div className='md:w-5/12 w-full space-y-3'>
 				<div className='md:flex gap-2'>
-					<div className='md:w-4/12 font-bold'>No. Handphone <span className='md:hidden'>:</span> </div>
+					<div className='md:w-4/12 font-bold'>Token <span className='md:hidden'>:</span> </div>
 					<div className='md:block hidden w-1/12 text-end'>:</div>
 					<div className='w-7/12 flex gap-2'>
-						<div>{status.phone}</div>
+						<div>{status.appKey}</div>
 						<div>
 							<button
 								className='text-gray-500 text-sm'
@@ -99,15 +99,11 @@ export default function Setting({
 	const admin = "6287839542505";
   const waLink = 'https://web.whatsapp.com/send';
 
-	const { data, setData, patch, processing } = useForm({
-		'phone' : status ? status.phone : ''
+	const { data, setData, patch, processing, errors } = useForm({
+		'appKey' : status ? status.appKey : ''
 	})
 
 	const [showAddData, setShowAddData] = useState(false);
-
-	const handleChangeValue = (values) => {
-		setData('phone', values.value)
-	}
 
 	const handleSetShowAddData = () => {
 		setShowAddData(true);
@@ -132,36 +128,6 @@ export default function Setting({
 				});
 			}
 		})
-	}
-
-	const handleChangeNumber = () => {
-		let message = `
-			*KONFIRMASI PERUBAHAN NOMOR HANDPHONE*
-			 %0A-------------------------------------------------------%0A
-			 _*Detail Organisasi*_
-			 %0AID : ${organization.id}
-			 %0ANama : ${organization.name}
-			 %0ANo. HP : ${data.phone}
-		`;
-
-		let whatsapp = `${waLink}?phone=${admin}&text=${message}`;
-
-		window.open(whatsapp, '_blank');		
-	}
-
-	const handleConnectionProblem = () => {
-		let message = `
-			*KONEKSI TERPUTUS*
-			 %0A-------------------------------------------------------%0A
-			 _*Detail Organisasi*_
-			 %0AID : ${organization.id}
-			 %0ANama : ${organization.name}
-			 %0ANo. HP : ${data.phone}
-		`;
-
-		let whatsapp = `${waLink}?phone=${admin}&text=${message}`;
-
-		window.open(whatsapp, '_blank');		
 	}
 
 	const handleCheckConnection = () => {
@@ -199,7 +165,7 @@ export default function Setting({
 								/>
 							}
 							
-							{/* jika sudaj ada status */}
+							{/* jika sudah ada status */}
 							{
 								status
 								&& <WithData
@@ -217,7 +183,7 @@ export default function Setting({
 									<tbody>
 										<tr>
 											<td className='w-[25px]'>•</td>
-											<td>Whatsapp Broadcasting Plugin dari keuanganumum.com adalah unofficial atau tidak terafiliasi dengan WhatsApp</td>
+											<td>Whatsapp Broadcasting Plugin dari keuanganumum.com menggunakan <a href="https://fonnte.com/" className='text-[#182b4d] font-bold hover:underline' target="_blank" rel="noopener noreferrer">Fonnte</a> sebagai Whatsapp API Gateway, silakan registrasi dan berlangganan sesuai dengan kebutuhan Anda</td>
 										</tr>
 										<tr>
 											<td className='w-[25px]'>•</td>
@@ -230,14 +196,6 @@ export default function Setting({
 										<tr>
 											<td className='w-[25px]'>•</td>
 											<td>Kami menyarankan menautkan nomor handphone yang telah diregistrasikan pada WhatsApp Business</td>
-										</tr>
-										<tr>
-											<td className='w-[25px]'>•</td>
-											<td>Apabila terjadi perubahan nomor handphone, hubungi <button onClick={handleChangeNumber} className='text-green-600 font-bold'>Admin 0878396542505</button></td>
-										</tr>
-										<tr>
-											<td className='w-[25px]'>•</td>
-											<td>Apabila koneksi terputus, hubungi <button onClick={handleConnectionProblem} className='text-green-600 font-bold'>Admin 0878396542505</button></td>
 										</tr>
 									</tbody>
 								</table>
@@ -252,24 +210,23 @@ export default function Setting({
 				<form onSubmit={handleSubmit} className='p-6' id='deleteForm' name='deleteForm'>
 					<h2 className='text-lg font-medium text-gray-900 text-center'>
 						{
-							status ? 'Ubah No HP Tautan WhatsApp' : 'Tautkan WhatsApp'
+							status ? 'Ubah Token' : 'Tautkan WhatsApp'
 						}
 					</h2>
 
 					<div className='mt-6 '>
 						<div className='flex flex-col sm:flex-row w-full gap-1'>
 							<div className='w-full sm:w-1/3 my-auto'>
-								<InputLabel value={'No. Handphone'} htmlFor='phone' />
+								<InputLabel value={'Token'} htmlFor='token' />
 							</div>
 							<div className='w-full sm:w-2/3'>
-								<NumericFormat
-									value={data.phone}
-									customInput={TextInput}
-									onValueChange={(values) => handleChangeValue(values)}
-									thousandSeparator={false}
-									className='text-start w-full border'
-									placeholder='628xxx'
-									prefix={''}
+								<TextInput
+									id='token'
+									name='Token'
+									className={`w-full ${errors?.appKey && 'border-red-500'}`}
+									placeholder='Token'
+									value={data.appKey || ''}
+									onChange={(e) => setData('appKey', e.target.value)}
 								/>
 							</div>
 						</div>

@@ -53,19 +53,20 @@ class WhatsappBroadcastingController extends Controller
 	public function update(Request $request, Organization $organization)
 	{
 		$validated = $request->validate([
-			'phone' => [
+			'appKey' => [
 				'required',
 				'string',
 			]
 		]);
-
+		
 		WhatsappPlugin::updateOrCreate([
 			'organization_id' => $organization['id']
 		],[
-			'phone' => $validated['phone']
+			'appKey' => $validated['appKey']
 		]);
 
-		return redirect()->back()->with('success', 'No WhatsApp Berhasil Didaftarkan');
+
+		return redirect()->back()->with('success', 'No WhatsApp Berhasil Ditautkan');
 	}
 
 	public function checkConnection(Organization $organization)
