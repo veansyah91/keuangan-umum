@@ -40,13 +40,9 @@ class WhatsAppRepository implements WhatsAppRepositoryInterface
       CURLOPT_FOLLOWLOCATION => true,
       CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
       CURLOPT_CUSTOMREQUEST => 'POST',
-      CURLOPT_POSTFIELDS => array(
-        'target' => '08123456789',
-        'message' => 'test message', 
-        'countryCode' => '62', //optional
-      ),
+      CURLOPT_POSTFIELDS => $data,
       CURLOPT_HTTPHEADER => array(
-        'Authorization: TOKEN' //change TOKEN to your actual token
+        'Authorization: ' . $data['appkey'] //change TOKEN to your actual token
       ),
     ));
 

@@ -3,6 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
 import { Head, Link, useForm } from '@inertiajs/react';
 import {
+	IoAddCircleOutline,
     IoArrowBackOutline,
 } from 'react-icons/io5';
 import { ToastContainer, toast } from 'react-toastify';
@@ -38,6 +39,16 @@ function WithData({
 		<div className='w-full flex pt-5 gap-2'>
 			<div className='md:w-5/12 w-full space-y-3'>
 				<div className='md:flex gap-2'>
+					<div className='md:w-4/12 font-bold'>No. Handphone <span className='md:hidden'>:</span> </div>
+					<div className='md:block hidden w-1/12 text-end'>:</div>
+					<div className='w-7/12 flex gap-2'>
+						<div>{status.phone}</div>
+						<div>
+							
+						</div>						
+					</div>
+				</div>
+				<div className='md:flex gap-2'>
 					<div className='md:w-4/12 font-bold'>Token <span className='md:hidden'>:</span> </div>
 					<div className='md:block hidden w-1/12 text-end'>:</div>
 					<div className='w-7/12 flex gap-2'>
@@ -57,36 +68,55 @@ function WithData({
 					<div className='md:block hidden w-1/12 text-end'>:</div>
 					<div className='w-7/12'>{status.expired_date ?? "-"}</div>
 				</div>
-				<div className='md:flex gap-2'>
-					<div className='md:w-4/12 font-bold'>Status <span className='md:hidden'>:</span></div>
-					<div className='hidden md:block w-1/12 text-end'>:</div>
-					<div className={`w-7/12 font-bold space-x-5`}><span className={status.is_active ? 'text-green-500' : 'text-red-500'}>{status.is_active ? 'Aktif' : 'Tidak Aktif' }</span></div>
+				<div className='md:flex gap-2 my-auto'>
+					<div className='md:w-4/12 font-bold my-auto'>Status <span className='md:hidden'>:</span></div>
+					<div className='hidden md:block w-1/12 text-end my-auto'>:</div>
+					<div className={`w-7/12 font-bold space-x-5 my-auto flex`}>
+						<span className={status.is_active ? 'text-green-500 my-auto' : 'text-red-500 my-auto'}>
+							{status.is_active ? 'Aktif' : 'Tidak Aktif' }
+						</span>
+						{
+							status.is_active 
+							? "" 
+							:<Link href={route('add-ons.whatsapp-invoice.create', {organization: status.organization_id})}>
+								<button className='my-auto'>
+									<IoAddCircleOutline size={20} /> 
+								</button>
+							</Link>	
+						}			
+								
+					</div>
 				</div>
-				<div className='md:flex gap-2'>
-					<div className='md:w-4/12 w-full font-bold'>Koneksi Terakhir <span className='md:hidden'>:</span></div>
-					<div className='md:block hidden w-1/12 text-end'>:</div>
-					<div className='w-7/12'>{status.last_connection ?? "-"}</div>
-				</div>
-				<div className='md:flex gap-2'>
-					<div className='md:w-4/12 w-full font-bold'>Koneksi <span className='md:hidden'>:</span></div>
-					<div className='hidden md:block md:w-1/12 text-end'>:</div>
-					<div className='md:w-7/12 w-full my-auto flex gap-5'>
-					{
-						status.connection 
-						? <div className='my-auto text-green-500 flex gap-2'><div className='my-auto'><FaPowerOff /></div> <div>connected</div></div>  
-						: <div className='my-auto text-red-500 flex gap-2'><div className='my-auto'><FaPowerOff /></div> <div>disconnected</div></div> 
-					}
-					<div className='w-full'>
-						<button className='border py-1 px-2 rounded-md' onClick={handleCheckConnection} disabled={processing}>
+				{
+					status.is_active ? 
+					<>
+						<div className='md:flex gap-2'>
+							<div className='md:w-4/12 w-full font-bold'>Koneksi Terakhir <span className='md:hidden'>:</span></div>
+							<div className='md:block hidden w-1/12 text-end'>:</div>
+							<div className='w-7/12'>{status.last_connection ?? "-"}</div>
+						</div>
+						<div className='md:flex gap-2'>
+							<div className='md:w-4/12 w-full font-bold'>Koneksi <span className='md:hidden'>:</span></div>
+							<div className='hidden md:block md:w-1/12 text-end'>:</div>
+							<div className='md:w-7/12 w-full my-auto flex gap-5'>
 							{
-								processing 
-								?<span className="loading loading-dots loading-xs"></span>
-								:<span>Cek Koneksi</span>
-							}							
-							</button>
-					</div>
-					</div>
-				</div>
+								status.connection 
+								? <div className='my-auto text-green-500 flex gap-2'><div className='my-auto'><FaPowerOff /></div> <div>connected</div></div>  
+								: <div className='my-auto text-red-500 flex gap-2'><div className='my-auto'><FaPowerOff /></div> <div>disconnected</div></div> 
+							}
+							<div className='w-full'>
+								<button className='border py-1 px-2 rounded-md' onClick={handleCheckConnection} disabled={processing}>
+									{
+										processing 
+										?<span className="loading loading-dots loading-xs"></span>
+										:<span>Cek Koneksi</span>
+									}							
+									</button>
+							</div>
+							</div>
+						</div>
+					</> : ""
+				}
 			</div>
 		</div>
 	)
@@ -95,18 +125,19 @@ function WithData({
 export default function Setting({
 	status, organization
 }) {
-	
-	const admin = "6287839542505";
-  const waLink = 'https://web.whatsapp.com/send';
-
 	const { data, setData, patch, processing, errors } = useForm({
-		'appKey' : status ? status.appKey : ''
-	})
+		'appKey' : status ? status.appKey : '',
+		'phone' : status ? status.phone : '',
+	});	
 
 	const [showAddData, setShowAddData] = useState(false);
 
 	const handleSetShowAddData = () => {
 		setShowAddData(true);
+	}
+
+	const handleChangeValue = (values) => {
+		setData('phone', values.value);
 	}
 	
 	const handleSubmit = (e) => {
@@ -214,6 +245,24 @@ export default function Setting({
 						}
 					</h2>
 
+					<div className='mt-6 '>
+						<div className='flex flex-col sm:flex-row w-full gap-1'>
+							<div className='w-full sm:w-1/3 my-auto'>
+								<InputLabel value={'No. Handphone'} htmlFor='phone' />
+							</div>
+							<div className='w-full sm:w-2/3'>
+								<NumericFormat
+									value={data.phone || ''}
+									customInput={TextInput}
+									onValueChange={(values) => handleChangeValue(values)}
+									thousandSeparator={false}
+									className={`w-full ${errors?.appKey && 'border-red-500'}`}
+									prefix={''}
+									placeholder='628xxxx'
+								/>
+							</div>
+						</div>
+					</div>
 					<div className='mt-6 '>
 						<div className='flex flex-col sm:flex-row w-full gap-1'>
 							<div className='w-full sm:w-1/3 my-auto'>
