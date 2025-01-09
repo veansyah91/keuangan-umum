@@ -25,7 +25,7 @@ import { useDebounce } from 'use-debounce';
 import { usePrevious } from 'react-use';
 
 export default function Log({
-  logs, startDate, endDate, searchFilter, statusFilter
+  logs, startDate, endDate, searchFilter, statusFilter, organization
 }) {
   const [search, setSearch] = useState(searchFilter || '');
   const [showModalFilter, setShowModalFilter] = useState(false);

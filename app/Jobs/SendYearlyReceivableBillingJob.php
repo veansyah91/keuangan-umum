@@ -39,6 +39,8 @@ class SendYearlyReceivableBillingJob implements ShouldQueue
 																				->get();
 
 		$whatsappPlugin = WhatsappPlugin::where('organization_id', $this->organization->id)->first();
+
+		$delay = 0;
 		
 		foreach ($receivables as $receivable) {
 			$contact = Contact::with(['student', 'lastLevel'])->find($receivable['contact_id']);
@@ -72,15 +74,25 @@ class SendYearlyReceivableBillingJob implements ShouldQueue
 				$tempDetail .= "\nTotal: IDR. " . number_format($receivable['value'], 0, '', '.');
 	
 				$message = "*TAGIHAN IURAN TAHUNAN*\n-------------------------------------------------------\nNama : " . $contact['name'] . "\nNo. Siswa : " . $contact->student->no_ref . "\nTahun Masuk : " . $contact->student->entry_year . "\nKelas Sekarang : " . $contact->lastLevel->level . "\n\nDETAIL:" . $tempDetail . "\n\nTTD,\n\n" . strtoupper($this->organization['name']);
+				// $data = array(
+				// 	'appkey' => $whatsappPlugin['appKey'],
+				// 	'authkey' => $whatsappPlugin['authkey'],
+				// 	'to' => PhoneNumber::setFormat($contact['phone']),
+				// 	'message' => $message,
+				// 	'sandbox' => 'false'
+				// );
+
 				$data = array(
 					'appkey' => $whatsappPlugin['appKey'],
 					'authkey' => $whatsappPlugin['authkey'],
-					'to' => PhoneNumber::setFormat($contact['phone']),
+					'target' => PhoneNumber::setFormat($contact['phone']),
 					'message' => $message,
 					'sandbox' => 'false'
 				);
+
+				$delay += rand(3, 5);
 	
-				SendWhatsAppNotifJob::dispatch($data, $whatsAppLog['id'])->onQueue('whatsapp')->delay(now()->addSeconds(rand(100, 200)));
+				SendWhatsAppNotifJob::dispatch($data, $whatsAppLog['id'])->onQueue('whatsapp')->delay($delay);
 			}
 		}
 	}

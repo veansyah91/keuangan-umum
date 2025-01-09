@@ -295,6 +295,7 @@ class StudentEntryReceivablePaymentController extends Controller
 					'appkey' => $whatsappPlugin['appKey'],
 					'authkey' => $whatsappPlugin['authkey'],
 					'to' => PhoneNumber::setFormat($contact['phone']),
+					'target' => PhoneNumber::setFormat($contact['phone']),
 					'message' => $message,
 					'sandbox' => 'false'
 				);
@@ -359,7 +360,7 @@ class StudentEntryReceivablePaymentController extends Controller
 		]);
 	}
 
-	public function Show(Organization $organization, StudentEntryReceivableLedger $receivablePayment)
+	public function show(Organization $organization, StudentEntryReceivableLedger $receivablePayment)
 	{
 		$user = Auth::user();
 		$receivablePaymentWithDetail = StudentEntryReceivableLedger::with('payment')->find($receivablePayment['id']);
@@ -561,6 +562,7 @@ class StudentEntryReceivablePaymentController extends Controller
 			'appkey' => $whatsappPlugin['appKey'],
 			'authkey' => $whatsappPlugin['authkey'],
 			'to' => PhoneNumber::setFormat($contact['phone']),
+			'target' => PhoneNumber::setFormat($contact['phone']),
 			'message' => $message,
 			'sandbox' => 'false'
 		);
@@ -568,6 +570,5 @@ class StudentEntryReceivablePaymentController extends Controller
 		SendWhatsAppNotifJob::dispatch($data, $whatsAppLog['id'])->onQueue('whatsapp');
 
 		return redirect()->back()->with('success', 'Rincian Pembayaran Piutang Iuran Tahunan telah diteruskan Via Whatsapp');
-
 	}
 }

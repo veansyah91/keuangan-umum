@@ -37,8 +37,9 @@ class SendWhatsAppNotifJob implements ShouldQueue
         $result = $whatsAppRepository->sendMessageViaFonte($this->data);
         $result_object = json_decode($result, true);
 
-        \Log::info($result_object);
-        \Log::info($result_object["status"]);
+        \Log::info($this->data);
+        // \Log::info($result_object);
+        // \Log::info($result_object["status"]);
 
         try {     
             if ($result_object["status"]) {

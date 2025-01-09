@@ -101,6 +101,7 @@ class StudentEntryReceivableController extends Controller
 				'appkey' => $whatsappPlugin['appKey'],
 				'authkey' => $whatsappPlugin['authkey'],
 				'to' => PhoneNumber::setFormat($contact['phone']),
+				'target' => PhoneNumber::setFormat($contact['phone']),
 				'message' => $message,
 				'sandbox' => 'false'
 			);
