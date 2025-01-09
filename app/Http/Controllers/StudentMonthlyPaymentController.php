@@ -57,11 +57,6 @@ class StudentMonthlyPaymentController extends Controller
 		$this->now = CarbonImmutable::now();
 	}
 
-	public function sendMessage()
-	{
-
-	}
-
 	protected function newRef($organization, $dateRequest = '')
 	{
 		$now = $this->now;
@@ -397,10 +392,18 @@ class StudentMonthlyPaymentController extends Controller
 
 			$message = "*PEMBAYARAN IURAN BULANAN*\n-------------------------------------------------------\nNama : " . $contact['name'] . "\nNo. Siswa : " . $contact->student->no_ref . "\nTahun Masuk : " . $contact->student->entry_year . "\nKelas Sekarang : " . $contact->lastLevel->level . "\n-------------------------------------------------------\nNo. Ref : " . $validated['no_ref'] . "\nHari/Tanggal : " . $tempDate->isoFormat('D MMMM YYYY') . "\nBulan : " . $validated['month'] . "\nJumlah Bayar: IDR. " . number_format($validated['value'], 0, '', '.') . "\n\nDetail:" . $tempDetail . "\n\nTTD,\n\n" . strtoupper($organization['name']);
 
+			// $data = array(
+			// 	'appkey' => $whatsappPlugin['appKey'],
+			// 	'authkey' => $whatsappPlugin['authkey'],
+			// 	'to' => PhoneNumber::setFormat($contact['phone']),
+			// 	'message' => $message,
+			// 	'sandbox' => 'false'
+			// );
+
 			$data = array(
 				'appkey' => $whatsappPlugin['appKey'],
 				'authkey' => $whatsappPlugin['authkey'],
-				'to' => PhoneNumber::setFormat($contact['phone']),
+				'target' => PhoneNumber::setFormat($contact['phone']),
 				'message' => $message,
 				'sandbox' => 'false'
 			);
@@ -711,10 +714,17 @@ class StudentMonthlyPaymentController extends Controller
 
 		$message = "*PEMBAYARAN IURAN BULANAN*\n-------------------------------------------------------\nNama : " . $contact['name'] . "\nNo. Siswa : " . $contact->student->no_ref . "\nTahun Masuk : " . $contact->student->entry_year . "\nKelas Sekarang : " . $contact->lastLevel->level . "\n-------------------------------------------------------\nNo. Ref : " . $paymentWithDetail['no_ref'] . "\nHari/Tanggal : " . $tempDate->isoFormat('D MMMM YYYY') . "\nBulan : " . $paymentWithDetail['month'] . "\nJumlah Bayar: IDR. " . number_format($paymentWithDetail['value'], 0, '', '.') . "\n\nDetail:" . $tempDetail . "\n\nTTD,\n\n" . strtoupper($organization['name']);
 
+		// $data = array(
+		// 	'appkey' => $whatsappPlugin['appKey'],
+		// 	'authkey' => $whatsappPlugin['authkey'],
+		// 	'to' => PhoneNumber::setFormat($contact['phone']),
+		// 	'message' => $message,
+		// 	'sandbox' => 'false'
+		// );
 		$data = array(
 			'appkey' => $whatsappPlugin['appKey'],
 			'authkey' => $whatsappPlugin['authkey'],
-			'to' => PhoneNumber::setFormat($contact['phone']),
+			'target' => PhoneNumber::setFormat($contact['phone']),
 			'message' => $message,
 			'sandbox' => 'false'
 		);

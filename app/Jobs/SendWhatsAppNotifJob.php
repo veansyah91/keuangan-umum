@@ -34,17 +34,22 @@ class SendWhatsAppNotifJob implements ShouldQueue
         
         $whatsAppLog = WhatsappLog::find($this->id);
 
-        $result = $whatsAppRepository->sendMessage($this->data);
-        $result_object = json_decode($result);
+        $result = $whatsAppRepository->sendMessageViaFonte($this->data);
+        $result_object = json_decode($result, true);
 
-        // \Log::channel('whatsapp')->info('Status Pengiriman WhatsApp Broadcasting '.$result);
+        \Log::info($result_object);
+        \Log::info($result_object["status"]);
 
-        try {
-            if ($result_object->message_status === "Success") {
+        try {     
+            if ($result_object["status"]) {
                 $whatsAppLog->update([
                     'status' => 'sent'
                 ]);
-            }            
+            } else {
+                $whatsAppLog->update([
+                    'status' => 'failed'
+                ]);
+            }
         } catch (\Throwable $th) {
             $whatsAppLog->update([
                 'status' => 'failed'

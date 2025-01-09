@@ -214,7 +214,7 @@ export default function Setting({
 									<tbody>
 										<tr>
 											<td className='w-[25px]'>•</td>
-											<td>Whatsapp Broadcasting Plugin dari keuanganumum.com menggunakan <a href="https://fonnte.com/" className='text-[#182b4d] font-bold hover:underline' target="_blank" rel="noopener noreferrer">Fonnte</a> sebagai Whatsapp API Gateway, silakan registrasi dan berlangganan sesuai dengan kebutuhan Anda</td>
+											<td>Whatsapp Broadcasting Plugin dari keuanganumum.com menggunakan <a href="https://fonnte.com/" className='text-blue-600 font-bold hover:underline' target="_blank" rel="noopener noreferrer">Fonnte</a> sebagai Whatsapp API Gateway, silakan registrasi dan berlangganan sesuai dengan kebutuhan Anda</td>
 										</tr>
 										<tr>
 											<td className='w-[25px]'>•</td>
