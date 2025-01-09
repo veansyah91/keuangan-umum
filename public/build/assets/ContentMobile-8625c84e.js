@@ -1,0 +1,1 @@
+import{j as s}from"./app-6584a0e7.js";function i({children:t}){return s.jsx("div",{className:"sm:hidden pb-16 pt-16",children:s.jsx("div",{className:"bg-white pt-10 sm:pt-0",children:t})})}export{i as C};
