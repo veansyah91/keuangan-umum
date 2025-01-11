@@ -186,13 +186,13 @@ class CashinController extends Controller
         }
 
         // jika tahun, tidak dalam peride
-        $year = $this->now->isoFormat('YYYY');
-        $tempDateInput = Carbon::create($validated['date']);
-        $yearInput = $tempDateInput->isoFormat('YYYY');
+        // $year = $this->now->isoFormat('YYYY');
+        // $tempDateInput = Carbon::create($validated['date']);
+        // $yearInput = $tempDateInput->isoFormat('YYYY');
 
-        if ($yearInput !== $year) {
-            return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
-        }
+        // if ($yearInput !== $year) {
+        //     return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
+        // }
 
         $value = 0;
 
@@ -336,8 +336,9 @@ class CashinController extends Controller
             ->first();
 
         if ($user['id'] !== $cashIn['created_by_id'] && $organizationUser->organizations[0]->pivot->role !== 'admin') {
-            return redirect(route('cashflow.journal', $organization['id']))->with('error', 'Anda Tidak Memiliki Hak Akses');
+            return redirect()->back()->withErrors(['error' => 'Anda Tidak Memiliki Hak Akses']);
         }
+    
 
         $validated = $request->validate([
             'date' => [
@@ -397,13 +398,13 @@ class CashinController extends Controller
         }
 
         // jika tahun, tidak dalam peride
-        $year = $this->now->isoFormat('YYYY');
-        $tempDateInput = Carbon::create($validated['date']);
-        $yearInput = $tempDateInput->isoFormat('YYYY');
+        // $year = $this->now->isoFormat('YYYY');
+        // $tempDateInput = Carbon::create($validated['date']);
+        // $yearInput = $tempDateInput->isoFormat('YYYY');
 
-        if ($yearInput !== $year) {
-            return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
-        }
+        // if ($yearInput !== $year) {
+        //     return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
+        // }
 
         $value = 0;
 
@@ -459,13 +460,13 @@ class CashinController extends Controller
         }
 
         // jika tahun, tidak dalam peride
-        $year = $this->now->isoFormat('YYYY');
-        $tempDateInput = Carbon::create($cashIn['date']);
-        $yearInput = $tempDateInput->isoFormat('YYYY');
+        // $year = $this->now->isoFormat('YYYY');
+        // $tempDateInput = Carbon::create($cashIn['date']);
+        // $yearInput = $tempDateInput->isoFormat('YYYY');
 
-        if ($yearInput !== $year) {
-            return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
-        }
+        // if ($yearInput !== $year) {
+        //     return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
+        // }
 
         // cek apakah role user yang mengakses adalah admin atau pengguna yang membuat data, jika bukan, maka redirect ke halaman awal
         $organizationUser = User::whereId($user['id'])
@@ -474,23 +475,30 @@ class CashinController extends Controller
             })
             ->first();
 
-        if ($user['id'] !== $cashIn['user_id'] && $organizationUser->organizations[0]->pivot->role !== 'admin') {
-            return redirect(route('cashflow.cash-in', $organization['id']))->with('error', 'Anda Tidak Memiliki Hak Akses');
+        if ($user['id'] !== $cashIn['created_by_id'] && $organizationUser->organizations[0]->pivot->role !== 'admin') {
+            return redirect(route('cashflow.cash-in', $organization['id']))->withErrors(['error' => 'Anda Tidak Memiliki Hak Akses']);
         }
 
-        $journal = Journal::find($cashIn['journal_id']);
-        $journal->delete();
+        try {
+            $journal = Journal::find($cashIn['journal_id']);
+            $journal->delete();
 
-        $log = [
-            'description' => $cashIn['description'],
-            'date' => $cashIn['date'],
-            'no_ref' => $cashIn['no_ref'],
-            'value' => $cashIn['value'],
-        ];
+            $log = [
+                'description' => $cashIn['description'],
+                'date' => $cashIn['date'],
+                'no_ref' => $cashIn['no_ref'],
+                'value' => $cashIn['value'],
+            ];
 
-        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menghapus DATA pada KAS MASUK, yaitu DATA : '.json_encode($log));
+            $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menghapus DATA pada KAS MASUK, yaitu DATA : '.json_encode($log));
 
-        return redirect(route('cashflow.cash-in', $organization['id']));
+            return redirect(route('cashflow.cash-in', $organization['id']));
+        } catch (\Throwable $th) {
+            \Log::info($th);
+            return redirect()->back()->with(['error' => "Something's wrong"]);
+        }
+
+        
 
     }
 }

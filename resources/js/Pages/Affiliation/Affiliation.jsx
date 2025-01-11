@@ -21,6 +21,7 @@ import dayjs from 'dayjs';
 import AffiliationWithdrawMobile from './Components/AffiliationWithdrawMobile';
 import BadgeSuccess from '@/Components/Badges/BadgeSuccess';
 import BadgeWarning from '@/Components/Badges/BadgeWarning';
+import { FaHandshake } from 'react-icons/fa';
 
 export default function Affiliation({ auth, affiliation, affiliationWithdraws }) {
     const [showWithdrawModal, setShowWithdrawModal] = useState(false);
@@ -138,20 +139,35 @@ export default function Affiliation({ auth, affiliation, affiliationWithdraws })
                     </Header>
 
                     <div className='py-3 px-6 text-gray-900 flex-none sm:flex sm:flex-row-reserve sm:gap-2 sm:justify-between space-y-5 sm:space-y-0'>
-                        <div className='flex gap-2'>
-                            <div className='my-auto'>
-                                <GiTakeMyMoney />{' '}
+                        <div className='space-y-3'>
+                            <div className='flex gap-2 '>
+                                <div className='my-auto'>
+                                    <FaHandshake />{' '}
+                                </div>
+                                <div className='my-auto'>
+                                    Kode Anda: <span className='font-bold'>{ affiliation.no_ref }</span>
+                                </div>
                             </div>
-                            <div className='my-auto'>
-                                Saldo Anda:{' '}
-                                <span className='font-bold text-lg text-green-500'>
-                                    Rp. {formatNumber(affiliation.balance)}
-                                </span>
+                            <div className='flex gap-2'>
+                                <div className='my-auto'>
+                                    <GiTakeMyMoney />{' '}
+                                </div>
+                                <div className='my-auto'>
+                                    Saldo Anda:{' '}
+                                    <span className='font-bold text-lg text-green-500'>
+                                        Rp. {formatNumber(affiliation.balance)}
+                                    </span>
+                                </div>
                             </div>
-                        </div>
+                        </div>                        
                         {affiliation.balance > 0 && (
                             <div className='flex gap-2'>
-                                <PrimaryButton className='w-full' onClick={() => handleSetShowWithdrawModal()}>
+                                <div className='sm:block hidden'>
+                                    <PrimaryButton className='w-full' onClick={() => handleSetShowWithdrawModal()}>
+                                        <div className='w-full'>Ajukan Penarikan</div>
+                                    </PrimaryButton>
+                                </div>
+                                <PrimaryButton className='w-full sm:hidden block' onClick={() => handleSetShowWithdrawModal()}>
                                     <div className='w-full'>Ajukan Penarikan</div>
                                 </PrimaryButton>
                             </div>

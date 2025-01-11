@@ -85,6 +85,7 @@ export default function Ledger({
 
     // function
     const handleSelectedAccount = (selected) => {
+        // let tempData = [...selectedAccount];
         setSelectedAccount(selected);
     };
 
@@ -131,7 +132,7 @@ export default function Ledger({
                 program: selectedProgram.id,
                 project: selectedProject.id,
                 department: selectedDepartment.id,
-                account: selectedAccount.id,
+                account: selectedAccount?.id,
             },
             onBefore: (visit) => {
                 visit.completed ? setIsLoading(false) : setIsLoading(true);
@@ -194,7 +195,7 @@ export default function Ledger({
                                     id='account'
                                 />
                                 {selectedAccount?.code && (
-                                    <div className='absolute text-xs'>Kode: {selectedAccount.code}</div>
+                                    <div className='absolute text-xs'>Kode: {selectedAccount?.code}</div>
                                 )}
                             </div>
                             <div className='my-auto w-full'>
@@ -222,7 +223,7 @@ export default function Ledger({
                             <div className='my-auto hidden md:block'>
                                 <PrimaryButton
                                     disabled={
-                                        !selectedAccount.id ||
+                                        !selectedAccount?.id ||
                                         !startDate ||
                                         !endDate ||
                                         startDate > endDate ||
@@ -402,7 +403,7 @@ export default function Ledger({
 
                     <div className='md:hidden w-full print:hidden'>
                         <PrimaryButton
-                            disabled={!selectedAccount.id || !startDate || !endDate || startDate > endDate || isLoading}
+                            disabled={!selectedAccount?.id || !startDate || !endDate || startDate > endDate || isLoading}
                             onClick={handleReload}
                             className='w-full'>
                             <div className='text-center w-full'>Filter</div>
@@ -423,7 +424,7 @@ export default function Ledger({
                     </div>
                     <div className='w-full mt-3 hidden print:flex print:justify-between'>
                         <div className='uppercase'>
-                            Akun : {selectedAccount.code} - {selectedAccount.name}
+                            Akun : {selectedAccount?.code} - {selectedAccount?.name}
                         </div>
                         <div className='text-end italic'>
                             Periode : {dayjs(startDate).format('MMMM DD, YYYY')} -{' '}

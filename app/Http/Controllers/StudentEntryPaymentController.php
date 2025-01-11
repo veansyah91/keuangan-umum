@@ -88,9 +88,9 @@ class StudentEntryPaymentController extends Controller
 																			$query->with('student');
 																	})
 																	->whereOrganizationId($organization['id'])
-																	->orderBy('study_year', 'desc')
 																	->orderBy('date', 'desc')
 																	->orderBy('no_ref', 'desc')
+																	->orderBy('study_year', 'desc')
 																	->paginate(50)->withQueryString(),
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'searchFilter' => $search,
@@ -391,6 +391,7 @@ class StudentEntryPaymentController extends Controller
 					'appkey' => $whatsappPlugin['appKey'],
 					'authkey' => $whatsappPlugin['authkey'],
 					'to' => PhoneNumber::setFormat($contact['phone']),
+					'target' => PhoneNumber::setFormat($contact['phone']),
 					'message' => $message,
 					'sandbox' => 'false'
 				);
@@ -528,6 +529,7 @@ class StudentEntryPaymentController extends Controller
 		$validator->sometimes('cash_account_id', 'required|exists:accounts,id', function ($input) {
 			return $input->paidValue > 0;  // Hanya validasi 'cash_account_id' jika 'paidValue' bernilai > 0
 		});
+
 
 		$validated = $validator->validated();
 
@@ -825,6 +827,7 @@ class StudentEntryPaymentController extends Controller
 				'appkey' => $whatsappPlugin['appKey'],
 				'authkey' => $whatsappPlugin['authkey'],
 				'to' => PhoneNumber::setFormat($contact['phone']),
+				'target' => PhoneNumber::setFormat($contact['phone']),
 				'message' => $message,
 				'sandbox' => 'false'
 			);

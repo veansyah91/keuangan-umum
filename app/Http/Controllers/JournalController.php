@@ -190,13 +190,13 @@ class JournalController extends Controller
 
 
         // jika tahun, tidak dalam peride
-        $year = $this->now->isoFormat('YYYY');
-        $tempDateInput = Carbon::create($validated['date']);
-        $yearInput = $tempDateInput->isoFormat('YYYY');
+        // $year = $this->now->isoFormat('YYYY');
+        // $tempDateInput = Carbon::create($validated['date']);
+        // $yearInput = $tempDateInput->isoFormat('YYYY');
 
-        if ($yearInput !== $year) {
-            return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
-        }
+        // if ($yearInput !== $year) {
+        //     return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
+        // }
 
         foreach ($validated['accounts'] as $value) {
             $totalDebit += $value['debit'];
@@ -393,13 +393,13 @@ class JournalController extends Controller
         }
 
         // jika tahun, tidak dalam peride
-        $year = $this->now->isoFormat('YYYY');
-        $tempDateInput = Carbon::create($validated['date']);
-        $yearInput = $tempDateInput->isoFormat('YYYY');
+        // $year = $this->now->isoFormat('YYYY');
+        // $tempDateInput = Carbon::create($validated['date']);
+        // $yearInput = $tempDateInput->isoFormat('YYYY');
 
-        if ($yearInput !== $year) {
-            return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
-        }
+        // if ($yearInput !== $year) {
+        //     return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
+        // }
 
         // cek balancing debit dan kredit
         $totalDebit = 0;
@@ -453,13 +453,13 @@ class JournalController extends Controller
         }
 
         // jika tahun, tidak dalam periode
-        $year = $this->now->isoFormat('YYYY');
-        $tempDateInput = Carbon::create($journal['date']);
-        $yearInput = $tempDateInput->isoFormat('YYYY');
+        // $year = $this->now->isoFormat('YYYY');
+        // $tempDateInput = Carbon::create($journal['date']);
+        // $yearInput = $tempDateInput->isoFormat('YYYY');
 
-        if ($yearInput !== $year) {
-            return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
-        }
+        // if ($yearInput !== $year) {
+        //     return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
+        // }
 
         // cek apakah role user yang mengakses adalah admin atau pengguna yang membuat data, jika bukan, maka redirect ke halaman awal
         $organizationUser = User::whereId($user['id'])

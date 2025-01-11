@@ -188,13 +188,13 @@ class CashoutController extends Controller
         }
 
         // jika tahun, tidak dalam peride
-        $year = $this->now->isoFormat('YYYY');
-        $tempDateInput = Carbon::create($validated['date']);
-        $yearInput = $tempDateInput->isoFormat('YYYY');
+        // $year = $this->now->isoFormat('YYYY');
+        // $tempDateInput = Carbon::create($validated['date']);
+        // $yearInput = $tempDateInput->isoFormat('YYYY');
 
-        if ($yearInput !== $year) {
-            return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
-        }
+        // if ($yearInput !== $year) {
+        //     return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
+        // }
 
         $value = 0;
 
@@ -340,7 +340,7 @@ class CashoutController extends Controller
             ->first();
 
         if ($user['id'] !== $cashOut['created_by_id'] && $organizationUser->organizations[0]->pivot->role !== 'admin') {
-            return redirect(route('cashflow.journal', $organization['id']))->with('error', 'Anda Tidak Memiliki Hak Akses');
+            return redirect()->back()->withErrors(['error' => 'Anda Tidak Memiliki Hak Akses']);
         }
 
         $validated = $request->validate([
@@ -401,13 +401,13 @@ class CashoutController extends Controller
         }
 
         // jika tahun, tidak dalam peride
-        $year = $this->now->isoFormat('YYYY');
-        $tempDateInput = Carbon::create($validated['date']);
-        $yearInput = $tempDateInput->isoFormat('YYYY');
+        // $year = $this->now->isoFormat('YYYY');
+        // $tempDateInput = Carbon::create($validated['date']);
+        // $yearInput = $tempDateInput->isoFormat('YYYY');
 
-        if ($yearInput !== $year) {
-            return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
-        }
+        // if ($yearInput !== $year) {
+        //     return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
+        // }
 
         $value = 0;
 
@@ -463,13 +463,13 @@ class CashoutController extends Controller
         }
 
         // jika tahun, tidak dalam peride
-        $year = $this->now->isoFormat('YYYY');
-        $tempDateInput = Carbon::create($cashOut['date']);
-        $yearInput = $tempDateInput->isoFormat('YYYY');
+        // $year = $this->now->isoFormat('YYYY');
+        // $tempDateInput = Carbon::create($cashOut['date']);
+        // $yearInput = $tempDateInput->isoFormat('YYYY');
 
-        if ($yearInput !== $year) {
-            return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
-        }
+        // if ($yearInput !== $year) {
+        //     return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
+        // }
 
         // cek apakah role user yang mengakses adalah admin atau pengguna yang membuat data, jika bukan, maka redirect ke halaman awal
         $organizationUser = User::whereId($user['id'])
@@ -478,22 +478,29 @@ class CashoutController extends Controller
             })
             ->first();
 
-        if ($user['id'] !== $cashOut['user_id'] && $organizationUser->organizations[0]->pivot->role !== 'admin') {
-            return redirect(route('cashflow.cash-in', $organization['id']))->with('error', 'Anda Tidak Memiliki Hak Akses');
+        if ($user['id'] !== $cashOut['created_by_id'] && $organizationUser->organizations[0]->pivot->role !== 'admin') {
+            return redirect(route('cashflow.cash-out', $organization['id']))->withErrors(['error' => 'Anda Tidak Memiliki Hak Akses']);
         }
 
-        $journal = Journal::find($cashOut['journal_id']);
-        $journal->delete();
+        try {
+            $journal = Journal::find($cashOut['journal_id']);
+            $journal->delete();
 
-        $log = [
-            'description' => $cashOut['description'],
-            'date' => $cashOut['date'],
-            'no_ref' => $cashOut['no_ref'],
-            'value' => $cashOut['value'],
-        ];
+            $log = [
+                'description' => $cashOut['description'],
+                'date' => $cashOut['date'],
+                'no_ref' => $cashOut['no_ref'],
+                'value' => $cashOut['value'],
+            ];
 
-        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menghapus DATA pada KAS KELUAR, yaitu DATA : '.json_encode($log));
+            $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menghapus DATA pada KAS KELUAR, yaitu DATA : '.json_encode($log));
 
-        return redirect(route('cashflow.cash-out', $organization['id']));
+            return redirect(route('cashflow.cash-out', $organization['id']));
+        } catch (\Throwable $th) {
+            \Log::info($th);
+            return redirect()->back()->withErrors(['error' => 'Anda Tidak Memiliki Hak Akses']);
+        }
+
+        
     }
 }

@@ -79,7 +79,7 @@ export default function Index({ role, organization, receivables, searchFilter, w
 	const handleSubmitSendWa = (e) => {
 		e.preventDefault();
 
-		post(route('cashflow.student-entry-receivable.send-whatsapp-multi', {organization: organization.id}), {
+		post(route('cashflow.student-monthly-receivable.send-whatsapp-multi', {organization: organization.id}), {
 			onSuccess: ({ props }) => {
 				setShowSendWaModal(false);
 

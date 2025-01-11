@@ -57,11 +57,6 @@ class StudentMonthlyPaymentController extends Controller
 		$this->now = CarbonImmutable::now();
 	}
 
-	public function sendMessage()
-	{
-
-	}
-
 	protected function newRef($organization, $dateRequest = '')
 	{
 		$now = $this->now;
@@ -101,9 +96,10 @@ class StudentMonthlyPaymentController extends Controller
 																	})
 																	->with('receivableLedger')
 																	->whereOrganizationId($organization['id'])
+																	->orderBy('date', 'desc')
+																	->orderBy('no_ref', 'desc')
 																	->orderBy('study_year', 'desc')
 																	->orderBy('month', 'desc')
-																	->orderBy('date', 'desc')
 																	->paginate(50)->withQueryString(),
 				'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 				'type' => request('type') ?? 'now',
@@ -254,42 +250,41 @@ class StudentMonthlyPaymentController extends Controller
 		}
 
 		$schoolAccount = SchoolAccountSetting::whereOrganizationId($organization['id'])->first();
-		$creditAccount = Account::find($schoolAccount['revenue_student']);
-
-		if ($validated['type'] == 'prepaid') 
-		{
-			// buat penjurnalan pembayaran iuran bulanan dibayar dimuka
-			$creditAccount = Account::find($schoolAccount['prepaid_student']);
-
-		} elseif ($validated['type'] == 'receivable')
-		{
-			// cek apakah ada piutang siswa di bulan yang akan dilakukan pembayaran
-			$creditAccount = Account::find($schoolAccount['receivable_monthly_student']);
-		}
-
+		$creditAccount = Account::find($schoolAccount['revenue_student']);	
 		$cashAccount = Account::find($validated['cash_account_id']);
 
-		$validated['accounts'] = [
-			[
-				'id' => $cashAccount['id'],
-				'name' => $cashAccount['name'],
-				'code' => $cashAccount['code'],
-				'is_cash' => 1,
-				'debit' => $validated['value'],
-				'credit' => 0,
-			],
-			[
-				'id' => $creditAccount['id'],
-				'name' => $creditAccount['name'],
-				'code' => $creditAccount['code'],
-				'is_cash' => 0,
-				'debit' => 0,
-				'credit' => $validated['value'],
-			],
-		];		
-
 		if ($payment) {
-			DB::transaction(function() use ($organization, $payment, $validated){				
+			DB::transaction(function() use ($organization, $payment, $validated, $cashAccount, $creditAccount, $schoolAccount){				
+				if ($validated['type'] == 'prepaid') 
+				{
+					// buat penjurnalan pembayaran iuran bulanan dibayar dimuka
+					$creditAccount = Account::find($schoolAccount['prepaid_student']);
+
+				} elseif ($validated['type'] == 'receivable')
+				{
+					// cek apakah ada piutang siswa di bulan yang akan dilakukan pembayaran
+					$creditAccount = Account::find($schoolAccount['receivable_monthly_student']);
+				}
+
+				$validated['accounts'] = [
+					[
+						'id' => $cashAccount['id'],
+						'name' => $cashAccount['name'],
+						'code' => $cashAccount['code'],
+						'is_cash' => 1,
+						'debit' => $validated['value'],
+						'credit' => 0,
+					],
+					[
+						'id' => $creditAccount['id'],
+						'name' => $creditAccount['name'],
+						'code' => $creditAccount['code'],
+						'is_cash' => 0,
+						'debit' => 0,
+						'credit' => $validated['value'],
+					],
+				];	
+
 				$journal = $this->journalRepository->store($validated);
 				$validated['journal_id'] = $journal['id'];
 				
@@ -328,7 +323,25 @@ class StudentMonthlyPaymentController extends Controller
 				return redirect()->back()->withErrors(['no_ref' => 'Data is existed']);
 			}
 
-			DB::transaction(function() use ($validated){
+			DB::transaction(function() use ($validated, $cashAccount, $creditAccount){
+				$validated['accounts'] = [
+					[
+						'id' => $cashAccount['id'],
+						'name' => $cashAccount['name'],
+						'code' => $cashAccount['code'],
+						'is_cash' => 1,
+						'debit' => $validated['value'],
+						'credit' => 0,
+					],
+					[
+						'id' => $creditAccount['id'],
+						'name' => $creditAccount['name'],
+						'code' => $creditAccount['code'],
+						'is_cash' => 0,
+						'debit' => 0,
+						'credit' => $validated['value'],
+					],
+				];
 				$journal = $this->journalRepository->store($validated);
 
 				$validated['journal_id'] = $journal['id'];
@@ -379,10 +392,18 @@ class StudentMonthlyPaymentController extends Controller
 
 			$message = "*PEMBAYARAN IURAN BULANAN*\n-------------------------------------------------------\nNama : " . $contact['name'] . "\nNo. Siswa : " . $contact->student->no_ref . "\nTahun Masuk : " . $contact->student->entry_year . "\nKelas Sekarang : " . $contact->lastLevel->level . "\n-------------------------------------------------------\nNo. Ref : " . $validated['no_ref'] . "\nHari/Tanggal : " . $tempDate->isoFormat('D MMMM YYYY') . "\nBulan : " . $validated['month'] . "\nJumlah Bayar: IDR. " . number_format($validated['value'], 0, '', '.') . "\n\nDetail:" . $tempDetail . "\n\nTTD,\n\n" . strtoupper($organization['name']);
 
+			// $data = array(
+			// 	'appkey' => $whatsappPlugin['appKey'],
+			// 	'authkey' => $whatsappPlugin['authkey'],
+			// 	'to' => PhoneNumber::setFormat($contact['phone']),
+			// 	'message' => $message,
+			// 	'sandbox' => 'false'
+			// );
+
 			$data = array(
 				'appkey' => $whatsappPlugin['appKey'],
 				'authkey' => $whatsappPlugin['authkey'],
-				'to' => PhoneNumber::setFormat($contact['phone']),
+				'target' => PhoneNumber::setFormat($contact['phone']),
 				'message' => $message,
 				'sandbox' => 'false'
 			);
@@ -693,10 +714,17 @@ class StudentMonthlyPaymentController extends Controller
 
 		$message = "*PEMBAYARAN IURAN BULANAN*\n-------------------------------------------------------\nNama : " . $contact['name'] . "\nNo. Siswa : " . $contact->student->no_ref . "\nTahun Masuk : " . $contact->student->entry_year . "\nKelas Sekarang : " . $contact->lastLevel->level . "\n-------------------------------------------------------\nNo. Ref : " . $paymentWithDetail['no_ref'] . "\nHari/Tanggal : " . $tempDate->isoFormat('D MMMM YYYY') . "\nBulan : " . $paymentWithDetail['month'] . "\nJumlah Bayar: IDR. " . number_format($paymentWithDetail['value'], 0, '', '.') . "\n\nDetail:" . $tempDetail . "\n\nTTD,\n\n" . strtoupper($organization['name']);
 
+		// $data = array(
+		// 	'appkey' => $whatsappPlugin['appKey'],
+		// 	'authkey' => $whatsappPlugin['authkey'],
+		// 	'to' => PhoneNumber::setFormat($contact['phone']),
+		// 	'message' => $message,
+		// 	'sandbox' => 'false'
+		// );
 		$data = array(
 			'appkey' => $whatsappPlugin['appKey'],
 			'authkey' => $whatsappPlugin['authkey'],
-			'to' => PhoneNumber::setFormat($contact['phone']),
+			'target' => PhoneNumber::setFormat($contact['phone']),
 			'message' => $message,
 			'sandbox' => 'false'
 		);

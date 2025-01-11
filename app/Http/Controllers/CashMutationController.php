@@ -172,13 +172,13 @@ class CashMutationController extends Controller
         }
 
         // jika tahun, tidak dalam peride
-        $year = $this->now->isoFormat('YYYY');
-        $tempDateInput = Carbon::create($validated['date']);
-        $yearInput = $tempDateInput->isoFormat('YYYY');
+        // $year = $this->now->isoFormat('YYYY');
+        // $tempDateInput = Carbon::create($validated['date']);
+        // $yearInput = $tempDateInput->isoFormat('YYYY');
 
-        if ($yearInput !== $year) {
-            return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
-        }
+        // if ($yearInput !== $year) {
+        //     return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
+        // }
 
         // siapkan variabel akun untuk buku besar
         $validated['accounts'][0] = [
@@ -355,13 +355,13 @@ class CashMutationController extends Controller
         }
 
         // jika tahun, tidak dalam peride
-        $year = $this->now->isoFormat('YYYY');
-        $tempDateInput = Carbon::create($validated['date']);
-        $yearInput = $tempDateInput->isoFormat('YYYY');
+        // $year = $this->now->isoFormat('YYYY');
+        // $tempDateInput = Carbon::create($validated['date']);
+        // $yearInput = $tempDateInput->isoFormat('YYYY');
 
-        if ($yearInput !== $year) {
-            return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
-        }
+        // if ($yearInput !== $year) {
+        //     return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
+        // }
 
         // siapkan variabel akun untuk buku besar
         $validated['accounts'][0] = [
@@ -414,13 +414,13 @@ class CashMutationController extends Controller
         }
 
         // jika tahun, tidak dalam peride
-        $year = $this->now->isoFormat('YYYY');
-        $tempDateInput = Carbon::create($cashMutation['date']);
-        $yearInput = $tempDateInput->isoFormat('YYYY');
+        // $year = $this->now->isoFormat('YYYY');
+        // $tempDateInput = Carbon::create($cashMutation['date']);
+        // $yearInput = $tempDateInput->isoFormat('YYYY');
 
-        if ($yearInput !== $year) {
-            return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
-        }
+        // if ($yearInput !== $year) {
+        //     return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
+        // }
 
         // cek apakah role user yang mengakses adalah admin atau pengguna yang membuat data, jika bukan, maka redirect ke halaman awal
         $organizationUser = User::whereId($user['id'])

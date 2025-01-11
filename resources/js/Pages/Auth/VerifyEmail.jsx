@@ -21,7 +21,7 @@ export default function VerifyEmail({ status }) {
 
             {status === 'verification-link-sent' && (
                 <div className='mb-4 font-medium text-sm text-green-600'>
-                    Link Verifikasi Telah Dikirim Ke Email Anda.
+                    Link verifikasi dikirim ke email anda dalam 1-2 menit. Silakan cek email anda.
                 </div>
             )}
 

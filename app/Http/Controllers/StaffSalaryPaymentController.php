@@ -178,16 +178,16 @@ class StaffSalaryPaymentController extends Controller
 				'name' => $creditAccount['name'],
 				'code' => $creditAccount['code'],
 				'is_cash' => 1,
-				'debit' => $validated['value'],
-				'credit' => 0,
+				'credit' => $validated['value'],
+				'debit' => 0,
 			],
 			[
 				'id' => $debitAccount['id'],
 				'name' => $debitAccount['name'],
 				'code' => $debitAccount['code'],
 				'is_cash' => 0,
-				'debit' => 0,
-				'credit' => $validated['value'],
+				'credit' => 0,
+				'debit' => $validated['value'],
 			],
 		];		
 
@@ -532,12 +532,19 @@ class StaffSalaryPaymentController extends Controller
 		"\nTotal: IDR. " . $request['total'] .
 		"\n\n*Detail*:" . $tempDetail ."\n\nTTD,\n\n" . strtoupper($organization['name']);
 
+		// $data = array(
+		// 	'appkey' => $whatsappPlugin['appKey'],
+		// 	'authkey' => $whatsappPlugin['authkey'],
+		// 	'to' => PhoneNumber::setFormat($contact['phone']),
+		// 	'message' => $message,
+		// 	'sandbox' => 'false'
+		// );
+
 		$data = array(
 			'appkey' => $whatsappPlugin['appKey'],
 			'authkey' => $whatsappPlugin['authkey'],
-			'to' => PhoneNumber::setFormat($contact['phone']),
+			'target' => PhoneNumber::setFormat($contact['phone']),
 			'message' => $message,
-			'sandbox' => 'false'
 		);
 
 		SendWhatsAppNotifJob::dispatch($data, $whatsAppLog['id'])->onQueue('whatsapp');

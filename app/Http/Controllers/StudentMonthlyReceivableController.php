@@ -120,7 +120,6 @@ class StudentMonthlyReceivableController extends Controller
       'date' => request('date') ?? $this->now->isoFormat('YYYY-M-DD'),
       'contacts' => $this->contactRepository->getStudents($organization['id'], $contactCategory['id'], request(['contact'])),
       'selectedContactParam' => Contact::with(['contactCategories', 'student', 'lastLevel'])->find(request('selectedContact')),
-      'accounts' => $this->accountRepository->getDataNonCash($organization['id'], request(['account'])),
     ]);
   }
 
@@ -182,10 +181,6 @@ class StudentMonthlyReceivableController extends Controller
           'string',
           'nullable'
       ],
-      'credit_account' => [
-          'required',
-          'exists:accounts,id'
-      ],
     ]);
 
     $user = Auth::user();
@@ -204,90 +199,92 @@ class StudentMonthlyReceivableController extends Controller
     if ($payment) {
         return redirect()->back()->withErrors(['error' => 'Data is existed']);
     }
-    
-    $payment = StudentMonthlyPayment::create($validated);
 
-    foreach ($validated['details'] as $detail) {
-        if ($detail['value'] > 0) {
-            $data = [
-                'payment_id' => $payment['id'],
-                'student_payment_category_id' => $detail['id'],
-                'value' => $detail['value'],
-            ];
+    DB::transaction(function() use ($validated, $payment, $organization, $user) {    
+			$payment = StudentMonthlyPayment::create($validated);
 
-            DB::table('s_monthly_payment_details')
-                ->insert($data);
-        }
-    }
+			foreach ($validated['details'] as $detail) {
+					if ($detail['value'] > 0) {
+							$data = [
+									'payment_id' => $payment['id'],
+									'student_payment_category_id' => $detail['id'],
+									'value' => $detail['value'],
+							];
 
-    $schoolAccount = SchoolAccountSetting::whereOrganizationId($organization['id'])->first();
-    $debitAccount = Account::find($schoolAccount['receivable_monthly_student']);
+							DB::table('s_monthly_payment_details')
+									->insert($data);
+					}
+			}
 
-    $creditAccount = Account::find($validated['credit_account']);
+			$schoolAccount = SchoolAccountSetting::whereOrganizationId($organization['id'])->first();
+			$debitAccount = Account::find($schoolAccount['receivable_monthly_student']);
 
-    $validated['accounts'] = [
-      [
-          'id' => $debitAccount['id'],
-          'name' => $debitAccount['name'],
-          'code' => $debitAccount['code'],
-          'is_cash' => 0,
-          'debit' => $validated['value'],
-          'credit' => 0,
-      ],
-      [
-          'id' => $creditAccount['id'],
-          'name' => $creditAccount['name'],
-          'code' => $creditAccount['code'],
-          'is_cash' => 0,
-          'debit' => 0,
-          'credit' => $validated['value'],
-      ],
-    ];
-    
-    // buat data pada table piutang bulanan
-    // cek apakah sudah ada data
-    // jika sudah ada, maka tambahkan lalu update sisa (value) 
-    // jika belum ada maka buat data baru
-    $receivable = StudentMonthlyReceivable::whereOrganizationId($organization['id'])
-                                            ->whereContactId($validated['contact_id'])
-                                            ->first();
+			$creditAccount = Account::find($schoolAccount['revenue_student']);
 
-    if($receivable)
-    {
-        $temp_receivable = $receivable['value'];
-        $receivable->update([
-            'value' => $temp_receivable + $validated['value']
-        ]);
-    } else {
-        $receivable = StudentMonthlyReceivable::create($validated);
-    }
+			$validated['accounts'] = [
+				[
+						'id' => $debitAccount['id'],
+						'name' => $debitAccount['name'],
+						'code' => $debitAccount['code'],
+						'is_cash' => 0,
+						'debit' => $validated['value'],
+						'credit' => 0,
+				],
+				[
+						'id' => $creditAccount['id'],
+						'name' => $creditAccount['name'],
+						'code' => $creditAccount['code'],
+						'is_cash' => 0,
+						'debit' => 0,
+						'credit' => $validated['value'],
+				],
+			];
 
-    $journal = $this->journalRepository->store($validated);
+			// buat data pada table piutang bulanan
+			// cek apakah sudah ada data
+			// jika sudah ada, maka tambahkan lalu update sisa (value) 
+			// jika belum ada maka buat data baru
+			$receivable = StudentMonthlyReceivable::whereOrganizationId($organization['id'])
+																							->whereContactId($validated['contact_id'])
+																							->first();
 
-    $validated['journal_id'] = $journal['id'];
+			if($receivable)
+			{
+					$temp_receivable = $receivable['value'];
+					$receivable->update([
+							'value' => $temp_receivable + $validated['value']
+					]);
+			} else {
+					$receivable = StudentMonthlyReceivable::create($validated);
+			}
 
-    $receivableLedger = StudentMonthlyReceivableLedger::create([
-        'receivable_id' => $receivable['id'],
-        'debit' => $validated['value'],
-        'credit' => 0,
-        'no_ref' => $validated['no_ref'],
-        'description' => $validated['description'],
-        'date' => $validated['date'],
-        'study_year' => $validated['study_year'],
-        'month' => $validated['month'],
-        'journal_id' => $validated['journal_id'],
-        'created_by_id' => $validated['created_by_id'],
-        'payment_id' => $payment['id'],
-    ]);
+			$journal = $this->journalRepository->store($validated);
 
-    $log = [
-        'description' => $validated['description'],
-        'date' => $validated['date'],
-        'no_ref' => $validated['no_ref'],
-        'value' => $validated['value'],
-    ];
+			$validated['journal_id'] = $journal['id'];
 
-    $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menambahkan DATA pada PIUTANG IURAN BULANAN dengan DATA : '.json_encode($log));
+			$receivableLedger = StudentMonthlyReceivableLedger::create([
+					'receivable_id' => $receivable['id'],
+					'debit' => $validated['value'],
+					'credit' => 0,
+					'no_ref' => $validated['no_ref'],
+					'description' => $validated['description'],
+					'date' => $validated['date'],
+					'study_year' => $validated['study_year'],
+					'month' => $validated['month'],
+					'journal_id' => $validated['journal_id'],
+					'created_by_id' => $validated['created_by_id'],
+					'payment_id' => $payment['id'],
+			]);
+
+			$log = [
+					'description' => $validated['description'],
+					'date' => $validated['date'],
+					'no_ref' => $validated['no_ref'],
+					'value' => $validated['value'],
+			];
+
+			$this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menambahkan DATA pada PIUTANG IURAN BULANAN dengan DATA : '.json_encode($log));
+    });
 
     return redirect(route('cashflow.student-monthly-receivable.create', $organization['id']))->with('success', 'Piutang Iuran Bulanan Berhasil Ditambahkan');
   }
@@ -295,7 +292,6 @@ class StudentMonthlyReceivableController extends Controller
   public function show(Organization $organization, StudentMonthlyReceivable $receivable)
   {
     $user = Auth::user();
-
 		
 		return Inertia::render('StudentMonthlyReceivable/Show',[
 			'organization' => $organization,
@@ -332,7 +328,6 @@ class StudentMonthlyReceivableController extends Controller
       'role' => $this->userRepository->getRole($user['id'], $organization['id']),
       'date' => request('date') ?? $ledger['date'],
       'contacts' => $this->contactRepository->getStudents($organization['id'], $contactCategory['id'], request(['contact'])),
-      'accounts' => $this->accountRepository->getDataNonCash($organization['id'], request(['account'])),
 			'ledger' => $ledger,
 			'receivable' => StudentMonthlyReceivable::find($ledger['receivable_id']),
 			'payment' => $payment,
@@ -340,7 +335,6 @@ class StudentMonthlyReceivableController extends Controller
       'newRef' => request('date') ? $this->newRef($organization, request('date')) : $ledger['no_ref'],
 			'contact' => Contact::with('student')->find($payment['contact_id']),
 			'lastLevel' => StudentLevel::whereContactId($payment['contact_id'])->latest()->first(),
-			'creditAccount' => Account::find($ledgerJournal['account_id'])
 		]);
 	}
 
@@ -402,10 +396,6 @@ class StudentMonthlyReceivableController extends Controller
 					'string',
 					'nullable'
 			],
-			'credit_account' => [
-					'required',
-					'exists:accounts,id'
-			],
 		]);
 
 		$user = Auth::user();
@@ -415,82 +405,83 @@ class StudentMonthlyReceivableController extends Controller
 
 		// Jika telah dilakukan pembayaran paid_date not null
 		// maka tampilkan error
+    DB::transaction(function() use ($validated, $organization, $user, $ledger, $receivable) {		
+			$payment = StudentMonthlyPayment::find($ledger['payment_id']);
+			$payment->update([
+				'no_ref' => $validated['no_ref'],
+				'contact_id' => $validated['contact_id'],
+				'value' => $validated['value'],
+				'month' => $validated['month'],
+				'study_year' => $validated['study_year'],
+				'date' => $validated['date'],
+			]);
 
-		$payment = StudentMonthlyPayment::find($ledger['payment_id']);
-		$payment->update([
-			'no_ref' => $validated['no_ref'],
-			'contact_id' => $validated['contact_id'],
-			'value' => $validated['value'],
-			'month' => $validated['month'],
-			'study_year' => $validated['study_year'],
-			'date' => $validated['date'],
-		]);
+			$details = DB::table('s_monthly_payment_details')
+										->where('payment_id', $payment['id'])
+										->delete();
+			
+			foreach ($validated['details'] as $detail) {
+				if ($detail['value'] > 0) {
+					$data = [
+						'payment_id' => $payment['id'],
+						'student_payment_category_id' => $detail['id'],
+						'value' => $detail['value'],
+					];
 
-		$details = DB::table('s_monthly_payment_details')
-									->where('payment_id', $payment['id'])
-									->delete();
-		
-		foreach ($validated['details'] as $detail) {
-			if ($detail['value'] > 0) {
-				$data = [
-					'payment_id' => $payment['id'],
-					'student_payment_category_id' => $detail['id'],
-					'value' => $detail['value'],
-				];
-
-				DB::table('s_monthly_payment_details')->insert($data);
+					DB::table('s_monthly_payment_details')->insert($data);
+				}
 			}
-		}
-		$schoolAccount = SchoolAccountSetting::whereOrganizationId($organization['id'])->first();
-    $debitAccount = Account::find($schoolAccount['receivable_monthly_student']);
-    $creditAccount = Account::find($validated['credit_account']);
+			$schoolAccount = SchoolAccountSetting::whereOrganizationId($organization['id'])->first();
+			$debitAccount = Account::find($schoolAccount['receivable_monthly_student']);
+			$creditAccount = Account::find($schoolAccount['revenue_student']);
 
-		$validated['accounts'] = [
-      [
-          'id' => $debitAccount['id'],
-          'name' => $debitAccount['name'],
-          'code' => $debitAccount['code'],
-          'is_cash' => 0,
-          'debit' => $validated['value'],
-          'credit' => 0,
-      ],
-      [
-          'id' => $creditAccount['id'],
-          'name' => $creditAccount['name'],
-          'code' => $creditAccount['code'],
-          'is_cash' => 0,
-          'debit' => 0,
-          'credit' => $validated['value'],
-      ],
-    ];
-		
-		$temReceivableValue = $receivable['value'] - $ledger['debit'];
+			$validated['accounts'] = [
+				[
+						'id' => $debitAccount['id'],
+						'name' => $debitAccount['name'],
+						'code' => $debitAccount['code'],
+						'is_cash' => 0,
+						'debit' => $validated['value'],
+						'credit' => 0,
+				],
+				[
+						'id' => $creditAccount['id'],
+						'name' => $creditAccount['name'],
+						'code' => $creditAccount['code'],
+						'is_cash' => 0,
+						'debit' => 0,
+						'credit' => $validated['value'],
+				],
+			];
+			
+			$temReceivableValue = $receivable['value'] - $ledger['debit'];
 
-		$receivable->update([
-			'contact_id' => $validated['contact_id'],
-			'value' => $validated['value'] + $temReceivableValue
-		]);
+			$receivable->update([
+				'contact_id' => $validated['contact_id'],
+				'value' => $validated['value'] + $temReceivableValue
+			]);
 
-		$this->journalRepository->update($validated, $ledger->journal);
+			$this->journalRepository->update($validated, $ledger->journal);
 
-		$ledger->update([
-			'debit' => $validated['value'],
-			'credit' => 0,
-			'no_ref' => $validated['no_ref'],
-			'description' => $validated['description'],
-			'date' => $validated['date'],
-			'study_year' => $validated['study_year'],
-			'month' => $validated['month'],
-		]);
+			$ledger->update([
+				'debit' => $validated['value'],
+				'credit' => 0,
+				'no_ref' => $validated['no_ref'],
+				'description' => $validated['description'],
+				'date' => $validated['date'],
+				'study_year' => $validated['study_year'],
+				'month' => $validated['month'],
+			]);
 
-		$log = [
-			'description' => $validated['description'],
-			'date' => $validated['date'],
-			'no_ref' => $validated['no_ref'],
-			'value' => $validated['value'],
-		];
+			$log = [
+				'description' => $validated['description'],
+				'date' => $validated['date'],
+				'no_ref' => $validated['no_ref'],
+				'value' => $validated['value'],
+			];
 
-		$this->logRepository->store($organization['id'], strtoupper($user['name']).' telah mengubah DATA pada PIUTANG IURAN BULANAN dengan DATA : '.json_encode($log));
+			$this->logRepository->store($organization['id'], strtoupper($user['name']).' telah mengubah DATA pada PIUTANG IURAN BULANAN dengan DATA : '.json_encode($log));
+		});
 
 		return redirect()->back()->with('success', 'Piutang Iuran Bulanan Berhasil Diubah');
 	}
@@ -499,45 +490,46 @@ class StudentMonthlyReceivableController extends Controller
 	{
 		// cek pada payment
 		// jika sudah dilakukan pembayaran, maka tampilkan error
-
 		if ($ledger['paid_date']) 
 		{
 			return redirect()->back()->withErrors(['message' => 'Piutang Tidak Dapat Dihapus']);
 		}
 
-        $user = Auth::user();
+		$user = Auth::user();
 
-		// hapus data pada journal 
-		$journal = Journal::find($ledger['journal_id']);
-		$journal->delete();
-		
-		// cek kurangi jumlah piutang
-		$value = $receivable['value'];
-		$receivable->update([
-			'value' => $value - $ledger['debit']
-		]);
+    DB::transaction(function() use ($ledger, $organization, $user, $receivable) {
+			// hapus data pada journal 
+			$journal = Journal::find($ledger['journal_id']);
+			$journal->delete();
+			
+			// cek kurangi jumlah piutang
+			$value = $receivable['value'];
+			$receivable->update([
+				'value' => $value - $ledger['debit']
+			]);
 
-		$payment = StudentMonthlyPayment::find($ledger['payment_id']);
+			$payment = StudentMonthlyPayment::find($ledger['payment_id']);
 
-		// hapus data pada tabel s_monthly_payment_details
-		DB::table('s_monthly_payment_details')
-		->where('payment_id', $payment['id'])
-		->delete();
+			// hapus data pada tabel s_monthly_payment_details
+			DB::table('s_monthly_payment_details')
+			->where('payment_id', $payment['id'])
+			->delete();
 
-		// hapus data pada tabel student_monthly_payments
-		$payment->delete();
+			// hapus data pada tabel student_monthly_payments
+			$payment->delete();
 
-        // hapus data pada table student_monthly_receivable_ledgers
-		$ledger->delete();
+					// hapus data pada table student_monthly_receivable_ledgers
+			$ledger->delete();
 
-		$log = [
-			'date' => $ledger['date'],
-			'no_ref' => $ledger['no_ref'],
-			'value' => $ledger['value'],
-		];
+			$log = [
+				'date' => $ledger['date'],
+				'no_ref' => $ledger['no_ref'],
+				'value' => $ledger['value'],
+			];
 
-		$this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menghapus DATA pada PIUTANG IURAN BULANAN dengan DATA : '.json_encode($log));
+			$this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menghapus DATA pada PIUTANG IURAN BULANAN dengan DATA : '.json_encode($log));
 
+		});
 		return redirect()->back()->with('success', 'Piutang Iuran Bulanan Berhasil Diubah');
 	}
 
@@ -593,10 +585,18 @@ class StudentMonthlyReceivableController extends Controller
 		"\nKelas Sekarang: " . $contact->lastLevel->level . "\n" . $tempDetail .
 		"\n\nTTD,\n\n" . strtoupper($organization['name']);
 
+		// $data = array(
+		// 	'appkey' => $whatsappPlugin['appKey'],
+		// 	'authkey' => $whatsappPlugin['authkey'],
+		// 	'to' => PhoneNumber::setFormat($contact['phone']),
+		// 	'message' => $message,
+		// 	'sandbox' => 'false'
+		// );
+
 		$data = array(
 			'appkey' => $whatsappPlugin['appKey'],
 			'authkey' => $whatsappPlugin['authkey'],
-			'to' => PhoneNumber::setFormat($contact['phone']),
+			'target' => PhoneNumber::setFormat($contact['phone']),
 			'message' => $message,
 			'sandbox' => 'false'
 		);

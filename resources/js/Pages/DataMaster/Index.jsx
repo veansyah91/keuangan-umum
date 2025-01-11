@@ -105,7 +105,7 @@ export default function Index({ organization }) {
 					</section>  
 					<section className='pt-2 pb-10 space-y-3'>
 						<div className='text-center font-bold'>
-							Staff
+							Staf
 						</div>
 						<div className='flex justify-center gap-6'>
 							<Link 
@@ -194,7 +194,7 @@ export default function Index({ organization }) {
 
 				<div className='sm:hidden pt-2 pb-5 px-2 mx-auto bg-white '>
 					<div className='text-center font-bold'>
-						Staff
+						Staf
 					</div>
 					<div className='flex flex-wrap gap-2 w-full justify-center'>
 						<Link 

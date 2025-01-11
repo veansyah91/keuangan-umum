@@ -53,27 +53,34 @@ class WhatsappBroadcastingController extends Controller
 	public function update(Request $request, Organization $organization)
 	{
 		$validated = $request->validate([
+			'appKey' => [
+				'required',
+				'string',
+			],
 			'phone' => [
 				'required',
 				'string',
 			]
 		]);
-
+	
 		WhatsappPlugin::updateOrCreate([
 			'organization_id' => $organization['id']
 		],[
-			'phone' => $validated['phone']
+			'phone' => $validated['phone'],
+			'appKey' => $validated['appKey'],
 		]);
 
-		return redirect()->back()->with('success', 'No WhatsApp Berhasil Didaftarkan');
+		return redirect()->back()->with('success', 'No WhatsApp Berhasil Ditautkan');
 	}
 
 	public function checkConnection(Organization $organization)
-	{
-		$plugin = WhatsappPlugin::where('organization_id', $organization['id'])
-															->first();
+	{															
+		$plugin = WhatsappPlugin::whereOrganizationId($organization['id'])->first();
 
-		// dd($plugin);
+		if (!$plugin['is_active']) {
+			return redirect()->back()->withErrors(['error' => 'Anda belum berlangganan add-on Whatsapp Broadcasting']);
+		}
+
 		try {
 			$now = Carbon::now();
 
@@ -82,23 +89,28 @@ class WhatsappBroadcastingController extends Controller
 			$data = array(
 				'appkey' => $plugin['appKey'],
 				'authkey' => $plugin['authkey'],
-				'to' => '6287839542505',
+				'target' => '6287839542505',
 				'message' => $message,
 				'sandbox' => 'false'
 			);
 
 			$whatsAppRepository = new WhatsAppRepository;
-			$result = $whatsAppRepository->sendMessage($data);
+			$result = $whatsAppRepository->sendMessageViaFonte($data);
 			
 			$data = json_decode($result);
 
-			if ($data->message_status === "Success") {
+			if ($data->status) {
 				$plugin->update([
 					'connection' => true,
 					'last_connection' => $now
 				]);
 				return redirect()->back()->with('success', "Perangkat Telah Dihubungkan dengan Whatsapp Broadcasting");
-			}			
+			} else {
+				$plugin->update([
+					'connection' => false,
+				]);
+				return redirect()->back()->withErrors(['error' => "Perangkat gagal terhubung, silakan cek kembali TOKEN anda"]);
+			}
 		} catch (\Throwable $th) {
 			$plugin->update([
 				'connection' => false,

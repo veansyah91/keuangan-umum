@@ -37,6 +37,7 @@ class SendMonthlyReceivableBillingJob implements ShouldQueue
 																							->where('value', '>', 0)
 																							->get();
 
+		$delay = 0;
 		foreach ($receivables as $receivable) {
 			$contact = Contact::with(['student', 'lastLevel'])->find($receivable['contact_id']);
 
@@ -68,15 +69,24 @@ class SendMonthlyReceivableBillingJob implements ShouldQueue
 				"\nKelas Sekarang: " . $contact->lastLevel->level . "\n" . $tempDetail .
 				"\n\nTTD,\n\n" . strtoupper($this->organization->name);
 
+				// $data = array(
+				// 	'appkey' => $whatsappPlugin['appKey'],
+				// 	'authkey' => $whatsappPlugin['authkey'],
+				// 	'to' => PhoneNumber::setFormat($contact['phone']),
+				// 	'message' => $message,
+				// 	'sandbox' => 'false'
+				// );
+
 				$data = array(
 					'appkey' => $whatsappPlugin['appKey'],
 					'authkey' => $whatsappPlugin['authkey'],
-					'to' => PhoneNumber::setFormat($contact['phone']),
+					'target' => PhoneNumber::setFormat($contact['phone']),
 					'message' => $message,
 					'sandbox' => 'false'
 				);
 
-				SendWhatsAppNotifJob::dispatch($data, $whatsAppLog['id'])->onQueue('whatsapp')->delay(now()->addSeconds(rand(100, 200)));
+				$delay += rand(3, 5);
+				SendWhatsAppNotifJob::dispatch($data, $whatsAppLog['id'])->onQueue('whatsapp')->delay(now()->addSeconds($delay));
 
 				\Log::channel('whatsapp')->info($data);
 			}           

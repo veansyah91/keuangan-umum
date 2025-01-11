@@ -48,6 +48,8 @@ class SendSalaryNotifViaWhatsappJon implements ShouldQueue
 
 		$whatsappPlugin = WhatsappPlugin::where('organization_id', $this->organization->id)->first();
 
+		$delay = 0;
+
 		foreach ($payments as $payment) {
 			$whatsAppLog = WhatsappLog::create([
 				'organization_id' => $this->organization->id,
@@ -99,10 +101,12 @@ class SendSalaryNotifViaWhatsappJon implements ShouldQueue
 			"\n\nDETAIL:" . $tempDetail . "\n\nTTD,\n\n" . strtoupper($this->organization['name'])
 			;
 
+			$delay += rand(3, 5);
 			$data = array(
 				'appkey' => $whatsappPlugin['appKey'],
 				'authkey' => $whatsappPlugin['authkey'],
 				'to' => PhoneNumber::setFormat($payment['phone']),
+				'target' => PhoneNumber::setFormat($payment['phone']),
 				'message' => $message,
 				'sandbox' => 'false'
 			);

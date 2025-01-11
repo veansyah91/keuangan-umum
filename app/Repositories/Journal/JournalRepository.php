@@ -71,16 +71,10 @@ class JournalRepository implements JournalRepositoryInterface
         $journal->update($validated);
 
         // delete ledger
-        $ledgers = Ledger::whereJournalId($journal['id'])->get();
-        foreach ($ledgers as $ledger) {
-            $ledger->delete();
-        }
+        $ledgers = Ledger::whereJournalId($journal['id'])->delete();
 
         // delete cashflow
-        $cashflows = Cashflow::whereJournalId($journal['id'])->get();
-        foreach ($cashflows as $cashflow) {
-            $cashflow->delete();
-        }
+        $cashflows = Cashflow::whereJournalId($journal['id'])->delete();
 
         $validated['journal_id'] = $journal['id'];
         $isCash = false;
