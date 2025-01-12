@@ -17,6 +17,8 @@ use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\CashflowController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Admin\MenuController;
+use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\DataLedgerController;
 use App\Http\Controllers\DataMasterController;
 use App\Http\Controllers\DepartmentController;
@@ -106,6 +108,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 			Route::get('/data-master/villages', [VillageController::class, 'index'])->name('admin.data-master.village');
 			Route::post('/data-master/villages', [VillageController::class, 'post'])->name('admin.data-master.village.post');
+
+			Route::get('/data-master/pages', [PageController::class, 'index'])->name('admin.data-master.page');
+			Route::get('/data-master/menus', MenuController::class)->name('admin.data-master.menu');
 
 			// User Master
 			Route::get('/user-master', UserMasterController::class)->name('admin.user-master');
