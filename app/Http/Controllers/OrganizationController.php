@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
+use App\Models\Menu;
 use App\Models\User;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -16,6 +17,7 @@ use Illuminate\Http\Request;
 use App\Models\ContactCategory;
 use Illuminate\Validation\Rule;
 use App\Models\FixedAssetCategory;
+use Illuminate\Support\Facades\DB;
 use App\Models\SchoolAccountSetting;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
@@ -598,9 +600,20 @@ class OrganizationController extends Controller
             FixedAssetCategory::create($fixedAssetCategory);
         }
         //
+        
+        // Menu
+            $menus = Menu::all();
+
+            foreach ($menus as $menu) {
+                DB::table('organization_menu')
+                        ->insert([
+                            'organization_id' => $organization['id'],
+                            'menu_id' => $menu['id'],
+                        ]);
+            }
+        // 
 
         return redirect(route('organization'))->with('success', 'Organisasi Berhasil Disimpan!');
-
     }
 
     /**
