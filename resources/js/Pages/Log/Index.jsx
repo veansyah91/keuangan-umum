@@ -4,9 +4,6 @@ import Header from '@/Components/Header';
 import { Head, Link, router } from '@inertiajs/react';
 import TitleMobile from '@/Components/Mobiles/TitleMobile';
 import {
-    IoArrowBackOutline,
-    IoCalendarOutline,
-    IoFilter,
     IoPlayBack,
     IoPlayForward,
     IoSearchSharp,
@@ -22,10 +19,8 @@ import ContentDesktop from '@/Components/Desktop/ContentDesktop';
 import LogDesktop from './Components/LogDesktop';
 import { usePrevious } from 'react-use';
 
-export default function Index({ logs, organization, searchFilter, startDate, endDate }) {
+export default function Index({ logs, organization, searchFilter }) {
     // state
-    const [showSearch, setShowSearch] = useState(false);
-    const [showDateFilter, setShowDateFilter] = useState(false);
 
     // filter
     const [search, setSearch] = useState(searchFilter || '');
@@ -45,10 +40,6 @@ export default function Index({ logs, organization, searchFilter, startDate, end
     }, [debounceValue, debounceDateValue]);
 
     // function
-    const handleShowSearch = () => {
-        setShowSearch(!showSearch);
-    };
-
     const handleDateValueChange = (newValue) => {
         setDateValue(newValue);
     };

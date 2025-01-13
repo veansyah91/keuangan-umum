@@ -43,7 +43,7 @@ class Organization extends Model
 
     public function menus(): BelongsToMany
     {
-        return $this->belongsToMany(Menu::class)->withPivot('is_sctive');
+        return $this->belongsToMany(Menu::class, 'organization_menu', 'organization_id', 'menu_id')->withPivot('is_active');
     }
 
     public function accountCategory(): HasMany

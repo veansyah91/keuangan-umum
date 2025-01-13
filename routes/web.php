@@ -24,6 +24,7 @@ use App\Http\Controllers\DataMasterController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\AffiliationController;
+use App\Http\Controllers\MenuSettingController;
 use App\Http\Controllers\CashMutationController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\StaffContactController;
@@ -205,6 +206,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 			Route::get('/whatsapp-invoice/create', [WhatsappBroadcastingInvoiceController::class, 'create'])->name('add-ons.whatsapp-invoice.create');
 			Route::get('/whatsapp-invoice/{invoice}', [WhatsappBroadcastingInvoiceController::class, 'show'])->name('add-ons.whatsapp-invoice.show');
 		});
+
+		// Menu Setting
+		Route::get('/menu-setting/{organization}', [MenuSettingController::class, 'index'])->name('menu-setting');
+		Route::patch('/menu-setting/{organization}', [MenuSettingController::class, 'update'])->name('menu-setting.update');
 
 		// Data Master
 		Route::prefix('data-master/{organization}')->group(function () {
