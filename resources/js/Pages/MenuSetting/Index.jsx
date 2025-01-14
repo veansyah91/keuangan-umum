@@ -54,7 +54,7 @@ export default function Index({ pages, organization }) {
   },[]);
 
   const handleChangeData = (menu, index1, index2) => {
-    console.log(detail);
+    console.log(menu);
     console.log(index1);
     console.log(deindex2tail);
 
