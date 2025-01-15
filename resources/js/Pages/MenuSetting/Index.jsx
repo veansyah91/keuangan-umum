@@ -37,10 +37,6 @@ const filterData = (pages, menus) => {
   return newMenus;
 }
 
-const filterValue = (page, data) => {
-  // return data.filter(d => )
-}
-
 export default function Index({ pages, organization }) {
   const { data, setData, processing, patch } = useForm({
     'menu' : []

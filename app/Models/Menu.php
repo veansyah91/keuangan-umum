@@ -13,7 +13,7 @@ class Menu extends Model
 
     protected $fillable = ['name', 'page'];
 
-    public function organization(): BelongsToMany
+    public function organizations(): BelongsToMany
     {
         return $this->belongsToMany(Organization::class, 'organization_menu', 'organization_id', 'menu_id')->withPivot('is_active');
     }

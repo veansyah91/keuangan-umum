@@ -17,7 +17,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { RiFileListLine } from 'react-icons/ri';
 
 
-export default function Index({ organization }) {
+export default function Index({ organization, menus }) {
 	const { errors } = usePage().props;
 
 	useEffect(() => {
@@ -68,64 +68,71 @@ export default function Index({ organization }) {
 					</div>
 				</section>
 				<section className='text-center font-bold'>
-					<section className='pt-2 pb-10 space-y-3'>
-						<div className='text-center font-bold'>
-							Siswa
-						</div>
+					{
+						menus.find(menu => menu.menu_name === "SISWA") 
+						&& <section className='pt-2 pb-10 space-y-3'>
+							<div className='text-center font-bold'>
+								Siswa
+							</div>
+								<div className='flex justify-center gap-6'>
+									<Link 
+										href={route('data-master.students', organization.id)}
+										onError={errors => 
+											toast.error(errors.message, {
+												position: toast.POSITION.TOP_CENTER,
+											})
+										}    
+									>
+										<CardMenu 
+											bgColor={'bg-green-500'} 
+											icon={<IoMdPeople />} 
+											title={'Data Siswa'} 
+										/>
+									</Link>
+									<Link href={route('data-master.student-payment-category', organization.id)}>
+										<CardMenu 
+											bgColor={'bg-orange-900'} 
+											icon={<BiDetail />} 
+											title={'Rincian Biaya Bulanan'} 
+										/>
+									</Link>
+									<Link href={route('data-master.student-entry-payment-category', organization.id)}>
+										<CardMenu 
+											bgColor={'bg-slate-900'} 
+											icon={<BiCategory />} 
+											title={'Rincian Biaya Masuk'} 
+										/>
+									</Link>
+								</div>
+						</section>  
+					}
+					{
+						menus.find(menu => menu.menu_name === "STAFF")
+						&& <section className='pt-2 pb-10 space-y-3'>
+							<div className='text-center font-bold'>
+								Staf
+							</div>
 							<div className='flex justify-center gap-6'>
 								<Link 
-									href={route('data-master.students', organization.id)}
-									onError={errors => 
-										toast.error(errors.message, {
-											position: toast.POSITION.TOP_CENTER,
-										})
-									}    
+									href={route('data-master.staff', organization.id)}
 								>
 									<CardMenu 
-										bgColor={'bg-green-500'} 
-										icon={<IoMdPeople />} 
-										title={'Data Siswa'} 
+										bgColor={'bg-cyan-900'} 
+										icon={<FaPeopleGroup />} 
+										title={'Data Staf'} 
 									/>
 								</Link>
-								<Link href={route('data-master.student-payment-category', organization.id)}>
+								<Link href={route('data-master.salary-category', organization.id)}>
 									<CardMenu 
-										bgColor={'bg-orange-900'} 
-										icon={<BiDetail />} 
-										title={'Rincian Biaya Bulanan'} 
-									/>
-								</Link>
-								<Link href={route('data-master.student-entry-payment-category', organization.id)}>
-									<CardMenu 
-										bgColor={'bg-slate-900'} 
-										icon={<BiCategory />} 
-										title={'Rincian Biaya Masuk'} 
+										bgColor={'bg-rose-700'} 
+										icon={<RiFileListLine />} 
+										title={'Komponen Penggajian'} 
 									/>
 								</Link>
 							</div>
-					</section>  
-					<section className='pt-2 pb-10 space-y-3'>
-						<div className='text-center font-bold'>
-							Staf
-						</div>
-						<div className='flex justify-center gap-6'>
-							<Link 
-								href={route('data-master.staff', organization.id)}
-							>
-								<CardMenu 
-									bgColor={'bg-cyan-900'} 
-									icon={<FaPeopleGroup />} 
-									title={'Data Staf'} 
-								/>
-							</Link>
-							<Link href={route('data-master.salary-category', organization.id)}>
-								<CardMenu 
-									bgColor={'bg-rose-700'} 
-									icon={<RiFileListLine />} 
-									title={'Komponen Penggajian'} 
-								/>
-							</Link>
-						</div>
-					</section>  
+						</section> 
+					}
+					 
 				</section>
 			</ContainerDesktop>
 			{/* Desktop */}
@@ -156,65 +163,73 @@ export default function Index({ organization }) {
 					</Link>
 				</div>
 
-				<div className='sm:hidden pt-2 pb-5 px-2 mx-auto bg-white '>
-					<div className='text-center font-bold'>
-						Siswa
+				{
+					menus.find(menu => menu.menu_name === "SISWA") &&
+					<div className='sm:hidden pt-2 pb-5 px-2 mx-auto bg-white '>
+						<div className='text-center font-bold'>
+							Siswa
+						</div>
+						<div className='flex flex-wrap gap-2 w-full justify-center'>
+							<Link 
+								href={route('data-master.students', organization.id)}
+								onError={errors => 
+									toast.error(errors.message, {
+										position: toast.POSITION.TOP_CENTER,
+									})
+								}    
+							>
+								<CardMenu 
+									bgColor={'bg-green-500'} 
+									icon={<IoMdPeople />} 
+									title={'Data Siswa'} 
+								/>
+							</Link>
+							<Link href={route('data-master.student-payment-category', organization.id)}>
+								<CardMenu 
+									bgColor={'bg-orange-900'} 
+									icon={<BiDetail />} 
+									title={'Rincian Biaya Bulanan'} 
+								/>
+							</Link>
+							<Link href={route('data-master.student-entry-payment-category', organization.id)}>
+								<CardMenu 
+									bgColor={'bg-slate-900'} 
+									icon={<BiCategory />} 
+									title={'Rincian Biaya Masuk'} 
+								/>
+							</Link>
+						</div>
 					</div>
-					<div className='flex flex-wrap gap-2 w-full justify-center'>
-						<Link 
-							href={route('data-master.students', organization.id)}
-							onError={errors => 
-								toast.error(errors.message, {
-									position: toast.POSITION.TOP_CENTER,
-								})
-							}    
-						>
-							<CardMenu 
-								bgColor={'bg-green-500'} 
-								icon={<IoMdPeople />} 
-								title={'Data Siswa'} 
-							/>
-						</Link>
-						<Link href={route('data-master.student-payment-category', organization.id)}>
-							<CardMenu 
-								bgColor={'bg-orange-900'} 
-								icon={<BiDetail />} 
-								title={'Rincian Biaya Bulanan'} 
-							/>
-						</Link>
-						<Link href={route('data-master.student-entry-payment-category', organization.id)}>
-							<CardMenu 
-								bgColor={'bg-slate-900'} 
-								icon={<BiCategory />} 
-								title={'Rincian Biaya Masuk'} 
-							/>
-						</Link>
-					</div>
-				</div>
+				}
 
-				<div className='sm:hidden pt-2 pb-5 px-2 mx-auto bg-white '>
-					<div className='text-center font-bold'>
-						Staf
+				{
+					menus.find(menu => menu.menu_name === "STAFF") &&
+					<div className='sm:hidden pt-2 pb-5 px-2 mx-auto bg-white '>
+						<div className='text-center font-bold'>
+							Staf
+						</div>
+						<div className='flex flex-wrap gap-2 w-full justify-center'>
+							<Link 
+								href={route('data-master.staff', organization.id)}
+							>
+								<CardMenu 
+									bgColor={'bg-cyan-900'} 
+									icon={<FaPeopleGroup />} 
+									title={'Data Staf'} 
+								/>
+							</Link>
+							<Link href={route('data-master.salary-category', organization.id)}>
+								<CardMenu 
+									bgColor={'bg-rose-700'} 
+									icon={<RiFileListLine />} 
+									title={'Rincian Penggajian'} 
+								/>
+							</Link>
+						</div>
 					</div>
-					<div className='flex flex-wrap gap-2 w-full justify-center'>
-						<Link 
-							href={route('data-master.staff', organization.id)}
-						>
-							<CardMenu 
-								bgColor={'bg-cyan-900'} 
-								icon={<FaPeopleGroup />} 
-								title={'Data Staf'} 
-							/>
-						</Link>
-						<Link href={route('data-master.salary-category', organization.id)}>
-							<CardMenu 
-								bgColor={'bg-rose-700'} 
-								icon={<RiFileListLine />} 
-								title={'Rincian Penggajian'} 
-							/>
-						</Link>
-					</div>
-				</div>
+				}
+
+				
 			</section>
 			{/* Mobile */}
 		</>
