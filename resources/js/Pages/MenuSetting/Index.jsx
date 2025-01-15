@@ -16,7 +16,7 @@ import ContainerDesktop from '@/Components/Desktop/ContainerDesktop';
 import TitleDesktop from '@/Components/Desktop/TitleDesktop';
 import ContentDesktop from '@/Components/Desktop/ContentDesktop';
 import { usePrevious } from 'react-use';
-import { ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import FormInput from '@/Components/FormInput';
 import PrimaryButton from '@/Components/PrimaryButton';
 
@@ -26,7 +26,7 @@ const filterData = (pages, menus) => {
   pages.forEach(page => {
     let tempPage = {
       pageName: page.name,
-      details: menus.filter(menu => page.name === menu.page).map(menu => ({ menuId: menu.id, menuName: menu.name, isActive: menu.pivot.is_active }))
+      details: menus.filter(menu => page.name === menu.page).map(menu => ({ menuId: menu.id, menuName: menu.name, isActive: menu.pivot.is_active ? true:false }))
     }
     if (tempPage.details.length > 0) {
       newMenus = [
@@ -42,29 +42,40 @@ const filterValue = (page, data) => {
 }
 
 export default function Index({ pages, organization }) {
-  const { data, setData, processing } = useForm({
+  const { data, setData, processing, patch } = useForm({
     'menu' : []
   });
 
 
   useEffect(() => {
-
     setData('menu',filterData(pages, organization.menus));
-
   },[]);
 
   const handleChangeData = (menu, index1, index2) => {
-    console.log(menu);
-    console.log(index1);
-    console.log(index2);
 
-    
+    menu.details[index2] = {
+      ...menu.details[index2],
+      isActive: !menu.details[index2].isActive
+    }
+
+    let temp = [...data.menu];
+    temp[index1] = menu;
+
+    setData('menu', temp);    
   }
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    console.log(data);
+    patch(route('menu-setting.update', {organization: organization.id}), {
+      onSuccess: ({ props }) => {
+        const { flash } = props;
+        
+        toast.success(flash.success, {
+            position: toast.POSITION.TOP_CENTER,
+        });
+      }
+    })
     
   }
   
@@ -77,7 +88,7 @@ export default function Index({ pages, organization }) {
         <div className='w-full sm:mt-2 sm:py-5'>
           <div className='sm:mx-auto px-3 sm:px-5 space-y-5'>
             {
-              filterData(pages, organization.menus).map((menu, index1) => 
+              data.menu.map((menu, index1) => 
                 <div className='w-full text-slate-900 space-y-2 sm:space-y-0 sm:flex' key={index1}>
                   <div className='w-full sm:w-2/12 text-center sm:text-start uppercase font-bold'>
                     { menu.pageName }

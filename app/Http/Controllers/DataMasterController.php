@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Menu;
+use App\Models\Page;
+use Inertia\Inertia;
 use App\Models\Organization;
-use App\Repositories\User\UserRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
+use App\Repositories\User\UserRepository;
 
 class DataMasterController extends Controller
 {
@@ -23,6 +25,10 @@ class DataMasterController extends Controller
     public function __invoke(Request $request, Organization $organization)
     {
         $user = Auth::user();
+
+        $menus = Menu::where('page', "DATA MASTER")->get();
+
+        // $organization
 
         return Inertia::render('DataMaster/Index', [
             'organization' => $organization,
