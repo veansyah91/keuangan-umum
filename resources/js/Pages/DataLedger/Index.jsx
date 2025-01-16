@@ -6,7 +6,7 @@ import ContainerDesktop from '@/Components/Desktop/ContainerDesktop';
 import CardMenu from '@/Components/CardMenu';
 import { PiNotebook } from 'react-icons/pi';
 import { LiaClipboardListSolid } from 'react-icons/lia';
-import { RiBookletLine } from 'react-icons/ri';
+import { RiBookletLine, RiMenu3Fill } from 'react-icons/ri';
 import { IoMdList } from 'react-icons/io';
 
 export default function Index({ organization, menus }) {
@@ -40,6 +40,17 @@ export default function Index({ organization, menus }) {
 							</div>
 						</>
 					}
+					{
+						menus.find(menu => menu.menu_name === "STAFF") &&
+						<>
+							<div className='mx-auto w-full text-center font-bold'>Staf</div>
+							<div className='flex justify-center pt-5 pb-10 gap-5'>		
+								<Link href={route('data-ledger.account-staff', organization.id)}>
+									<CardMenu bgColor={'bg-rose-500'} icon={<RiMenu3Fill />} title={'Daftar Akun Staf'} />
+								</Link>					
+							</div>
+						</>
+					}
 					
 				</section>
 				<section>
@@ -65,15 +76,18 @@ export default function Index({ organization, menus }) {
 						<CardMenu bgColor={'bg-orange-500'} icon={<PiNotebook />} title={'Data Akun'} />
 					</Link>
 				</div>
-				<div className='mx-auto w-full text-center font-bold pt-2'>Sekolah</div>
-				<div className='flex flex-wrap gap-2 w-full justify-center'>
-					{
-						menus.find(menu => menu.menu_name === "SEKOLAH") &&
-						<Link href={route('data-ledger.account-school', organization.id)}>
-							<CardMenu bgColor={'bg-slate-500'} icon={<IoMdList />} title={'Daftar Akun Sekolah'} />
-						</Link>	
-					}
-				</div>
+				{
+					menus.find(menu => menu.menu_name === "SEKOLAH") &&
+					<>
+						<div className='mx-auto w-full text-center font-bold pt-2'>Sekolah</div>
+						<div className='flex flex-wrap gap-2 w-full justify-center'>
+							<Link href={route('data-ledger.account-school', organization.id)}>
+								<CardMenu bgColor={'bg-slate-500'} icon={<IoMdList />} title={'Daftar Akun Sekolah'} />
+							</Link>	
+						</div>
+					</>
+				}
+
 				<div className='flex flex-wrap gap-2 w-full justify-center mt-5'>
 					<Link href={route('data-ledger.journal', organization.id)}>
 						<CardMenu bgColor={'bg-emerald-500'} icon={<RiBookletLine />} title={'Jurnal Umum'} />

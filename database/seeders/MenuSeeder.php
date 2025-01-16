@@ -22,6 +22,10 @@ class MenuSeeder extends Seeder
         "page" => "BUKU BESAR"
        ],
        [
+        "name" => "STAFF",
+        "page" => "BUKU BESAR"
+       ],
+       [
         "name" => "SISWA",
         "page" => "ARUS KAS"
        ],

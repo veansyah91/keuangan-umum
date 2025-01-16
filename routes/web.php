@@ -25,6 +25,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\AffiliationController;
 use App\Http\Controllers\MenuSettingController;
+use App\Http\Controllers\AccountStaffController;
 use App\Http\Controllers\CashMutationController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\StaffContactController;
@@ -327,6 +328,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 			// Account School
 			Route::get('/account-school', [AccountSchoolController::class, 'index'])->name('data-ledger.account-school');
 			Route::patch('/account-school', [AccountSchoolController::class, 'update'])->name('data-ledger.account-school.update');
+
+			// Account Staff
+			Route::get('/account-staff', [AccountStaffController::class, 'index'])->name('data-ledger.account-staff');
+			Route::patch('/account-staff', [AccountStaffController::class, 'update'])->name('data-ledger.account-staff.update');
 
 			// Journal
 			Route::get('/journals', [JournalController::class, 'index'])->name('data-ledger.journal');
