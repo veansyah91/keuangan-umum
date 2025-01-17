@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Inertia\Inertia;
+use App\Models\AccountStaff;
 use App\Models\Organization;
 use Illuminate\Http\Request;
 use App\Models\SchoolAccountSetting;
@@ -68,6 +69,12 @@ class AccountSchoolController extends Controller
 		
 		// cek apakah sudah ada data atau tidak
 		$account = SchoolAccountSetting::find($request->id);
+
+		AccountStaff::updateOrCreate([
+			'organization_id' => $organization['id']
+		],[
+			'staff_salary_expense' => $validated['staff_salary_expense']
+		]);
 
 		if ($account) {
 			$account->update($validated);

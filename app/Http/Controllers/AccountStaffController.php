@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use App\Models\AccountStaff;
 use App\Models\Organization;
 use Illuminate\Http\Request;
+use App\Models\SchoolAccountSetting;
 use App\Repositories\Account\AccountRepository;
 
 class AccountStaffController extends Controller
@@ -41,6 +42,18 @@ class AccountStaffController extends Controller
 			],			
 		]);
 
-		dd($validated);
+		AccountStaff::updateOrCreate([
+			'organization_id' => $organization['id']
+		],[
+			'staff_salary_expense' => $validated['staff_salary_expense']
+		]);
+
+		SchoolAccountSetting::updateOrCreate([
+			'organization_id' => $organization['id']
+		],[
+			'staff_salary_expense' => $validated['staff_salary_expense']
+		]);
+
+		return redirect()->back()->with('success', 'Tautan Akun Berhasil Diperbarui');
 	}
 }

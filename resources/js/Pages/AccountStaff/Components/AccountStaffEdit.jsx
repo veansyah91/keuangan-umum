@@ -8,9 +8,10 @@ import { Link, useForm } from '@inertiajs/react';
 import FormInput from '@/Components/FormInput';
 import { toast } from 'react-toastify';
 
-export default function AccountStaffEdit({ organization, accountStaff, accounts }) {
+export default function AccountStaffEdit({ organization, accountStaff, accounts }) {	
 	const { setIsEdit } = useContext(AccountStaffState);
   const { data, setData,  patch, processing, errors } = useForm({
+		id: accountStaff ? accountStaff.id : null,
     staff_salary_expense: accountStaff ? accountStaff.staff_salary_expense.id : null,
   });
 
@@ -31,7 +32,7 @@ export default function AccountStaffEdit({ organization, accountStaff, accounts 
 	};
 
 	const handleSubmit = (e) => {
-		e.preventDefault();
+		e.preventDefault();		
 
 		patch(route('data-ledger.account-staff.update', {
 			organization: organization.id,

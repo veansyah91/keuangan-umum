@@ -12,6 +12,7 @@ use App\Models\Journal;
 use App\Models\WhatsappLog;
 use Carbon\CarbonImmutable;
 use App\Helpers\PhoneNumber;
+use App\Models\AccountStaff;
 use App\Models\ContactStaff;
 use App\Models\Organization;
 use App\Models\StudentLevel;
@@ -169,8 +170,8 @@ class StaffSalaryPaymentController extends Controller
 		$validated['created_by_id'] = $user['id'];
 
 		// tautkan akun-akun
-		$schoolAccount = SchoolAccountSetting::whereOrganizationId($organization['id'])->first();
-		$debitAccount = Account::find($schoolAccount['staff_salary_expense']);
+		$accountStaff = AccountStaff::whereOrganizationId($organization['id'])->first();
+		$debitAccount = Account::find($accountStaff['staff_salary_expense']);
 		$creditAccount = Account::find($validated['cash_account_id']);
 		$validated['accounts'] = [
 			[

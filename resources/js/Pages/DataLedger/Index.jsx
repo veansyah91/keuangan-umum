@@ -87,7 +87,6 @@ export default function Index({ organization, menus }) {
 						</div>
 					</>
 				}
-
 				<div className='flex flex-wrap gap-2 w-full justify-center mt-5'>
 					<Link href={route('data-ledger.journal', organization.id)}>
 						<CardMenu bgColor={'bg-emerald-500'} icon={<RiBookletLine />} title={'Jurnal Umum'} />

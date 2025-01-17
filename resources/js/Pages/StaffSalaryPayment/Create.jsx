@@ -80,7 +80,7 @@ const dataDetails = (contacts, categories) => {
 
 export default function Create({
   organization, categories, newRef, date, cashAccounts, contacts, history
-}) {	
+}) {		
   const { data, setData, post, errors, processing } = useForm({
     value: 0,
     organization_id : organization.id,
@@ -90,7 +90,7 @@ export default function Create({
     study_year:dayjs(date).format('YYYY').toString(),
 		cash_account_id: '',
 		details:dataDetails(contacts, categories)
-  })
+  });	
 	
 	const [dateValue, setDateValue] = useState({
 		startDate: date,
@@ -268,18 +268,18 @@ export default function Create({
 	}
 
 	const handleReloadOldValue = () => {	
-		let tempData = data;
+		let tempData = data;		
 		
 		let newDetails = tempData.details.map(detail =>
 			{				
 				let newCategory = detail.categories.map(category => {
-					let findCategoryInHistory = history.details.find(history => history.contact_id === detail.id && history.category_id === category.id);
-					
+					let findCategoryInHistory = history.details.find(history => history.contact_id === detail.id && history.category_id === category.id);			
+
 					return {
 						...category,
-						value: category.has_hour ? category.value : findCategoryInHistory.value,
-						total: category.has_hour ?  0 : findCategoryInHistory.value,
-						qty: category.has_hour ?  0 : 1
+						value: category.has_hour ? (findCategoryInHistory.value > 0 ? (findCategoryInHistory.value/findCategoryInHistory.qty) : category.value) : findCategoryInHistory.value,
+						total: findCategoryInHistory.value,
+						qty: category.has_hour ? findCategoryInHistory.qty : 1
 					}				
 				});
 
@@ -297,7 +297,7 @@ export default function Create({
 			details: newDetails
 		}
 
-		setData(tempData);
+		setData(tempData);		
 
 		setContactForm({
 			id: tempData?.details[step]?.id, 

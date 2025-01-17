@@ -122,15 +122,12 @@ export default function AccountSchoolEdit({ organization, accountSchool, account
 
 				toast.success(flash.success, {
 					position: toast.POSITION.TOP_CENTER,
-			});
-				
+				});
 			},
 			onError: errors => {
-				console.log(errors);
-				
+				console.log(errors);				
 			}
 		});
-
 	}
 
   return (
