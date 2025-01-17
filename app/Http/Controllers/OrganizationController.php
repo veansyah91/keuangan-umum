@@ -12,6 +12,7 @@ use App\Models\Contact;
 use App\Models\Village;
 use App\Models\Affiliation;
 use Illuminate\Support\Str;
+use App\Models\AccountStaff;
 use App\Models\Organization;
 use Illuminate\Http\Request;
 use App\Models\ContactCategory;
@@ -576,6 +577,7 @@ class OrganizationController extends Controller
         }
         //
         SchoolAccountSetting::create($attribute);
+        AccountStaff::create($attribute);
 
         // Category
         $contactCategories = [

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('accout_staff', function (Blueprint $table) {
+        Schema::create('account_staff', function (Blueprint $table) {
             $table->id();
             $table->foreignUuid('organization_id')->constrained()->cascadeOnDelete();
 
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('accout_staff');
+        Schema::dropIfExists('account_staff');
     }
 };

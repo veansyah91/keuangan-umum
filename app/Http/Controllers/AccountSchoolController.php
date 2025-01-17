@@ -16,6 +16,7 @@ class AccountSchoolController extends Controller
 	{
 			$this->accountRepository = $accountRepository;
 	}
+	
 	public function index(Organization $organization)
 	{
 		$accountSchool = SchoolAccountSetting::whereOrganizationId($organization['id'])

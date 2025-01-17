@@ -64,39 +64,51 @@ export default function AccountSchoolEdit({ organization, accountSchool, account
 
   // function
 	const handleEntryStudent = (selected) => {   
-		errors.entry_student = null;
-    setEntryStudent({ id: selected.id, name: selected.name, code: selected.code, is_cash: selected.is_cash });
-    setData('entry_student', selected.id);
+		if (selected){
+			errors.entry_student = null;
+			setEntryStudent({ id: selected.id, name: selected.name, code: selected.code, is_cash: selected.is_cash });
+			setData('entry_student', selected.id);
+		}
 	};
 
   const handleReceivableEntryStudent = (selected) => { 
-		errors.receivable_entry_student = null;
-    setReceivableEntryStudent({ id: selected.id, name: selected.name, code: selected.code, is_cash: selected.is_cash });
-    setData('receivable_entry_student', selected.id);
+		if (selected){
+			errors.receivable_entry_student = null;
+			setReceivableEntryStudent({ id: selected.id, name: selected.name, code: selected.code, is_cash: selected.is_cash });
+			setData('receivable_entry_student', selected.id);
+		}
 	};
 
 	const handleReceivableMonthlyStudent = (selected) => { 
-		errors.receivable_monthly_student = null;
-    setReceivableMonthlyStudent({ id: selected.id, name: selected.name, code: selected.code, is_cash: selected.is_cash });
-    setData('receivable_monthly_student', selected.id);
+		if (selected){
+			errors.receivable_monthly_student = null;
+			setReceivableMonthlyStudent({ id: selected.id, name: selected.name, code: selected.code, is_cash: selected.is_cash });
+			setData('receivable_monthly_student', selected.id);
+		}
 	};
 
 	const handlePrepaidStudent = (selected) => {    
-		errors.prepaid_student = null;
-    setPrepaidStudent({ id: selected.id, name: selected.name, code: selected.code, is_cash: selected.is_cash });
-    setData('prepaid_student', selected.id);
+		if (selected){
+			errors.prepaid_student = null;
+			setPrepaidStudent({ id: selected.id, name: selected.name, code: selected.code, is_cash: selected.is_cash });
+			setData('prepaid_student', selected.id);
+		}
 	};
 
 	const handleRevenueStudent = (selected) => {  
-		errors.revenue_student = null;
-    setRevenueStudent({ id: selected.id, name: selected.name, code: selected.code, is_cash: selected.is_cash });
-    setData('revenue_student', selected.id);
+		if (selected){
+			errors.revenue_student = null;
+			setRevenueStudent({ id: selected.id, name: selected.name, code: selected.code, is_cash: selected.is_cash });
+			setData('revenue_student', selected.id);
+		}
 	};
 
 	const handleStaffSalaryExpense = (selected) => { 
-		errors.staff_salary_expense = null;
-    setStaffSalaryExpense({ id: selected.id, name: selected.name, code: selected.code, is_cash: selected.is_cash });
-    setData('staff_salary_expense', selected.id);
+		if (selected){
+			errors.staff_salary_expense = null;
+			setStaffSalaryExpense({ id: selected.id, name: selected.name, code: selected.code, is_cash: selected.is_cash });
+			setData('staff_salary_expense', selected.id);
+		}
 	};
 
 	const handleSubmit = (e) => {

@@ -22,16 +22,18 @@ export default function AccountStaffEdit({ organization, accountStaff, accounts 
 	});
 
   // function
-	const handleStaffSalaryExpense = (selected) => { 
+	const handleStaffSalaryExpense = (selected) => { 		
 		errors.staff_salary_expense = null;
-    setStaffSalaryExpense({ id: selected.id, name: selected.name, code: selected.code, is_cash: selected.is_cash });
-    setData('staff_salary_expense', selected.id);
+		if (selected){
+			setStaffSalaryExpense({ id: selected ? selected.id : null, name: selected ? selected.name : '', code: selected ? selected.code : '', is_cash: selected ? selected.is_cash : false });
+			setData('staff_salary_expense', selected ? selected.id : null);
+		}    
 	};
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
 
-		patch(route('data-ledger.account-Staff.update', {
+		patch(route('data-ledger.account-staff.update', {
 			organization: organization.id,
 		}),{
 			onSuccess: ({ props }) => {

@@ -18,5 +18,11 @@ class DatabaseSeeder extends Seeder
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
         // ]);
+
+        // Perbarui Halaman
+        $this->call(MenuTableSeeder::class);
+        $this->call(OrganizationMenuTableSeeder::class);
+
+        // sesuaikan akun sekolah dengan akun staff
     }
 }
