@@ -1,0 +1,1 @@
+import{j as e}from"./app-cbf17b2f.js";function s({menu:r,className:t}){return e.jsx(e.Fragment,{children:e.jsxs("tr",{className:t,children:[e.jsx("td",{children:r.page}),e.jsx("td",{children:r.name})]})})}export{s as default};
