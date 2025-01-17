@@ -1,7 +1,7 @@
-import React, { useEffect, useState, createContext } from 'react';
+import React, { useState, createContext } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { IoArrowBackOutline } from 'react-icons/io5';
 import { ToastContainer } from 'react-toastify';
 import AccountStaffEdit from './Components/AccountStaffEdit';

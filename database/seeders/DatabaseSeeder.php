@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         // Perbarui Halaman
-        $this->call(MenuTableSeeder::class);
+        $this->call(MenuSeeder::class);
         $this->call(OrganizationMenuTableSeeder::class);
 
         // sesuaikan akun sekolah dengan akun staff

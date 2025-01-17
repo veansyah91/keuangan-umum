@@ -8,15 +8,27 @@ use Inertia\Response;
 use App\Models\Organization;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Repositories\User\UserRepository;
+use Illuminate\Support\Facades\Auth;
 
 class MenuSettingController extends Controller
 {
+	protected $userRepository;
+
+	public function __construct(UserRepository $userRepository)
+	{
+		$this->userRepository = $userRepository;
+	}
+	
 	public function index(Organization $organization): Response
 	{
+		$user = Auth::user();
+
 		$organizationMenu = Organization::with('menus')->find($organization['id']);
 		$pages = Page::all();
 		return Inertia::render('MenuSetting/Index', [
 			'organization' => $organizationMenu,
+			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'pages' => $pages
 		]);
 	}

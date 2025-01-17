@@ -70,7 +70,6 @@ class SendSalaryNotifViaWhatsappJon implements ShouldQueue
 
 					$tempDetail .= "\n" . $key++ . "." . $detail->category->name . ": " . $unit . number_format($detail->value, 0, '', '.');	
 				}
-
 			}
 
 			// detail plus
@@ -111,7 +110,7 @@ class SendSalaryNotifViaWhatsappJon implements ShouldQueue
 				'sandbox' => 'false'
 			);
 
-			// \Log::channel('whatsapp')->info($message);
+			\Log::channel('whatsapp')->info($message);
 			SendWhatsAppNotifJob::dispatch($data, $whatsAppLog['id'])->onQueue('whatsapp')->delay(now()->addSeconds(rand(100, 200)));
 
 		}
