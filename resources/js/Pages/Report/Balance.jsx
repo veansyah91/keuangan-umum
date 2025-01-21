@@ -149,13 +149,11 @@ export default function Balance({
             ];
 
             tempLedgers.sort((a, b) => a.code - b.code);
-
         }
         
         tempEquity += (active + pasive) * -1;
 
         setDataLedgers(tempLedgers);
-
         setAsset(tempAsset);
         setLiability(tempLiability * -1);
         setEquity(tempEquity * -1);
