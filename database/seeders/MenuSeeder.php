@@ -33,6 +33,10 @@ class MenuSeeder extends Seeder
         "name" => "STAFF",
         "page" => "ARUS KAS"
        ],
+       [
+        "name" => "SIMPAN PINJAM",
+        "page" => "ARUS KAS"
+       ],
     ];
     /**
      * Run the database seeds.

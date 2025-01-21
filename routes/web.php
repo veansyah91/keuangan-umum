@@ -5,9 +5,11 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\LogController;
+use App\Http\Controllers\DebtController;
 use App\Http\Controllers\AddonsController;
 use App\Http\Controllers\CashinController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SavingController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\CashoutController;
 use App\Http\Controllers\ContactController;
@@ -448,6 +450,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 			Route::post('/staff-salary-payment/{payment}/send-whatsapp-multi', [StaffSalaryPaymentController::class, 'sendWhatsappMulti'])->name('cashflow.staff-salary-payment.send-whatsapp-multi');
 			Route::get('/staff-salary-payment/{id}/{staff}/edit', [StaffSalaryPaymentController::class, 'editStaff'])->name('cashflow.staff-salary-payment.staff.edit');
 			Route::patch('/staff-salary-payment/{payment}/{staff}', [StaffSalaryPaymentController::class, 'updateStaff'])->name('cashflow.staff-salary-payment.staff.update');
+
+			// debt
+			Route::get('/debt', DebtController::class)->name('cashflow.debt');
+
+			// saving
+			Route::get('/saving', SavingController::class)->name('cashflow.saving');
 
 		});
 

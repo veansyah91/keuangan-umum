@@ -3,7 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
 import { Head, Link } from '@inertiajs/react';
 import ContainerDesktop from '@/Components/Desktop/ContainerDesktop';
-import { FaHandHoldingUsd, FaMoneyBillWaveAlt } from 'react-icons/fa';
+import { FaHandHoldingUsd, FaMoneyBillWaveAlt, FaWallet } from 'react-icons/fa';
 import CardMenu from '@/Components/CardMenu';
 import { FaMoneyBillTransfer } from 'react-icons/fa6';
 import { SlNotebook } from "react-icons/sl";
@@ -11,7 +11,7 @@ import { LiaMoneyBillWaveSolid } from 'react-icons/lia';
 import { PiMoney } from 'react-icons/pi';
 import { CgNotes } from 'react-icons/cg';
 
-export default function Index({ organization, menus }) {	
+export default function Index({ organization, menus }) {		
 	return (
 		<>
 			<Head title='Arus Kas' />
@@ -104,13 +104,32 @@ export default function Index({ organization, menus }) {
 							</div>
 						</section>  
 						</section>
-					}				
+					}	
+					{
+						menus.find(menu => menu.menu_name === "SIMPAN PINJAM")
+						&& <section className='text-center font-bold'>
+						<section className='pt-2 pb-10 space-y-3'>
+							<div className='text-center font-bold'>
+								Simpan
+							</div>
+							<div className='flex justify-center gap-6'>
+								<Link href={route('cashflow.debt', organization.id)}>
+									<CardMenu 
+										bgColor={'bg-blue-400'} 
+										icon={<FaWallet />} 
+										title={'Simpan'} 
+									/>
+								</Link>
+							</div>
+						</section>  
+						</section>
+					}					
 			</ContainerDesktop>
 			{/* Desktop */}
 
 			{/* Mobile */}
 			<section>
-				<div className='sm:hidden flex flex-wrap pt-14 pb-5 px-2 mx-auto bg-white gap-2 w-full justify-center'>
+				<div className='sm:hidden flex flex-wrap pt-14 px-2 mx-auto bg-white gap-2 w-full justify-center'>
 					<Link href={route('cashflow.cash-in', organization.id)}>
 						<CardMenu bgColor={'bg-cyan-500'} icon={<FaHandHoldingUsd />} title={'Penerimaan'} />
 					</Link>
@@ -185,9 +204,27 @@ export default function Index({ organization, menus }) {
 						<div className='flex flex-wrap pt-2 px-2 mx-auto gap-2 w-full justify-center'>
 							<Link href={route('cashflow.staff-salary-payment', organization.id)}>
 								<CardMenu 
-									bgColor={'bg-green-500'} 
+									bgColor={'bg-slate-800'} 
 									icon={<LiaMoneyBillWaveSolid />} 
 									title={'Pembayaran Gaji Bulanan'} 
+								/>
+							</Link>
+						</div>
+					</div>
+				}	
+
+				{
+					menus.find(menu => menu.menu_name === "SIMPAN PINJAM") &&
+					<div className='sm:hidden pt-5 bg-white '>
+						<div className='text-center font-bold'>
+							Simpan
+						</div>
+						<div className='flex flex-wrap pt-2 px-2 mx-auto gap-2 w-full justify-center'>
+							<Link href={route('cashflow.debt', organization.id)}>
+								<CardMenu 
+									bgColor={'bg-blue-400'} 
+									icon={<FaWallet />} 
+									title={'Simpan'} 
 								/>
 							</Link>
 						</div>

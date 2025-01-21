@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
 
         // Perbarui Halaman
         $this->call(MenuSeeder::class);
-        $this->call(OrganizationMenuTableSeeder::class);
+        $this->call(OrganizationMenuSeeder::class);
 
         // sesuaikan akun sekolah dengan akun staff
     }
