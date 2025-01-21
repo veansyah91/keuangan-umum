@@ -134,8 +134,7 @@ export default function Balance({
                 ...tempLedgers[arrayEarningYear],
                 total: tempValue * -1,
             };
-            tempEquity += tempValue * -1;
-            console.log(active + pasive);        
+            tempEquity += tempValue * -1;     
 
         } else {
             tempLedgers = [
@@ -151,13 +150,9 @@ export default function Balance({
 
             tempLedgers.sort((a, b) => a.code - b.code);
 
-            tempEquity += (active + pasive) * -1;
-            // console.log(tempEquity);   
-            console.log(active + pasive);        
-
         }
-
-        // console.log(tempEquity);        
+        
+        tempEquity += (active + pasive) * -1;
 
         setDataLedgers(tempLedgers);
 
