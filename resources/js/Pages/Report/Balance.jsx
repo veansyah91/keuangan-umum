@@ -119,11 +119,10 @@ export default function Balance({
             if (ledger.code >= '300000000' && ledger.code <= '399999999') {
                 tempEquity += parseInt(ledger.total);
                 pasive += parseInt(ledger.total);
-
                 if (!ledger.can_be_deleted) {
                     arrayEarningYear = index;
                 }
-            }
+            }            
         });     
 
         let tempLedgers = [...ledgers];
@@ -134,8 +133,8 @@ export default function Balance({
                 ...tempLedgers[arrayEarningYear],
                 total: tempValue * -1,
             };
-            tempEquity += tempValue * -1;     
 
+            // tempEquity += tempValue * -1;              
         } else {
             tempLedgers = [
                 ...tempLedgers,
@@ -147,12 +146,11 @@ export default function Balance({
                     total: (active + pasive) * -1,
                 },
             ];
-
             tempLedgers.sort((a, b) => a.code - b.code);
         }
-        
-        tempEquity += (active + pasive) * -1;
 
+        tempEquity += (active + pasive) * -1;   
+                 
         setDataLedgers(tempLedgers);
         setAsset(tempAsset);
         setLiability(tempLiability * -1);
@@ -162,7 +160,6 @@ export default function Balance({
     const handleEndDateValueChange = (newValue) => {
         setEndDateValue(newValue);
         setEndDate(dayjs(newValue.endDate).format('YYYY-MM-DD'));
-
     };
 
     const handleReload = () => {

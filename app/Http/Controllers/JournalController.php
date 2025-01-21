@@ -259,6 +259,7 @@ class JournalController extends Controller
     {
         $user = Auth::user();
 
+
         // cek apakah role user yang mengakses adalah admin atau pengguna yang membuat data, jika bukan, maka redirect ke halaman awal
         $organizationUser = User::whereId($user['id'])
             ->with('organizations', function ($query) use ($organization) {
@@ -275,13 +276,13 @@ class JournalController extends Controller
         }
 
         // jika tahun, tidak dalam periode
-        $year = $this->now->isoFormat('YYYY');
-        $tempDateInput = Carbon::create($journal['date']);
-        $yearInput = $tempDateInput->isoFormat('YYYY');
+        // $year = $this->now->isoFormat('YYYY');
+        // $tempDateInput = Carbon::create($journal['date']);
+        // $yearInput = $tempDateInput->isoFormat('YYYY');
 
-        if ($yearInput !== $year) {
-            return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
-        }
+        // if ($yearInput !== $year) {
+        //     return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
+        // }
 
         $now = Carbon::now();
         $date = request('date') ?? $journal['date'];
