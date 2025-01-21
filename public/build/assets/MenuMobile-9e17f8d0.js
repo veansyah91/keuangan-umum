@@ -1,1 +1,0 @@
-import{j as s}from"./app-cc504c21.js";function a({menu:e}){return s.jsx("div",{className:" text-gray-900 py-2 px-2 border flex gap-5 justify-start",children:s.jsxs("div",{className:"mr-2 text-start",children:[s.jsxs("div",{className:"text-sm",children:["Halaman: ",e.page]}),s.jsx("div",{className:"font-bold text-lg",children:e.name})]})})}export{a as default};

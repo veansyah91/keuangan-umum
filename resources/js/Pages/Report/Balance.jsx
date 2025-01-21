@@ -133,8 +133,7 @@ export default function Balance({
                 ...tempLedgers[arrayEarningYear],
                 total: tempValue * -1,
             };
-
-            // tempEquity += tempValue * -1;              
+       
         } else {
             tempLedgers = [
                 ...tempLedgers,
