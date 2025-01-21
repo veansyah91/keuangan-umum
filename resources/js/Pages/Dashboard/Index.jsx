@@ -15,7 +15,7 @@ import { FaHandHoldingUsd } from 'react-icons/fa';
 import CostRevenueChart from './Components/CostRevenueChart';
 import CashflowChart from './Components/CashflowChart';
 
-const Index = ({ balance, startDate, endDate }) => {
+const Index = ({ balance, startDate, endDate }) => {    
     const { date, setDate } = useContext(AppContext);
     const [isLoading, setIsLoading] = useState(false);    
 

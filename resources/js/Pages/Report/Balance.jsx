@@ -26,6 +26,7 @@ export default function Balance({
     program,
     department,
 }) {
+    
     const [dataLedgers, setDataLedgers] = useState([]);
     const [endDate, setEndDate] = useState(endDateFilter || '');
 
@@ -123,7 +124,7 @@ export default function Balance({
                     arrayEarningYear = index;
                 }
             }
-        });
+        });     
 
         let tempLedgers = [...ledgers];
 
@@ -134,6 +135,8 @@ export default function Balance({
                 total: tempValue * -1,
             };
             tempEquity += tempValue * -1;
+            console.log(active + pasive);        
+
         } else {
             tempLedgers = [
                 ...tempLedgers,
@@ -149,7 +152,12 @@ export default function Balance({
             tempLedgers.sort((a, b) => a.code - b.code);
 
             tempEquity += (active + pasive) * -1;
+            // console.log(tempEquity);   
+            console.log(active + pasive);        
+
         }
+
+        // console.log(tempEquity);        
 
         setDataLedgers(tempLedgers);
 

@@ -38,7 +38,7 @@ export default function BalanceContent({ title, ledgers, showCode, type, amount 
             default:
                 break;
         }
-    };
+    };    
 
     return (
         <div className='mt-3'>
