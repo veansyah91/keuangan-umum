@@ -206,7 +206,7 @@ class AccountController extends Controller
 
         // cek di buku besar, apakah akun pernah digunakan
         $ledger = Ledger::whereAccountId($account['id'])
-            ->first();
+                        ->first();
 
         if ($ledger) {
             return redirect()->back()->withErrors(['used' => 'Tidak Dapat Dihapus, Akun Telah Digunakan']);

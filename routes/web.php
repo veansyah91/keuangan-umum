@@ -458,10 +458,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
 			// saving
 			Route::get('/saving', SavingController::class)->name('cashflow.saving');
 
+			// saving category
 			Route::get('/saving/category', [SavingCategoryController::class, 'index'])->name('cashflow.saving-category');
 			Route::post('/saving/category', [SavingCategoryController::class, 'store'])->name('cashflow.saving-category.store');
 			Route::patch('/saving/category/{category}', [SavingCategoryController::class, 'update'])->name('cashflow.saving-category.update');
 			Route::delete('/saving/category/{category}', [SavingCategoryController::class, 'destroy'])->name('cashflow.saving-category.delete');
+
+			// saving credit
+
+			// saving debit
+
+			// savings
 		});
 
 	});
