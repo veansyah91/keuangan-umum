@@ -115,16 +115,16 @@ export default function Index({
         router.reload({
             only: ['code'],
             data: {
-                selectedAccountCategory: selectedAccountCategory.id,
+                selectedAccountCategory: selectedAccountCategory?.id,
             },
             onSuccess: (page) => {
                 setData({
                     ...data,
                     code:
-                        tempData.selectedAccountCategoryId == selectedAccountCategory.id
+                        tempData.selectedAccountCategoryId == selectedAccountCategory?.id
                             ? tempData.code
                             : page.props.code.toString(),
-                    account_category_id: selectedAccountCategory.id,
+                    account_category_id: selectedAccountCategory?.id,
                     is_cash: !isEdit && parseInt(page.props.code) < 120000000 ? true : false,
                 });
             },
