@@ -113,7 +113,7 @@ export default function Index({ organization, menus }) {
 								Simpan
 							</div>
 							<div className='flex justify-center gap-6'>
-								<Link href={route('cashflow.debt', organization.id)}>
+								<Link href={route('cashflow.saving', organization.id)}>
 									<CardMenu 
 										bgColor={'bg-blue-400'} 
 										icon={<FaWallet />} 
@@ -220,7 +220,7 @@ export default function Index({ organization, menus }) {
 							Simpan
 						</div>
 						<div className='flex flex-wrap pt-2 px-2 mx-auto gap-2 w-full justify-center'>
-							<Link href={route('cashflow.debt', organization.id)}>
+							<Link href={route('cashflow.saving', organization.id)}>
 								<CardMenu 
 									bgColor={'bg-blue-400'} 
 									icon={<FaWallet />} 

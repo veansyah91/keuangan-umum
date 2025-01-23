@@ -7,19 +7,24 @@ use App\Models\AccountStaff;
 use App\Models\Organization;
 use Illuminate\Http\Request;
 use App\Models\SchoolAccountSetting;
+use Illuminate\Support\Facades\Auth;
+use App\Repositories\User\UserRepository;
 use App\Repositories\Account\AccountRepository;
 
 class AccountSchoolController extends Controller
 {
-	protected $accountRepository;
+	protected $accountRepository, $userRepository;
 
-	public function __construct(AccountRepository $accountRepository)
+	public function __construct(AccountRepository $accountRepository, UserRepository $userRepository)
 	{
 			$this->accountRepository = $accountRepository;
+			$this->userRepository = $userRepository;
 	}
 	
 	public function index(Organization $organization)
 	{
+		$user = Auth::user();
+
 		$accountSchool = SchoolAccountSetting::whereOrganizationId($organization['id'])
 																					->with([
 																						'staffSalaryExpense',
@@ -32,6 +37,7 @@ class AccountSchoolController extends Controller
 																					->first();
 
 		return Inertia::render('AccountSchool/Index', [
+			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'organization' => $organization,
 			'accountSchool' => $accountSchool,
 			'accounts' => $this->accountRepository->getDataNonCash($organization['id'], request(['account'])),

@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\StudentEntryPaymentCategory;
-use App\Repositories\Log\LogRepository;
-use App\Repositories\User\UserRepository;
 use Inertia\Inertia;
 use App\Models\Organization;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use App\Repositories\Log\LogRepository;
+use App\Repositories\User\UserRepository;
+use Illuminate\Support\Facades\Validator;
+use App\Models\StudentEntryPaymentCategory;
 
 class StudentEntryPaymentCategoryController extends Controller
 {
@@ -105,6 +106,11 @@ class StudentEntryPaymentCategoryController extends Controller
     public function destroy(Organization $organization, StudentEntryPaymentCategory $studentEntryPaymentCategory)
     {
         // cek penggunaan
+        $using = DB::table('s_yearly_payment_details')->where('student_payment_category_id', $studentEntryPaymentCategory['id'])->first();
+
+        if ($using) {
+            return redirect()->back()->withErrors(['message' => 'Rincian Telah Digunakan']);
+        }
 
         $studentEntryPaymentCategory->delete();
         return redirect()->back()->with('success', 'Kategori Berhasil Dihapus');

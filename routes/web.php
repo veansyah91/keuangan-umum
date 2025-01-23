@@ -38,6 +38,7 @@ use App\Http\Controllers\Admin\VillageController;
 use App\Http\Controllers\Admin\DistrictController;
 use App\Http\Controllers\Admin\ProvinceController;
 use App\Http\Controllers\SalaryCategoryController;
+use App\Http\Controllers\SavingCategoryController;
 use App\Http\Controllers\StudentContactController;
 use App\Http\Controllers\AccountCategoryController;
 use App\Http\Controllers\Admin\AdminUserController;
@@ -456,6 +457,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 			// saving
 			Route::get('/saving', SavingController::class)->name('cashflow.saving');
+
+			Route::get('/saving/category', [SavingCategoryController::class, 'index'])->name('cashflow.saving-category');
+			Route::post('/saving/category', [SavingCategoryController::class, 'store'])->name('cashflow.saving-category.store');
+			Route::patch('/saving/category/{category}', [SavingCategoryController::class, 'update'])->name('cashflow.saving-category.update');
 
 		});
 

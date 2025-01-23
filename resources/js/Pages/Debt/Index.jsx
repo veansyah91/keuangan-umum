@@ -18,7 +18,7 @@ import { RiFileListLine } from 'react-icons/ri';
 
 export default function Index() {
   return (
-    <div>Index</div>
+    <div>Hutang</div>
   )
 }
 
