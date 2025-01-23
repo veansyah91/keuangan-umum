@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SavingCategory extends Model
 {
-    protected $fillable = ['name', 'organization_id'];
+    protected $fillable = ['name', 'organization_id', 'account_id'];
 
     public function scopeFilter($query, $filters)
     {

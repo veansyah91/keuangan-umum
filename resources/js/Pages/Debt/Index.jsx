@@ -18,7 +18,9 @@ import { RiFileListLine } from 'react-icons/ri';
 
 export default function Index() {
   return (
-    <div>Hutang</div>
+    <>
+      <Head title='Arus Kas' />
+    </>
   )
 }
 

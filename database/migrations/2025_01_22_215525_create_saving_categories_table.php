@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('saving_categories', function (Blueprint $table) {
             $table->id();
             $table->foreignUuid('organization_id')->constrained()->cascadeOnDelete();
-
+            $table->unsignedBigInteger('account_id');
+            $table->foreign('account_id')->references('id')->on('accounts');
             $table->string('name');
             $table->timestamps();
         });

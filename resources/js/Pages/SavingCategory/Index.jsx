@@ -30,7 +30,8 @@ import { NumericFormat } from 'react-number-format';
 export default function Index({ organization, categories, role }) {
   const { data, setData, post, patch, errors, processing, reset } = useForm({
     id: null,
-    'name' : ''
+    'name' : '',
+    'account_id': null
   })
 
   const [search, setSearch] = useState("");

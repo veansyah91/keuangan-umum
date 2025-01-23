@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Database\Seeders\SavingCategorySeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -22,6 +23,7 @@ class DatabaseSeeder extends Seeder
         // Perbarui Halaman
         $this->call(MenuSeeder::class);
         $this->call(OrganizationMenuSeeder::class);
+        $this->call(SavingCategorySeeder::class);
 
         // sesuaikan akun sekolah dengan akun staff
     }
