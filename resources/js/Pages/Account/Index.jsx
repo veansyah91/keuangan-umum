@@ -28,9 +28,7 @@ export default function Index({
     accounts,
     role,
     accountCategories,
-    code,
     searchFilter,
-    accountCategoryFilter,
     selectedAccountCategoryFilter,
 }) {
     const accountCategoriesData = accountCategories;

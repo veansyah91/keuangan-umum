@@ -13,14 +13,16 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Repositories\User\UserRepository;
 use Illuminate\Support\Facades\Validator;
+use App\Repositories\Account\AccountRepository;
 
 class SavingCategoryController extends Controller
 {
-	protected $userRepository;
+	protected $userRepository, $accountRepository;
 
-	public function __construct(UserRepository $userRepository)
+	public function __construct(UserRepository $userRepository, AccountRepository $accountRepository)
 	{
-			$this->userRepository = $userRepository;
+		$this->userRepository = $userRepository;
+		$this->accountRepository = $accountRepository;
 	}
 	
 	public function index(Organization $organization)
@@ -29,10 +31,12 @@ class SavingCategoryController extends Controller
 
 		return Inertia::render('SavingCategory/Index', [
 			'organization' => $organization,
+			'accounts' => $this->accountRepository->getDataNonCash($organization['id'], request(['account'])),
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'categories' => SavingCategory::filter(request(['search']))
-                                                ->whereOrganizationId($organization['id'])
-                                                ->paginate(50)->withQueryString(),
+																			->with('account')
+																			->whereOrganizationId($organization['id'])
+																			->paginate(50)->withQueryString(),
 		]);
 	}
 
@@ -49,8 +53,8 @@ class SavingCategoryController extends Controller
 		]);
 
 		if ($validator->fails()) {
-				// Handle validation failure
-				return redirect()->back()->withErrors($validator)->withInput();
+			// Handle validation failure
+			return redirect()->back()->withErrors($validator)->withInput();
 		}
 
 		$validated = $validator->validated();
@@ -112,13 +116,79 @@ class SavingCategoryController extends Controller
 					'organization_id' => $organization['id'],
 				]);
 			}
+
 			$validated['account_id'] = $account['id'];
 
 			SavingCategory::create($validated);
 		});
 
-
 		return redirect()->back()->with('success', 'Kategori Tabungan Berhasil Ditambahkan');
+	}
 
+	public function update(Request $request, Organization $organization, SavingCategory $category)
+	{
+		$validator = Validator::make($request->all(), [
+			'name' => [
+					'required',
+					'string',
+					Rule::unique('saving_categories')->where(function ($query) use ($organization) {
+							return $query->where('organization_id', $organization['id']);
+					})->ignore($category['id']),
+			],	
+			'account_id' => [
+				'required',
+				'numeric',
+				'exists:accounts,id'
+			],
+			'auto_adjust' => [
+				'required',
+				'boolean',
+			]
+		]);
+
+		$validated = $validator->validated();
+		if (!$validated['auto_adjust']) {
+			$account = Account::where('id', '<>', $validated['account_id'])->where('name', 'like', 'TABUNGAN ' . $validated['name'])->first();
+
+			if ($account) {
+				return redirect()->back()->withErrors(['message', 'Nama Telah digunakan pada Akun, Silakan atur akun secara manual']);
+			}
+		}
+
+		DB::transaction(function() use ($validated, $organization, $category){
+			$category->update($validated);
+
+			// cek nama akun jika akun disesuaikan secara otomatis
+			if ($validated['auto_adjust']) {
+				$account = Account::find($category['account_id']);
+
+				$account->update([
+					'name' => 'TABUNGAN ' . $validated['name']
+				]);
+			}
+		});
+
+		return redirect()->back()->with('success', 'Kategori Tabungan Berhasil Diubah');
+	}
+
+	public function destroy(Organization $organization, SavingCategory $category)
+	{
+		// cek apakah category telah digunakan
+
+		try {
+			DB::transaction(function() use($category, $organization){
+				$category->delete();
+
+				$delete_account = $this->accountRepository->deleteData($category['account_id']);
+
+				if ($delete_account) {
+					return redirect()->back()->with('success', "Kategori tabungan berhasil dihapus");
+				}
+				return redirect()->back()->with('success', "Kategori tabungan berhasil dihapus, tapi Gagal menghapus akun");
+
+			});
+		} catch (\Throwable $th) {
+			throw $th;
+		}
 	}
 }
