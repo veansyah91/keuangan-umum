@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('saving_ledgers', function (Blueprint $table) {
             $table->id();
+            $table->foreignUuid('organization_id')->constrained()->cascadeOnDelete();
+            $table->unsignedBigInteger('saving_balance_id');
+            $table->foreign('saving_balance_id')->references('id')->on('saving_balances');
+            $table->bigInteger('debit')->default(0);
+            $table->bigInteger('credit')->default(0);
             $table->timestamps();
         });
     }

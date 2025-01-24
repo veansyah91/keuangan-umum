@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('saving_balances', function (Blueprint $table) {
             $table->id();
             $table->foreignUuid('organization_id')->constrained()->cascadeOnDelete();
+            $table->unsignedBigInteger('contact_id');
+            $table->foreign('contact_id')->references('id')->on('contacts');
             $table->unsignedBigInteger('saving_category_id');
             $table->foreign('saving_category_id')->references('id')->on('saving_categories');
             $table->bigInteger('value')->default(0);
