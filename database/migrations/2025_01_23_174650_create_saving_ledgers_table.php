@@ -16,8 +16,12 @@ return new class extends Migration
             $table->foreignUuid('organization_id')->constrained()->cascadeOnDelete();
             $table->unsignedBigInteger('saving_balance_id');
             $table->foreign('saving_balance_id')->references('id')->on('saving_balances');
+            $table->foreignId('journal_id')->constrained()->cascadeOnDelete();
             $table->bigInteger('debit')->default(0);
             $table->bigInteger('credit')->default(0);
+            $table->date('date');
+            $table->string('description')->nullable();
+            $table->string('no_ref');
             $table->timestamps();
         });
     }

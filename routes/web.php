@@ -27,6 +27,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\AffiliationController;
 use App\Http\Controllers\MenuSettingController;
+use App\Http\Controllers\SavingDebitController;
 use App\Http\Controllers\AccountStaffController;
 use App\Http\Controllers\CashMutationController;
 use App\Http\Controllers\OrganizationController;
@@ -454,7 +455,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 			// debt
 			Route::get('/debt', DebtController::class)->name('cashflow.debt');
-
+			
 			// saving
 			Route::get('/saving', SavingController::class)->name('cashflow.saving');
 
@@ -465,10 +466,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 			Route::delete('/saving/category/{category}', [SavingCategoryController::class, 'destroy'])->name('cashflow.saving-category.delete');
 
 			// saving credit
+			Route::get('/saving/debit', [SavingDebitController::class, 'index'])->name('cashflow.saving.debit');
 
 			// saving debit
+			Route::get('/saving/credit', [SavingCreditController::class, 'index'])->name('cashflow.saving.credit');
 
 			// savings
+			Route::get('/saving/balance', [SavingBalanceController::class, 'index'])->name('cashflow.saving.balance');
+
 		});
 
 	});

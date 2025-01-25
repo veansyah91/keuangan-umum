@@ -15,7 +15,8 @@ import { FaPeopleGroup } from 'react-icons/fa6';
 import { BiCategory, BiDetail } from "react-icons/bi";
 import { ToastContainer, toast } from 'react-toastify';
 import { RiFileListLine } from 'react-icons/ri';
-import { CiViewList } from 'react-icons/ci';
+import { CiLogin, CiLogout, CiViewList } from 'react-icons/ci';
+import { FaBook } from 'react-icons/fa';
 
 export default function Index({
   organization
@@ -29,6 +30,31 @@ export default function Index({
             <div className='flex flex-wrap justify-center pt-5 pb-10 gap-5'>
               <Link href={route('cashflow.saving-category', organization.id)}>
                 <CardMenu bgColor={'bg-cyan-500'} icon={<CiViewList />} title={'Kategori Simpanan'} />
+              </Link>
+              <Link href={route('cashflow.saving.balance', organization.id)}>
+                <CardMenu bgColor={'bg-slate-600'} icon={<FaBook />} title={'Saldo Simpanan'} />
+              </Link>
+              <Link href={route('cashflow.saving.credit', organization.id)}>
+                <CardMenu 
+                  bgColor={'bg-green-500'} 
+                  icon={
+                    <div className='rotate-90'>
+                      <CiLogin />
+                    </div>
+                  }
+                  title={'Tambah Simpanan'} 
+                />
+              </Link>
+              <Link href={route('cashflow.saving.credit', organization.id)}>
+                <CardMenu 
+                  bgColor={'bg-red-500'} 
+                  icon={
+                    <div className='rotate-90'>
+                      <CiLogout />
+                    </div>
+                  }
+                  title={'Ambil Simpanan'} 
+                />
               </Link>
             </div>
           </section>
