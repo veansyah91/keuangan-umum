@@ -441,7 +441,7 @@ Index.layout = (page) => (
     organization={page.props.organization}
     title='Kategori Tabungan'
     backLink={
-      <Link href={route('data-master', page.props.organization.id)}>
+      <Link href={route('cashflow.saving', page.props.organization.id)}>
         <IoArrowBackOutline />
       </Link>
     }

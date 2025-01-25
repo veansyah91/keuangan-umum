@@ -23,6 +23,13 @@ class SavingLedger extends Model
         'no_ref'
     ];
 
+    public function scopeFilter($query, $filters)
+    {
+        $query->when($filters['search'] ?? false, function ($query, $search) {
+            return $query->where('no_ref', 'like', '%'.$search.'%');
+        });
+    }
+
     public function organization(): BelongsTo
     {
         return $this->belongsTo(Organization::class);
@@ -32,4 +39,5 @@ class SavingLedger extends Model
     {
         return $this->belongTo(SavingBalance::class);
     }
+    
 }

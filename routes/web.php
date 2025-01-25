@@ -31,11 +31,13 @@ use App\Http\Controllers\SavingDebitController;
 use App\Http\Controllers\AccountStaffController;
 use App\Http\Controllers\CashMutationController;
 use App\Http\Controllers\OrganizationController;
+use App\Http\Controllers\SavingCreditController;
 use App\Http\Controllers\StaffContactController;
 use App\Http\Controllers\StudentLevelController;
 use App\Http\Controllers\AccountSchoolController;
 use App\Http\Controllers\Admin\RegencyController;
 use App\Http\Controllers\Admin\VillageController;
+use App\Http\Controllers\SavingBalanceController;
 use App\Http\Controllers\Admin\DistrictController;
 use App\Http\Controllers\Admin\ProvinceController;
 use App\Http\Controllers\SalaryCategoryController;
@@ -465,11 +467,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 			Route::patch('/saving/category/{category}', [SavingCategoryController::class, 'update'])->name('cashflow.saving-category.update');
 			Route::delete('/saving/category/{category}', [SavingCategoryController::class, 'destroy'])->name('cashflow.saving-category.delete');
 
-			// saving credit
-			Route::get('/saving/debit', [SavingDebitController::class, 'index'])->name('cashflow.saving.debit');
-
 			// saving debit
+			Route::get('/saving/debit', [SavingDebitController::class, 'index'])->name('cashflow.saving.debit');
+			Route::get('/saving/debit/create', [SavingDebitController::class, 'create'])->name('cashflow.saving.debit.create');
+
+			// saving credit
 			Route::get('/saving/credit', [SavingCreditController::class, 'index'])->name('cashflow.saving.credit');
+			Route::get('/saving/credit/create', [SavingCreditController::class, 'create'])->name('cashflow.saving.credit.create');
 
 			// savings
 			Route::get('/saving/balance', [SavingBalanceController::class, 'index'])->name('cashflow.saving.balance');
