@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use Inertia\Inertia;
+use App\Helpers\NewRef;
+use Carbon\CarbonImmutable;
 use App\Models\Organization;
 use Illuminate\Http\Request;
 use App\Models\SavingBalance;
 use Illuminate\Support\Facades\Auth;
+use App\Repositories\User\UserRepository;
 
 class SavingBalanceController extends Controller
 {
@@ -42,10 +45,16 @@ class SavingBalanceController extends Controller
 	public function index(Organization $organization)
 	{
 		$user = Auth::user();
+
+
 		
 		return Inertia::render('SavingBalance/Index',[
 			'organization' => $organization,
 			'user' => $user,
+			'members' => SavingBalance::filter(request(['search']))
+																	->with('savingCategory')
+																	->whereOrganizationId($organization['id'])
+																	->paginate(50)->withQueryString(),
 		]);
 	}
 }

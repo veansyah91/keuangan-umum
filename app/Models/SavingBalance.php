@@ -28,4 +28,11 @@ class SavingBalance extends Model
     {
         return $this->belongTo(SavingCategory::class);
     }
+
+    public function scopeFilter($query, $filters)
+    {
+        $query->when($filters['search'] ?? false, function ($query, $search) {
+            return $query->where('no_ref', 'like', '%'.$search.'%');
+        });
+    }
 }
