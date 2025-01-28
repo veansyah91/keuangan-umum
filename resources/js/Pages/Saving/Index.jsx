@@ -23,7 +23,7 @@ export default function Index({
                 <CardMenu bgColor={'bg-cyan-500'} icon={<CiViewList />} title={'Kategori Simpanan'} />
               </Link>
               <Link href={route('cashflow.saving.balance', organization.id)}>
-                <CardMenu bgColor={'bg-slate-600'} icon={<FaBook />} title={'Saldo Simpanan'} />
+                <CardMenu bgColor={'bg-slate-600'} icon={<FaBook />} title={'Data Simpanan'} />
               </Link>
               <Link href={route('cashflow.saving.credit', organization.id)}>
                 <CardMenu 
@@ -58,7 +58,7 @@ export default function Index({
               <CardMenu bgColor={'bg-cyan-500'} icon={<CiViewList />} title={'Kategori Simpanan'} />
             </Link>
             <Link href={route('cashflow.saving.balance', organization.id)}>
-              <CardMenu bgColor={'bg-slate-600'} icon={<FaBook />} title={'Saldo Simpanan'} />
+              <CardMenu bgColor={'bg-slate-600'} icon={<FaBook />} title={'Data Simpanan'} />
             </Link>
             <Link href={route('cashflow.saving.credit', organization.id)}>
               <CardMenu 

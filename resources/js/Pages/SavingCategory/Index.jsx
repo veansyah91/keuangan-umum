@@ -24,7 +24,7 @@ import TextInput from '@/Components/TextInput';
 import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 import DangerButton from '@/Components/DangerButton';
 
-export default function Index({ organization, categories, role, accounts }) {
+export default function Index({ organization, categories, role, accounts, querySearch }) {
   const { data, setData, post, patch, errors, processing, reset, delete:destroy } = useForm({
     id: null,
     'name' : '',
@@ -39,7 +39,7 @@ export default function Index({ organization, categories, role, accounts }) {
     is_cash: false 
   });
 
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(querySearch || "");
 
   const [showModalDelete, setShowModalDelete] = useState(false);
   const [showModalInput, setShowModalInput] = useState(false);

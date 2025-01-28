@@ -24,19 +24,22 @@ import TextInput from '@/Components/TextInput';
 import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 import DangerButton from '@/Components/DangerButton';
 
-export default function Index({ organization, role, members }) {
+export default function Index({ organization, role, members, querySearch }) {
   // state
   const { data, setData, post, patch, errors, processing, reset, delete:destroy } = useForm({
     id: null,
-    'contact_id' : '',
-    'category_id': null,
-    'no_ref': true
+    'no_ref': '',
+    'contact_id': null,
+    'category_id': null
   });
 
   const [modalInputLabel, setModalInputLabel] = useState({
-    title: 'Tambah Data Tabungan',
+    title: 'Tambah Data Simpanan',
     submit: 'Tambah'
   });
+
+  const [search, setSearch] = useState(querySearch || "");
+
 
   // function
   const createData = () => {    
@@ -44,7 +47,7 @@ export default function Index({ organization, role, members }) {
     setIsUpdate(false);
     reset();
     setModalInputLabel({
-      title: 'Tambah Data Tabungan',
+      title: 'Tambah Data Simpanan',
       submit: 'Tambah'
     });
   }
@@ -52,23 +55,141 @@ export default function Index({ organization, role, members }) {
   return (
     <>
       {/* Mobile */}
-      <Head title='Data Tabungan' />
+      <Head title='Data Simpanan' />
       <ToastContainer />
 
       {role !== 'viewer' && (
         <AddButtonMobile label={'Tambah'} handleShowInputModal={createData} />
       )}
+      <TitleMobile
+        zIndex={'z-50'}
+        search={search}
+        setSearch={(e) => setSearch(e.target.value)}
+        pageBefore={
+          members.links[0].url ? (
+            <Link
+              href={route('cashflow.saving.balance', {
+                organization: organization.id,
+                page: members.current_page - 1,
+                search: search,
+              })}
+              preserveState
+              only={['members']}>
+              <IoPlayBack />
+            </Link>
+          ) : (
+            <div className='text-gray-300'>
+              <IoPlayBack />
+            </div>
+          )
+        }
+        pageAfter={
+          members.links[members.links.length - 1].url ? (
+            <Link
+              href={route('cashflow.saving.balance', {
+                organization: organization.id,
+                page: members.current_page + 1,
+                search: search,
+              })}
+              only={['members']}
+              preserveState>
+              <IoPlayForward />
+            </Link>
+          ) : (
+            <div className='text-gray-300'>
+              <IoPlayForward />
+            </div>
+          )
+        }
+        page={
+          <>
+            {members.current_page}/{members.last_page}
+          </>
+        }
+        data={members}
+      />
+
+      {/* Desktop */}
+      <ContainerDesktop>
+        <TitleDesktop>
+          <div className='my-auto w-7/12'>
+            {role !== 'viewer' && (
+              <div className='space-x-2'>
+                <PrimaryButton className='py-3' onClick={createData}>Tambah Data</PrimaryButton>
+              </div>
+            )}
+          </div>
+          <div className='w-3/12 border flex rounded-lg'>
+            <label htmlFor='search-input' className='my-auto ml-2'>
+              <IoSearchSharp />
+            </label>
+            <input
+              id='search-input'
+              name='search-input'
+              type='search'
+              placeholder='Cari Data Tabungan'
+              className='w-full border-none focus:outline-none focus:ring-0'
+              value={search || ''}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <div className='italic text-xs my-auto w-1/12 text-center'>
+            <PageNumber data={members} />
+          </div>
+          <div className='my-auto flex space-x-2 w-1/12'>
+            <div className='my-auto'>
+              {members.links[0].url ? (
+                <Link
+                  href={route('cashflow.saving.balance', {
+                    organization: organization.id,
+                    page: members.current_page - 1,
+                    search: search,
+                  })}
+                  preserveState
+                  only={['members']}>
+                  <IoPlayBack />
+                </Link>
+              ) : (
+                <div className='text-gray-300'>
+                  <IoPlayBack />
+                </div>
+              )}
+            </div>
+            <div className='my-auto'>
+              {members.current_page}/{members.last_page}
+            </div>
+            <div className='my-auto'>
+              {members.links[members.links.length - 1].url ? (
+                <Link
+                  href={route('cashflow.saving.balance', {
+                    organization: organization.id,
+                    page: members.current_page + 1,
+                    search: search,
+                  })}
+                  only={['members']}
+                  preserveState>
+                  <IoPlayForward />
+                </Link>
+              ) : (
+                <div className='text-gray-300'>
+                  <IoPlayForward />
+                </div>
+              )}
+            </div>
+          </div>
+        </TitleDesktop>        
+      </ContainerDesktop>
     </>
   )
 }
 
 Index.layout = (page) => (
   <AuthenticatedLayout
-    header={<Header>Data Tabungan</Header>}
+    header={<Header>Data Simpanan</Header>}
     children={page}
     user={page.props.auth.user}
     organization={page.props.organization}
-    title='Data Tabungan'
+    title='Data Simpanan'
     backLink={
       <Link href={route('cashflow.saving', page.props.organization.id)}>
         <IoArrowBackOutline />
@@ -81,9 +202,9 @@ Index.layout = (page) => (
             <Link href={route('cashflow', page.props.organization.id)}>Arus Kas</Link>
           </li>
           <li className='font-bold'>
-            <Link href={route('cashflow.saving', page.props.organization.id)}>Tabungan</Link>
+            <Link href={route('cashflow.saving', page.props.organization.id)}>Simpanan</Link>
           </li>
-          <li>Data Tabungan</li>
+          <li>Data Simpanan</li>
         </ul>
       </div>
     }
