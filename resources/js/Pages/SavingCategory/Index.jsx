@@ -329,87 +329,87 @@ export default function Index({ organization, categories, role, accounts, queryS
       <Modal show={showModalInput} onClose={() => setShowModalInput(false)}>
         <form onSubmit={handleSubmit} className='p-6'>
           <h2 className='text-lg font-medium text-gray-900 border-b-2 py-1'>{modalInputLabel.title}</h2>
-            <div className='mt-5 space-y-5'>
-              <div className='flex flex-col sm:flex-row w-full gap-1'>
-                <div className='w-full sm:w-1/3 my-auto'>
-                  <InputLabel htmlFor='name' value='Nama Kategori' className='mx-auto my-auto' />
-                </div>
+          <div className='mt-5 space-y-5'>
+            <div className='flex flex-col sm:flex-row w-full gap-1'>
+              <div className='w-full sm:w-1/3 my-auto'>
+                <InputLabel htmlFor='name' value='Nama Kategori' className='mx-auto my-auto' />
+              </div>
 
-                <div className='sm:w-2/3 w-full'>
-                  <TextInput
-                    id='name'
-                    type='text'
-                    name='name'
-                    value={data.name}
-                    className={`mt-1 w-full ${errors && errors.name && 'border-red-500'}`}
-                    isFocused={true}
-                    onChange={(e) => setData('name', e.target.value.toUpperCase())}
-                    placeholder='Nama Kategori'
-                  />
-                  {errors && errors.name && (
-                    <div className='-mb-3'>
-                      <div className='text-xs text-red-500'>{errors.name}</div>
-                    </div>
+              <div className='sm:w-2/3 w-full'>
+                <TextInput
+                  id='name'
+                  type='text'
+                  name='name'
+                  value={data.name}
+                  className={`mt-1 w-full ${errors && errors.name && 'border-red-500'}`}
+                  isFocused={true}
+                  onChange={(e) => setData('name', e.target.value.toUpperCase())}
+                  placeholder='Nama Kategori'
+                />
+                {errors && errors.name && (
+                  <div className='-mb-3'>
+                    <div className='text-xs text-red-500'>{errors.name}</div>
+                  </div>
+                )}
+              </div>
+            </div> 
+            {
+              isUpdate &&
+              <div className='flex justify-start w-full gap-1 mt-5'>
+                <div className='w-12/12'>
+                  <div className='form-control '>
+                      <label className='label cursor-pointer gap-2' htmlFor={`auto_adjust`}>
+                          <input
+                              type='checkbox'
+                              className='checkbox'
+                              id={`auto_adjust`}
+                              value={data.auto_adjust}
+                              onChange={() => setData('auto_adjust', !data.auto_adjust)}
+                              checked={data.auto_adjust}
+                          />
+                          <span className='label-text font-bold'>Sesuaikan Akun Tabungan Otomatis</span>
+                      </label>
+                  </div>
+                  {errors && errors.auto_adjust && (
+                      <div className='-mb-3'>
+                          <div className='text-xs text-red-500'>{errors.auto_adjust}</div>
+                      </div>
                   )}
                 </div>
               </div> 
-              {
-                isUpdate &&
-                <div className='flex justify-start w-full gap-1 mt-5'>
-                  <div className='w-12/12'>
-                    <div className='form-control '>
-                        <label className='label cursor-pointer gap-2' htmlFor={`auto_adjust`}>
-                            <input
-                                type='checkbox'
-                                className='checkbox'
-                                id={`auto_adjust`}
-                                value={data.auto_adjust}
-                                onChange={() => setData('auto_adjust', !data.auto_adjust)}
-                                checked={data.auto_adjust}
-                            />
-                            <span className='label-text font-bold'>Sesuaikan Akun Tabungan Otomatis</span>
-                        </label>
-                    </div>
-                    {errors && errors.auto_adjust && (
-                        <div className='-mb-3'>
-                            <div className='text-xs text-red-500'>{errors.auto_adjust}</div>
-                        </div>
-                    )}
-                  </div>
-                </div> 
-              }
-              
-              {
-                !data.auto_adjust &&
-                <div className='md:flex gap-1'>
-                  <div className='w-full md:w-1/3 font-bold md:font-normal my-auto'>
-                    <InputLabel value={'Akun Tabungan'} htmlFor='account_id' />
-                  </div>
-                  <div className='w-full md:w-2/3 my-auto'>
-                    <ClientSelectInput
-                      resources={accounts}
-                      selected={selectedSavingCategoryAccount}
-                      setSelected={(selected) => handleSelectedSavingCategoryAccount(selected)}
-                      maxHeight='max-h-40'
-                      placeholder='Cari Akun'
-                      id='account_id'
-                      isError={errors?.account_id? true : false}
-                    />
-                    {selectedSavingCategoryAccount?.code && (
-                      <div className='absolute text-xs'>Kode: {selectedSavingCategoryAccount.code}</div>
-                    )}
-                  </div>
-                </div>	
-              }
-              
-              <div className='mt-6 flex justify-end'>
-                <SecondaryButton onClick={e => setShowModalInput(false)}>Batal</SecondaryButton>
-    
-                <PrimaryButton className='ms-3' disabled={processing}>
-                  {modalInputLabel.submit}
-                </PrimaryButton>
+            }
+            
+            {
+              !data.auto_adjust &&
+              <div className='md:flex gap-1'>
+                <div className='w-full md:w-1/3 font-bold md:font-normal my-auto'>
+                  <InputLabel value={'Akun Tabungan'} htmlFor='account_id' />
                 </div>
-            </div>
+                <div className='w-full md:w-2/3 my-auto'>
+                  <ClientSelectInput
+                    resources={accounts}
+                    selected={selectedSavingCategoryAccount}
+                    setSelected={(selected) => handleSelectedSavingCategoryAccount(selected)}
+                    maxHeight='max-h-40'
+                    placeholder='Cari Akun'
+                    id='account_id'
+                    isError={errors?.account_id? true : false}
+                  />
+                  {selectedSavingCategoryAccount?.code && (
+                    <div className='absolute text-xs'>Kode: {selectedSavingCategoryAccount.code}</div>
+                  )}
+                </div>
+              </div>	
+            }
+            
+            <div className='mt-6 flex justify-end'>
+              <SecondaryButton onClick={e => setShowModalInput(false)}>Batal</SecondaryButton>
+  
+              <PrimaryButton className='ms-3' disabled={processing}>
+                {modalInputLabel.submit}
+              </PrimaryButton>
+              </div>
+          </div>
         </form>        
       </Modal>
       <Modal show={showModalDelete} onClose={() => setShowModalDelete(false)}>

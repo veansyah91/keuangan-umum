@@ -9,16 +9,19 @@ use Carbon\CarbonImmutable;
 use App\Models\Organization;
 use Illuminate\Http\Request;
 use App\Models\SavingBalance;
+use App\Models\SavingCategory;
 use Illuminate\Support\Facades\Auth;
 use App\Repositories\User\UserRepository;
+use App\Repositories\Contact\ContactRepository;
 
 class SavingBalanceController extends Controller
 {
-	protected $logRepository, $userRepository;
+	protected $logRepository, $userRepository, $contactRepository;
 
-	public function __construct(UserRepository $userRepository)
+	public function __construct(UserRepository $userRepository, ContactRepository $contactRepository)
 	{
 		$this->userRepository = $userRepository;
+		$this->contactRepository = $contactRepository;
 		$this->now = CarbonImmutable::now();
 	}
 
@@ -45,11 +48,13 @@ class SavingBalanceController extends Controller
 	public function index(Organization $organization)
 	{
 		$user = Auth::user();
-
-
 		
 		return Inertia::render('SavingBalance/Index',[
+			'newRef' => $this->newRef($organization, $this->now->isoFormat('YYYY-M-DD')),
 			'organization' => $organization,
+			'contacts' => $this->contactRepository->getData($organization['id'], request(['contact'])),
+			'categories' => SavingCategory::filter(request(['search']))
+																			->whereOrganizationId($organization['id'])->get(),
 			'user' => $user,
 			'members' => SavingBalance::filter(request(['search']))
 																	->with('savingCategory')

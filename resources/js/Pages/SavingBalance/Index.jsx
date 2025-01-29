@@ -23,16 +23,24 @@ import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
 import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 import DangerButton from '@/Components/DangerButton';
+import ContactSelectInput from '@/Components/SelectInput/ContactSelectInput';
 
-export default function Index({ organization, role, members, querySearch }) {
+export default function Index({ organization, role, members, querySearch, newRef, contacts, categories }) {  
   // state
   const { data, setData, post, patch, errors, processing, reset, delete:destroy } = useForm({
     id: null,
-    'no_ref': '',
+    'no_ref': newRef || '',
     'contact_id': null,
     'category_id': null
   });
 
+  const [selectedContact, setSelectedContact] = useState({ id: null, name: '', phone: '' });
+  const [selectedCategory, setSelectedCategory] = useState({ id: null, name: '' });
+
+  const [showModalDelete, setShowModalDelete] = useState(false);
+  const [showModalInput, setShowModalInput] = useState(false);
+  const [isUpdate, setIsUpdate] = useState(false);
+  
   const [modalInputLabel, setModalInputLabel] = useState({
     title: 'Tambah Data Simpanan',
     submit: 'Tambah'
@@ -42,6 +50,23 @@ export default function Index({ organization, role, members, querySearch }) {
 
 
   // function
+  const handleSelectedContact = (selected) => {
+    if (selected) {
+      setSelectedContact({ id: selected?.id, name: selected?.name, phone: selected?.phone });
+      setData('contact_id', selected?.id);
+    }
+    
+  };
+
+  const handleSelectedCategory = (selected) => {
+    if (selected) {
+      setData('category_id', selected?.id);
+      setSelectedCategory({
+        id: selected?.id, name: selected?.name
+      });
+    }
+  }
+
   const createData = () => {    
     setShowModalInput(true);
     setIsUpdate(false);
@@ -50,6 +75,13 @@ export default function Index({ organization, role, members, querySearch }) {
       title: 'Tambah Data Simpanan',
       submit: 'Tambah'
     });
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    console.log('submit add data');
+    
   }
 
   return (
@@ -179,6 +211,83 @@ export default function Index({ organization, role, members, querySearch }) {
           </div>
         </TitleDesktop>        
       </ContainerDesktop>
+
+      {/* Modal */}
+      <Modal show={showModalInput} onClose={() => setShowModalInput(false)}>
+        <form onSubmit={handleSubmit} className='p-6'>
+          <h2 className='text-lg font-medium text-gray-900 border-b-2 py-1'>{modalInputLabel.title}</h2>
+          <div className='mt-5 space-y-5'>
+            <div className='flex flex-col sm:flex-row w-full gap-1'>
+              <div className='w-full sm:w-1/3 my-auto'>
+                <InputLabel htmlFor='no_ref' value='No. Ref' className='mx-auto my-auto' />
+              </div>
+
+              <div className='sm:w-2/3 w-full'>
+                <TextInput
+                  id='no_ref'
+                  type='text'
+                  name='no_ref'
+                  value={data.no_ref}
+                  className={`mt-1 w-full ${errors && errors.no_ref && 'border-red-500'}`}
+                  isFocused={true}
+                  onChange={(e) => setData('no_ref', e.target.value.toUpperCase())}
+                  placeholder='No. Ref'
+                />
+                {errors && errors.no_ref && (
+                  <div className='-mb-3'>
+                    <div className='text-xs text-red-500'>{errors.no_ref}</div>
+                  </div>
+                )}
+              </div>
+            </div> 
+            <div className='flex flex-col sm:flex-row w-full gap-1'>
+              <div className='w-full sm:w-1/3 my-auto'>
+                <InputLabel htmlFor='contact_id' value='Kontak' className='mx-auto my-auto' />
+              </div>
+
+              <div className='sm:w-2/3 w-full'>
+                 <ContactSelectInput
+                  resources={contacts}
+                  selected={selectedContact}
+                  setSelected={(selected) => handleSelectedContact(selected)}
+                  maxHeight='max-h-40'
+                  placeholder='Cari Kontak'
+                  isError={errors.contact_id ? true : false}
+                  id='contact'
+                  notFound={<span>Tidak Ada Data. <Link className='font-bold text-blue-600' href={route('data-master.contact.create', {organization:organization.id})}>Buat Baru ?</Link></span>}
+                />
+                {errors && errors.contact_id && (
+                  <div className='-mb-3'>
+                    <div className='text-xs text-red-500'>{errors.contact_id}</div>
+                  </div>
+                )}
+              </div>
+            </div> 
+            <div className='flex flex-col sm:flex-row w-full gap-1'>
+              <div className='w-full sm:w-1/3 my-auto'>
+                <InputLabel htmlFor='category' value='Kategori Tabungan' className='mx-auto my-auto' />
+              </div>
+
+              <div className='sm:w-2/3 w-full'>
+                 <ClientSelectInput
+                  resources={categories}
+                  selected={selectedCategory}
+                  setSelected={(selected) => handleSelectedCategory(selected)}
+                  maxHeight='max-h-40'
+                  placeholder='Cari Kategori'
+                  isError={errors.category_id ? true : false}
+                  notFound={<span>Tidak Ada Data. <Link className='font-bold text-blue-600' href={route('data-ledger.account', {organization:organization.id})}>Buat Baru ?</Link></span>}
+                />
+                {errors && errors.category && (
+                  <div className='-mb-3'>
+                    <div className='text-xs text-red-500'>{errors.category}</div>
+                  </div>
+                )}
+              </div>
+            </div> 
+          </div>
+        </form>
+      </Modal>
     </>
   )
 }
