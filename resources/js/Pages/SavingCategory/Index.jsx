@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -408,7 +408,7 @@ export default function Index({ organization, categories, role, accounts, queryS
               <PrimaryButton className='ms-3' disabled={processing}>
                 {modalInputLabel.submit}
               </PrimaryButton>
-              </div>
+            </div>
           </div>
         </form>        
       </Modal>

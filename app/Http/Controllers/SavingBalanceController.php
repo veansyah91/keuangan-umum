@@ -10,7 +10,9 @@ use App\Models\Organization;
 use Illuminate\Http\Request;
 use App\Models\SavingBalance;
 use App\Models\SavingCategory;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use App\Repositories\User\UserRepository;
 use App\Repositories\Contact\ContactRepository;
 
@@ -61,5 +63,40 @@ class SavingBalanceController extends Controller
 																	->whereOrganizationId($organization['id'])
 																	->paginate(50)->withQueryString(),
 		]);
+	}
+
+	public function store(Request $request, Organization $organization)
+	{
+		$validator = Validator::make($request->all(), [
+			'no_ref' => [
+				'required',
+				'string',
+				Rule::unique('saving_balances')->where(function ($query) use ($organization) {
+					return $query->where('organization_id', $organization['id']);
+				}),
+			],	
+			'contact_id' => [
+				'required',
+				'exists:contacts,id',
+			],
+			'category_id' => [
+				'required',
+				'exists:saving_categories,id',
+			],
+		]);
+
+		if ($validator->fails()) {
+			// Handle validation failure
+			return redirect()->back()->withErrors($validator)->withInput();
+		}
+
+		$validated = $validator->validated();
+		$validated['organization_id'] = $organization['id'];
+		// cek apakah contact_id dan categoty pernah dibuat
+		$balance = SavingBalance::whereOrganizationId($organization['id'])
+															->whereSavingCategoryId($validated['category_id'])
+															->whereContactId($validated['contact_id'])
+															->first();
+		dd($balance);
 	}
 }

@@ -80,7 +80,12 @@ export default function Index({ organization, role, members, querySearch, newRef
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    console.log('submit add data');
+    post(route('cashflow.saving.balance.store', { organization: organization }), {
+      onSuccess: ({ props }) => {
+        console.log(props);
+        
+      }
+    })
     
   }
 
@@ -285,6 +290,13 @@ export default function Index({ organization, role, members, querySearch, newRef
                 )}
               </div>
             </div> 
+            <div className='mt-6 flex justify-end'>
+              <SecondaryButton onClick={e => setShowModalInput(false)}>Batal</SecondaryButton>
+  
+              <PrimaryButton className='ms-3' disabled={processing}>
+                {modalInputLabel.submit}
+              </PrimaryButton>
+            </div>
           </div>
         </form>
       </Modal>
