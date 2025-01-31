@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Contact;
 use App\Models\Organization;
 use App\Models\SavingCategory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,18 +17,9 @@ class SavingBalance extends Model
         'organization_id',
         'contact_id',
         'saving_category_id',
-        'value'
+        'value',
+        'no_ref'
     ];
-
-    public function organization(): BelongsTo
-    {
-        return $this->belongTo(Organization::class);
-    }
-
-    public function savingCategory(): BelongsTo
-    {
-        return $this->belongTo(SavingCategory::class);
-    }
 
     public function scopeFilter($query, $filters)
     {
@@ -35,4 +27,21 @@ class SavingBalance extends Model
             return $query->where('no_ref', 'like', '%'.$search.'%');
         });
     }
+
+    public function savingCategory(): BelongsTo
+    {
+        return $this->belongsTo(SavingCategory::class, 'saving_category_id');
+    }
+
+    public function contact(): BelongsTo
+    {
+        return $this->belongsTo(Contact::class);
+    }
+
+    public function organization(): BelongsTo
+    {
+        return $this->belongsTo(Organization::class);
+    }    
+
+    
 }

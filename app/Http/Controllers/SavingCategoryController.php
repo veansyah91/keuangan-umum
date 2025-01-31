@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use App\Models\Account;
 use App\Models\Organization;
 use Illuminate\Http\Request;
+use App\Models\SavingBalance;
 use App\Models\SavingCategory;
 use App\Models\AccountCategory;
 use Illuminate\Validation\Rule;
@@ -174,6 +175,12 @@ class SavingCategoryController extends Controller
 	public function destroy(Organization $organization, SavingCategory $category)
 	{
 		// cek apakah category telah digunakan
+		$balance = SavingBalance::where('saving_category_id', $category['id'])
+															->first();
+
+		if ($balance) {
+			return redirect()->back()->withErrors(['error' => 'Tidak dapat menghapus, Kategori telah digunakan']);
+		}
 
 		try {
 			DB::transaction(function() use($category, $organization){

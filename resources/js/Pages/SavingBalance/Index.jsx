@@ -25,18 +25,18 @@ import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 import DangerButton from '@/Components/DangerButton';
 import ContactSelectInput from '@/Components/SelectInput/ContactSelectInput';
 
-export default function Index({ organization, role, members, querySearch, newRef, contacts, categories }) {  
+export default function Index({ organization, role, members, querySearch, newRef, contacts, categories }) { 
   // state
   const { data, setData, post, patch, errors, processing, reset, delete:destroy } = useForm({
     id: null,
     'no_ref': newRef || '',
     'contact_id': null,
-    'category_id': null
+    'saving_category_id': null
   });
 
   const [selectedContact, setSelectedContact] = useState({ id: null, name: '', phone: '' });
   const [selectedCategory, setSelectedCategory] = useState({ id: null, name: '' });
-
+  
   const [showModalDelete, setShowModalDelete] = useState(false);
   const [showModalInput, setShowModalInput] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
@@ -48,19 +48,28 @@ export default function Index({ organization, role, members, querySearch, newRef
 
   const [search, setSearch] = useState(querySearch || "");
 
-
   // function
+  const setDefault = () => {
+    setData({
+      id: null,
+      'no_ref': newRef || '',
+      'contact_id': null,
+      'saving_category_id': null
+    });
+    setSelectedContact({ id: null, name: '', phone: '' });
+    setSelectedCategory({ id: null, name: '' });
+  }
+
   const handleSelectedContact = (selected) => {
     if (selected) {
       setSelectedContact({ id: selected?.id, name: selected?.name, phone: selected?.phone });
       setData('contact_id', selected?.id);
-    }
-    
+    }    
   };
 
   const handleSelectedCategory = (selected) => {
     if (selected) {
-      setData('category_id', selected?.id);
+      setData('saving_category_id', selected?.id);
       setSelectedCategory({
         id: selected?.id, name: selected?.name
       });
@@ -70,23 +79,90 @@ export default function Index({ organization, role, members, querySearch, newRef
   const createData = () => {    
     setShowModalInput(true);
     setIsUpdate(false);
-    reset();
+    setDefault();
     setModalInputLabel({
       title: 'Tambah Data Simpanan',
       submit: 'Tambah'
     });
   }
 
-  const handleSubmit = (e) => {
+  const handleDelete = (member) => {
+    setShowModalDelete(true);
+
+    setData({
+      'id': member.id,
+      'no_ref': member.no_ref,
+      'contact_id': member.contact_id,
+      'saving_category_id': member.saving_category_id,
+    });
+  }
+
+  const handleEdit = (member) => {
+    setModalInputLabel({
+      title: 'Ubah Kategori',
+      submit: 'Ubah'
+    });
+    setShowModalInput(true);
+    setData({
+      'id': member.id,
+      'no_ref': member.no_ref,
+      'contact_id': member.contact_id,
+      'saving_category_id': member.saving_category_id,
+    });
+    setSelectedContact({ id: member.contact.id, name: member.contact.name, phone: member.contact.phone });
+    setSelectedCategory({ id: member.saving_category.id, name: member.saving_category.name });
+    setIsUpdate(true);
+  }
+
+  const handleSubmitDelete = (e) => {
     e.preventDefault();
 
-    post(route('cashflow.saving.balance.store', { organization: organization }), {
+    destroy(route('cashflow.saving.balance.delete', {organization: organization.id, balance:data.id}), {
       onSuccess: ({ props }) => {
-        console.log(props);
-        
+        const { flash } = props;
+
+        toast.success(flash.success, {
+          position: toast.POSITION.TOP_CENTER,
+        });
+        router.replace(window.location.pathname);
+        setShowModalDelete(false); 
+      }
+    });
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault();  
+    
+    isUpdate 
+    ?patch(route('cashflow.saving.balance.update', {organization: organization.id, balance: data.id}), {
+      onSuccess: ({ props }) => {
+        const { flash } = props;
+
+        toast.success(flash.success, {
+          position: toast.POSITION.TOP_CENTER,
+        });
+        router.replace(window.location.pathname);
+        setShowModalInput(false);
+        setIsUpdate(false);  
       }
     })
-    
+    :post(route('cashflow.saving.balance.store', { organization: organization }), {
+      onSuccess: ({ props }) => {
+        const { flash } = props;
+
+        toast.success(flash.success, {
+          position: toast.POSITION.TOP_CENTER,
+        });
+        router.replace(window.location.pathname);
+        setShowModalInput(false);
+        setIsUpdate(false);  
+      },
+      onError: errors => {
+        toast.error(errors.error, {
+          position: toast.POSITION.TOP_CENTER,
+        });
+      },
+    })
   }
 
   return (
@@ -145,6 +221,18 @@ export default function Index({ organization, role, members, querySearch, newRef
         }
         data={members}
       />
+      <ContentMobile>
+        {members.data.map((member) => (
+          <SavingBalanceMobile
+            member={member}
+            key={member.id}
+            handleDelete={() => handleDelete(member)}
+            handleEdit={() => handleEdit(member)}
+            role={role}
+          />
+        ))}
+      </ContentMobile>
+      
 
       {/* Desktop */}
       <ContainerDesktop>
@@ -214,7 +302,36 @@ export default function Index({ organization, role, members, querySearch, newRef
               )}
             </div>
           </div>
-        </TitleDesktop>        
+        </TitleDesktop>       
+
+        <div className='sm:flex hidden gap-5'>
+          <div className='w-full'>
+            <ContentDesktop>
+              <table className='table table-pin-rows table-pin-cols text-base'>
+                <thead className='text-base text-gray-900'>
+                  <tr className=''>
+                    <th className='bg-gray-200'>No. Ref</th>
+                    <th className='bg-gray-200'>Nama Kontak</th>
+                    <th className='bg-gray-200'>Kategori Simpanan</th>
+                    <th className='bg-gray-200'></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {members.data.map((member, index) => (
+                    <SavingBalanceDesktop
+                      key={index}
+                      member={member}
+                      className={`${index % 2 == 0 && 'bg-gray-100'}`}
+                      handleDelete={() => handleDelete(member)}
+                      handleEdit={() => handleEdit(member)}
+                      role={role}
+                    />
+                  ))}
+                </tbody>
+              </table>
+            </ContentDesktop>            
+          </div> 
+        </div> 
       </ContainerDesktop>
 
       {/* Modal */}
@@ -280,7 +397,7 @@ export default function Index({ organization, role, members, querySearch, newRef
                   setSelected={(selected) => handleSelectedCategory(selected)}
                   maxHeight='max-h-40'
                   placeholder='Cari Kategori'
-                  isError={errors.category_id ? true : false}
+                  isError={errors.saving_category_id ? true : false}
                   notFound={<span>Tidak Ada Data. <Link className='font-bold text-blue-600' href={route('data-ledger.account', {organization:organization.id})}>Buat Baru ?</Link></span>}
                 />
                 {errors && errors.category && (
@@ -298,6 +415,22 @@ export default function Index({ organization, role, members, querySearch, newRef
               </PrimaryButton>
             </div>
           </div>
+        </form>
+      </Modal>
+      <Modal show={showModalDelete} onClose={() => setShowModalDelete(false)}>
+        <form onSubmit={handleSubmitDelete} className='p-6' id='delete-confirmation' name='delete-confirmation'>
+          <h2 className='text-lg font-medium text-gray-900 text-center'>
+              <div>Hapus Data Simpanan { data?.no_ref }?
+              </div>              
+          </h2>
+
+            <div className='mt-6 flex justify-end'>
+                <SecondaryButton onClick={() => setShowModalDelete(false)}>Batal</SecondaryButton>
+
+                <DangerButton className='ms-3' disabled={processing}>
+                    Hapus
+                </DangerButton>
+            </div>
         </form>
       </Modal>
     </>

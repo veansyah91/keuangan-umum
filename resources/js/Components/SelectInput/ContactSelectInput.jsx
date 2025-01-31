@@ -103,7 +103,7 @@ export default function ContactSelectInput({
                               </span>
                             ))}
                           </div>
-                          <div className='text-base'>{d.name.toUpperCase()}</div>
+                          <div className='text-base'>{d.student?`${d.student.no_ref ? d.student.no_ref + '-' : ''}` : ''}{d.name.toUpperCase()}</div>
                         </div>
                         {selected ? (
                           <div

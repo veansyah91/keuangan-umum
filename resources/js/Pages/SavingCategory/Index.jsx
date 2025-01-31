@@ -146,6 +146,11 @@ export default function Index({ organization, categories, role, accounts, queryS
         setShowModalDelete(false);
         setIsUpdate(false);
         reset();
+      },
+      onError: errors => {
+        toast.error(errors.error, {
+          position: toast.POSITION.TOP_CENTER,
+        });
       }
     })
   }

@@ -41,7 +41,7 @@ class SavingBalanceController extends Controller
 					->first();
 
 			if ($cashMutation) {
-					$newRef = NewRef::create('C-', $cashMutation['no_ref']);
+					$newRef = NewRef::create('S-', $cashMutation['no_ref']);
 			}
 
 			return $newRef;
@@ -50,7 +50,7 @@ class SavingBalanceController extends Controller
 	public function index(Organization $organization)
 	{
 		$user = Auth::user();
-		
+
 		return Inertia::render('SavingBalance/Index',[
 			'newRef' => $this->newRef($organization, $this->now->isoFormat('YYYY-M-DD')),
 			'organization' => $organization,
@@ -60,6 +60,9 @@ class SavingBalanceController extends Controller
 			'user' => $user,
 			'members' => SavingBalance::filter(request(['search']))
 																	->with('savingCategory')
+																	->with('contact', function ($query){
+																		return $query->with(['contactCategories', 'student']);
+																	})
 																	->whereOrganizationId($organization['id'])
 																	->paginate(50)->withQueryString(),
 		]);
@@ -79,7 +82,7 @@ class SavingBalanceController extends Controller
 				'required',
 				'exists:contacts,id',
 			],
-			'category_id' => [
+			'saving_category_id' => [
 				'required',
 				'exists:saving_categories,id',
 			],
@@ -92,11 +95,57 @@ class SavingBalanceController extends Controller
 
 		$validated = $validator->validated();
 		$validated['organization_id'] = $organization['id'];
+
 		// cek apakah contact_id dan categoty pernah dibuat
 		$balance = SavingBalance::whereOrganizationId($organization['id'])
-															->whereSavingCategoryId($validated['category_id'])
+															->whereSavingCategoryId($validated['saving_category_id'])
 															->whereContactId($validated['contact_id'])
 															->first();
-		dd($balance);
+	
+		if ($balance) {
+			return redirect()->back()->withErrors(['error' => 'Data is existed']);
+		}
+
+		$balance = SavingBalance::create($validated);
+
+		// return redirect(route('cashflow.saving.balance', ['organization' => $organization['id']]))->with('success', 'Data tabungan berhasil ditambah');
+		return redirect()->back()->with('success', 'Data tabungan berhasil ditambah');
+	}
+
+	public function update(Request $request, Organization $organization, SavingBalance $balance)
+	{
+		$validator = Validator::make($request->all(), [
+			'no_ref' => [
+				'required',
+				'string',
+				Rule::unique('saving_balances')->where(function ($query) use ($organization) {
+					return $query->where('organization_id', $organization['id']);
+				})->ignore($balance['id']),
+			],	
+			'contact_id' => [
+				'required',
+				'exists:contacts,id',
+			],
+			'saving_category_id' => [
+				'required',
+				'exists:saving_categories,id',
+			],
+		]);
+
+		$validated = $validator->validated();
+
+		$balance->update($validated);
+
+		return redirect()->back()->with('success', 'Data tabungan berhasil diubah');
+	}
+
+	public function destroy(Request $request, Organization $organization, SavingBalance $balance)
+	{
+		// cek apakah data telah dipakai
+
+		// jika belum dipakai maka dihapus
+		$balance->delete();
+
+		return redirect()->back()->with('success', 'Data simpanan tabungan berhasil dihapus');
 	}
 }
