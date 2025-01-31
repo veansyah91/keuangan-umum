@@ -30,7 +30,7 @@ import { usePrevious } from 'react-use';
 export default function Index({ organization, role, members, querySearch, newRef, contacts, categories }) { 
   // state
   const { data, setData, post, patch, errors, processing, reset, delete:destroy } = useForm({
-    id: null,
+    'id': null,
     'no_ref': newRef || '',
     'contact_id': null,
     'saving_category_id': null
@@ -188,10 +188,10 @@ export default function Index({ organization, role, members, querySearch, newRef
 
   return (
     <>
-      {/* Mobile */}
       <Head title='Data Simpanan' />
       <ToastContainer />
 
+      {/* Mobile */}
       {role !== 'viewer' && (
         <AddButtonMobile label={'Tambah'} handleShowInputModal={createData} />
       )}

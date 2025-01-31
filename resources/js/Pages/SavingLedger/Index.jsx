@@ -11,35 +11,92 @@ import AddButtonMobile from '@/Components/AddButtonMobile';
 import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
 import PrimaryButton from '@/Components/PrimaryButton';
-import { useDebounce } from 'use-debounce';
 import ContainerDesktop from '@/Components/Desktop/ContainerDesktop';
 import TitleDesktop from '@/Components/Desktop/TitleDesktop';
 import PageNumber from '@/Components/PageNumber';
 import TitleMobile from '@/Components/Mobiles/TitleMobile';
 import ContentMobile from '@/Components/Mobiles/ContentMobile';
 import ContentDesktop from '@/Components/Desktop/ContentDesktop';
-import DangerButton from '@/Components/DangerButton';
-import { usePrevious } from 'react-use';
+import SavingLedgerMobile from './Components/SavingLedgerMobile';
+import SavingLedgerDesktop from './Components/SavingLedgerDesktop';
 import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
-import { NumericFormat } from 'react-number-format';
+import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
+import DangerButton from '@/Components/DangerButton';
+import ContactSelectInput from '@/Components/SelectInput/ContactSelectInput';
+import { useDebounce } from 'use-debounce';
+import { usePrevious } from 'react-use';
+import { FiLogIn, FiLogOut } from 'react-icons/fi';
 
-export default function Index({
-  organization, role, ledgers, searchQuery
-}) {  
-  const [search, setSearch] = useState(searchQuery || "");
+export default function Index({ ledgers, organization, role, newRefCredit, newRefDebit, querySearch }) {
+  console.log(newRefCredit);
+  
+  // state
+  const { data, setData, post, patch, errors, processing, reset, delete:destroy } = useForm({
+    'id': null,
+    'value': '',
+    'contact_id': null,
+    'saving_category_id': null
+  });
+  const [modalInputLabel, setModalInputLabel] = useState({
+    title: 'Tambah Data Simpanan',
+    submit: 'Tambah'
+  });
+  const [showModalInput, setShowModalInput] = useState(false);
+  const [isUpdate, setIsUpdate] = useState(false);
+  const [search, setSearch] = useState(querySearch || "");
+  
+
+  // function
+  const setDefault = () => {
+
+  }
+
+  const createCreditData = () => {    
+    setShowModalInput(true);
+    setIsUpdate(false);
+    setDefault();
+    setModalInputLabel({
+      title: 'Tambah Data Simpanan',
+      submit: 'Tambah'
+    });
+  }
+
+  const createDebitData = () => {    
+    setShowModalInput(true);
+    setIsUpdate(false);
+    setDefault();
+    setModalInputLabel({
+      title: 'Tambah Data Simpanan',
+      submit: 'Tambah'
+    });
+  }
+
   
   return (
     <>
-      <Head title='Tambah Tabungan' />
+      <Head title='Tambah/Ambil Simpanan' />
       <ToastContainer />
-
-      {/* Mobile */}
-      {role !== 'viewer' && (
-        <Link href={route('cashflow.saving.credit.create', {organization: organization.id})}>
-          <AddButtonMobile label={'Tambah Data'} />
-        </Link>
-      )}
+      {
+        role !== 'viewer' && (
+          <div className='md:hidden fixed bottom-2 w-full z-40 flex'>
+            <div className='px-2'>
+              <button type='button' className={'btn bg-green-800 text-white w-full'} onClick={createCreditData}>
+                <div className='text-xl font-bold rotate-90'>
+                  <FiLogIn />
+                </div>
+              </button>
+            </div>
+            <div className='px-2'>
+              <button type='button' className={'btn bg-orange-800 text-white w-full'} onClick={createDebitData}>
+                <div className='text-xl font-bold -rotate-90'>
+                  <FiLogOut />
+                </div>
+              </button>
+            </div>
+          </div>
+        )
+      }
       <TitleMobile
         zIndex={'z-50'}
         search={search}
@@ -47,7 +104,7 @@ export default function Index({
         pageBefore={
           ledgers.links[0].url ? (
             <Link
-              href={route('cashflow.saving.credit', {
+              href={route('cashflow.saving.ledger', {
                 organization: organization.id,
                 page: ledgers.current_page - 1,
                 search: search,
@@ -65,7 +122,7 @@ export default function Index({
         pageAfter={
           ledgers.links[ledgers.links.length - 1].url ? (
             <Link
-              href={route('cashflow.saving.credit', {
+              href={route('cashflow.saving.ledger', {
                 organization: organization.id,
                 page: ledgers.current_page + 1,
                 search: search,
@@ -87,6 +144,17 @@ export default function Index({
         }
         data={ledgers}
       />
+      <ContentMobile>
+        {ledgers.data.map((ledger) => (
+          <SavingLedgerMobile
+            ledger={ledger}
+            key={ledger.id}
+            handleDelete={() => handleDelete(ledger)}
+            handleEdit={() => handleEdit(ledger)}
+            role={role}
+          />
+        ))}
+      </ContentMobile>
 
       {/* Desktop */}
       <ContainerDesktop>
@@ -94,9 +162,16 @@ export default function Index({
           <div className='my-auto w-7/12'>
             {role !== 'viewer' && (
               <div className='space-x-2'>
-                <Link href={route('cashflow.saving.credit.create', {organization: organization.id})}>
-                  <PrimaryButton className='py-3'>Tambah Data</PrimaryButton>
-                </Link>
+                <button onClick={createCreditData} className='bg-green-800 px-4 py-2 text-white border border-transparent rounded-md font-semibold'>
+                  <div className='text-xl font-bold rotate-90'>
+                    <FiLogIn />
+                  </div>
+                </button>
+                <button onClick={createDebitData} className='bg-orange-800 px-4 py-2 text-white border border-transparent rounded-md font-semibold'>
+                  <div className='text-xl font-bold -rotate-90'>
+                    <FiLogOut />
+                  </div>
+                </button>
               </div>
             )}
           </div>
@@ -108,7 +183,7 @@ export default function Index({
               id='search-input'
               name='search-input'
               type='search'
-              placeholder='Cari Simpanan'
+              placeholder='Cari'
               className='w-full border-none focus:outline-none focus:ring-0'
               value={search || ''}
               onChange={(e) => setSearch(e.target.value)}
@@ -121,7 +196,7 @@ export default function Index({
             <div className='my-auto'>
               {ledgers.links[0].url ? (
                 <Link
-                  href={route('cashflow.saving.credit', {
+                  href={route('cashflow.saving.ledger', {
                     organization: organization.id,
                     page: ledgers.current_page - 1,
                     search: search,
@@ -142,7 +217,7 @@ export default function Index({
             <div className='my-auto'>
               {ledgers.links[ledgers.links.length - 1].url ? (
                 <Link
-                  href={route('cashflow.saving.credit', {
+                  href={route('cashflow.saving.ledger', {
                     organization: organization.id,
                     page: ledgers.current_page + 1,
                     search: search,
@@ -166,11 +241,11 @@ export default function Index({
 
 Index.layout = (page) => (
   <AuthenticatedLayout
-    header={<Header>Tambah Simpanan</Header>}
+    header={<Header>Data Simpanan</Header>}
     children={page}
     user={page.props.auth.user}
     organization={page.props.organization}
-    title='Tambah Simpanan'
+    title='Data Simpanan'
     backLink={
       <Link href={route('cashflow.saving', page.props.organization.id)}>
         <IoArrowBackOutline />
@@ -183,9 +258,9 @@ Index.layout = (page) => (
             <Link href={route('cashflow', page.props.organization.id)}>Arus Kas</Link>
           </li>
           <li className='font-bold'>
-            <Link href={route('cashflow.saving', page.props.organization.id)}>Tabungan</Link>
+            <Link href={route('cashflow.saving', page.props.organization.id)}>Simpanan</Link>
           </li>
-          <li>Tambah Simpanan</li>
+          <li>Tambah/Ambil Simpanan</li>
         </ul>
       </div>
     }

@@ -8,6 +8,7 @@ import { IoArrowBackOutline } from 'react-icons/io5';
 import { ToastContainer } from 'react-toastify';
 import { CiLogin, CiLogout, CiViewList } from 'react-icons/ci';
 import { FaBook } from 'react-icons/fa';
+import { FaMoneyBillTransfer } from 'react-icons/fa6';
 
 export default function Index({
   organization
@@ -25,26 +26,11 @@ export default function Index({
               <Link href={route('cashflow.saving.balance', organization.id)}>
                 <CardMenu bgColor={'bg-slate-600'} icon={<FaBook />} title={'Data Simpanan'} />
               </Link>
-              <Link href={route('cashflow.saving.credit', organization.id)}>
+              <Link href={route('cashflow.saving.ledger', organization.id)}>
                 <CardMenu 
                   bgColor={'bg-green-500'} 
-                  icon={
-                    <div className='rotate-90'>
-                      <CiLogin />
-                    </div>
-                  }
-                  title={'Tambah Simpanan'} 
-                />
-              </Link>
-              <Link href={route('cashflow.saving.debit', organization.id)}>
-                <CardMenu 
-                  bgColor={'bg-red-500'} 
-                  icon={
-                    <div className='rotate-90'>
-                      <CiLogout />
-                    </div>
-                  }
-                  title={'Ambil Simpanan'} 
+                  icon={<FaMoneyBillTransfer />}
+                  title={'Tambah/Ambil Simpanan'} 
                 />
               </Link>
             </div>
@@ -60,26 +46,11 @@ export default function Index({
             <Link href={route('cashflow.saving.balance', organization.id)}>
               <CardMenu bgColor={'bg-slate-600'} icon={<FaBook />} title={'Data Simpanan'} />
             </Link>
-            <Link href={route('cashflow.saving.credit', organization.id)}>
+            <Link href={route('cashflow.saving.ledger', organization.id)}>
               <CardMenu 
                 bgColor={'bg-green-500'} 
-                icon={
-                  <div className='rotate-90'>
-                    <CiLogin />
-                  </div>
-                }
+                icon={<FaMoneyBillTransfer />}
                 title={'Tambah Simpanan'} 
-              />
-            </Link>
-            <Link href={route('cashflow.saving.debit', organization.id)}>
-              <CardMenu 
-                bgColor={'bg-red-500'} 
-                icon={
-                  <div className='rotate-90'>
-                    <CiLogout />
-                  </div>
-                }
-                title={'Ambil Simpanan'} 
               />
             </Link>
           </div>

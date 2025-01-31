@@ -1,7 +1,7 @@
 import React from 'react';
 import { IoAddOutline } from 'react-icons/io5';
 
-export default function AddButtonMobile({ handleShowInputModal, label = <IoAddOutline height={20} width={20} /> }) {
+export default function AddButtonMobile({ handleShowInputModal, label = < IoAddOutline height={20} width={20} /> }) {
     return (
         <div className='md:hidden fixed bottom-2 w-full z-40'>
             <div className='px-5'>

@@ -32,6 +32,7 @@ use App\Http\Controllers\AccountStaffController;
 use App\Http\Controllers\CashMutationController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\SavingCreditController;
+use App\Http\Controllers\SavingLedgerController;
 use App\Http\Controllers\StaffContactController;
 use App\Http\Controllers\StudentLevelController;
 use App\Http\Controllers\AccountSchoolController;
@@ -467,13 +468,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 			Route::patch('/saving/category/{category}', [SavingCategoryController::class, 'update'])->name('cashflow.saving-category.update');
 			Route::delete('/saving/category/{category}', [SavingCategoryController::class, 'destroy'])->name('cashflow.saving-category.delete');
 
-			// saving debit
-			Route::get('/saving/debit', [SavingDebitController::class, 'index'])->name('cashflow.saving.debit');
-			Route::get('/saving/debit/create', [SavingDebitController::class, 'create'])->name('cashflow.saving.debit.create');
-
-			// saving credit
-			Route::get('/saving/credit', [SavingCreditController::class, 'index'])->name('cashflow.saving.credit');
-			Route::get('/saving/credit/create', [SavingCreditController::class, 'create'])->name('cashflow.saving.credit.create');
+			// saving ledger
+			Route::get('/saving/ledger', [SavingLedgerController::class, 'index'])->name('cashflow.saving.ledger');
 
 			// savings
 			Route::get('/saving/balance', [SavingBalanceController::class, 'index'])->name('cashflow.saving.balance');
