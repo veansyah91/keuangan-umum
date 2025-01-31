@@ -51,6 +51,9 @@ class SavingBalanceController extends Controller
 	{
 		$user = Auth::user();
 
+		// dd(request('search'));
+		$searchRequest = request('search');
+
 		return Inertia::render('SavingBalance/Index',[
 			'newRef' => $this->newRef($organization, $this->now->isoFormat('YYYY-M-DD')),
 			'organization' => $organization,
@@ -59,6 +62,9 @@ class SavingBalanceController extends Controller
 																			->whereOrganizationId($organization['id'])->get(),
 			'user' => $user,
 			'members' => SavingBalance::filter(request(['search']))
+																	->orWhereHas('contact', function($query) use ($searchRequest){
+																		return $query->where('name', 'like', '%'. $searchRequest .'%');
+																	})
 																	->with('savingCategory')
 																	->with('contact', function ($query){
 																		return $query->with(['contactCategories', 'student']);

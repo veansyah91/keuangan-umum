@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Header from '@/Components/Header';
 import { Head, Link, router, useForm } from '@inertiajs/react';
@@ -24,6 +24,8 @@ import TextInput from '@/Components/TextInput';
 import ClientSelectInput from '@/Components/SelectInput/ClientSelectInput';
 import DangerButton from '@/Components/DangerButton';
 import ContactSelectInput from '@/Components/SelectInput/ContactSelectInput';
+import { useDebounce } from 'use-debounce';
+import { usePrevious } from 'react-use';
 
 export default function Index({ organization, role, members, querySearch, newRef, contacts, categories }) { 
   // state
@@ -47,8 +49,27 @@ export default function Index({ organization, role, members, querySearch, newRef
   });
 
   const [search, setSearch] = useState(querySearch || "");
+  const [debounceValue] = useDebounce(search, 500);
+  const prevSearch = usePrevious(search);
+  
+  // useEffect
+  useEffect(() => {
+    if (prevSearch !== undefined) {
+      handleReloadPage();
+    }
+  },[debounceValue])
 
   // function
+  const handleReloadPage = () => {
+    router.reload({
+      only: ['members'],
+      data: {
+        search,
+      },
+      preserveState: true,
+    });
+  };
+
   const setDefault = () => {
     setData({
       id: null,
@@ -65,7 +86,7 @@ export default function Index({ organization, role, members, querySearch, newRef
       setSelectedContact({ id: selected?.id, name: selected?.name, phone: selected?.phone });
       setData('contact_id', selected?.id);
     }    
-  };
+  }
 
   const handleSelectedCategory = (selected) => {
     if (selected) {
@@ -141,7 +162,7 @@ export default function Index({ organization, role, members, querySearch, newRef
         toast.success(flash.success, {
           position: toast.POSITION.TOP_CENTER,
         });
-        router.replace(window.location.pathname);
+        router.get(window.location.pathname);
         setShowModalInput(false);
         setIsUpdate(false);  
       }
@@ -153,7 +174,7 @@ export default function Index({ organization, role, members, querySearch, newRef
         toast.success(flash.success, {
           position: toast.POSITION.TOP_CENTER,
         });
-        router.replace(window.location.pathname);
+        router.get(window.location.pathname);
         setShowModalInput(false);
         setIsUpdate(false);  
       },
