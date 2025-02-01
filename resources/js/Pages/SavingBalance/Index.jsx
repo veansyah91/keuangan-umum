@@ -72,7 +72,7 @@ export default function Index({ organization, role, members, querySearch, newRef
 
   const setDefault = () => {
     setData({
-      id: null,
+      'id': null,
       'no_ref': newRef || '',
       'contact_id': null,
       'saving_category_id': null

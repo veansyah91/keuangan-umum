@@ -470,6 +470,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 			// saving ledger
 			Route::get('/saving/ledger', [SavingLedgerController::class, 'index'])->name('cashflow.saving.ledger');
+			Route::post('/saving/ledger', [SavingLedgerController::class, 'store'])->name('cashflow.saving.ledger.store');
 
 			// savings
 			Route::get('/saving/balance', [SavingBalanceController::class, 'index'])->name('cashflow.saving.balance');
