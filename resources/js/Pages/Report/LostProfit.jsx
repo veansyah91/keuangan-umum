@@ -184,7 +184,7 @@ export default function LostProfit({
     return (
         <>
             <Head
-                title={`Laporan ${ type > 0 ? "Surplus Defisit" : "Laba Rugi" } Periode : ${dayjs(startDate).format('MMMM DD, YYYY')} - ${dayjs(endDate).format('MMMM DD, YYYY')}`}
+                title={`Laporan ${ type > 0 ? "Surplus Defisit" : "Laba Rugi" } Periode : ${dayjs(startDate).locale('id').format('MMMM DD, YYYY')} - ${dayjs(endDate).format('MMMM DD, YYYY')}`}
             />
 
             <div className='sm:pt-0 pb-16 pt-12'>
@@ -429,8 +429,8 @@ export default function LostProfit({
                     </div>
                     <div className='w-full mt-3 hidden print:flex print:justify-between'>
                         <div className='text-end italic '>
-                            Periode : {dayjs(startDate).format('MMMM DD, YYYY')} -{' '}
-                            {dayjs(endDate).format('MMMM DD, YYYY')}
+                            Periode : {dayjs(startDate).locale('id').format('MMMM DD, YYYY')} -{' '}
+                            {dayjs(endDate).locale('id').format('MMMM DD, YYYY')}
                         </div>
                         <div className='text-xs my-auto'>
                             {(programs.length > 0 || projects.length > 0 || departments.length > 0) ? (
@@ -538,8 +538,7 @@ export default function LostProfit({
                                                 <div className='w-1/4 print:w-2/4 text-end'>Rp. </div>
                                                 <div className='w-3/4 print:w-2/4 text-end'>
                                                     {formatNumber(
-                                                        revenue -
-                                                            (cost.variable + cost.fixed + cost.depreciated + cost.other)
+                                                        revenue - (cost.variable + cost.fixed + cost.depreciated + cost.other)
                                                     )}
                                                 </div>
                                             </div>

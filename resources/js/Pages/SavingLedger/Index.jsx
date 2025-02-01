@@ -31,9 +31,9 @@ import SavingAccountSelectInput from '@/Components/SelectInput/SavingAccountSele
 import { NumericFormat } from 'react-number-format';
 import Datepicker from 'react-tailwindcss-datepicker';
 import dayjs from 'dayjs';
+import formatNumber from '@/Utils/formatNumber';
 
-export default function Index({ ledgers, organization, role, newRefCredit, newRefDebit, querySearch, balances, date }) {
-  
+export default function Index({ ledgers, organization, role, newRefCredit, newRefDebit, querySearch, balances, date, cashAccounts }) {  
   // state
   const { data, setData, post, patch, errors, setError, processing, reset, delete:destroy } = useForm({
     'id': null,
@@ -44,13 +44,15 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
     'type' : '',
     'date': date,
     'description' : '',
-    'no_ref': ''
+    'no_ref': '',
+    'cash_account_id' : null
   });
   const [dateValue, setDateValue] = useState({
     startDate: date,
     endDate: date,
   });
   const [selectedContact, setSelectedContact] = useState({ id: null, name: '', no_ref: '', balance_value: 0 });
+  const [selectedCashAccount, setSelectedCashAccount] = useState({ id: null, name: '', code: '', is_cash: true });
   
   const [modalInputLabel, setModalInputLabel] = useState({
     title: 'Tambah Data Simpanan',
@@ -63,6 +65,15 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
 
   // function
   const setDefault = () => {
+
+  }
+
+  const handleEdit = (ledger) => {
+    console.log(ledger);
+    
+  }
+
+  const handleDelete = (legder) => {
 
   }
 
@@ -101,9 +112,11 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
       'type' : '',
       'date': '',
       'description' : '',
-      'no_ref': ''
+      'no_ref': '',
+      'cash_account_id' : ''
     });
-    setSelectedContact({ id: null, name: '', no_ref: '', balance_value: 0 });
+    // setSelectedContact({ id: null, name: '', no_ref: '', balance_value: 0 });
+    // setSelectedCashAccount({ id: null, name: '', code: '', is_cash: true });
     setShowModalInput(true);
     setIsUpdate(false);
     setDefault();
@@ -119,7 +132,8 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
       'value': 0,
       'type' : 'credit',
       'date': date,
-      'description' : ''
+      'description' : '',
+      'cash_account_id' : null
     });
   }
 
@@ -133,8 +147,12 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
       'type' : '',
       'date': '',
       'description' : '',
-      'no_ref': ''
+      'no_ref': '',
+      'cash_account_id' : ''
+
     });
+    // setSelectedContact({ id: null, name: '', no_ref: '', balance_value: 0 });
+    // setSelectedCashAccount({ id: null, name: '', code: '', is_cash: true });
     setShowModalInput(true);
     setIsUpdate(false);
     setDefault();
@@ -150,9 +168,19 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
       'value': 0,
       'date': date,
       'type' : 'debit',
-      'description' : ''
+      'description' : '',
+      'cash_account_id' : null
+
     });
   }
+
+  const handleSelectedCashAccount = (selected) => {
+    if (selected) {
+      setSelectedCashAccount({ id: selected.id, name: selected.name, code: selected.code, is_cash: true });
+      setData('cash_account_id', selected.id);
+      setError('cash_account_id','');
+    }    
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -160,6 +188,16 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
     post(route('cashflow.saving.ledger.store', { organization: organization.id }), {
       onSuccess: ({ props }) => {
         const { flash } = props;
+        router.replace(window.location.pathname);
+
+        toast.success(flash.success, {
+          position: toast.POSITION.TOP_CENTER,
+        });
+
+        setSelectedContact({ id: null, name: '', no_ref: '', balance_value: 0 });
+        setSelectedCashAccount({ id: null, name: '', code: '', is_cash: true });
+        setShowModalInput(false);
+        setIsUpdate(false);  
       },
       onError: errors => {
         console.log(errors);
@@ -329,8 +367,26 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
             </div>
           </div>
         </TitleDesktop>
+        <div className='sm:flex hidden gap-5'>
+          <div className='w-full'>
+            <ContentDesktop>
+            <table className='table table-pin-rows table-pin-cols text-base'>
+              <thead className='text-base text-gray-900'>
+                <tr className=''>
+                  <th className='bg-gray-200'>Tanggal</th>
+                  <th className='bg-gray-200'>No. Ref</th>
+                  <th className='bg-gray-200'>Rekening</th>
+                  <th className='bg-gray-200 text-end'>Jumlah</th>
+                  <th className='bg-gray-200'></th>
+                </tr>
+              </thead>
+            </table>
+            </ContentDesktop>
+          </div>
+        </div>
       </ContainerDesktop>
 
+      
       {/* Modal */}
       <Modal show={showModalInput} onClose={() => setShowModalInput(false)}>
         <form onSubmit={handleSubmit} className='p-6'>
@@ -398,7 +454,7 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
                 {
                   selectedContact.id && <div className='flex justify-between text-xs'>
                     <div>Nama: <span className='font-bold'>{ selectedContact.name }</span></div>
-                    <div>Sisa Saldo: <span className='text-green-700 font-bold'>IDR. { selectedContact.balance_value }</span></div>
+                    <div>Sisa Saldo: <span className='text-green-700 font-bold'>IDR. { formatNumber(selectedContact.balance_value) }</span></div>
                   </div>
                 }
                 {errors && errors.balance_id && (
@@ -429,9 +485,30 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
                 )}
               </div>
             </div>
+            <div className='flex flex-col sm:flex-row w-full gap-1'>
+              <div className='w-full sm:w-1/3 my-auto'>
+                <InputLabel htmlFor='value' value='Akun Kas' className='mx-auto my-auto' />
+              </div>
+              <div className='sm:w-2/3 w-full'>
+                <ClientSelectInput
+                  resources={cashAccounts}
+                  selected={selectedCashAccount}
+                  setSelected={(selected) => handleSelectedCashAccount(selected)}
+                  maxHeight='max-h-40'
+                  placeholder='Cari Akun'
+                  isError={errors.cash_account_id ? true : false}
+                  id='account'
+                  contactFilter={''}
+                />
+                {errors && errors.cash_account_id && (
+                  <div className='-mb-3'>
+                    <div className='text-xs text-red-500'>{errors.cash_account_id}</div>
+                  </div>
+                )}
+              </div>
+            </div>
             <div className='mt-6 flex justify-end'>
-              <SecondaryButton onClick={e => setShowModalInput(false)}>Batal</SecondaryButton>
-  
+              <SecondaryButton onClick={e => setShowModalInput(false)}>Batal</SecondaryButton>  
               {
                 data.balance_id && data.no_ref && data.date && (data.value > 0) &&
                 <PrimaryButton className='ms-3' disabled={processing}>

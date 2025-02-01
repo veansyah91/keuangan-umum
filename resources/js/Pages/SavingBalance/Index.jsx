@@ -334,6 +334,7 @@ export default function Index({ organization, role, members, querySearch, newRef
                     <th className='bg-gray-200'>No. Ref</th>
                     <th className='bg-gray-200'>Nama Kontak</th>
                     <th className='bg-gray-200'>Kategori Simpanan</th>
+                    <th className='bg-gray-200 text-end'>Saldo</th>
                     <th className='bg-gray-200'></th>
                   </tr>
                 </thead>

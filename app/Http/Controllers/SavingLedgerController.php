@@ -5,24 +5,33 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use Inertia\Inertia;
 use App\Helpers\NewRef;
+use App\Models\Account;
 use Carbon\CarbonImmutable;
 use App\Models\Organization;
 use App\Models\SavingLedger;
 use Illuminate\Http\Request;
 use App\Models\SavingBalance;
+use App\Models\SavingCategory;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Repositories\Log\LogRepository;
 use App\Repositories\User\UserRepository;
+use App\Repositories\Account\AccountRepository;
 use App\Repositories\Contact\ContactRepository;
+use App\Repositories\Journal\JournalRepository;
 
 class SavingLedgerController extends Controller
 {
-	protected $logRepository, $userRepository, $contactRepository;
+	protected $logRepository, $userRepository, $contactRepository, $journalRepository, $accountRepository;
 
-	public function __construct(UserRepository $userRepository, ContactRepository $contactRepository)
+	public function __construct(UserRepository $userRepository, ContactRepository $contactRepository, JournalRepository $journalRepository, AccountRepository $accountRepository, LogRepository $logRepository)
 	{
 		$this->userRepository = $userRepository;
 		$this->contactRepository = $contactRepository;
+		$this->journalRepository = $journalRepository;
+		$this->accountRepository = $accountRepository;
+		$this->logRepository = $logRepository;
 		$this->now = CarbonImmutable::now();
 	}
 
@@ -57,6 +66,13 @@ class SavingLedgerController extends Controller
 			'date' => request('date') ?? $this->now->isoFormat('YYYY-M-DD'),
 			'ledgers' => SavingLedger::filter(request(['search']))
 																	->whereOrganizationId($organization['id'])
+																	->with('savingBalance', function ($query){
+																		return $query->with('contact', function ($query){
+																			return $query->with('contactCategories');
+																		});
+																	})
+																	->orderBy('date', 'desc')
+																	->orderBy('no_ref', 'desc')
 																	->paginate(50)->withQueryString(),
 			'balances' => SavingBalance::whereOrganizationId($organization['id'])
 																		->where(function ($query) use ($contact){
@@ -73,6 +89,7 @@ class SavingLedgerController extends Controller
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'newRefCredit' => $this->newRef($organization, $this->now->isoFormat('YYYY-M-DD'), "credit"),
 			'newRefDebit' => $this->newRef($organization, $this->now->isoFormat('YYYY-M-DD'), "debit"),
+			'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),
 		]);
 	}
 
@@ -82,38 +99,42 @@ class SavingLedgerController extends Controller
 
 		$validated = $request->validate([
 			'date' => [
-					'required',
-					'date',
+				'required',
+				'date',
 			],
 			'type' => [
-					'required',
-					'string'
+				'required',
+				'string'
 			],
 			'description' => [
-					'required',
-					'string',
+				'required',
+				'string',
 			],
 			'no_ref' => [
-					'required',
-					'string',
-					Rule::unique('saving_ledgers')->where(function ($query) use ($organization) {
-							return $query->where('organization_id', $organization['id']);
-					}),
+				'required',
+				'string',
+				Rule::unique('saving_ledgers')->where(function ($query) use ($organization) {
+					return $query->where('organization_id', $organization['id']);
+				}),
 			],
 			'balance_value' => [
-					'required',
-					'numeric',
-					'min:0'
+				'required',
+				'numeric',
+				'min:0'
 			],
 			'value' => [
-					'required',
-					'numeric',
-					'min:0'
+				'required',
+				'numeric',
+				'min:0'
 			],
 			'balance_id' => [
-					'required',
-					'exists:saving_balances,id',
+				'required',
+				'exists:saving_balances,id',
 			],
+			'cash_account_id' => [
+				'required',
+				'exists:accounts,id'
+			]
 		]);
 
 		// cek tanggal
@@ -126,7 +147,73 @@ class SavingLedgerController extends Controller
 			return redirect()->back()->withErrors(['value' => 'Value is Unexpected!']);
 		}
 
-		dd($validated);
+		// contact
+		$savingBalance = SavingBalance::find($validated['balance_id']);
+
+		// saving account
+		$savingCategory = SavingCategory::find($savingBalance['saving_category_id']);
+		$cash_saving = Account::find($savingCategory['account_id']);
+
+		// cash account
+		$cash_account = Account::find($validated['cash_account_id']);
+
+		$validated['saving_balance_id'] = $validated['balance_id'];
+		$validated['debit'] = $validated['type'] == 'debit' ? $validated['value'] : 0;
+		$validated['credit'] = $validated['type'] == 'credit' ? $validated['value'] : 0;
+		$validated['contact_id'] = $savingBalance['contact_id'];
+		$validated['user_id'] = $user['id'];	
+		$validated['organization_id'] = $organization['id'];	
+		$validated['accounts'] = [
+			// akun cash (pendapatan)
+			[
+				'id' => $cash_account['id'],
+				'name' => $cash_account['name'],
+				'code' => $cash_account['code'],
+				'is_cash' => 1,
+				'debit' => $validated['type'] == 'credit' ? $validated['value'] : 0,
+				'credit' => $validated['type'] == 'debit' ? $validated['value'] : 0,
+			],
+			// akun saving (simpanan)
+			[
+				'id' => $cash_saving['id'],
+				'name' => $cash_saving['name'],
+				'code' => $cash_saving['code'],
+				'is_cash' => 0,
+				'debit' => $validated['type'] == 'debit' ? $validated['value'] : 0,
+				'credit' => $validated['type'] == 'credit' ? $validated['value'] : 0,
+			],
+		];	
+		
+		$prefix = $validated['type'] == 'debit' ? 'PENARIKAN' : 'PENAMBAHAN';
+
+		DB::transaction(function() use ($validated, $user, $savingBalance, $prefix, $organization){
+			// journal
+			$journal = $this->journalRepository->store($validated);
+			$validated['journal_id'] = $journal['id'];
+
+			// saving ledger
+			$savingLedger = SavingLedger::create($validated);
+
+			// update Saving Ledger
+			$newValue = $savingBalance['value'] + ($validated['value'] * ($validated['type'] == 'credit' ? 1 : -1));
+			$savingBalance->update([
+				'value' => $newValue
+			]);
+
+			// log
+			$log = [
+				'description' => $validated['description'],
+				'date' => $validated['date'],
+				'no_ref' => $validated['no_ref'],
+				'value' => $validated['value'],
+			];
+
+			$desc = strtoupper($user['name']).' telah menambahkan DATA pada ' . $prefix . 'TABUNGAN dengan DATA : '.json_encode($log);
+
+			$this->logRepository->store($organization['id'], $desc);
+		});
+		
+		return redirect()->back()->with('success', 'Berhasil melakukan ' . $prefix . ' TABUNGAN');
 
 
 	}

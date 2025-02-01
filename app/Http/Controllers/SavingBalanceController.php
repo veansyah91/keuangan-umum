@@ -70,6 +70,7 @@ class SavingBalanceController extends Controller
 																		return $query->with(['contactCategories', 'student']);
 																	})
 																	->whereOrganizationId($organization['id'])
+																	->orderBy('value', 'desc')
 																	->paginate(50)->withQueryString(),
 		]);
 	}

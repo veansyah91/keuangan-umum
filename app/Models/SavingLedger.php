@@ -37,7 +37,7 @@ class SavingLedger extends Model
 
     public function savingBalance(): BelongsTo
     {
-        return $this->belongTo(SavingBalance::class);
+        return $this->belongsTo(SavingBalance::class);
     }
     
 }

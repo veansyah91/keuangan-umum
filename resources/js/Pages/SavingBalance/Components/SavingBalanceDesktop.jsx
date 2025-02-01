@@ -1,3 +1,4 @@
+import formatNumber from '@/Utils/formatNumber'
 import React from 'react'
 import { IoCreateOutline, IoEllipsisVertical, IoTrash } from 'react-icons/io5'
 
@@ -16,6 +17,7 @@ export default function SavingBalanceDesktop({ member, className, role, handleDe
           </div>
         </td>
         <td>{member.saving_category.name}</td>
+        <td className='text-end text-green-800 font-bold'>IDR. { formatNumber(member.value) }</td>
         <td className='text-end'>
           {role !== 'viewer' && (
             <div className='dropdown dropdown-left'>

@@ -168,8 +168,7 @@ export default function Create({
       setSelectedCashAccount({ id: selected.id, name: selected.name, code: selected.code, is_cash: true });
       setData('cash_account_id', selected.id);
       setError('cash_account_id','');
-    }
-    
+    }    
   };
 
   const handleChangeValue = (values, index) => {
