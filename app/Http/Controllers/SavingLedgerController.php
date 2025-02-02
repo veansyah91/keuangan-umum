@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Inertia\Inertia;
 use App\Helpers\NewRef;
 use App\Models\Account;
+use App\Models\Journal;
 use Carbon\CarbonImmutable;
 use App\Models\Organization;
 use App\Models\SavingLedger;
@@ -66,6 +67,7 @@ class SavingLedgerController extends Controller
 			'date' => request('date') ?? $this->now->isoFormat('YYYY-M-DD'),
 			'ledgers' => SavingLedger::filter(request(['search']))
 																	->whereOrganizationId($organization['id'])
+																	->with('cashAccount')
 																	->with('savingBalance', function ($query){
 																		return $query->with('contact', function ($query){
 																			return $query->with('contactCategories');
@@ -216,5 +218,37 @@ class SavingLedgerController extends Controller
 		return redirect()->back()->with('success', 'Berhasil melakukan ' . $prefix . ' TABUNGAN');
 
 
+	}
+
+	public function destroy(Organization $organization, SavingLedger $ledger)
+	{
+		// cek apakah data yang dihapus adalah data terakhir, jika tidak berikan error
+		$lastLedger = SavingLedger::where('saving_balance_id', $ledger['saving_balance_id'])
+																->orderBy('created_at', 'desc')
+																->first();
+		if ($lastLedger['id'] !== $ledger['id']) {
+			return redirect()->back()->withErrors(['error' => "Data can't be deleted"]);
+		}
+
+		// cek saldo
+		$savingBalance = SavingBalance::find($ledger['saving_balance_id']);
+
+		$update_saving_balance_value = $savingBalance['value'] + ($ledger['debit'] > 0 ? $ledger['debit'] : ($ledger['credit'] * -1));
+
+		DB::transaction(function() use ($organization, $ledger, $update_saving_balance_value, $savingBalance){
+			// perbarui Value pada Saving Balance
+			$savingBalance->update([
+				'value' => $update_saving_balance_value
+			]);
+
+			$ledger->delete();
+
+			// hapus journal
+			$journal = Journal::find($ledger['journal_id']);
+			$journal->delete();
+		});
+
+		$message = 'Berhasil Menghapus Data ' . ($ledger['debit'] > 0 ? 'Penarikan' : 'Penambahan') . ' Tabungan';
+		return redirect()->back()->with('success', $message);
 	}
 }

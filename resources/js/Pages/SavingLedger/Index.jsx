@@ -59,6 +59,7 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
     submit: 'Tambah'
   });
   const [showModalInput, setShowModalInput] = useState(false);
+  const [showModalDelete, setShowModalDelete] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
   const [search, setSearch] = useState(querySearch || "");
   
@@ -69,12 +70,41 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
   }
 
   const handleEdit = (ledger) => {
-    console.log(ledger);
-    
+    setShowModalInput(true);
+    setIsUpdate(true);
+    setError({
+      'id': '',
+      'value': '',
+      'balance_id': '',
+      'balance_value': '',
+      'value': '',
+      'type' : '',
+      'date': '',
+      'description' : '',
+      'no_ref': '',
+      'cash_account_id' : ''
+    });
+
+    setData({
+      'id' : ledger.id,
+      'value' : ledger.debit > 0 ? ledger.debit : ledger.credit,
+      'balance_id': ledger.saving_balance_id,
+      'balance_value': ledger.saving_balance.value,
+      'type' : ledger.debit > 0 ? 'debit' : 'credit',
+      'date': ledger.date,
+      'description' : ledger.description,
+      'no_ref': ledger.no_ref,
+      'cash_account_id' : ledger.cash_account_id
+    });
+
+    setSelectedContact({id: ledger.saving_balance.id, name: ledger.saving_balance.contact.name, no_ref: ledger.saving_balance.no_ref, balance_value: ledger.saving_balance.value});
+    setSelectedCashAccount({id: ledger.cash_account_id, name: ledger.cash_account.name, code: ledger.cash_account.code, is_cash: true})
   }
 
-  const handleDelete = (legder) => {
+  const handleDelete = (ledger) => {
+    setData('id', ledger.id);
 
+    setShowModalDelete(true);
   }
 
   const handleDateValueChange = (newValue) => {
@@ -170,7 +200,6 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
       'type' : 'debit',
       'description' : '',
       'cash_account_id' : null
-
     });
   }
 
@@ -185,7 +214,15 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    post(route('cashflow.saving.ledger.store', { organization: organization.id }), {
+    isUpdate 
+    ? patch(route('cashflow.saving.ledger.update', {organization: organization.id, ledger: data.id}),{
+      onSuccess: ({ props }) => {
+        const { flash } = props;
+
+        
+      }
+    })
+    : post(route('cashflow.saving.ledger.store', { organization: organization.id }), {
       onSuccess: ({ props }) => {
         const { flash } = props;
         router.replace(window.location.pathname);
@@ -204,6 +241,27 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
         
       }
     })
+  }
+
+  const handleSubmitDelete = (e) => {
+    e.preventDefault();
+
+    destroy(route('cashflow.saving.ledger.delete', {organization: organization.id, ledger: data.id}), {
+      onSuccess: ({ props }) => {
+        const { flash } = props;
+
+        toast.success(flash.success, {
+          position: toast.POSITION.TOP_CENTER,
+        });
+        setShowModalDelete(false);
+
+      },
+      onError: errors => {
+        toast.error(errors.error, {
+          position: toast.POSITION.TOP_CENTER,
+        });
+      }
+    });
   }
   
   return (
@@ -380,6 +438,18 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
                   <th className='bg-gray-200'></th>
                 </tr>
               </thead>
+              <tbody>
+                {ledgers.data.map((ledger, index) => (
+                  <SavingLedgerDesktop
+                    key={index}
+                    ledger={ledger}
+                    className={`${index % 2 == 0 && 'bg-gray-100'}`}
+                    handleDelete={() => handleDelete(ledger)}
+                    handleEdit={() => handleEdit(ledger)}
+                    role={role}
+                  />
+                ))}
+              </tbody>
             </table>
             </ContentDesktop>
           </div>
@@ -517,6 +587,22 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
               }
             </div>
           </div>        
+        </form>
+      </Modal>
+      <Modal show={showModalDelete} onClose={() => setShowModalDelete(false)}>
+        <form onSubmit={handleSubmitDelete} className='p-6' id='delete-confirmation' name='delete-confirmation'>
+          <h2 className='text-lg font-medium text-gray-900 text-center'>
+              <div>Hapus Data Simpanan { data?.no_ref }?
+              </div>              
+          </h2>
+
+            <div className='mt-6 flex justify-end'>
+                <SecondaryButton onClick={() => setShowModalDelete(false)}>Batal</SecondaryButton>
+
+                <DangerButton className='ms-3' disabled={processing}>
+                    Hapus
+                </DangerButton>
+            </div>
         </form>
       </Modal>
     </>

@@ -471,6 +471,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 			// saving ledger
 			Route::get('/saving/ledger', [SavingLedgerController::class, 'index'])->name('cashflow.saving.ledger');
 			Route::post('/saving/ledger', [SavingLedgerController::class, 'store'])->name('cashflow.saving.ledger.store');
+			Route::patch('/saving/ledger/{ledger}', [SavingLedgerController::class, 'update'])->name('cashflow.saving.ledger.update');
+			Route::delete('/saving/ledger/{ledger}', [SavingLedgerController::class, 'destroy'])->name('cashflow.saving.ledger.delete');
 
 			// savings
 			Route::get('/saving/balance', [SavingBalanceController::class, 'index'])->name('cashflow.saving.balance');

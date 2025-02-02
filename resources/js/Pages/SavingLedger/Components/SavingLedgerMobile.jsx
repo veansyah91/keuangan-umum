@@ -5,9 +5,7 @@ import { IoCreateOutline, IoEllipsisVertical, IoTrash } from 'react-icons/io5'
 
 export default function SavingLedgerMobile({
   ledger, role, handleDelete, handleEdit 
-}) {
-  console.log(ledger);
-  
+}) {    
   return (
     <>
       <div className=' text-gray-900 py-2 px-3 border flex gap-5 justify-between'>

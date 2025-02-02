@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Account;
 use App\Models\Organization;
 use App\Models\SavingBalance;
 use Illuminate\Database\Eloquent\Model;
@@ -20,7 +21,8 @@ class SavingLedger extends Model
         'credit',
         'date',
         'description',
-        'no_ref'
+        'no_ref',
+        'cash_account_id'
     ];
 
     public function scopeFilter($query, $filters)
@@ -38,6 +40,11 @@ class SavingLedger extends Model
     public function savingBalance(): BelongsTo
     {
         return $this->belongsTo(SavingBalance::class);
+    }
+
+    public function cashAccount(): BelongsTo
+    {
+        return $this->belongsTo(Account::class, 'cash_account_id');
     }
     
 }
