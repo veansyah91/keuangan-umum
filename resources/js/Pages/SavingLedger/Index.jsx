@@ -33,7 +33,7 @@ import Datepicker from 'react-tailwindcss-datepicker';
 import dayjs from 'dayjs';
 import formatNumber from '@/Utils/formatNumber';
 
-export default function Index({ ledgers, organization, role, newRefCredit, newRefDebit, querySearch, balances, date, cashAccounts }) {  
+export default function Index({ ledgers, organization, role, newRefCredit, newRefDebit, querySearch, balances, date, cashAccounts }) {   
   // state
   const { data, setData, post, patch, errors, setError, processing, reset, delete:destroy } = useForm({
     'id': null,
@@ -70,6 +70,10 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
   }
 
   const handleEdit = (ledger) => {
+    setModalInputLabel({
+      title: (ledger.debit > 0 ? 'Tarik' : 'Tambah') + ' Simpanan',
+      submit: 'Ubah'
+    });
     setShowModalInput(true);
     setIsUpdate(true);
     setError({
@@ -145,8 +149,8 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
       'no_ref': '',
       'cash_account_id' : ''
     });
-    // setSelectedContact({ id: null, name: '', no_ref: '', balance_value: 0 });
-    // setSelectedCashAccount({ id: null, name: '', code: '', is_cash: true });
+    setSelectedContact({ id: null, name: '', no_ref: '', balance_value: 0 });
+    setSelectedCashAccount({ id: null, name: '', code: '', is_cash: true });
     setShowModalInput(true);
     setIsUpdate(false);
     setDefault();
@@ -181,8 +185,8 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
       'cash_account_id' : ''
 
     });
-    // setSelectedContact({ id: null, name: '', no_ref: '', balance_value: 0 });
-    // setSelectedCashAccount({ id: null, name: '', code: '', is_cash: true });
+    setSelectedContact({ id: null, name: '', no_ref: '', balance_value: 0 });
+    setSelectedCashAccount({ id: null, name: '', code: '', is_cash: true });
     setShowModalInput(true);
     setIsUpdate(false);
     setDefault();
@@ -511,16 +515,23 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
                 <InputLabel htmlFor='balance_id' value='Kontak' className='mx-auto my-auto' />
               </div>
               <div className='sm:w-2/3 w-full'>
-                <SavingAccountSelectInput
-                  resources={balances}
-                  selected={selectedContact}
-                  setSelected={(selected) => handleSelectedContact(selected)}
-                  maxHeight='max-h-40'
-                  placeholder='Cari Kontak'
-                  isError={errors.contact_id ? true : false}
-                  id='contact'
-                  notFound={<span>Tidak Ada Data. <Link className='font-bold text-blue-600' href={route('data-master.contact.create', {organization:organization.id})}>Buat Baru ?</Link></span>}
-                />
+                {
+                  isUpdate 
+                  ? <div className='border px-3 py-2 rounded-lg'>
+                    { selectedContact.no_ref }
+                  </div>
+                  : <SavingAccountSelectInput
+                    resources={balances}
+                    selected={selectedContact}
+                    setSelected={(selected) => handleSelectedContact(selected)}
+                    maxHeight='max-h-40'
+                    placeholder='Cari Kontak'
+                    isError={errors.contact_id ? true : false}
+                    id='contact'
+                    notFound={<span>Tidak Ada Data. <Link className='font-bold text-blue-600' href={route('data-master.contact.create', {organization:organization.id})}>Buat Baru ?</Link></span>}
+                  />
+                }                
+                
                 {
                   selectedContact.id && <div className='flex justify-between text-xs'>
                     <div>Nama: <span className='font-bold'>{ selectedContact.name }</span></div>
@@ -578,9 +589,9 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
               </div>
             </div>
             <div className='mt-6 flex justify-end'>
-              <SecondaryButton onClick={e => setShowModalInput(false)}>Batal</SecondaryButton>  
+              <SecondaryButton onClick={_ => setShowModalInput(false)}>Batal</SecondaryButton>  
               {
-                data.balance_id && data.no_ref && data.date && (data.value > 0) &&
+                data.balance_id && data.no_ref && data.date && data.cash_account_id && (data.value > 0) &&
                 <PrimaryButton className='ms-3' disabled={processing}>
                   {modalInputLabel.submit}
                 </PrimaryButton>

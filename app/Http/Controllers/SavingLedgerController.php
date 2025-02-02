@@ -216,8 +216,75 @@ class SavingLedgerController extends Controller
 		});
 		
 		return redirect()->back()->with('success', 'Berhasil melakukan ' . $prefix . ' TABUNGAN');
+	}
 
+	public function update(Request $request, Organization $organization, SavingLedger $ledger)
+	{
+		$user = Auth::user();
 
+		$validated = $request->validate([
+			'date' => [
+				'required',
+				'date',
+			],
+			'type' => [
+				'required',
+				'string'
+			],
+			'description' => [
+				'required',
+				'string',
+			],
+			'no_ref' => [
+				'required',
+				'string',
+				Rule::unique('saving_ledgers')->where(function ($query) use ($organization) {
+					return $query->where('organization_id', $organization['id']);
+				})->ignore($ledger['id']),
+			],
+			'balance_value' => [
+				'required',
+				'numeric',
+				'min:0'
+			],
+			'value' => [
+				'required',
+				'numeric',
+				'min:0'
+			],
+			'balance_id' => [
+				'required',
+				'exists:saving_balances,id',
+			],
+			'cash_account_id' => [
+				'required',
+				'exists:accounts,id'
+			]
+		]);
+
+		// cek tanggal
+		// jika tanggal lebih tinggi dari hari sekarang, maka kirimkan error
+		if ($validated['date'] > $this->now->isoFormat('YYYY-M-DD')) {
+			return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
+		}
+
+		// cek apakah data yang dihapus adalah data terakhir, jika tidak berikan error
+		$lastLedger = SavingLedger::where('saving_balance_id', $ledger['saving_balance_id'])
+																->orderBy('created_at', 'desc')
+																->first();
+		if ($lastLedger['id'] !== $ledger['id']) {
+			return redirect()->back()->withErrors(['error' => "Data can't be deleted"]);
+		}
+
+		DB::transaction(function () use ($organization, $validated, $ledger, $user){
+			// perbarui saldo
+			$savingBalance = SavingBalance::find($ledger['saving_balance_id']);
+			// kembalikan saldo ke awal
+
+			$start_balance = $savingBalance['value'] + ($ledger['debit'] > 0 ? $ledger['debit'] : ($ledger['credit'] * -1));
+			dd($start_balance);
+
+		});
 	}
 
 	public function destroy(Organization $organization, SavingLedger $ledger)
