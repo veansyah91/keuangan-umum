@@ -12,7 +12,7 @@ export default function SavingLedgerDesktop({ ledger, className, role, handleDel
         <td>
           <div>{ledger.saving_balance.no_ref}</div>
           <div className='text-xs'>{ledger.saving_balance.contact.name}</div>
-          <div className='text-sm font-bold'>
+          <div className='text-xs font-bold'>
             {ledger.saving_balance.contact.contact_categories[0].name}
           </div>
         </td>

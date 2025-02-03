@@ -41,11 +41,11 @@ class StaffContactController extends Controller
 
         $contacts = Contact::filter(request(['search']))
                             ->whereOrganizationId($organization['id'])
-                            ->with('contactCategories', 'staff')
                             ->whereHas('contactCategories', function ($query) use ($contactCategory){
                                 $query->where('contact_category_id', $contactCategory['id']);
                             })
                             ->whereHas('staff')
+                            ->with('contactCategories', 'staff')
                             ->orderBy('name')
                             ->paginate(50)->withQueryString();
         

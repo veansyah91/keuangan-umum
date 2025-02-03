@@ -37,7 +37,6 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
   // state
   const { data, setData, post, patch, errors, setError, processing, reset, delete:destroy } = useForm({
     'id': null,
-    'value': '',
     'balance_id': null,
     'balance_value': 0,
     'value': 0,
@@ -62,9 +61,27 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
   const [showModalDelete, setShowModalDelete] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
   const [search, setSearch] = useState(querySearch || "");
-  
+  const [debounceValue] = useDebounce(search, 500);
+  const prevSearch = usePrevious(search);
+
+  // useEffect
+   useEffect(() => {
+      if (prevSearch !== undefined) {
+        handleReloadPage();
+      }
+    },[debounceValue]);
 
   // function
+  const handleReloadPage = () => {
+    router.reload({
+      only: ['ledgers'],
+      data: {
+        search,
+      },
+      preserveState: true,
+    });
+  };
+
   const setDefault = () => {
 
   }
@@ -81,7 +98,6 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
       'value': '',
       'balance_id': '',
       'balance_value': '',
-      'value': '',
       'type' : '',
       'date': '',
       'description' : '',
@@ -142,7 +158,6 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
       'value': '',
       'balance_id': '',
       'balance_value': '',
-      'value': '',
       'type' : '',
       'date': '',
       'description' : '',
@@ -177,7 +192,6 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
       'value': '',
       'balance_id': '',
       'balance_value': '',
-      'value': '',
       'type' : '',
       'date': '',
       'description' : '',
@@ -223,7 +237,21 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
       onSuccess: ({ props }) => {
         const { flash } = props;
 
-        
+        router.replace(window.location.pathname);
+
+        toast.success(flash.success, {
+          position: toast.POSITION.TOP_CENTER,
+        });
+
+        setSelectedContact({ id: null, name: '', no_ref: '', balance_value: 0 });
+        setSelectedCashAccount({ id: null, name: '', code: '', is_cash: true });
+        setShowModalInput(false);
+        setIsUpdate(false);  
+      },
+      onError: errors => {
+        toast.error(errors.error, {
+          position: toast.POSITION.TOP_CENTER,
+        });
       }
     })
     : post(route('cashflow.saving.ledger.store', { organization: organization.id }), {

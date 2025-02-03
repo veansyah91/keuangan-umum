@@ -56,15 +56,15 @@ class StudentEntryReceivableController extends Controller
 			'whatsappPlugin' => $whatsappPlugin,
 			'type' => $type,
 			'receivables' => StudentEntryReceivable::filter(request(['search']))
-																	->with('contact', function ($query) {
-																			$query->with(['student', 'lastLevel']);
-																	})
 																	->when($type !== 'all' ?? false, function ($query) use ($type){
 																		return $type === 'paid' 
 																		? $query->where('value', 0)
 																		: $query->where('value', '>', 0);
 																	})
 																	->whereOrganizationId($organization['id'])
+																	->with('contact', function ($query) {
+																		$query->with(['student', 'lastLevel']);
+																	})
 																	->orderBy('value', 'desc')
 																	->paginate(50)->withQueryString(),
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),

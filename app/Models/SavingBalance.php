@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Contact;
+use App\Models\Journal;
 use App\Models\Organization;
 use App\Models\SavingCategory;
 use Illuminate\Database\Eloquent\Model;
@@ -24,7 +25,10 @@ class SavingBalance extends Model
     public function scopeFilter($query, $filters)
     {
         $query->when($filters['search'] ?? false, function ($query, $search) {
-            return $query->where('no_ref', 'like', '%'.$search.'%');
+            return $query->where('no_ref', 'like', '%'.$search.'%')
+                        ->orWhereHas('contact', function($query) use ($search){
+                            return $query->where('name', 'like', '%'. $search .'%');
+                        });
         });
     }
 
@@ -43,5 +47,6 @@ class SavingBalance extends Model
         return $this->belongsTo(Organization::class);
     }    
 
+    
     
 }

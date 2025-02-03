@@ -28,7 +28,10 @@ class SavingLedger extends Model
     public function scopeFilter($query, $filters)
     {
         $query->when($filters['search'] ?? false, function ($query, $search) {
-            return $query->where('no_ref', 'like', '%'.$search.'%');
+            return $query->where('no_ref', 'like', '%'.$search.'%')
+                            ->orWhereHas('savingBalance', function($query) use ($search){
+                                return $query->where('no_ref', 'like', '%'. $search .'%');
+                            });
         });
     }
 
@@ -46,5 +49,10 @@ class SavingLedger extends Model
     {
         return $this->belongsTo(Account::class, 'cash_account_id');
     }
+
+    public function journal(): BelongsTo
+	{
+        return $this->belongsTo(Journal::class);
+	}
     
 }

@@ -35,8 +35,8 @@ class SavingCategoryController extends Controller
 			'accounts' => $this->accountRepository->getDataNonCash($organization['id'], request(['account'])),
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'categories' => SavingCategory::filter(request(['search']))
-																			->with('account')
 																			->whereOrganizationId($organization['id'])
+																			->with('account')
 																			->paginate(50)->withQueryString(),
 		]);
 	}

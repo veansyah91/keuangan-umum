@@ -276,15 +276,73 @@ class SavingLedgerController extends Controller
 			return redirect()->back()->withErrors(['error' => "Data can't be deleted"]);
 		}
 
-		DB::transaction(function () use ($organization, $validated, $ledger, $user){
+		// contact
+		$savingBalance = SavingBalance::find($validated['balance_id']);
+
+		// saving account
+		$savingCategory = SavingCategory::find($savingBalance['saving_category_id']);
+		$cash_saving = Account::find($savingCategory['account_id']);
+
+		// cash account
+		$cash_account = Account::find($validated['cash_account_id']);
+
+		$validated['organization_id'] = $organization['id'];	
+		$validated['accounts'] = [
+			// akun cash (pendapatan)
+			[
+				'id' => $cash_account['id'],
+				'name' => $cash_account['name'],
+				'code' => $cash_account['code'],
+				'is_cash' => 1,
+				'debit' => $validated['type'] == 'credit' ? $validated['value'] : 0,
+				'credit' => $validated['type'] == 'debit' ? $validated['value'] : 0,
+			],
+			// akun saving (simpanan)
+			[
+				'id' => $cash_saving['id'],
+				'name' => $cash_saving['name'],
+				'code' => $cash_saving['code'],
+				'is_cash' => 0,
+				'debit' => $validated['type'] == 'debit' ? $validated['value'] : 0,
+				'credit' => $validated['type'] == 'credit' ? $validated['value'] : 0,
+			],
+		];	
+		$validated['debit'] = $validated['type'] == 'debit' ? $validated['value'] : 0;
+		$validated['credit'] = $validated['type'] == 'credit' ? $validated['value'] : 0;
+
+		$prefix = $validated['type'] == 'debit' ? 'PENARIKAN' : 'PENAMBAHAN';
+
+		DB::transaction(function () use ($organization, $validated, $ledger, $user, $savingBalance, $prefix){
 			// perbarui saldo
-			$savingBalance = SavingBalance::find($ledger['saving_balance_id']);
 			// kembalikan saldo ke awal
-
 			$start_balance = $savingBalance['value'] + ($ledger['debit'] > 0 ? $ledger['debit'] : ($ledger['credit'] * -1));
-			dd($start_balance);
 
+			$last_balance = $start_balance + ($validated['value'] * ($validated['type'] == 'credit' ? 1 : -1));
+
+			$savingBalance->update([
+				'value' => $last_balance
+			]);
+
+			// perbarui ledger
+			$ledger->update($validated);
+
+			// journal
+			$this->journalRepository->update($validated, $ledger->journal);
+
+			// log
+			$log = [
+				'description' => $validated['description'],
+				'date' => $validated['date'],
+				'no_ref' => $validated['no_ref'],
+				'value' => $validated['value'],
+			];
+
+			$desc = strtoupper($user['name']).' telah mengubah DATA pada ' . $prefix . 'TABUNGAN dengan DATA : '.json_encode($log);
+
+			$this->logRepository->store($organization['id'], $desc);
 		});
+		return redirect()->back()->with('success', 'Berhasil mengubah ' . $prefix . ' TABUNGAN');
+
 	}
 
 	public function destroy(Organization $organization, SavingLedger $ledger)
