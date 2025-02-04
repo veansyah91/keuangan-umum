@@ -29,15 +29,6 @@ export default function JournalMobile({ journal, role, handleDelete }) {
                             className='dropdown-content z-[50] menu p-2 shadow bg-base-100 rounded-box w-56'>
                             <li>
                                 <Link
-                                    href={route('data-ledger.journal.edit', {
-                                        organization: journal.organization_id,
-                                        journal: journal.id,
-                                    })}>
-                                    <IoCreateOutline /> Edit
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
                                     href={route('data-ledger.journal.show', {
                                         organization: journal.organization_id,
                                         journal: journal.id,
@@ -45,6 +36,16 @@ export default function JournalMobile({ journal, role, handleDelete }) {
                                     <IoSearchOutline /> Detail / Tanda Terima
                                 </Link>
                             </li>
+                            <li>
+                                <Link
+                                    href={route('data-ledger.journal.edit', {
+                                        organization: journal.organization_id,
+                                        journal: journal.id,
+                                    })}>
+                                    <IoCreateOutline /> Edit
+                                </Link>
+                            </li>
+                            
                             <li>
                                 <button onClick={handleDelete}>
                                     <IoTrash />

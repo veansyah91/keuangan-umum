@@ -1,7 +1,9 @@
 import formatNumber from '@/Utils/formatNumber'
+import { Link } from '@inertiajs/react';
 import dayjs from 'dayjs';
 import React from 'react'
-import { IoCreateOutline, IoEllipsisVertical, IoTrash } from 'react-icons/io5'
+import { IoCreateOutline, IoEllipsisVertical, IoSearchOutline, IoTrash } from 'react-icons/io5'
+import { LiaFileInvoiceSolid } from 'react-icons/lia';
 
 export default function SavingLedgerMobile({
   ledger, role, handleDelete, handleEdit 
@@ -32,20 +34,31 @@ export default function SavingLedgerMobile({
                 <IoEllipsisVertical />
               </div>
               <ul
-                  tabIndex={0}
-                  className='dropdown-content z-[50] menu p-2 shadow bg-base-100 rounded-box w-56'>
-                  <li>
-                      <button onClick={handleEdit}>
-                          <IoCreateOutline />
-                          Ubah
-                      </button>
-                  </li>
-                  <li>
-                      <button onClick={handleDelete}>
-                          <IoTrash />
-                          Hapus
-                      </button>
-                  </li>
+                tabIndex={0}
+                className='dropdown-content z-[50] menu p-2 shadow bg-base-100 rounded-box w-56'
+              >
+                <li>
+                  <Link
+                      href={route('cashflow.saving.ledger.show', {
+                        organization: ledger.organization_id,
+                        ledger: ledger.id,
+                      })}>
+                      <LiaFileInvoiceSolid />Detail / Cetak 
+                  </Link>
+                </li>
+
+                <li>
+                  <button onClick={handleEdit}>
+                    <IoCreateOutline />
+                    Ubah
+                  </button>
+                </li>
+                <li>
+                  <button onClick={handleDelete}>
+                    <IoTrash />
+                    Hapus
+                  </button>
+                </li>
               </ul>
             </div>
           )}

@@ -470,12 +470,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 			// saving ledger
 			Route::get('/saving/ledger', [SavingLedgerController::class, 'index'])->name('cashflow.saving.ledger');
+			Route::get('/saving/ledger/{ledger}', [SavingLedgerController::class, 'show'])->name('cashflow.saving.ledger.show');
 			Route::post('/saving/ledger', [SavingLedgerController::class, 'store'])->name('cashflow.saving.ledger.store');
 			Route::patch('/saving/ledger/{ledger}', [SavingLedgerController::class, 'update'])->name('cashflow.saving.ledger.update');
 			Route::delete('/saving/ledger/{ledger}', [SavingLedgerController::class, 'destroy'])->name('cashflow.saving.ledger.delete');
 
 			// savings
 			Route::get('/saving/balance', [SavingBalanceController::class, 'index'])->name('cashflow.saving.balance');
+			Route::get('/saving/balance/{balance}', [SavingBalanceController::class, 'show'])->name('cashflow.saving.balance.show');
 			Route::post('/saving/balance', [SavingBalanceController::class, 'store'])->name('cashflow.saving.balance.store');
 			Route::patch('/saving/balance/{balance}', [SavingBalanceController::class, 'update'])->name('cashflow.saving.balance.update');
 			Route::delete('/saving/balance/{balance}', [SavingBalanceController::class, 'destroy'])->name('cashflow.saving.balance.delete');

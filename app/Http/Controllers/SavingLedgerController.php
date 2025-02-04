@@ -376,4 +376,13 @@ class SavingLedgerController extends Controller
 		$message = 'Berhasil Menghapus Data ' . ($ledger['debit'] > 0 ? 'Penarikan' : 'Penambahan') . ' Tabungan';
 		return redirect()->back()->with('success', $message);
 	}
+
+	public function show(Organization $organization, SavingLedger $ledger)
+	{
+		dd($ledger);
+		return Inertia::render('SavingLedger/Show', [
+			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
+			'organization' => $organization,
+		]);
+	}
 }
