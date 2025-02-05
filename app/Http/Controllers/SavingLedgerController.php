@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Repositories\Log\LogRepository;
 use App\Repositories\User\UserRepository;
+use Riskihajar\Terbilang\Facades\Terbilang;
 use App\Repositories\Account\AccountRepository;
 use App\Repositories\Contact\ContactRepository;
 use App\Repositories\Journal\JournalRepository;
@@ -379,10 +380,14 @@ class SavingLedgerController extends Controller
 
 	public function show(Organization $organization, SavingLedger $ledger)
 	{
-		dd($ledger);
+		$user = Auth::user();
+
 		return Inertia::render('SavingLedger/Show', [
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'organization' => $organization,
+			'ledger' => $ledger,
+			'balance' => SavingBalance::find($ledger['saving_balance_id']),
+			'terbilang' => Terbilang::make($ledger['debit'] > 0 ? $ledger['debit'] : $ledger['credit'])
 		]);
 	}
 }

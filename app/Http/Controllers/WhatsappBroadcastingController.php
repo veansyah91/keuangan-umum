@@ -97,9 +97,9 @@ class WhatsappBroadcastingController extends Controller
 			$whatsAppRepository = new WhatsAppRepository;
 			$result = $whatsAppRepository->sendMessageViaFonte($data);
 			
-			$data = json_decode($result);
+			$data = $result;
 
-			if ($data->status) {
+			if ($data['status']) {
 				$plugin->update([
 					'connection' => true,
 					'last_connection' => $now
