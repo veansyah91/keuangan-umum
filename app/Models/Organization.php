@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Menu;
 use App\Traits\UUID;
+use App\Models\SavingBalance;
 use App\Models\WhatsappPlugin;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -69,6 +70,11 @@ class Organization extends Model
     public function whatsApp(): HasOne
     {
         return $this->hasOne(WhatsappPlugin::class);
+    }
+
+    public function savingBalance(): HasMany
+    {
+        return $this->hasMany(SavingBalance::class);
     }
 
     public function scopeFilter($query, $filters)

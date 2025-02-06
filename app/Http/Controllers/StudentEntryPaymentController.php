@@ -84,10 +84,10 @@ class StudentEntryPaymentController extends Controller
 		return Inertia::render('StudentEntryPayment/Index', [
 			'organization' => $organization,
 			'payments' => StudentEntryPayment::filter(request(['search','studyYear','start_date', 'end_date']))
+																	->whereOrganizationId($organization['id'])
 																	->with('contact', function ($query) {
 																			$query->with('student');
 																	})
-																	->whereOrganizationId($organization['id'])
 																	->orderBy('date', 'desc')
 																	->orderBy('no_ref', 'desc')
 																	->orderBy('study_year', 'desc')
@@ -725,7 +725,7 @@ class StudentEntryPaymentController extends Controller
 
 		$paymentWithDetail = StudentEntryPayment::with('details')->find($payment['id']);
 		
-		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
+		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->whereIsActive(true)->whereConnection(true)->first();
 
 		return Inertia::render('StudentEntryPayment/Show',[
 			'organization' => $organization,

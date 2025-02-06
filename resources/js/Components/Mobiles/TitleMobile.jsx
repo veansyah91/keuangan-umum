@@ -57,7 +57,7 @@ export default function TitleMobile({
                 <div
                     className={`sm:hidden fixed mt-12 w-full bg-white border px-3 py-1 justify-between shadow-lg ${zIndex} p-1`}>
                     <div className='flex p-1'>
-                        <div className='w-1/12 my-auto'>
+                        <div className='w-1/12 mx-auto my-auto'>
                             <button onClick={() => setShowDate(false)} className='my-auto p-2'>
                                 <IoArrowBackOutline />
                             </button>
@@ -77,14 +77,14 @@ export default function TitleMobile({
 
             {showSearch && (
                 <div
-                    className={`sm:hidden fixed mt-12 w-full bg-white border px-3 py-1 justify-between shadow-lg ${zIndex} p-1`}>
+                    className={`sm:hidden fixed mt-12 w-full bg-white border px-1 py-1 justify-between shadow-lg ${zIndex} p-1`}>
                     <div className='flex p-1'>
-                        <div className='w-1/12 my-auto'>
+                        <div className='w-2/12 mx-auto my-auto'>
                             <button onClick={() => setShowSearch(false)} className='my-auto p-2'>
                                 <IoArrowBackOutline />
                             </button>
                         </div>
-                        <div className='w-11/12 border-2 rounded-lg'>
+                        <div className='w-10/12 border-2 rounded-lg'>
                             <input
                                 type='search'
                                 className='border-none max-h-full h-full my-auto focus:border-none w-full focus:ring-0'

@@ -292,8 +292,7 @@ class JournalController extends Controller
             'role' => $this->userRepository->getRole($user['id'], $organization['id']),
             'newRef' => $this->newRef($organization, request('date')),
             'date' => $date,
-            'accounts' => $this->accountRepository
-            ->getData($organization['id'], request(['search'])),
+            'accounts' => $this->accountRepository->getData($organization['id'], request(['search'])),
             'journal' => $journal,
             'ledgers' => Ledger::whereJournalId($journal['id'])->with('account')->orderBy('credit', 'asc')->get(),
             'program' => Program::find($journal['program_id']),

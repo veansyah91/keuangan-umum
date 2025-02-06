@@ -9,6 +9,7 @@ use App\Models\Organization;
 use Illuminate\Http\Request;
 use App\Models\AccountCategory;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Repositories\Log\LogRepository;
 use App\Repositories\User\UserRepository;
@@ -118,10 +119,12 @@ class AccountController extends Controller
 
         $validated['organization_id'] = $organization['id'];
 
-        Account::create($validated);
-        $user = Auth::user();
+        DB::transaction(function() use ($validated, $organization, $log){
+            Account::create($validated);
+            $user = Auth::user();
 
-        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menambahkan DATA pada AKUN dengan DATA : '.json_encode($log));
+            $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menambahkan DATA pada AKUN dengan DATA : '.json_encode($log));
+        });
 
         return redirect(route('data-ledger.account', $organization['id']));
     }
@@ -179,11 +182,14 @@ class AccountController extends Controller
 
         $validated = $validator->validated();
 
-        $account->update($validated);
+        DB::transaction(function() use ($validated, $organization, $account){
+            $account->update($validated);
 
-        $user = Auth::user();
-
-        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menambahkan DATA pada AKUN menjadi : '.json_encode($validated));
+            $user = Auth::user();
+    
+            $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menambahkan DATA pada AKUN menjadi : '.json_encode($validated));
+        });
+        
 
         return redirect(route('data-ledger.account', $organization['id']));
     }
@@ -200,7 +206,7 @@ class AccountController extends Controller
 
         // cek di buku besar, apakah akun pernah digunakan
         $ledger = Ledger::whereAccountId($account['id'])
-            ->first();
+                        ->first();
 
         if ($ledger) {
             return redirect()->back()->withErrors(['used' => 'Tidak Dapat Dihapus, Akun Telah Digunakan']);

@@ -5,9 +5,11 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\LogController;
+use App\Http\Controllers\DebtController;
 use App\Http\Controllers\AddonsController;
 use App\Http\Controllers\CashinController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SavingController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\CashoutController;
 use App\Http\Controllers\ContactController;
@@ -25,17 +27,21 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\AffiliationController;
 use App\Http\Controllers\MenuSettingController;
+use App\Http\Controllers\SavingDebitController;
 use App\Http\Controllers\AccountStaffController;
 use App\Http\Controllers\CashMutationController;
 use App\Http\Controllers\OrganizationController;
+use App\Http\Controllers\SavingLedgerController;
 use App\Http\Controllers\StaffContactController;
 use App\Http\Controllers\StudentLevelController;
 use App\Http\Controllers\AccountSchoolController;
 use App\Http\Controllers\Admin\RegencyController;
 use App\Http\Controllers\Admin\VillageController;
+use App\Http\Controllers\SavingBalanceController;
 use App\Http\Controllers\Admin\DistrictController;
 use App\Http\Controllers\Admin\ProvinceController;
 use App\Http\Controllers\SalaryCategoryController;
+use App\Http\Controllers\SavingCategoryController;
 use App\Http\Controllers\StudentContactController;
 use App\Http\Controllers\AccountCategoryController;
 use App\Http\Controllers\Admin\AdminUserController;
@@ -448,6 +454,33 @@ Route::middleware(['auth', 'verified'])->group(function () {
 			Route::post('/staff-salary-payment/{payment}/send-whatsapp-multi', [StaffSalaryPaymentController::class, 'sendWhatsappMulti'])->name('cashflow.staff-salary-payment.send-whatsapp-multi');
 			Route::get('/staff-salary-payment/{id}/{staff}/edit', [StaffSalaryPaymentController::class, 'editStaff'])->name('cashflow.staff-salary-payment.staff.edit');
 			Route::patch('/staff-salary-payment/{payment}/{staff}', [StaffSalaryPaymentController::class, 'updateStaff'])->name('cashflow.staff-salary-payment.staff.update');
+
+			// debt
+			Route::get('/debt', DebtController::class)->name('cashflow.debt');
+			
+			// saving
+			Route::get('/saving', SavingController::class)->name('cashflow.saving');
+
+			// saving category
+			Route::get('/saving/category', [SavingCategoryController::class, 'index'])->name('cashflow.saving-category');
+			Route::post('/saving/category', [SavingCategoryController::class, 'store'])->name('cashflow.saving-category.store');
+			Route::patch('/saving/category/{category}', [SavingCategoryController::class, 'update'])->name('cashflow.saving-category.update');
+			Route::delete('/saving/category/{category}', [SavingCategoryController::class, 'destroy'])->name('cashflow.saving-category.delete');
+
+			// saving ledger
+			Route::get('/saving/ledger', [SavingLedgerController::class, 'index'])->name('cashflow.saving.ledger');
+			Route::get('/saving/ledger/{ledger}', [SavingLedgerController::class, 'show'])->name('cashflow.saving.ledger.show');
+			Route::post('/saving/ledger/{ledger}/send-whatsapp', [SavingLedgerController::class, 'sendWhatsapp'])->name('cashflow.saving.ledger.send-whatsapp');
+			Route::post('/saving/ledger', [SavingLedgerController::class, 'store'])->name('cashflow.saving.ledger.store');
+			Route::patch('/saving/ledger/{ledger}', [SavingLedgerController::class, 'update'])->name('cashflow.saving.ledger.update');
+			Route::delete('/saving/ledger/{ledger}', [SavingLedgerController::class, 'destroy'])->name('cashflow.saving.ledger.delete');
+
+			// savings
+			Route::get('/saving/balance', [SavingBalanceController::class, 'index'])->name('cashflow.saving.balance');
+			Route::get('/saving/balance/{balance}', [SavingBalanceController::class, 'show'])->name('cashflow.saving.balance.show');
+			Route::post('/saving/balance', [SavingBalanceController::class, 'store'])->name('cashflow.saving.balance.store');
+			Route::patch('/saving/balance/{balance}', [SavingBalanceController::class, 'update'])->name('cashflow.saving.balance.update');
+			Route::delete('/saving/balance/{balance}', [SavingBalanceController::class, 'destroy'])->name('cashflow.saving.balance.delete');
 
 		});
 

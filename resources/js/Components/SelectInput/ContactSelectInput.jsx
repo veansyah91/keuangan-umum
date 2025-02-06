@@ -55,7 +55,7 @@ export default function ContactSelectInput({
               className={`relative w-full cursor-default rounded-md bg-white text-left border focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-300 sm:text-sm ${isError ? 'border-red-500' : 'border-gray-300'}`}>
               <Combobox.Input
                 className='w-full border-none py-3 pl-3 pr-10 leading-5 text-gray-800 focus:ring-0'
-                displayValue={(selected) => selected.name.toUpperCase()}
+                displayValue={(selected) => selected?.name.toUpperCase()}
                 onChange={(event) => setQuery(event.target.value.toUpperCase())}
                 placeholder={placeholder}
                 type='search'
@@ -103,7 +103,7 @@ export default function ContactSelectInput({
                               </span>
                             ))}
                           </div>
-                          <div className='text-base'>{d.name.toUpperCase()}</div>
+                          <div className='text-base'>{d.student?`${d.student.no_ref ? d.student.no_ref + '-' : ''}` : ''}{d.name.toUpperCase()}</div>
                         </div>
                         {selected ? (
                           <div

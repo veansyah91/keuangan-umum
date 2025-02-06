@@ -22,7 +22,6 @@ import DangerButton from '@/Components/DangerButton';
 import { usePrevious } from 'react-use';
 import SalaryCategoryMobile from './Components/SalaryCategoryMobile';
 import SalaryCategoryDesktop from './Components/SalaryCategoryDesktop';
-import SuccessButton from '@/Components/SuccessButton';
 import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
 import { NumericFormat } from 'react-number-format';

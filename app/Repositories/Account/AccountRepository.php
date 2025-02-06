@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Account;
 
+use App\Models\Ledger;
 use App\Models\Account;
 
 class AccountRepository implements AccountRepositoryInterface
@@ -36,5 +37,22 @@ class AccountRepository implements AccountRepositoryInterface
                         ->select('id', 'name', 'code', 'is_cash')
                         ->orderBy('code')
                         ->get();
+    }
+
+    public function deleteData($id)
+    {
+        $account = Account::find($id);
+
+        // cek di buku besar, apakah akun pernah digunakan
+        $ledger = Ledger::whereAccountId($account['id'])
+                            ->first();
+
+        if ($ledger) {
+            return false;
+        }
+
+        $account->delete();
+
+        return true;
     }
 }

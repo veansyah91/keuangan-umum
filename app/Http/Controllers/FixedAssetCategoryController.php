@@ -218,40 +218,39 @@ class FixedAssetCategoryController extends Controller
 
     public function destroy(Organization $organization, FixedAssetCategory $fixedAssetCategory)
     {
-        $user = Auth::user();
+			$user = Auth::user();
 
-        // cek apakah kelompok harta tetap telah digunakan
-				// cek akun harta tetap
-				$accounts = Account::whereOrganizationId($organization['id'])
-														->where('name', 'like', '%' . $fixedAssetCategory['name'] . '%') 
-														->orderBy('code')
-														->get();
+			// cek apakah kelompok harta tetap telah digunakan
+			// cek akun harta tetap
+			$accounts = Account::whereOrganizationId($organization['id'])
+													->where('name', 'like', '%' . $fixedAssetCategory['name'] . '%') 
+													->orderBy('code')
+													->get();
 
-				// cek di buku besar
-				$ledger = Ledger::whereOrganizationId($organization['id'])
-													->whereAccountId($accounts[0]['id'])
-													->first();
+			// cek di buku besar
+			$ledger = Ledger::whereOrganizationId($organization['id'])
+												->whereAccountId($accounts[0]['id'])
+												->first();
 
-				// jika akun telah digunakan, maka tampilkan pesan error
-				if ($ledger) {
-					return redirect()->back()->withErrors(['message' => 'Data tidak dapat dihapus karena telah digunakan!']);
-				}
+			// jika akun telah digunakan, maka tampilkan pesan error
+			if ($ledger) {
+				return redirect()->back()->withErrors(['message' => 'Data tidak dapat dihapus karena telah digunakan!']);
+			}
 
-				foreach ($accounts as $account) {
-					$account->delete();
-				}
+			foreach ($accounts as $account) {
+				$account->delete();
+			}
 
-        $log = [
-            'name' => $fixedAssetCategory['name'],
-            'lifetime' => $fixedAssetCategory['lifetime'],
-            'status' => $fixedAssetCategory['status'],
-        ];
+			$log = [
+					'name' => $fixedAssetCategory['name'],
+					'lifetime' => $fixedAssetCategory['lifetime'],
+					'status' => $fixedAssetCategory['status'],
+			];
 
-        $fixedAssetCategory->delete();
+			$fixedAssetCategory->delete();
 
-        $this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menghapus DATA pada KATEGORI AKUN : '.json_encode($log));
+			$this->logRepository->store($organization['id'], strtoupper($user['name']).' telah menghapus DATA pada KATEGORI AKUN : '.json_encode($log));
 
-        return redirect()->back();
-        dd($fixedAssetCategory);
+			return redirect()->back();
     }
 }

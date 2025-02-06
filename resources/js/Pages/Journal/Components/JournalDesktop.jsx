@@ -36,21 +36,21 @@ export default function JournalDesktop({ journal, className, handleDelete, handl
                                 className='dropdown-content z-[50] menu p-2 shadow bg-base-100 rounded-box w-56'>
                                 <li>
                                     <Link
+                                        href={route('data-ledger.journal.show', {
+                                            organization: journal.organization_id,
+                                            journal: journal.id,
+                                        })}>
+                                        <IoSearchOutline /> Detail / Tanda Terima
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link
                                         href={route('data-ledger.journal.edit', {
                                             organization: journal.organization_id,
                                             journal: journal.id,
                                         })}
                                         preserveScroll={true}>
                                         <IoCreateOutline /> Edit
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link
-                                        href={route('data-ledger.journal.show', {
-                                            organization: journal.organization_id,
-                                            journal: journal.id,
-                                        })}>
-                                        <IoSearchOutline /> Detail / Tanda Terima
                                     </Link>
                                 </li>
                                 <li>

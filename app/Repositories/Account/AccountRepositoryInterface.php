@@ -6,4 +6,5 @@ interface AccountRepositoryInterface
 {
     public function getData($organizationId, $request);
     public function getDataNonCash($organizationId, $request);
+    public function deleteData($id);
 }

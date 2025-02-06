@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use App\Models\AccountStaff;
 use App\Models\Organization;
 use Illuminate\Http\Request;
+use App\Models\SavingCategory;
 use App\Models\ContactCategory;
 use Illuminate\Validation\Rule;
 use App\Models\FixedAssetCategory;
@@ -127,7 +128,7 @@ class OrganizationController extends Controller
         ],
         [
             'code' => '240000000',
-            'name' => 'UTANG PAJAL',
+            'name' => 'UTANG PAJAK',
         ],
         [
             'code' => '260000000',
@@ -307,6 +308,11 @@ class OrganizationController extends Controller
             'category_name' => 'TABUNGAN',
             'code' => '240000000',
             'name' => 'TABUNGAN',
+        ],
+        [
+            'category_name' => 'TABUNGAN',
+            'code' => '240000001',
+            'name' => 'TABUNGAN UMUM',
         ],
         [
             'category_name' => 'MODAL',
@@ -539,6 +545,7 @@ class OrganizationController extends Controller
         //         return $account;
         //     });
         // });
+        $savingAccountId = null;
         foreach ($accountCategoriesCollection as $accountCategory) {
             $filteredAccounts = $accountsDefault->where('category_name', $accountCategory['name']);
 
@@ -573,12 +580,23 @@ class OrganizationController extends Controller
                 if ($account['name'] == 'BEBAN GAJI STAF') {
                     $attribute['staff_salary_expense'] = $account['id'];
                 }
+
+                // saving account 
+                if ($account['name'] == 'TABUNGAN UMUM') {
+                    $savingAccountId = $account['id'];
+                }
+
+
             }
         }
         //
         SchoolAccountSetting::create($attribute);
         AccountStaff::create($attribute);
-
+        SavingCategory::create([
+            'name' => 'UMUM',
+            'account_id' => $savingAccountId,
+            'organization_id' => $organization['id']
+        ]);
         // Category
         $contactCategories = [
             'UMUM',

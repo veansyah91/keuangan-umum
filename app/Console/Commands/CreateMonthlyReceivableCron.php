@@ -98,7 +98,7 @@ class CreateMonthlyReceivableCron extends Command
 						'month' => $now->month,
 						'study_year' => $studyYear,
 						'date' => date('Y-m-d'),
-						'description' => "Piutang SPP Siswa: " . $student['name'] . ' Bulan : ' . $now->month - 1 . ", Tahun Ajaran: " . $studyYear,
+						'description' => "Piutang SPP Siswa: " . $student['name'] . ' Bulan : ' . $now->month . ", Tahun Ajaran: " . $studyYear,
 						'created_by_id' => $lastPayment['created_by_id'],
 						'accounts' => [
 							// debit

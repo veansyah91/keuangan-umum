@@ -678,7 +678,7 @@ class StudentMonthlyPaymentController extends Controller
 
 		$paymentWithDetail = StudentMonthlyPayment::with('details')->find($payment['id']);
 
-		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
+		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->whereIsActive(true)->whereConnection(true)->first();
 
 		return Inertia::render('StudentMonthlyPayment/Show',[
 			'organization' => $organization,

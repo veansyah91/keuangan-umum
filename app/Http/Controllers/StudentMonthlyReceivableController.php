@@ -81,11 +81,12 @@ class StudentMonthlyReceivableController extends Controller
       'organization' => $organization,
       'whatsappPlugin' => $whatsappPlugin ? true : false,
       'receivables' => StudentMonthlyReceivable::filter(request(['search']))
+																	->where('value', '>', 0)
+                                  ->whereOrganizationId($organization['id'])
                                   ->with('contact', function ($query) {
                                       $query->with('student', 'lastLevel');
                                   })
-                                  ->where('value', '>', 0)
-                                  ->whereOrganizationId($organization['id'])
+                                  
                                   ->orderBy('value', 'desc')
                                   ->paginate(50)->withQueryString(),
       'role' => $this->userRepository->getRole($user['id'], $organization['id']),

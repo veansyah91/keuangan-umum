@@ -440,7 +440,7 @@ class StaffSalaryPaymentController extends Controller
 
 		$user = Auth::user();
 		
-		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
+		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->whereIsActive(true)->whereConnection(true)->first();
 		
 		return Inertia::render('StaffSalaryPayment/ShowStaff', [
 			'organization' => $organization,

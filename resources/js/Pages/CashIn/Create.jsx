@@ -37,8 +37,6 @@ export default function Create({
 
     const [selectedContact, setSelectedContact] = useState({ id: null, name: '', phone: '' });
 
-    const [contactError, setContactError] = useState('');
-
     const [selectedCashAccount, setSelectedCashAccount] = useState({ id: null, name: '', code: '', is_cash: true });
 
     const [cashAccountError, setCashAccountError] = useState('');
@@ -73,7 +71,7 @@ export default function Create({
 
     const [value, setValue] = useState(0);
 
-    const { data, setData, post, reset, errors, setError, processing } = useForm({
+    const { data, setData, post, errors, processing } = useForm({
         date: date,
         contact_id: null,
         no_ref: newRef,
@@ -553,7 +551,6 @@ export default function Create({
                                                 placeholder='Cari Akun'
                                                 isError={accountErrors[index] ? true : false}
                                                 notFound={<span>Tidak Ada Data. <Link className='font-bold text-blue-600' href={route('data-ledger.account', {organization:organization.id})}>Buat Baru ?</Link></span>}
-
                                             />
                                             {selectedAccount[index]?.code && (
                                                 <div className='absolute text-xs'>

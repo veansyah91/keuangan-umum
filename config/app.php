@@ -171,11 +171,14 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
+        Riskihajar\Terbilang\TerbilangServiceProvider::class,
+
         /*
          * Helper Service Providers...
          */
         App\Providers\NewRefServiceProvider::class,
         App\Providers\PhoneNumberServiceProvider::class,
+
     ])->toArray(),
 
     /*
@@ -192,6 +195,8 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         // 'Example' => App\Facades\Example::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+
+        'Terbilang' => Riskihajar\Terbilang\Facades\Terbilang::class,
     ])->toArray(),
 
 ];
