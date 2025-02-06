@@ -725,7 +725,7 @@ class StudentEntryPaymentController extends Controller
 
 		$paymentWithDetail = StudentEntryPayment::with('details')->find($payment['id']);
 		
-		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
+		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->whereIsActive(true)->whereConnection(true)->first();
 
 		return Inertia::render('StudentEntryPayment/Show',[
 			'organization' => $organization,

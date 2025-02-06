@@ -13,6 +13,7 @@ use App\Models\SavingLedger;
 use Illuminate\Http\Request;
 use App\Models\SavingBalance;
 use App\Models\SavingCategory;
+use App\Models\WhatsappPlugin;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -382,11 +383,18 @@ class SavingLedgerController extends Controller
 	{
 		$user = Auth::user();
 
+		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->whereIsActive(true)->whereConnection(true)->first();
+
 		return Inertia::render('SavingLedger/Show', [
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
 			'organization' => $organization,
+			'whatsappPlugin' => $whatsappPlugin ? true : false,
 			'ledger' => $ledger,
-			'balance' => SavingBalance::find($ledger['saving_balance_id']),
+			'user' => $user,
+			'balance' => SavingBalance::whereId($ledger['saving_balance_id'])
+																	->with('contact', function($query) {
+																		return $query->with('contactCategories');
+																	})->first(),
 			'terbilang' => Terbilang::make($ledger['debit'] > 0 ? $ledger['debit'] : $ledger['credit'])
 		]);
 	}

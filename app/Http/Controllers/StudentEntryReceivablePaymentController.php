@@ -130,7 +130,7 @@ class StudentEntryReceivablePaymentController extends Controller
 			return redirect()->back()->withErrors(['message' => 'Silakan Buat Kategori Kontak SISWA terlebih dahulu!']);
 		}
 
-		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
+		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->whereIsActive(true)->whereConnection(true)->first();
 
 		return Inertia::render('StudentEntryReceivablePayment/Create',[
 			'organization' => $organization,
@@ -364,7 +364,7 @@ class StudentEntryReceivablePaymentController extends Controller
 	{
 		$user = Auth::user();
 		$receivablePaymentWithDetail = StudentEntryReceivableLedger::with('payment')->find($receivablePayment['id']);
-		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
+		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->whereIsActive(true)->whereConnection(true)->first();
 
 		return Inertia::render('StudentEntryReceivablePayment/Show',[
 			'organization' => $organization,

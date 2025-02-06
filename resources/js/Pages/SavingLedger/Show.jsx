@@ -9,16 +9,12 @@ import SecondaryButton from '@/Components/SecondaryButton';
 import formatNumber from '@/Utils/formatNumber';
 import { toast, ToastContainer } from 'react-toastify';
 
-export default function Show({ contact, organization, role, payment, user, whatsappPlugin }) {		
+export default function Show({ contact, organization, role, ledger, user, whatsappPlugin, balance }) {			
   const { data, post, processing } = useForm({
-		contact_id:payment.contact_id,
-    date:payment.date,
-    no_ref:payment.no_ref,
-    value:payment.value,
-    receivable_value: payment.receivable_value,
-    paidValue: payment.value - payment.receivable_value,
-    study_year:payment.study_year,
-    details:payment.details,
+		contact_id:ledger.contact_id,
+    date:ledger.date,
+    no_ref:ledger.no_ref,
+    value:ledger.debit > 0 ? ledger.debit : ledger.credit,
     send_wa:whatsappPlugin,
 	});
 
@@ -30,7 +26,7 @@ export default function Show({ contact, organization, role, payment, user, whats
 
 	const handleSendWA = () => {
 		if (whatsappPlugin) {			
-			post(route('cashflow.student-entry-payment.send-whatsapp', {organization: organization.id, payment: payment.id}), {
+			post(route('cashflow.student-entry-ledger.send-whatsapp', {organization: organization.id, ledger: ledger.id}), {
 				onSuccess: ({ props }) => {
 					const { flash } = props;
 	
@@ -43,10 +39,10 @@ export default function Show({ contact, organization, role, payment, user, whats
 		}
 
 		// cek format contact phone
-		let phone = contact.phone;		    
+		let phone = balance.contact.phone;		    
 
 		if (!phone) {
-			toast.error(`No Handphone ${contact.name} tidak ditemukan`, {
+			toast.error(`No Handphone ${balance.contact.name} tidak ditemukan`, {
 				position: toast.POSITION.TOP_CENTER,
 			});
 			return
@@ -58,13 +54,13 @@ export default function Show({ contact, organization, role, payment, user, whats
 
 		let detail = '';
 
-		payment.details.forEach((r, index) => {
+		ledger.details.forEach((r, index) => {
 			detail += `%0A${index+1}. ${r.name} : IDR ${formatNumber(r.pivot.value)}`;
 		});
 
-		detail += `%0A*Total: IDR. ${ formatNumber(payment.value) }*%0A*Jumlah Bayar: IDR. ${ formatNumber(payment.value - payment.receivable_value) }*%0A*Sisa: IDR. ${ formatNumber(payment.receivable_value) }*`
+		detail += `%0A*Total: IDR. ${ formatNumber(ledger.value) }*%0A*Jumlah Bayar: IDR. ${ formatNumber(ledger.value - ledger.receivable_value) }*%0A*Sisa: IDR. ${ formatNumber(ledger.receivable_value) }*`
 		
-		let message = `*PEMBAYARAN IURAN TAHUNAN*%0A-------------------------------------------------------%0A*Nama*: ${contact.name}%0A*No. Siswa*: ${contact.student.no_ref ?? '-'}%0A*Tahun Masuk*: ${contact.student.entry_year}%0A*Kelas Sekarang*: ${contact.last_level.level}%0A-------------------------------------------------------%0A*No Ref*: ${payment.no_ref}%0A*Tanggal*: ${dayjs(payment.date).locale('id').format('DD MMMM YYYY')}%0A*Tahun Ajaran*: ${payment.study_year}%0A%0A*DETAIL:*${detail}%0A%0A%0ATtd,%0A%0A%0A*${organization.name}*`;
+		let message = `*PEMBAYARAN IURAN TAHUNAN*%0A-------------------------------------------------------%0A*Nama*: ${balance.contact.name}%0A*No. Siswa*: ${balance.contact.no_ref ?? '-'}%0A*Tahun Masuk*: ${balance.contact.student.entry_year}%0A*Kelas Sekarang*: ${balance.contact.last_level.level}%0A-------------------------------------------------------%0A*No Ref*: ${ledger.no_ref}%0A*Tanggal*: ${dayjs(ledger.date).locale('id').format('DD MMMM YYYY')}%0A*Tahun Ajaran*: ${ledger.study_year}%0A%0A*DETAIL:*${detail}%0A%0A%0ATtd,%0A%0A%0A*${organization.name}*`;
 
 		let whatsapp = `${waLink}?phone=${phone}&text=${message}`
 
@@ -73,7 +69,7 @@ export default function Show({ contact, organization, role, payment, user, whats
   return (
     <>
 			<Head
-				title={`Pembayaran Iuran Tahunan ${contact.name} (${contact.student.no_ref})`}
+				title={`${(ledger.debit > 0 ? "PENARIKAN" : "SETORAN")} UANG TABUNGAN ${balance.contact.name} (${balance.no_ref})`}
 			/>
 
 			<ToastContainer />			
@@ -86,7 +82,7 @@ export default function Show({ contact, organization, role, payment, user, whats
 						</div>
 						<div className='text-end px-3 hidden sm:block space-x-5'>
 							{
-								contact.phone &&
+								balance.contact.phone &&
 									<SecondaryButton onClick={handleSendWA} disabled={processing}>
 										<div className='flex gap-2'>
 											<div className='my-auto'>
@@ -130,7 +126,7 @@ export default function Show({ contact, organization, role, payment, user, whats
 
 					{/* Title Print*/}
 					<div className='uppercase pt-9 pb-3 border-b hidden print:flex print:justify-between'>
-						<div className='w-1/2 text-2xl my-auto'>Pembayaran Iuran Tahunan</div>
+						<div className='w-1/2 text-xl my-auto'>{`${(ledger.debit > 0 ? "PENARIKAN" : "SETORAN")} UANG TABUNGAN`}</div>
 						<div className='w-1/2 text-end mt-auto'>
 							<div>{organization.name}</div>
 							<div className='text-xs'>{organization.address}</div>
@@ -148,76 +144,30 @@ export default function Show({ contact, organization, role, payment, user, whats
 							<div className='w-full space-y-2'>
 								<div className='flex'>
 									<div className='w-1/4'>Nama</div>
-									<div className='w-3/4'>: {contact.name}</div>
+									<div className='w-3/4'>: {balance.contact.name} ({balance.contact.contact_categories[0].name})</div>
 								</div>
 								<div className='flex'>
-									<div className='w-1/4'>No. Siswa</div>
-									<div className='w-3/4'>: {contact.student.no_ref ?? '-'}</div>
-								</div>
-								<div className='flex'>
-									<div className='w-1/4'>Tahun Masuk</div>
-									<div className='w-3/4'>: {contact.student.entry_year}</div>
-								</div>
-								<div className='flex'>
-									<div className='w-1/4'>Kelas Sekarang</div>
-									<div className='w-3/4'>: {contact.last_level.level}</div>
+									<div className='w-1/4'>ID Simpanan</div>
+									<div className='w-3/4'>: {balance.no_ref ?? '-'}</div>
 								</div>
 							</div>
 
 							<div className='w-full space-y-2 mt-2 pt-3 border-t border-slate-900'>
 								<div className='flex'>
-									<div className='w-1/4'>No Ref</div>
-									<div className='w-3/4'>: {payment.no_ref}</div>
+									<div className='w-1/4'>No Ref Transaksi</div>
+									<div className='w-3/4'>: {ledger.no_ref}</div>
 								</div>
 								<div className='flex'>
 									<div className='w-1/4'>Tanggal</div>
-									<div className='w-3/4'>: { dayjs(payment.date).locale('id').format('DD MMMM YYYY') }</div>
-								</div>
-								<div className='flex'>
-									<div className='w-1/4'>Tahun Ajaran</div>
-									<div className='w-3/4'>: { payment.study_year }</div>
+									<div className='w-3/4'>: { dayjs(ledger.date).locale('id').format('DD MMMM YYYY') }</div>
 								</div>
 								<div className='flex'>
 									<div className='w-1/4'>Total</div>
-									<div className='w-3/4'>: IDR. { formatNumber(payment.value) }</div>
+									<div 
+										className={`w-3/4 font-bold ${ledger.debit > 0 ? "text-red-600" : "text-green-600"}`}
+									>: IDR. { formatNumber((ledger.debit > 0 ? ledger.debit : ledger.credit)) } ({ (ledger.debit > 0 ? "D" : "C") })</div>
 								</div>
 							</div>
-
-							{/* Data */}
-							<table className='mt-5 w-full table text-base'>
-								<thead className='text-base text-gray-900'>
-									<tr>
-										<th className='text-start'>No</th>
-										<th className='text-start'>Keterangan</th>
-										<th className='text-end'>Jumlah</th>
-									</tr>
-								</thead>
-								<tbody>
-									{
-										payment.details.map((detail, index) => 
-											<tr key={detail.id}>
-												<td>{index + 1}</td>
-												<td>{detail.name}</td>
-												<td className='text-end'>IDR. { formatNumber(detail.pivot.value) }</td>
-											</tr>
-										)
-									}
-								</tbody>
-								<tfoot className='text-base text-gray-900'>
-									<tr>
-										<th className='text-start' colSpan={2}>Total</th>
-										<th className='text-end'>IDR. { formatNumber(payment.value) }</th>
-									</tr>
-                  <tr>
-										<th className='text-start' colSpan={2}>Jumlah Bayar</th>
-										<th className='text-end'>IDR. { formatNumber(payment.value - payment.receivable_value) }</th>
-									</tr>
-                  <tr>
-										<th className='text-start' colSpan={2}>Sisa</th>
-										<th className='text-end'>IDR. { formatNumber(payment.receivable_value) }</th>
-									</tr>
-								</tfoot>
-							</table>
 
 							{/* Footer */}
 							<div className='mt-20 w-full hidden justify-end print:flex'>
@@ -238,13 +188,13 @@ export default function Show({ contact, organization, role, payment, user, whats
 
 Show.layout = (page) => (
 	<AuthenticatedLayout
-		header={<Header>Detail Pembayaran {page.props.contact.name}</Header>}
+		header={<Header>Detail {page.props.ledger.debit > 0 ? "Penarikan" : "Setoran"} Simpanan</Header>}
 		children={page}
 		user={page.props.auth.user}
 		organization={page.props.organization}
-		title={`Detail Pembayaran`}
+		title={`Detail Simpanan`}
 		backLink={
-			<Link href={route('cashflow.student-entry-payment', page.props.organization.id)}>
+			<Link href={route('cashflow.saving.ledger', {organization: page.props.organization.id})}>
 				<IoArrowBackOutline />
 			</Link>
 		}
@@ -254,10 +204,13 @@ Show.layout = (page) => (
 					<li className='font-bold'>
 						<Link href={route('cashflow', page.props.organization.id)}>Arus Kas</Link>
 					</li>
-                    <li className='font-bold'>
-						<Link href={route('cashflow.student-entry-payment', page.props.organization.id)}>Pembayaran Iuran Tahunan Siswa</Link>
+					<li className='font-bold'>
+						<Link href={route('cashflow.saving', page.props.organization.id)}>Simpanan</Link>
 					</li>
-					<li>Detail Pembayaran Iuran Tahunan</li>
+					<li className='font-bold'>
+						<Link href={route('cashflow.saving.ledger', page.props.organization.id)}>Tambah/Tarik Simpanan</Link>
+					</li>
+					<li>Detail/Print Simpanan</li>
 				</ul>
 			</div>
 		}

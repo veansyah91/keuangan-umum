@@ -89,7 +89,7 @@ class WhatsappBroadcastingController extends Controller
 			$data = array(
 				'appkey' => $plugin['appKey'],
 				'authkey' => $plugin['authkey'],
-				'target' => '6287839542505',
+				'target' => $plugin['phone'],
 				'message' => $message,
 				'sandbox' => 'false'
 			);

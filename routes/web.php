@@ -31,7 +31,6 @@ use App\Http\Controllers\SavingDebitController;
 use App\Http\Controllers\AccountStaffController;
 use App\Http\Controllers\CashMutationController;
 use App\Http\Controllers\OrganizationController;
-use App\Http\Controllers\SavingCreditController;
 use App\Http\Controllers\SavingLedgerController;
 use App\Http\Controllers\StaffContactController;
 use App\Http\Controllers\StudentLevelController;
@@ -471,6 +470,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 			// saving ledger
 			Route::get('/saving/ledger', [SavingLedgerController::class, 'index'])->name('cashflow.saving.ledger');
 			Route::get('/saving/ledger/{ledger}', [SavingLedgerController::class, 'show'])->name('cashflow.saving.ledger.show');
+			Route::get('/saving/ledger/{ledger}/print', [SavingLedgerController::class, 'show'])->name('cashflow.saving.ledger.print');
 			Route::post('/saving/ledger', [SavingLedgerController::class, 'store'])->name('cashflow.saving.ledger.store');
 			Route::patch('/saving/ledger/{ledger}', [SavingLedgerController::class, 'update'])->name('cashflow.saving.ledger.update');
 			Route::delete('/saving/ledger/{ledger}', [SavingLedgerController::class, 'destroy'])->name('cashflow.saving.ledger.delete');
