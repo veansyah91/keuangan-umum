@@ -9,7 +9,7 @@ import SecondaryButton from '@/Components/SecondaryButton';
 import formatNumber from '@/Utils/formatNumber';
 import { toast, ToastContainer } from 'react-toastify';
 
-export default function Show({ organization, ledger, user, whatsappPlugin, balance }) {		
+export default function Show({ organization, ledger, user, whatsappPlugin, balance, terbilang }) {		
 	
   const { data, post, processing } = useForm({
 		contact_id:balance.contact_id,
@@ -20,6 +20,7 @@ export default function Show({ organization, ledger, user, whatsappPlugin, balan
     date:ledger.date,
     no_ref:ledger.no_ref,
     value:ledger.debit > 0 ? ledger.debit : ledger.credit,
+		terbilang: terbilang,
     send_wa:whatsappPlugin,
 	});
 
@@ -165,8 +166,17 @@ export default function Show({ organization, ledger, user, whatsappPlugin, balan
 								<div className='flex'>
 									<div className='w-1/4'>Total</div>
 									<div 
-										className={`w-3/4 font-bold ${ledger.debit > 0 ? "text-red-600" : "text-green-600"}`}
-									>: IDR. { formatNumber((ledger.debit > 0 ? ledger.debit : ledger.credit)) } ({ (ledger.debit > 0 ? "D" : "C") })</div>
+										className={`w-3/4`}
+									>
+										<div>
+										: <span className={`font-bold ${ledger.debit > 0 ? "text-red-600" : "text-green-600"}`}>
+												 IDR. { formatNumber((ledger.debit > 0 ? ledger.debit : ledger.credit)) } ({ (ledger.debit > 0 ? "D" : "C") })
+											</span>
+										</div>
+										<div>
+											(<span className='italic uppercase'>{data.terbilang} rupiah</span>)
+										</div>
+									</div>
 								</div>
 							</div>
 
