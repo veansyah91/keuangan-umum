@@ -498,10 +498,6 @@ class StudentMonthlyReceivableController extends Controller
 		$user = Auth::user();
 
     DB::transaction(function() use ($ledger, $organization, $user, $receivable) {
-			// hapus data pada journal 
-			$journal = Journal::find($ledger['journal_id']);
-			$journal->delete();
-			
 			// cek kurangi jumlah piutang
 			$value = $receivable['value'];
 			$receivable->update([
@@ -515,11 +511,15 @@ class StudentMonthlyReceivableController extends Controller
 			->where('payment_id', $payment['id'])
 			->delete();
 
-			// hapus data pada tabel student_monthly_payments
-			$payment->delete();
-
-					// hapus data pada table student_monthly_receivable_ledgers
+			// hapus data pada table student_monthly_receivable_ledgers
 			$ledger->delete();
+
+			// hapus data pada tabel student_monthly_payments
+			$payment->delete();			
+
+			// hapus data pada journal 
+			$journal = Journal::find($ledger['journal_id']);
+			$journal->delete();
 
 			$log = [
 				'date' => $ledger['date'],
