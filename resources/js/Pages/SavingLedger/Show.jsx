@@ -9,14 +9,14 @@ import SecondaryButton from '@/Components/SecondaryButton';
 import formatNumber from '@/Utils/formatNumber';
 import { toast, ToastContainer } from 'react-toastify';
 
-export default function Show({ organization, ledger, user, whatsappPlugin, balance }) {
-	console.log(balance);
-				
+export default function Show({ organization, ledger, user, whatsappPlugin, balance }) {		
+	
   const { data, post, processing } = useForm({
 		contact_id:balance.contact_id,
 		contact_phone:balance.contact.phone,
 		contact_name:balance.contact.name,
 		contact_ref:balance.no_ref,
+		contact_type:balance.saving_category.name,
     date:ledger.date,
     no_ref:ledger.no_ref,
     value:ledger.debit > 0 ? ledger.debit : ledger.credit,
@@ -30,22 +30,18 @@ export default function Show({ organization, ledger, user, whatsappPlugin, balan
 	};	
 
 	const handleSendWA = () => {
-		// if (whatsappPlugin) {			
-		// 	post(route('cashflow.student-entry-ledger.send-whatsapp', {organization: organization.id, ledger: ledger.id}), {
-		// 		onSuccess: ({ props }) => {
-		// 			const { flash } = props;
+		if (whatsappPlugin) {			
+			post(route('cashflow.saving.ledger.send-whatsapp', {organization: organization.id, ledger: ledger.id}), {
+				onSuccess: ({ props }) => {
+					const { flash } = props;
 	
-		// 			toast.success(flash.success, {
-		// 				position: toast.POSITION.TOP_CENTER,
-		// 			});	
-		// 		},
-		// 	})
-		// 	return;
-		// }
-
-		console.log(data);
-
-		// return;
+					toast.success(flash.success, {
+						position: toast.POSITION.TOP_CENTER,
+					});	
+				},
+			})
+			return;
+		}
 
 		// cek format contact phone
 		let phone = balance.contact.phone;		    
@@ -61,7 +57,7 @@ export default function Show({ organization, ledger, user, whatsappPlugin, balan
 			phone = "62" + phone.slice(1);
 		}
 		
-		let message = `*BUKTI ${ ledger.debit > 0 ? "PENARIKAN" : "SETORAN" } TABUNGAN*%0A-------------------------------------------------------%0A*Nama*: ${data.contact_name}%0A*ID Simpanan*: ${data.contact_ref}%0A-------------------------------------------------------%0A*No Ref Transaksi*: ${ledger.no_ref}%0A*Tanggal*: ${dayjs(ledger.date).locale('id').format('DD MMMM YYYY')}%0A*Jumlah*: IDR. ${ledger.debit > 0 ? formatNumber(ledger.debit) : formatNumber(ledger.credit)}%0A%0A%0ATtd,%0A%0A%0A*${organization.name}*`;
+		let message = `*BUKTI ${ ledger.debit > 0 ? "PENARIKAN" : "SETORAN" } TABUNGAN*%0A-------------------------------------------------------%0A*Nama*: ${data.contact_name}%0A*ID Simpanan*: ${data.contact_ref}%0A*Jenis Simpanan*: ${data.contact_type}%0A-------------------------------------------------------%0A*No Ref Transaksi*: ${ledger.no_ref}%0A*Tanggal*: ${dayjs(ledger.date).locale('id').format('DD MMMM YYYY')}%0A*Total*: IDR. ${ledger.debit > 0 ? formatNumber(ledger.debit) : formatNumber(ledger.credit)}%0A%0A%0ATtd,%0A%0A%0A*${organization.name}*`;
 		
 		let whatsapp = `${waLink}?phone=${phone}&text=${message}`
 
@@ -150,6 +146,10 @@ export default function Show({ organization, ledger, user, whatsappPlugin, balan
 								<div className='flex'>
 									<div className='w-1/4'>ID Simpanan</div>
 									<div className='w-3/4'>: {balance.no_ref ?? '-'}</div>
+								</div>
+								<div className='flex'>
+									<div className='w-1/4'>Jenis Simpanan</div>
+									<div className='w-3/4'>: {data.contact_type}</div>
 								</div>
 							</div>
 

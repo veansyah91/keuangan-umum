@@ -7,7 +7,9 @@ use Inertia\Inertia;
 use App\Helpers\NewRef;
 use App\Models\Account;
 use App\Models\Journal;
+use App\Models\WhatsappLog;
 use Carbon\CarbonImmutable;
+use App\Helpers\PhoneNumber;
 use App\Models\Organization;
 use App\Models\SavingLedger;
 use Illuminate\Http\Request;
@@ -15,6 +17,7 @@ use App\Models\SavingBalance;
 use App\Models\SavingCategory;
 use App\Models\WhatsappPlugin;
 use Illuminate\Validation\Rule;
+use App\Jobs\SendWhatsAppNotifJob;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Repositories\Log\LogRepository;
@@ -392,10 +395,49 @@ class SavingLedgerController extends Controller
 			'ledger' => $ledger,
 			'user' => $user,
 			'balance' => SavingBalance::whereId($ledger['saving_balance_id'])
+																	->with('savingCategory')
 																	->with('contact', function($query) {
 																		return $query->with('contactCategories');
 																	})->first(),
 			'terbilang' => Terbilang::make($ledger['debit'] > 0 ? $ledger['debit'] : $ledger['credit'])
 		]);
+	}
+
+	public function sendWhatsapp(Request $request, Organization $organization, SavingLedger $ledger)
+	{
+		$description = ($ledger['debit'] > 0 ? "PENARIKAN TABUNGAN " : "SETORAN TABUNGAN ");
+		$value = $ledger['debit'] > 0 ? number_format($ledger['debit'], 0, '', '.') : number_format($ledger['credit'], 0, '', '.');
+
+		$whatsAppLog = WhatsappLog::create([
+			'organization_id' => $organization['id'],
+			'contact_id' => $request['contact_id'],
+			'description' => $description . "oleh " . $request['contact_ref'] . " a.n " . $request['contact_name'],
+			'status' => 'waiting'
+		]);
+
+		$tempDate = new Carbon($ledger['date']);
+		
+		$message = "BUKTI " . $description . "\n-------------------------------------------------------" . 
+		"\n*Nama*: " . $request['contact_name'] . 
+		"\n*ID Simpanan*: " . $request['contact_ref'] . 
+		"\n*Jenis Simpanan*: " . $request['contact_type'] . 
+		"\n-------------------------------------------------------" . 
+		"\n*No Ref Transaksi*: " . $ledger['contact_name'] . 
+		"\n*Tanggal*: " . $tempDate->isoFormat('D MMMM YYYY') . 
+		"\n*Total*: IDR. " . $value . 
+		"\n\n\nTtd, \n\n\n" . $organization['name'];
+
+		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
+
+		$data = array(
+			'appkey' => $whatsappPlugin['appKey'],
+			'authkey' => $whatsappPlugin['authkey'],
+			'target' => PhoneNumber::setFormat($request['contact_phone']),
+			'message' => $message,
+			'sandbox' => 'false'
+		);
+
+		SendWhatsAppNotifJob::dispatch($data, $whatsAppLog['id'])->onQueue('whatsapp');
+		return redirect()->back()->with('success', 'Bukti ' . $description . 'telah diteruskan Via Whatsapp');
 	}
 }
