@@ -628,7 +628,7 @@ export default function Edit({
 
                             <div className='flex justify-end flex-col-reverse sm:flex-row gap-2 mt-5'>
                                 <div className='w-full sm:w-1/12 my-auto text-center'>
-                                    <Link href={route('data-master.fixed-asset', organization.id)}>
+                                    <Link href={route('data-ledger.journal', organization.id)}>
                                         <SecondaryButton className='w-full'>
                                             <div className='text-center w-full'>Batal</div>
                                         </SecondaryButton>
