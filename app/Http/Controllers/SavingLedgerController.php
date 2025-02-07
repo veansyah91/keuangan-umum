@@ -418,9 +418,10 @@ class SavingLedgerController extends Controller
 		$tempDate = new Carbon($ledger['date']);
 		
 		$message = "BUKTI " . $description . "\n-------------------------------------------------------" . 
-		"\n*Nama*: " . $request['contact_name'] . 
-		"\n*ID Simpanan*: " . $request['contact_ref'] . 
 		"\n*Jenis Simpanan*: " . $request['contact_type'] . 
+		"\n*ID Simpanan*: " . $request['contact_ref'] . 
+		"\n*Nama*: " . $request['contact_name'] . 
+		"\n*Saldo Akhir*: IDR. " . number_format($request['contact_value'], 0, '', '.') . 
 		"\n-------------------------------------------------------" . 
 		"\n*No Ref Transaksi*: " . $ledger['contact_name'] . 
 		"\n*Tanggal*: " . $tempDate->isoFormat('D MMMM YYYY') . 

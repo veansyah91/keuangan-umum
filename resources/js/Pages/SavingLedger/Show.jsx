@@ -17,6 +17,7 @@ export default function Show({ organization, ledger, user, whatsappPlugin, balan
 		contact_name:balance.contact.name,
 		contact_ref:balance.no_ref,
 		contact_type:balance.saving_category.name,
+		contact_value:balance.value,
     date:ledger.date,
     no_ref:ledger.no_ref,
     value:ledger.debit > 0 ? ledger.debit : ledger.credit,
@@ -58,7 +59,7 @@ export default function Show({ organization, ledger, user, whatsappPlugin, balan
 			phone = "62" + phone.slice(1);
 		}
 		
-		let message = `*BUKTI ${ ledger.debit > 0 ? "PENARIKAN" : "SETORAN" } TABUNGAN*%0A-------------------------------------------------------%0A*Nama*: ${data.contact_name}%0A*ID Simpanan*: ${data.contact_ref}%0A*Jenis Simpanan*: ${data.contact_type}%0A-------------------------------------------------------%0A*No Ref Transaksi*: ${ledger.no_ref}%0A*Tanggal*: ${dayjs(ledger.date).locale('id').format('DD MMMM YYYY')}%0A*Total*: IDR. ${ledger.debit > 0 ? formatNumber(ledger.debit) : formatNumber(ledger.credit)}%0A%0A%0ATtd,%0A%0A%0A*${organization.name}*`;
+		let message = `*BUKTI ${ ledger.debit > 0 ? "PENARIKAN" : "SETORAN" } TABUNGAN*%0A-------------------------------------------------------%0A*Jenis Simpanan*: ${data.contact_type}%0A*Nama*: ${data.contact_name}%0A*ID Simpanan*: ${data.contact_ref}%0A*Saldo Akhir*: IDR. ${formatNumber(data.contact_value)}%0A-------------------------------------------------------%0A*No Ref Transaksi*: ${ledger.no_ref}%0A*Tanggal*: ${dayjs(ledger.date).locale('id').format('DD MMMM YYYY')}%0A*Total*: IDR. ${ledger.debit > 0 ? formatNumber(ledger.debit) : formatNumber(ledger.credit)}%0A%0A%0ATtd,%0A%0A%0A*${organization.name}*`;
 		
 		let whatsapp = `${waLink}?phone=${phone}&text=${message}`
 
@@ -141,17 +142,22 @@ export default function Show({ organization, ledger, user, whatsappPlugin, balan
 							{/* Identity */}
 							<div className='w-full space-y-2'>
 								<div className='flex'>
-									<div className='w-1/4'>Nama</div>
-									<div className='w-3/4'>: {balance.contact.name} ({balance.contact.contact_categories[0].name})</div>
+									<div className='w-1/4'>Jenis Simpanan</div>
+									<div className='w-3/4'>: {data.contact_type}</div>
 								</div>
 								<div className='flex'>
 									<div className='w-1/4'>ID Simpanan</div>
 									<div className='w-3/4'>: {balance.no_ref ?? '-'}</div>
 								</div>
 								<div className='flex'>
-									<div className='w-1/4'>Jenis Simpanan</div>
-									<div className='w-3/4'>: {data.contact_type}</div>
+									<div className='w-1/4'>Nama</div>
+									<div className='w-3/4'>: {balance.contact.name} ({balance.contact.contact_categories[0].name})</div>
 								</div>
+								<div className='flex'>
+									<div className='w-1/4'>Saldo Akhir</div>
+									<div className='w-3/4'>: IDR. { formatNumber(data.contact_value) }</div>
+								</div>
+								
 							</div>
 
 							<div className='w-full space-y-2 mt-2 pt-3 border-t border-slate-900'>
