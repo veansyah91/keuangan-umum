@@ -1,6 +1,8 @@
 import formatNumber from '@/Utils/formatNumber'
+import { Link } from '@inertiajs/react'
 import React from 'react'
 import { IoCreateOutline, IoEllipsisVertical, IoTrash } from 'react-icons/io5'
+import { RiBookletLine } from 'react-icons/ri'
 
 export default function SavingBalanceMobile({ member, role, handleDelete, handleEdit }) {
   return (
@@ -27,20 +29,26 @@ export default function SavingBalanceMobile({ member, role, handleDelete, handle
                 <IoEllipsisVertical />
               </div>
               <ul
-                  tabIndex={0}
-                  className='dropdown-content z-[50] menu p-2 shadow bg-base-100 rounded-box w-56'>
-                  <li>
-                      <button onClick={handleEdit}>
-                          <IoCreateOutline />
-                          Ubah
-                      </button>
-                  </li>
-                  <li>
-                      <button onClick={handleDelete}>
-                          <IoTrash />
-                          Hapus
-                      </button>
-                  </li>
+                tabIndex={0}
+                className='dropdown-content z-[50] menu p-2 shadow bg-base-100 rounded-box w-56'>
+                <li>
+                  <Link href={route('cashflow.saving.balance.show',{organization: member.organization_id, balance: member.id})}>
+                    <RiBookletLine />
+                    Cetak Buku Tabungan
+                  </Link>
+                </li>
+                <li>
+                  <button onClick={handleEdit}>
+                    <IoCreateOutline />
+                    Ubah
+                  </button>
+                </li>
+                <li>
+                  <button onClick={handleDelete}>
+                    <IoTrash />
+                    Hapus
+                  </button>
+                </li>
               </ul>
             </div>
           )}

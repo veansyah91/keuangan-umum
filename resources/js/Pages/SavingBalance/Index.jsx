@@ -147,6 +147,11 @@ export default function Index({ organization, role, members, querySearch, newRef
         });
         router.replace(window.location.pathname);
         setShowModalDelete(false); 
+      },
+      onError: errors => {
+        toast.error(errors.error, {
+          position: toast.POSITION.TOP_CENTER,
+        });
       }
     });
   }
@@ -254,7 +259,6 @@ export default function Index({ organization, role, members, querySearch, newRef
         ))}
       </ContentMobile>
       
-
       {/* Desktop */}
       <ContainerDesktop>
         <TitleDesktop>

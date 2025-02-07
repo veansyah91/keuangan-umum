@@ -7,13 +7,14 @@ use Inertia\Inertia;
 use App\Helpers\NewRef;
 use Carbon\CarbonImmutable;
 use App\Models\Organization;
+use App\Models\SavingLedger;
 use Illuminate\Http\Request;
 use App\Models\SavingBalance;
 use App\Models\SavingCategory;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 use App\Repositories\User\UserRepository;
+use Illuminate\Support\Facades\Validator;
 use App\Repositories\Contact\ContactRepository;
 
 class SavingBalanceController extends Controller
@@ -25,6 +26,14 @@ class SavingBalanceController extends Controller
 		$this->userRepository = $userRepository;
 		$this->contactRepository = $contactRepository;
 		$this->now = CarbonImmutable::now();
+	}
+
+	public function ledgers($balance, $startDate, $endDate)
+	{
+		return SavingLedger::where('saving_balance_id', $balance['id'])
+												->where('date', '>=', request('startDate'))
+												->where('date', '<=', request('endDate'))
+												->get();
 	}
 
 	protected function newRef($organization, $dateRequest = '')
@@ -145,10 +154,26 @@ class SavingBalanceController extends Controller
 	public function destroy(Request $request, Organization $organization, SavingBalance $balance)
 	{
 		// cek apakah data telah dipakai
+		$ledger = SavingLedger::where('saving_balance_id', $balance['id'])->first();
+
+		if ($ledger) {
+			return redirect()->back()->withErrors(['error' => "Data can't be deleted"]);
+		}
 
 		// jika belum dipakai maka dihapus
 		$balance->delete();
 
 		return redirect()->back()->with('success', 'Data simpanan tabungan berhasil dihapus');
+	}
+
+	public function show(Organization $organization, SavingBalance $balance)
+	{
+		return Inertia::render('SavingBalance/Show', [
+			'balance' => $balance,
+			'organization' => $organization,
+			'ledgers' => Inertia::lazy(fn () => $this->ledgers($balance, request('startDate'), request('endDate'))),
+			'startDateFilter' => request('startDate'),
+			'endDateFilter' => request('endDate'),
+		]);
 	}
 }
