@@ -1,1 +1,0 @@
-import{j as t}from"./app-d982c3f4.js";function a({page:e}){return t.jsx("div",{className:" text-gray-900 py-2 px-2 border flex gap-5 justify-start",children:t.jsx("div",{className:"mr-2 text-start",children:e.name})})}export{a as default};
