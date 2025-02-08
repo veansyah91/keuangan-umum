@@ -7,14 +7,21 @@ import { IoArrowBackOutline, IoPlayBack, IoPlayForward, IoSearchSharp } from 're
 import dayjs from 'dayjs';
 import Datepicker from 'react-tailwindcss-datepicker';
 import PrimaryButton from '@/Components/PrimaryButton';
+import { FaPrint } from 'react-icons/fa/index.esm';
+import SecondaryButton from '@/Components/SecondaryButton';
+import formatNumber from '@/Utils/formatNumber';
 
 export default function Show({
   startDateFilter,
   endDateFilter,
   ledgers,
-  organization
-}) {
-  console.log(ledgers);
+  organization,
+  startedValue,
+  balance,
+  balanceCategory,
+  contact
+}) {  
+  console.log(startedValue);
   
   const [dataLedgers, setDataLedgers] = useState([]);
   const [startDate, setStartDate] = useState(startDateFilter || '');
@@ -35,6 +42,32 @@ export default function Show({
     endDate: endDateFilter || '',
   });
 
+  // useEffect
+  useEffect(() => {
+    if (startDateFilter && endDateFilter && startedValue) {
+      handleModifyLedgers(ledgers, startedValue);
+    }
+  }, []);
+
+  const handleModifyLedgers = (ledgers, startedValue) => {
+    let tempTotal = startedValue;
+    let newLedgers = [];
+    ledgers.map((ledger, index) => {
+      tempTotal += ledger.debit - ledger.credit;
+
+      newLedgers[index] = {
+        ...ledger,
+        total: tempTotal,
+      };
+    });
+
+    setDataLedgers(newLedgers);
+    setTotal({
+        startValue: startedValue,
+        endValue: tempTotal,
+    });
+  };
+
   const handleStartDateValueChange = (newValue) => {
     setStartDateValue(newValue);
     setStartDate(dayjs(newValue.endDate).format('YYYY-MM-DD'));
@@ -47,7 +80,7 @@ export default function Show({
 
   const handleReload = () => {
     router.reload({
-      only: ['ledgers'],
+      only: ['ledgers', 'startedValue'],
       data: {
         startDate,
         endDate,
@@ -55,6 +88,12 @@ export default function Show({
       onBefore: (visit) => {
         visit.completed ? setIsLoading(false) : setIsLoading(true);
       },
+      onSuccess: ({ props }) => {        
+        handleModifyLedgers(props.ledgers, props.startedValue);
+      },
+      onFinish: () => {
+        setIsLoading(false);
+      }
     });
   }
 
@@ -108,6 +147,27 @@ export default function Show({
                 </PrimaryButton>
               </div>
             </div>
+            <div className='text-end px-3 hidden md:block print:flex print:justify-between'>
+              <SecondaryButton onClick={handlePrint}>
+                <div className='flex gap-2'>
+                  <div className='my-auto'>
+                    <FaPrint />
+                  </div>
+                  <div className='my-auto'>Print</div>
+                </div>
+              </SecondaryButton>
+            </div>
+            <div className='fixed md:hidden bottom-2 right-2'>
+              <button
+                onClick={handlePrint}
+                className='bg-white border-2 border-slate-900 p-2 rounded-full h-14 w-14'>
+                <div className='flex gap-2'>
+                  <div className='my-auto mx-auto'>
+                    <FaPrint />
+                  </div>
+                </div>
+              </button>
+            </div>
           </div>
          
           {/* Title Print*/}
@@ -121,7 +181,61 @@ export default function Show({
                 {organization.province}
               </div>
             </div>
-          </div>          
+          </div>  
+          <div className='w-full mt-3 hidden print:flex print:justify-between'>
+            <div className='text-xs'>
+              <div>
+                <div>{balance.no_ref ?? '-'}</div>
+                <div>an. {contact.name}</div>
+              </div>
+              <div className='font-bold'>
+                {balanceCategory.name}
+              </div>
+            </div>
+            <div className='text-end italic text-xs'>
+              Periode : {dayjs(startDateValue.startDate).locale('id').format('MMMM DD, YYYY')} -{' '}
+              {dayjs(endDateValue.startDate).locale('id').  format('MMMM DD, YYYY')}
+            </div>
+          </div>  
+
+          {/* Content */}
+          <div className="my-2 -mx-5 space-y-3 print:font-['Open_Sans'] overflow-auto">
+            <div className='md:w-full w-[550px] print:w-full'>
+              <table className='table uppercase table-zebra table-xs'>
+                <thead>
+                  <tr className='text-slate-900 font-bold border-b-2 border-slate-900'>
+                    <th className='w-1/12'>tanggal</th>
+                    <th>ref</th>
+                    <th>Dekripsi</th>
+                    <th className='text-end'>debit</th>
+                    <th className='text-end'>kredit</th>
+                    <th className='text-end'>total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className='font-bold'>
+                    <td colSpan={5}>Nilai Awal</td>
+                    <td className='text-end'>IDR. {formatNumber(Math.abs(total.startValue))} { Math.abs(total.startValue) !== 0 && (total.startValue > 0 ? "(D)" : "(C)") }</td>
+                  </tr>
+                  {dataLedgers.map((ledger, index) => (
+                    <tr key={index}>
+                      <td>{ledger.date}</td>
+                      <td>{ledger.no_ref}</td>
+                      <td>{ledger.description ?? ledger.journal?.description}</td>
+                      <td className='text-end'>IDR. {formatNumber(ledger.debit)}</td>
+                      <td className='text-end'>IDR. {formatNumber(ledger.credit)}</td>
+                      <td className='text-end'>IDR. {formatNumber(Math.abs(ledger.total))} ({ ledger.total > 0 ? "D" : "C" })</td>
+                    </tr>
+                  ))}
+                  <tr className='font-bold'>
+                    <td colSpan={5}>Nilai Akhir</td>
+                    <td className='text-end'>IDR. {formatNumber(Math.abs(total.endValue))} ({ total.endValue > 0 ? "D" : "C" })</td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>              
+            </div>
+          </div>
         </div>
       </div>
     </>

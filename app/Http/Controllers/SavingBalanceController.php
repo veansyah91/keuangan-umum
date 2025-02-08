@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use Inertia\Inertia;
 use App\Helpers\NewRef;
+use App\Models\Contact;
 use Carbon\CarbonImmutable;
 use App\Models\Organization;
 use App\Models\SavingLedger;
@@ -31,9 +32,17 @@ class SavingBalanceController extends Controller
 	public function ledgers($balance, $startDate, $endDate)
 	{
 		return SavingLedger::where('saving_balance_id', $balance['id'])
-												->where('date', '>=', request('startDate'))
-												->where('date', '<=', request('endDate'))
+												->where('created_at', '>=', $startDate)
+												->where('created_at', '<=', $endDate)
 												->get();
+	}
+
+	public function sumLedgerBefore($balance, $startDate)
+	{
+		$ledgers = SavingLedger::where('saving_balance_id', $balance['id'])
+								->where('created_at', '<', $startDate)
+								->get();
+		return count($ledgers) > 0 ? ((int)$ledgers['debit'] - (int)$ledgers['credit']) : 0;
 	}
 
 	protected function newRef($organization, $dateRequest = '')
@@ -168,12 +177,27 @@ class SavingBalanceController extends Controller
 
 	public function show(Organization $organization, SavingBalance $balance)
 	{
+		$user = Auth::user();
+		 
+		$ledgers = SavingLedger::where('saving_balance_id', $balance['id'])
+																	->where('created_at', '>=', request('startDate') ?? '')
+																	->where('created_at', '<=', request('endDate') ?? '')
+																	->get();
+
+		$ledgersBefore =  SavingLedger::where('saving_balance_id', $balance['id'])
+																		->where('created_at', '<', request('startDate') ?? '')
+																		->selectRaw('SUM(debit) - SUM(credit) AS amount')
+    																->value('amount');
+
 		return Inertia::render('SavingBalance/Show', [
 			'balance' => $balance,
+			'balanceCategory' => SavingCategory::find($balance['saving_category_id']),
+			'contact' => Contact::with('contactCategories')->find($balance['contact_id']),
 			'organization' => $organization,
-			'ledgers' => Inertia::lazy(fn () => $this->ledgers($balance, request('startDate'), request('endDate'))),
+			'ledgers' => $ledgers,
 			'startDateFilter' => request('startDate'),
 			'endDateFilter' => request('endDate'),
+			'startedValue' => $ledgersBefore,
 		]);
 	}
 }

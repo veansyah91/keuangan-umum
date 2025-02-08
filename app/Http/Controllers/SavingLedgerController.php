@@ -65,7 +65,7 @@ class SavingLedgerController extends Controller
   public function index(Organization $organization)
 	{
 		$user = Auth::user();
-		$contact = request('contact');
+		$contact = request('contact') ?? '';
 
 		return Inertia::render('SavingLedger/Index', [
 			'organization' => $organization,

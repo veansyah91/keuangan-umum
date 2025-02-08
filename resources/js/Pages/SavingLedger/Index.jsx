@@ -80,6 +80,16 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
     });
   };
 
+  const reloadContact = () => {
+    router.reload({
+      only: ['balances'],
+      data: {
+        contact : ''
+      },
+      preserveState: true,
+    })
+  }
+
   const setDefault = () => {
 
   }
@@ -144,7 +154,6 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
         ...tempData,
         balance_id: selected.id,
         balance_value: selected.value,
-        description: `${selected.contact.name} ${tempData.type == 'credit' ? 'menambah' : 'menarik'} tabungan`
       }
       setData(tempData);
     }    
@@ -162,11 +171,12 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
       'no_ref': '',
       'cash_account_id' : ''
     });
+    selectedContact.id && reloadContact();
+
     setSelectedContact({ id: null, name: '', no_ref: '', balance_value: 0 });
     setSelectedCashAccount({ id: null, name: '', code: '', is_cash: true });
     setShowModalInput(true);
     setIsUpdate(false);
-    setDefault();
     setModalInputLabel({
       title: 'Tambah Simpanan',
       submit: 'Tambah'
@@ -179,7 +189,7 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
       'value': 0,
       'type' : 'credit',
       'date': date,
-      'description' : '',
+      'description' : 'SETOR TABUNGAN',
       'cash_account_id' : null
     });
   }
@@ -197,11 +207,12 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
       'cash_account_id' : ''
 
     });
+    selectedContact.id && reloadContact();
+    
     setSelectedContact({ id: null, name: '', no_ref: '', balance_value: 0 });
     setSelectedCashAccount({ id: null, name: '', code: '', is_cash: true });
     setShowModalInput(true);
-    setIsUpdate(false);
-    setDefault();
+    setIsUpdate(false);    
     setModalInputLabel({
       title: 'Tarik Simpanan',
       submit: 'Tarik'
@@ -214,7 +225,7 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
       'value': 0,
       'date': date,
       'type' : 'debit',
-      'description' : '',
+      'description' : 'TARIK TABUNGAN',
       'cash_account_id' : null
     });
   }
@@ -260,7 +271,7 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
         toast.success(flash.success, {
           position: toast.POSITION.TOP_CENTER,
         });
-
+        reloadContact();
         setSelectedContact({ id: null, name: '', no_ref: '', balance_value: 0 });
         setSelectedCashAccount({ id: null, name: '', code: '', is_cash: true });
         setShowModalInput(false);
@@ -532,6 +543,28 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
                 {errors && errors.no_ref && (
                   <div className='-mb-3'>
                     <div className='text-xs text-red-500'>{errors.no_ref}</div>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className='flex flex-col sm:flex-row w-full gap-1'>
+              <div className='w-full sm:w-1/3 my-auto'>
+                <InputLabel htmlFor='description' value='Deskripsi' className='mx-auto my-auto' />
+              </div>
+              <div className='sm:w-2/3 w-full'>
+                <TextInput
+                  id='description'
+                  type='text'
+                  name='description'
+                  value={data.description}
+                  className={`mt-1 w-full ${errors && errors.description && 'border-red-500'}`}
+                  isFocused={true}
+                  onChange={(e) => setData('description', e.target.value.toUpperCase())}
+                  placeholder='Deskripsi'
+                />
+                {errors && errors.description && (
+                  <div className='-mb-3'>
+                    <div className='text-xs text-red-500'>{errors.description}</div>
                   </div>
                 )}
               </div>
