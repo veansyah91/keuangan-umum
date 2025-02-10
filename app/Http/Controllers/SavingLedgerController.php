@@ -162,7 +162,7 @@ class SavingLedgerController extends Controller
 		}
 
 		// contact
-		$savingBalance = SavingBalance::with('contact')->find($validated['balance_id']);
+		$savingBalance = SavingBalance::with(['contact', 'savingCategory'])->find($validated['balance_id']);
 
 		// saving account
 		$savingCategory = SavingCategory::find($savingBalance['saving_category_id']);
@@ -231,6 +231,8 @@ class SavingLedgerController extends Controller
 				$request['contact_name'] = $savingBalance['contact']['name'];
 				$request['contact_phone'] = $savingBalance['contact']['phone'];
 				$request['contact_value'] = $newValue;
+				$request['contact_type'] = $savingBalance['savingCategory']['name'];
+
 				$this->sendWhatsapp($request, $organization, $ledger);
 			}
 
@@ -440,9 +442,9 @@ class SavingLedgerController extends Controller
 		"\n*Nama*: " . $request['contact_name'] . 
 		"\n*Saldo Akhir*: IDR. " . number_format($request['contact_value'], 0, '', '.') . 
 		"\n-------------------------------------------------------" . 
-		"\n*No Ref Transaksi*: " . $ledger['contact_name'] . 
+		"\n*No Ref Transaksi*: " . $ledger['no_ref'] . 
 		"\n*Tanggal*: " . $tempDate->isoFormat('D MMMM YYYY') . 
-		"\n*Total*: IDR. " . $value . 
+		"\n*Total*: IDR. " . $value . " _(" . Terbilang::make($ledger['debit'] > 0 ? $ledger['debit'] : $ledger['credit']) . ' rupiah)_'.
 		"\n\n\nTtd, \n\n\n" . $organization['name'];
 
 		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
