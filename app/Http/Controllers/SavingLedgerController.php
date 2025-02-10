@@ -162,7 +162,7 @@ class SavingLedgerController extends Controller
 		}
 
 		// contact
-		$savingBalance = SavingBalance::find($validated['balance_id']);
+		$savingBalance = SavingBalance::with('contact')->find($validated['balance_id']);
 
 		// saving account
 		$savingCategory = SavingCategory::find($savingBalance['saving_category_id']);
@@ -200,13 +200,13 @@ class SavingLedgerController extends Controller
 		
 		$prefix = $validated['type'] == 'debit' ? 'PENARIKAN' : 'PENAMBAHAN';
 
-		DB::transaction(function() use ($validated, $user, $savingBalance, $prefix, $organization){
+		DB::transaction(function() use ($validated, $user, $savingBalance, $prefix, $organization, $request){
 			// journal
 			$journal = $this->journalRepository->store($validated);
 			$validated['journal_id'] = $journal['id'];
 
 			// saving ledger
-			$savingLedger = SavingLedger::create($validated);
+			$ledger = SavingLedger::create($validated);
 
 			// update Saving Ledger
 			$newValue = $savingBalance['value'] + ($validated['value'] * ($validated['type'] == 'credit' ? 1 : -1));
@@ -223,6 +223,16 @@ class SavingLedgerController extends Controller
 			];
 
 			$desc = strtoupper($user['name']).' telah menambahkan DATA pada ' . $prefix . 'TABUNGAN dengan DATA : '.json_encode($log);
+
+			// send wa
+			if ($validated['send_wa']) {
+				$request['contact_id'] = $savingBalance['contact_id'];
+				$request['contact_ref'] = $savingBalance['no_ref'];
+				$request['contact_name'] = $savingBalance['contact']['name'];
+				$request['contact_phone'] = $savingBalance['contact']['phone'];
+				$request['contact_value'] = $newValue;
+				$this->sendWhatsapp($request, $organization, $ledger);
+			}
 
 			$this->logRepository->store($organization['id'], $desc);
 		});

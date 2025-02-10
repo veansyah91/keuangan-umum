@@ -120,7 +120,7 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
       'description' : ledger.description,
       'no_ref': ledger.no_ref,
       'cash_account_id' : ledger.cash_account_id,
-      'send_wa' : (whatsappPlugin && ledger.saving_balance.contact.phone) ? true : false
+      'send_wa' : false
     });
 
     setSelectedContact({
@@ -153,13 +153,17 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
 
   const handleSelectedContact = (selected) => {    
     if (selected) {
-      setSelectedContact({ id: selected.id, name: selected.contact.name, phone: selected.contact.phone, no_ref: selected.no_ref, balance_value: selected.value });
+      setSelectedContact({ 
+        id: selected.id, 
+        name: selected.contact.name, 
+        phone: selected.contact.phone, no_ref: selected.no_ref, balance_value: selected.value 
+      });
       let tempData = {...data};
       tempData = {
         ...tempData,
         balance_id: selected.id,
         balance_value: selected.value,
-        send_wa : (whatsappPlugin && ledger.saving_balance.contact.phone) ? true : false
+        send_wa : (whatsappPlugin && selected.contact.phone) ? true : false
       }
       setData(tempData);
     }    
@@ -177,7 +181,7 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
       'no_ref': '',
       'cash_account_id' : ''
     });
-    selectedContact.id && reloadContact();
+    // selectedContact.id && reloadContact();
 
     setSelectedContact({ id: null, name: '', no_ref: '',phone: '', balance_value: 0 });
     setSelectedCashAccount({ id: null, name: '', code: '', is_cash: true });
@@ -214,7 +218,7 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
       'cash_account_id' : ''
 
     });
-    selectedContact.id && reloadContact();
+    // selectedContact.id && reloadContact();
     
     setSelectedContact({ id: null, name: '', no_ref: '', phone: '', balance_value: 0 });
     setSelectedCashAccount({ id: null, name: '', code: '', is_cash: true });
@@ -238,6 +242,12 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
     });
   }
 
+  const handleCloseModalInput = () => {
+    setShowModalInput(false);
+
+    reloadContact();
+  }
+
   const handleSelectedCashAccount = (selected) => {
     if (selected) {
       setSelectedCashAccount({ id: selected.id, name: selected.name, code: selected.code, is_cash: true });
@@ -259,6 +269,7 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
         toast.success(flash.success, {
           position: toast.POSITION.TOP_CENTER,
         });
+        reloadContact();
 
         setSelectedContact({ id: null, name: '', no_ref: '', phone: '', balance_value: 0 });
         setSelectedCashAccount({ id: null, name: '', code: '', is_cash: true });
@@ -507,7 +518,7 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
 
       
       {/* Modal */}
-      <Modal show={showModalInput} onClose={() => setShowModalInput(false)}>
+      <Modal show={showModalInput} onClose={handleCloseModalInput}>
         <form onSubmit={handleSubmit} className='p-6'>
           <h2 className='text-lg font-medium text-gray-900 border-b-2 py-1'>{modalInputLabel.title}</h2>
           <div className='mt-5 space-y-5'>
@@ -678,7 +689,7 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
               </div>  
             } 
             <div className='mt-6 flex justify-end'>
-              <SecondaryButton onClick={_ => setShowModalInput(false)}>Batal</SecondaryButton>  
+              <SecondaryButton onClick={handleCloseModalInput}>Batal</SecondaryButton>  
               {
                 data.balance_id && data.no_ref && data.date && data.cash_account_id && (data.value > 0) &&
                 <PrimaryButton className='ms-3' disabled={processing}>
