@@ -58,7 +58,7 @@ export default function Create({ organization, newRef, contacts, date, categorie
     month:parseInt(monthNow()),
     study_year:studyYear(),
     description:'',
-    whatsappPlugin:true,
+    send_wa: true,
     details: [],
     cash_account_id: null
   });

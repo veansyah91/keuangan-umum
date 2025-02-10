@@ -31,7 +31,7 @@ import Datepicker from 'react-tailwindcss-datepicker';
 import dayjs from 'dayjs';
 import formatNumber from '@/Utils/formatNumber';
 
-export default function Index({ ledgers, organization, role, newRefCredit, newRefDebit, querySearch, balances, date, cashAccounts }) {   
+export default function Index({ ledgers, organization, role, newRefCredit, newRefDebit, querySearch, balances, date, cashAccounts, whatsappPlugin }) {   
   // state
   const { data, setData, post, patch, errors, setError, processing, reset, delete:destroy } = useForm({
     'id': null,
@@ -42,13 +42,14 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
     'date': date,
     'description' : '',
     'no_ref': '',
-    'cash_account_id' : null
+    'cash_account_id' : null,
+    'send_wa': whatsappPlugin || false,
   });
   const [dateValue, setDateValue] = useState({
     startDate: date,
     endDate: date,
   });
-  const [selectedContact, setSelectedContact] = useState({ id: null, name: '', no_ref: '', balance_value: 0 });
+  const [selectedContact, setSelectedContact] = useState({ id: null, name: '', no_ref: '', phone: '', balance_value: 0 });
   const [selectedCashAccount, setSelectedCashAccount] = useState({ id: null, name: '', code: '', is_cash: true });
   
   const [modalInputLabel, setModalInputLabel] = useState({
@@ -90,10 +91,6 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
     })
   }
 
-  const setDefault = () => {
-
-  }
-
   const handleEdit = (ledger) => {
     setModalInputLabel({
       title: (ledger.debit > 0 ? 'Tarik' : 'Tambah') + ' Simpanan',
@@ -122,10 +119,18 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
       'date': ledger.date,
       'description' : ledger.description,
       'no_ref': ledger.no_ref,
-      'cash_account_id' : ledger.cash_account_id
+      'cash_account_id' : ledger.cash_account_id,
+      'send_wa' : (whatsappPlugin && ledger.saving_balance.contact.phone) ? true : false
     });
 
-    setSelectedContact({id: ledger.saving_balance.id, name: ledger.saving_balance.contact.name, no_ref: ledger.saving_balance.no_ref, balance_value: ledger.saving_balance.value});
+    setSelectedContact({
+      id: ledger.saving_balance.id, 
+      name: ledger.saving_balance.contact.name, 
+      no_ref: ledger.saving_balance.no_ref, 
+      phone: ledger.saving_balance.contact.phone, 
+      balance_value: ledger.saving_balance.value
+    });
+
     setSelectedCashAccount({id: ledger.cash_account_id, name: ledger.cash_account.name, code: ledger.cash_account.code, is_cash: true})
   }
 
@@ -148,12 +153,13 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
 
   const handleSelectedContact = (selected) => {    
     if (selected) {
-      setSelectedContact({ id: selected.id, name: selected.contact.name, no_ref: selected.no_ref, balance_value: selected.value });
+      setSelectedContact({ id: selected.id, name: selected.contact.name, phone: selected.contact.phone, no_ref: selected.no_ref, balance_value: selected.value });
       let tempData = {...data};
       tempData = {
         ...tempData,
         balance_id: selected.id,
         balance_value: selected.value,
+        send_wa : (whatsappPlugin && ledger.saving_balance.contact.phone) ? true : false
       }
       setData(tempData);
     }    
@@ -173,7 +179,7 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
     });
     selectedContact.id && reloadContact();
 
-    setSelectedContact({ id: null, name: '', no_ref: '', balance_value: 0 });
+    setSelectedContact({ id: null, name: '', no_ref: '',phone: '', balance_value: 0 });
     setSelectedCashAccount({ id: null, name: '', code: '', is_cash: true });
     setShowModalInput(true);
     setIsUpdate(false);
@@ -190,7 +196,8 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
       'type' : 'credit',
       'date': date,
       'description' : 'SETOR TABUNGAN',
-      'cash_account_id' : null
+      'cash_account_id' : null,
+      'send_wa': whatsappPlugin || false,
     });
   }
 
@@ -209,7 +216,7 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
     });
     selectedContact.id && reloadContact();
     
-    setSelectedContact({ id: null, name: '', no_ref: '', balance_value: 0 });
+    setSelectedContact({ id: null, name: '', no_ref: '', phone: '', balance_value: 0 });
     setSelectedCashAccount({ id: null, name: '', code: '', is_cash: true });
     setShowModalInput(true);
     setIsUpdate(false);    
@@ -226,7 +233,8 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
       'date': date,
       'type' : 'debit',
       'description' : 'TARIK TABUNGAN',
-      'cash_account_id' : null
+      'cash_account_id' : null,
+      'send_wa': whatsappPlugin || false,
     });
   }
 
@@ -252,7 +260,7 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
           position: toast.POSITION.TOP_CENTER,
         });
 
-        setSelectedContact({ id: null, name: '', no_ref: '', balance_value: 0 });
+        setSelectedContact({ id: null, name: '', no_ref: '', phone: '', balance_value: 0 });
         setSelectedCashAccount({ id: null, name: '', code: '', is_cash: true });
         setShowModalInput(false);
         setIsUpdate(false);  
@@ -272,7 +280,7 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
           position: toast.POSITION.TOP_CENTER,
         });
         reloadContact();
-        setSelectedContact({ id: null, name: '', no_ref: '', balance_value: 0 });
+        setSelectedContact({ id: null, name: '', no_ref: '', phone: '', balance_value: 0 });
         setSelectedCashAccount({ id: null, name: '', code: '', is_cash: true });
         setShowModalInput(false);
         setIsUpdate(false);  
@@ -646,7 +654,29 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
                   </div>
                 )}
               </div>
-            </div>
+            </div>{
+            (whatsappPlugin && selectedContact.phone)
+              && <div className='md:w-1/3 w-2/3 mt-5'>
+                <div className='form-control '>
+                  <label className='label cursor-pointer' htmlFor={`send_wa`}>
+                    <input
+                      type='checkbox'
+                      className='checkbox'
+                      id={`send_wa`}
+                      value={data.send_wa}
+                      onChange={() => setData('send_wa', !data.send_wa)}
+                      checked={data.send_wa}
+                    />
+                    <span className='label-text'>Kirim Bukti Via WhatsApp</span>
+                  </label>
+                </div>
+                {errors && errors.send_wa && (
+                  <div className='-mb-3'>
+                    <div className='text-xs text-red-500'>{errors.send_wa}</div>
+                  </div>
+                )}
+              </div>  
+            } 
             <div className='mt-6 flex justify-end'>
               <SecondaryButton onClick={_ => setShowModalInput(false)}>Batal</SecondaryButton>  
               {

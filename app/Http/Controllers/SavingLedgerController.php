@@ -67,8 +67,11 @@ class SavingLedgerController extends Controller
 		$user = Auth::user();
 		$contact = request('contact') ?? '';
 
+		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
+
 		return Inertia::render('SavingLedger/Index', [
 			'organization' => $organization,
+			'whatsappPlugin' => $whatsappPlugin ? true : false,
 			'date' => request('date') ?? $this->now->isoFormat('YYYY-M-DD'),
 			'ledgers' => SavingLedger::filter(request(['search']))
 																	->whereOrganizationId($organization['id'])
@@ -141,7 +144,11 @@ class SavingLedgerController extends Controller
 			'cash_account_id' => [
 				'required',
 				'exists:accounts,id'
-			]
+			],
+			'send_wa' => [
+				'boolean',
+				'required'
+			],
 		]);
 
 		// cek tanggal
