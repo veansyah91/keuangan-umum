@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\SchoolAccountSetting;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
+use App\Notifications\OrganizationCreated;
 use App\Repositories\Village\VillageRepository;
 use App\Repositories\Account\AccountRepositoryInterface;
 use App\Repositories\AccountCategory\AccountCategoryRepositoryInterface;
@@ -481,7 +482,7 @@ class OrganizationController extends Controller
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('organizations'),
+                // Rule::unique('organizations'),
             ],
             'address' => 'required|string|max:255',
             'legality' => 'string|nullable',
@@ -496,6 +497,7 @@ class OrganizationController extends Controller
         ]);        
 
         $validated['slug'] = Str::slug($validated['name']);
+        $user = Auth::user();
 
         // Trial 1 Month
         $now = Carbon::now();
@@ -510,128 +512,116 @@ class OrganizationController extends Controller
         $validated['village_id'] = $validated['addressDetail']['village_id'];
         $organization['role'] = 'admin';
 
-        $organization = Organization::create($validated);
+        DB::transaction(function() use ($validated, $request, $user){       
+            $organization = Organization::create($validated);
 
-        $request->user()->organizations()->attach($organization);
+            $request->user()->organizations()->attach($organization);
 
-        //create default account category (accountancy)
-        $accountCategoriesDefault = collect($this->accountCategoriesDefault);
+            //create default account category (accountancy)
+            $accountCategoriesDefault = collect($this->accountCategoriesDefault);
 
-        $accountCategoriesCollection = $accountCategoriesDefault->map(function ($accountCategory) use ($organization) {
-            return $organization->accountCategory()->create($accountCategory);
-        });
-        //
-        
-        //create default account (accountancy)
-        $accountsDefault = collect($this->accountsDefault);
-
-        $attribute = [
-            'organization_id' => $organization['id'],
-        ];
-
-        // $accountCategoriesCollection->map(function ($accountCategory) use ($accountsDefault) {
-        //     $filteredAccount = $accountsDefault->where('category_name', $accountCategory['name']);
-
-        //     $filteredAccount->map(function ($account) use ($accountCategory) {
-        //         $account['organization_id'] = $accountCategory['organization_id'];
-        //         $account['can_be_deleted'] = $account['code'] == '320000000' ? false : true;
-
-        //         $accountDB = $accountCategory->accounts()->create($account);
-
-        //         // akun pendapatan iuran bulanan siswa
-        //         if ($accountDB['name'] == 'PENDAPATAN IURAN BULANAN SISWA') {
-        //             # code...
-        //         }
-        //         return $account;
-        //     });
-        // });
-        $savingAccountId = null;
-        foreach ($accountCategoriesCollection as $accountCategory) {
-            $filteredAccounts = $accountsDefault->where('category_name', $accountCategory['name']);
-
-            foreach ($filteredAccounts as $filteredAccount) {
-                $account = Account::create([
-                    'code' => $filteredAccount['code'],
-                    'name' => $filteredAccount['name'],
-                    'is_cash' => $filteredAccount['is_cash'] ?? false,
-                    'account_category_id' => $accountCategory['id'],
-                    'organization_id' => $organization['id'],
-                ]);				
+            $accountCategoriesCollection = $accountCategoriesDefault->map(function ($accountCategory) use ($organization) {
+                return $organization->accountCategory()->create($accountCategory);
+            });
+            //
             
-                // akun pendapatan iuran bulanan siswa
-                if ($account['name'] == 'PENDAPATAN IURAN BULANAN SISWA') {
-                    $attribute['revenue_student'] = $account['id'];
-                }
-                if ($account['name'] == 'PIUTANG IURAN BULANAN SISWA') {
-                    $attribute['receivable_monthly_student'] = $account['id'];
-                }
-                if ($account['name'] == 'PIUTANG IURAN MASUK SISWA') {
-                    $attribute['receivable_entry_student'] = $account['id'];
-                }
-                if ($account['name'] == 'PENDAPATAN IURAN BULANAN SISWA DITERIMA DI MUKA') {
-                    $attribute['prepaid_student'] = $account['id'];
-                }
-                if ($account['name'] == 'PENDAPATAN IURAN MASUK SISWA') {
-                    $attribute['entry_student'] = $account['id'];
-                }
-                if ($account['name'] == 'PENDAPATAN IURAN MASUK SISWA') {
-                    $attribute['entry_student'] = $account['id'];
-                }
-                if ($account['name'] == 'BEBAN GAJI STAF') {
-                    $attribute['staff_salary_expense'] = $account['id'];
-                }
+            //create default account (accountancy)
+            $accountsDefault = collect($this->accountsDefault);
 
-                // saving account 
-                if ($account['name'] == 'TABUNGAN UMUM') {
-                    $savingAccountId = $account['id'];
-                }
-
-
-            }
-        }
-        //
-        SchoolAccountSetting::create($attribute);
-        AccountStaff::create($attribute);
-        SavingCategory::create([
-            'name' => 'UMUM',
-            'account_id' => $savingAccountId,
-            'organization_id' => $organization['id']
-        ]);
-        // Category
-        $contactCategories = [
-            'UMUM',
-            'SISWA',
-            'STAF'
-        ];
-
-        foreach ($contactCategories as $contactCategory) {
-            ContactCategory::create([
-                'name' => $contactCategory,
+            $attribute = [
                 'organization_id' => $organization['id'],
-            ]);
-        }
+            ];
 
-        // Fixed Asset Category
-        $fixedAssetCategoriesCollection = collect($this->fixedAssetCategory);
+            $savingAccountId = null;
+            foreach ($accountCategoriesCollection as $accountCategory) {
+                $filteredAccounts = $accountsDefault->where('category_name', $accountCategory['name']);
 
-        foreach ($fixedAssetCategoriesCollection as $fixedAssetCategory) {
-            $fixedAssetCategory['organization_id'] = $organization['id'];
+                foreach ($filteredAccounts as $filteredAccount) {
+                    $account = Account::create([
+                        'code' => $filteredAccount['code'],
+                        'name' => $filteredAccount['name'],
+                        'is_cash' => $filteredAccount['is_cash'] ?? false,
+                        'account_category_id' => $accountCategory['id'],
+                        'organization_id' => $organization['id'],
+                    ]);				
+                
+                    // akun pendapatan iuran bulanan siswa
+                    if ($account['name'] == 'PENDAPATAN IURAN BULANAN SISWA') {
+                        $attribute['revenue_student'] = $account['id'];
+                    }
+                    if ($account['name'] == 'PIUTANG IURAN BULANAN SISWA') {
+                        $attribute['receivable_monthly_student'] = $account['id'];
+                    }
+                    if ($account['name'] == 'PIUTANG IURAN MASUK SISWA') {
+                        $attribute['receivable_entry_student'] = $account['id'];
+                    }
+                    if ($account['name'] == 'PENDAPATAN IURAN BULANAN SISWA DITERIMA DI MUKA') {
+                        $attribute['prepaid_student'] = $account['id'];
+                    }
+                    if ($account['name'] == 'PENDAPATAN IURAN MASUK SISWA') {
+                        $attribute['entry_student'] = $account['id'];
+                    }
+                    if ($account['name'] == 'PENDAPATAN IURAN MASUK SISWA') {
+                        $attribute['entry_student'] = $account['id'];
+                    }
+                    if ($account['name'] == 'BEBAN GAJI STAF') {
+                        $attribute['staff_salary_expense'] = $account['id'];
+                    }
 
-            FixedAssetCategory::create($fixedAssetCategory);
-        }
-        //
-        
-        // Menu
-            $menus = Menu::all();
-
-            foreach ($menus as $menu) {
-                DB::table('organization_menu')
-                        ->insert([
-                            'organization_id' => $organization['id'],
-                            'menu_id' => $menu['id'],
-                        ]);
+                    // saving account 
+                    if ($account['name'] == 'TABUNGAN UMUM') {
+                        $savingAccountId = $account['id'];
+                    }
+                }
             }
-        // 
+            //
+            SchoolAccountSetting::create($attribute);
+            AccountStaff::create($attribute);
+            SavingCategory::create([
+                'name' => 'UMUM',
+                'account_id' => $savingAccountId,
+                'organization_id' => $organization['id']
+            ]);
+            // Category
+            $contactCategories = [
+                'UMUM',
+                'SISWA',
+                'STAF'
+            ];
+
+            foreach ($contactCategories as $contactCategory) {
+                ContactCategory::create([
+                    'name' => $contactCategory,
+                    'organization_id' => $organization['id'],
+                ]);
+            }
+
+            // Fixed Asset Category
+            $fixedAssetCategoriesCollection = collect($this->fixedAssetCategory);
+
+            foreach ($fixedAssetCategoriesCollection as $fixedAssetCategory) {
+                $fixedAssetCategory['organization_id'] = $organization['id'];
+
+                FixedAssetCategory::create($fixedAssetCategory);
+            }
+            //
+            
+            // Menu
+                $menus = Menu::all();
+
+                foreach ($menus as $menu) {
+                    DB::table('organization_menu')
+                            ->insert([
+                                'organization_id' => $organization['id'],
+                                'menu_id' => $menu['id'],
+                            ]);
+                }
+            // 
+
+            // send notification via email
+            $user->notify(new OrganizationCreated($organization));
+        });
+
 
         return redirect(route('organization'))->with('success', 'Organisasi Berhasil Disimpan!');
     }
