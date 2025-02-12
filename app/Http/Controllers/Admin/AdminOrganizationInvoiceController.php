@@ -9,10 +9,12 @@ use App\Models\Affiliation;
 use App\Models\Organization;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 use App\Models\OrganizationInvoice;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
+use App\Notifications\OrganizationInvoicePaid;
 
 class AdminOrganizationInvoiceController extends Controller
 {
@@ -40,7 +42,7 @@ class AdminOrganizationInvoiceController extends Controller
         ]);
     }
 
-    public function paymentConfirmation(Request $request, OrganizationInvoice $organizationInvoice): RedirectResponse
+    public function paymentConfirmation(Request $request, OrganizationInvoice $organizationInvoice)
     {
         // Validation
         $validated = $request->validate([
@@ -51,48 +53,56 @@ class AdminOrganizationInvoiceController extends Controller
 
         $user = Auth::user();
 
-        // Update Organization Invoice
-        $organizationInvoice->update([
-            'status' => 'paid',
-            'accepted_by_user_id' => $user['id'],
-        ]);
-
-        // Update Organization (Expired Date Column)
-        $organization = Organization::findOrFail($organizationInvoice['organization_id']);
-
-        $now = Carbon::now();
-        $organizationExpired = Carbon::create($organization['expired']);
-        $refDate = $now > $organizationExpired ? $now : $organizationExpired;
-
-        $organizationInvoices = 0;
-
-        if ($organization['affiliation_is']) {
-            $organizationInvoices = OrganizationInvoice::where('organization_id', $organization['id'])
-                                                    ->where('affiliation_id', $organization['affiliation_is'])
-                                                    ->count();
-        }
-
-        $expiredDate = $validated['product'] == 'Tahunan' ? $refDate->add(1, 'year') : $refDate->add(1, 'month');
-
-        if ($organizationInvoices == 1) {
-            $expiredDate = $expiredDate->add(3, 'month');
-        }
-
-        $organization->update([
-            'expired' => $expiredDate,
-            'status' => 'active',
-        ]);
-
-        $affiliation = Affiliation::find($organization['affiliation_id']);
-
-        if ($affiliation ) {
-            $balance = $affiliation['balance'] + ($affiliation['insentive']*$organizationInvoice['price']/100);
-
-            $affiliation->update([
-                'balance' => $balance
+        DB::transaction(function() use ($validated, $user, $organizationInvoice){
+            // Update Organization Invoice
+            $organizationInvoice->update([
+                'status' => 'paid',
+                'accepted_by_user_id' => $user['id'],
             ]);
-        }
 
-        return redirect(route('admin.organization.invoice.index'));
+            // Update Organization (Expired Date Column)
+            $organization = Organization::findOrFail($organizationInvoice['organization_id']);
+
+            $now = Carbon::now();
+            $organizationExpired = Carbon::create($organization['expired']);
+            $refDate = $now > $organizationExpired ? $now : $organizationExpired;
+
+            $organizationInvoices = 0;
+
+            if ($organization['affiliation_is']) {
+                $organizationInvoices = OrganizationInvoice::where('organization_id', $organization['id'])
+                                                        ->where('affiliation_id', $organization['affiliation_is'])
+                                                        ->count();
+            }
+
+            $expiredDate = $validated['product'] == 'Tahunan' ? $refDate->add(1, 'year') : $refDate->add(1, 'month');
+
+            if ($organizationInvoices == 1) {
+                $expiredDate = $expiredDate->add(3, 'month');
+            }
+
+            $organization->update([
+                'expired' => $expiredDate,
+                'status' => 'active',
+            ]);
+
+            $affiliation = Affiliation::find($organization['affiliation_id']);
+
+            if ($affiliation ) {
+                $balance = $affiliation['balance'] + ($affiliation['insentive']*$organizationInvoice['price']/100);
+
+                $affiliation->update([
+                    'balance' => $balance
+                ]);
+            }
+
+            // send email
+            $admin = $organization->users()->wherePivot('role','admin')->first();
+
+            $user->notify(new OrganizationInvoicePaid($organization, $organizationInvoice, $user['name']));
+
+            return redirect(route('admin.organization.invoice.index'));
+        });
+
     }
 }

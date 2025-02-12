@@ -121,7 +121,7 @@ class OrganizationInvoiceController extends Controller
         
         // send notification via email
         $user->notify(new OrganizationInvoiceNotification($organization, $organizationInvoice, $user['name']));
-            return redirect(route('organization.invoice.show', [$organization['id'], $organizationInvoice['id']]))->with('success', 'Pesanan Perpanjangan Layanan Berhasil Dibuat!');
+        return redirect(route('organization.invoice.show', [$organization['id'], $organizationInvoice['id']]))->with('success', 'Pesanan Perpanjangan Layanan Berhasil Dibuat!');
         // });
         
     }
