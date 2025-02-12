@@ -6,7 +6,7 @@ import { Head, Link, router, useForm } from '@inertiajs/react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { IoArrowBackOutline, IoPlayBack, IoPlayForward, IoSearchSharp } from 'react-icons/io5';
+import { IoArrowBackOutline, IoFilter, IoPlayBack, IoPlayForward, IoSearchSharp } from 'react-icons/io5';
 import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
 import PrimaryButton from '@/Components/PrimaryButton';
@@ -31,7 +31,9 @@ import Datepicker from 'react-tailwindcss-datepicker';
 import dayjs from 'dayjs';
 import formatNumber from '@/Utils/formatNumber';
 
-export default function Index({ ledgers, organization, role, newRefCredit, newRefDebit, querySearch, balances, date, cashAccounts, whatsappPlugin }) {   
+export default function Index({ 
+  ledgers, organization, role, newRefCredit, newRefDebit, querySearch, balances, date, cashAccounts, whatsappPlugin, type, startDate, endDate 
+}) {   
   // state
   const { data, setData, post, patch, errors, setError, processing, reset, delete:destroy } = useForm({
     'id': null,
@@ -49,6 +51,17 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
     startDate: date,
     endDate: date,
   });
+
+  const [dateFilterValue, setDateFilterValue] = useState({
+    startDate: startDate || '',
+    endDate: endDate || '',
+  });
+
+  const [debounceDateFilterValue] = useDebounce(dateFilterValue, 500);  
+
+  const [dataFilter, setDataFilter] = useState({
+    type: type || 'all'
+  });
   const [selectedContact, setSelectedContact] = useState({ id: null, name: '', no_ref: '', phone: '', balance_value: 0 });
   const [selectedCashAccount, setSelectedCashAccount] = useState({ id: null, name: '', code: '', is_cash: true });
   
@@ -58,6 +71,8 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
   });
   const [showModalInput, setShowModalInput] = useState(false);
   const [showModalDelete, setShowModalDelete] = useState(false);
+  const [showModalFilter, setShowModalFilter] = useState(false);
+  
   const [isUpdate, setIsUpdate] = useState(false);
   const [search, setSearch] = useState(querySearch || "");
   const [debounceValue] = useDebounce(search, 500);
@@ -68,7 +83,7 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
       if (prevSearch !== undefined) {
         handleReloadPage();
       }
-    },[debounceValue]);
+    },[debounceValue, debounceDateFilterValue]);
 
   // function
   const handleReloadPage = () => {
@@ -76,6 +91,9 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
       only: ['ledgers'],
       data: {
         search,
+        'type': dataFilter.type,
+        'start_date' : dateFilterValue.startDate,
+        'end_date' : dateFilterValue.endDate,
       },
       preserveState: true,
     });
@@ -145,6 +163,10 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
       setData('date', dayjs(newValue.startDate).format('YYYY-MM-DD'));
   };
 
+  const handleDateFilterValueChange = (newValue) => {
+    setDateFilterValue(newValue);
+  }
+
   const handleChangeValue = (value) => {
     const { floatValue } = value;
 
@@ -168,6 +190,13 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
       setData(tempData);
     }    
   }  
+
+  const handleFilter = (e) => {
+    e.preventDefault();
+		
+		handleReloadPage();
+		setShowModalFilter(false);
+  }
 
   const createCreditData = () => {    
     setError({
@@ -394,6 +423,8 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
           </>
         }
         data={ledgers}
+        hasFilter={true}
+				showFilter={() => setShowModalFilter(true)}
       />
       <ContentMobile>
         {ledgers.data.map((ledger) => (
@@ -426,6 +457,27 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
               </div>
             )}
           </div>
+          <div className='my-auto w-4/12 flex gap-5 justify-end'>
+						<button className='py-3 px-3 border rounded-lg h-full' onClick={() => setShowModalFilter(true)}>
+							<IoFilter />
+						</button>
+						<Datepicker
+							value={dateFilterValue}
+							onChange={handleDateFilterValueChange}
+							showShortcuts={true}
+							configs={{
+								shortcuts: {
+									today: 'Hari Ini',
+									yesterday: 'Kemarin',
+									past: (period) => `${period} Hari Terakhir`,
+									currentMonth: 'Bulan Ini',
+									pastMonth: 'Bulan Lalu',
+									currentYear: 'Tahun Ini',
+								},
+							}}
+							separator={'s.d'}
+						/>
+					</div>
           <div className='w-3/12 border flex rounded-lg'>
             <label htmlFor='search-input' className='my-auto ml-2'>
               <IoSearchSharp />
@@ -518,6 +570,38 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
 
       
       {/* Modal */}
+      {/* Modal Filter */}
+      <Modal show={showModalFilter} onClose={() => setShowModalFilter(false)}>
+        <form onSubmit={handleFilter} className='p-6' id='filter' name='filter'>
+          <h2 className='text-lg font-medium text-gray-900'>Filter Data Simpanan</h2>
+
+          <div className='mt-6 '>
+            <div className='flex flex-col sm:flex-row w-full gap-1'>
+                <div className='sm:w-1/4 w-full my-auto font-bold'>Tipe</div>
+                <div className='sm:w-3/4 w-full flex'>
+                  <select 
+                    className="select select-bordered w-full" 
+                    value={dataFilter.type} 
+                    onChange={e => setDataFilter({...dataFilter, type: e.target.value})} 
+                    id='type_filter'
+                  >
+                    <option value={null}>Semua</option>
+                    <option value={'credit'}>Setor/Tambah Simpanan</option>
+                    <option value={'debit'}>Tarik Simpanan</option>
+                  </select>
+                </div>
+            </div>
+          </div>
+
+          <div className='mt-6 flex justify-end'>
+            <SecondaryButton onClick={() => setShowModalFilter(false)}>Batal</SecondaryButton>
+
+            <PrimaryButton className='ms-3'>Filter</PrimaryButton>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Modal Input */}
       <Modal show={showModalInput} onClose={handleCloseModalInput}>
         <form onSubmit={handleSubmit} className='p-6'>
           <h2 className='text-lg font-medium text-gray-900 border-b-2 py-1'>{modalInputLabel.title}</h2>
@@ -700,6 +784,8 @@ export default function Index({ ledgers, organization, role, newRefCredit, newRe
           </div>        
         </form>
       </Modal>
+
+      {/* Modal Delete */}
       <Modal show={showModalDelete} onClose={() => setShowModalDelete(false)}>
         <form onSubmit={handleSubmitDelete} className='p-6' id='delete-confirmation' name='delete-confirmation'>
           <h2 className='text-lg font-medium text-gray-900 text-center'>

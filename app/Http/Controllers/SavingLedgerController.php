@@ -38,12 +38,12 @@ class SavingLedgerController extends Controller
 		$this->journalRepository = $journalRepository;
 		$this->accountRepository = $accountRepository;
 		$this->logRepository = $logRepository;
-		$this->now = CarbonImmutable::now();
+		// now() = now();
 	}
 
-	protected function newRef($organization, $dateRequest = '', $type)
+	protected function newRef($organization, $dateRequest, $type)
 	{
-			$now = $this->now;
+			$now = now();
 			$date = $dateRequest ?? $now->isoFormat('YYYY-M-DD');
 			$dateRef = Carbon::create($date);
 			$prefix = $type == 'debit' ? 'SD-' : 'SC-';
@@ -68,12 +68,22 @@ class SavingLedgerController extends Controller
 		$contact = request('contact') ?? '';
 
 		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
+		$type = request('type') ?? 'all' ;
 
 		return Inertia::render('SavingLedger/Index', [
 			'organization' => $organization,
 			'whatsappPlugin' => $whatsappPlugin ? true : false,
-			'date' => request('date') ?? $this->now->isoFormat('YYYY-M-DD'),
-			'ledgers' => SavingLedger::filter(request(['search']))
+			'date' => request('date') ?? now()->isoFormat('YYYY-M-DD'),
+			'startDate' => request('startDate') ?? now()->isoFormat('YYYY-M-DD'),
+			'endDate' => request('endDate') ?? now()->isoFormat('YYYY-M-DD'),
+			'ledgers' => SavingLedger::filter(request(['search', 'start_date', 'end_date']))
+																	->when($type !== 'all' ?? false, function ($query) use ($type){
+																		if ($type == 'credit') {
+																			$query->where('credit', '>', 0);
+																		} else {
+																			$query->where('debit', '>', 0);
+																		}
+																	})
 																	->whereOrganizationId($organization['id'])
 																	->with('cashAccount')
 																	->with('savingBalance', function ($query){
@@ -97,8 +107,8 @@ class SavingLedgerController extends Controller
 																		->with('savingCategory')
 																		->take(20)->get(),
 			'role' => $this->userRepository->getRole($user['id'], $organization['id']),
-			'newRefCredit' => $this->newRef($organization, $this->now->isoFormat('YYYY-M-DD'), "credit"),
-			'newRefDebit' => $this->newRef($organization, $this->now->isoFormat('YYYY-M-DD'), "debit"),
+			'newRefCredit' => $this->newRef($organization, now()->isoFormat('YYYY-M-DD'), "credit"),
+			'newRefDebit' => $this->newRef($organization, now()->isoFormat('YYYY-M-DD'), "debit"),
 			'cashAccounts' => $this->accountRepository->getDataCash($organization['id'], request(['account'])),
 		]);
 	}
@@ -153,7 +163,7 @@ class SavingLedgerController extends Controller
 
 		// cek tanggal
 		// jika tanggal lebih tinggi dari hari sekarang, maka kirimkan error\
-		if ($validated['date'] > $this->now->isoFormat('YYYY-M-DD')) {
+		if ($validated['date'] > now()->isoFormat('YYYY-M-DD')) {
 			return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
 		}
 
@@ -288,7 +298,7 @@ class SavingLedgerController extends Controller
 
 		// cek tanggal
 		// jika tanggal lebih tinggi dari hari sekarang, maka kirimkan error
-		if ($validated['date'] > $this->now->isoFormat('YYYY-M-DD')) {
+		if ($validated['date'] > now()->isoFormat('YYYY-M-DD')) {
 			return redirect()->back()->withErrors(['date' => 'Date Value is Unexpected!']);
 		}
 

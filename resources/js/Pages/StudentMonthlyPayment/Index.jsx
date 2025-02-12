@@ -233,8 +233,7 @@ export default function Index({ role, organization, payments, searchFilter, type
 							}}
 							separator={'s.d'}
 						/>
-						
-				</div>
+					</div>
 					<div className='w-3/12 border flex rounded-lg'>
 						<label htmlFor='search-input' className='my-auto ml-2'>
 							<IoSearchSharp />
