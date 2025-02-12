@@ -10,8 +10,11 @@ use App\Models\Affiliation;
 use App\Models\Organization;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 use App\Models\OrganizationInvoice;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
+use App\Notifications\OrganizationInvoiceNotification;
 
 class OrganizationInvoiceController extends Controller
 {
@@ -75,7 +78,7 @@ class OrganizationInvoiceController extends Controller
         ]);
     }
 
-    public function store(Organization $organization, Request $request): RedirectResponse
+    public function store(Organization $organization, Request $request)
     {
         $validated = $request->validate([
             'product' => [
@@ -100,10 +103,14 @@ class OrganizationInvoiceController extends Controller
         $organizationInvoice = OrganizationInvoice::where('no_ref', 'like', $refHeader.'%')
             ->get()
             ->last();
+
         if ($organizationInvoice) {
             $validated['no_ref'] = NewRef::create('PF-', $organizationInvoice['no_ref']);
         }
 
+        $user = Auth::user();
+
+        // DB::transaction(function() use ($user, $validated, $organization){
         $organizationInvoice = OrganizationInvoice::create($validated);
 
         if ($validated['affiliation_id']) {
@@ -111,8 +118,12 @@ class OrganizationInvoiceController extends Controller
                 'affiliation_id' => $validated['affiliation_id']
             ]);
         }
-
-        return redirect(route('organization.invoice.show', [$organization['id'], $organizationInvoice['id']]))->with('success', 'Pesanan Perpanjangan Layanan Berhasil Dibuat!');
+        
+        // send notification via email
+        $user->notify(new OrganizationInvoiceNotification($organization, $organizationInvoice, $user['name']));
+            return redirect(route('organization.invoice.show', [$organization['id'], $organizationInvoice['id']]))->with('success', 'Pesanan Perpanjangan Layanan Berhasil Dibuat!');
+        // });
+        
     }
 
     public function show(Organization $organization, OrganizationInvoice $organizationInvoice): Response
