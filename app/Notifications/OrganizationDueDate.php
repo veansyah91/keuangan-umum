@@ -2,23 +2,25 @@
 
 namespace App\Notifications;
 
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
-class OrganizationDueDate extends Notification
+class OrganizationDueDate extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    private $organization;
+    private $organization, $name;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct($organization)
+    public function __construct($organization, $name)
     {
         $this->organization = $organization;
+        $this->name = $name;
     }
 
     /**
@@ -36,10 +38,16 @@ class OrganizationDueDate extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
+        $tempDate = new Carbon($this->organization['expired']);
+
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+            ->greeting('Hai ' . $this->name . ',')
+            ->line('Layanan anda akan berakhir dalam 30 hari, silakan melakukan perpanjangan Layanan agar anda bisa terus menikmati Layanan Keuangan Umum')
+            ->line('Organisasi: ' . $this->organization['name'])
+            ->line('Tanggal Kadaluarsa: ' . $tempDate->isoFormat('D MMMM YYYY'))
+            // ->action('Klik untuk memperpanjang Layanan', url('/organizations/' . $this->organization['id'] . '/invoices/create'))
+            ->action('Klik untuk memperpanjang Layanan', route('organization.invoice.create', ['organization' => $this->organization['id']]))
+            ->line('Terima kasih telah menggunakan Layanan Keuangan Umum');
     }
 
     /**
