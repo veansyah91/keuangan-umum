@@ -2,10 +2,12 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Organization;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
+use App\Models\Organization;
 use Illuminate\Console\Command;
+use App\Notifications\OrganizationDueDate;
+use App\Notifications\OrganizationInvoicePaid;
 
 class DeactiveOrganizationCron extends Command
 {
@@ -36,13 +38,23 @@ class DeactiveOrganizationCron extends Command
 
         foreach ($organizations as $organization) {
             $formatedMonths = Carbon::parse($organization['expired']);
-            $diff = $formatedMonths->diffInMonths($now);
+            $diff = $formatedMonths->diffInDays($now);
 
-            if ($diff > 2) {
+            \Log::info('Dif '. round($diff));
+
+
+            if (round($diff) == 60) {
                 $organization->update([
                     'status' => 'deactive',
                 ]);
-                // \Log::info($organization);
+            }
+
+            if ($diff == -1) {
+                // Buat email notification
+                $admin = $organization->users()->wherePivot('role','admin')->first();
+
+                $admin->notify(new OrganizationDueDate($organization, $admin['name']));
+
             }
         }
 

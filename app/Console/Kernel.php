@@ -22,7 +22,8 @@ class Kernel extends ConsoleKernel
             // ->everyMinute();
         $schedule->command('deactiveOrganization:cron')
             ->timezone('Asia/Jakarta')
-            ->daily();
+            ->monthlyOn(1, '00:00');
+            // ->daily();
         // ->everyMinute();
         $schedule->command('organizationInvoice:cron')
             ->timezone('Asia/Jakarta')

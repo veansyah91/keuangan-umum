@@ -99,7 +99,7 @@ class AdminOrganizationInvoiceController extends Controller
             // send email
             $admin = $organization->users()->wherePivot('role','admin')->first();
 
-            $user->notify(new OrganizationInvoicePaid($organization, $organizationInvoice, $user['name']));
+            $admin->notify(new OrganizationInvoicePaid($organization, $organizationInvoice, $admin['name']));
 
             return redirect(route('admin.organization.invoice.index'));
         });
