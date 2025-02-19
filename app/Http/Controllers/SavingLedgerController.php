@@ -462,7 +462,7 @@ class SavingLedgerController extends Controller
 		$data = array(
 			'appkey' => $whatsappPlugin['appKey'],
 			'authkey' => $whatsappPlugin['authkey'],
-			'target' => PhoneNumber::setFormat($request['contact_phone']),
+			'target' => $contact['phone'] && PhoneNumber::setFormat($request['contact_phone']),
 			'message' => $message,
 			'sandbox' => 'false'
 		);

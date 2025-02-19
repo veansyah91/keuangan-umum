@@ -104,8 +104,8 @@ class SendSalaryNotifViaWhatsappJon implements ShouldQueue
 			$data = array(
 				'appkey' => $whatsappPlugin['appKey'],
 				'authkey' => $whatsappPlugin['authkey'],
-				'to' => PhoneNumber::setFormat($payment['phone']),
-				'target' => PhoneNumber::setFormat($payment['phone']),
+				'to' => $payment['phone'] && PhoneNumber::setFormat($payment['phone']),
+				'target' => $payment['phone'] && PhoneNumber::setFormat($payment['phone']),
 				'message' => $message,
 				'sandbox' => 'false'
 			);

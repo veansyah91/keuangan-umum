@@ -294,8 +294,8 @@ class StudentEntryReceivablePaymentController extends Controller
 				$data = array(
 					'appkey' => $whatsappPlugin['appKey'],
 					'authkey' => $whatsappPlugin['authkey'],
-					'to' => PhoneNumber::setFormat($contact['phone']),
-					'target' => PhoneNumber::setFormat($contact['phone']),
+					'to' => $contact['phone'] &&  PhoneNumber::setFormat($contact['phone']),
+					'target' => $contact['phone'] &&  PhoneNumber::setFormat($contact['phone']),
 					'message' => $message,
 					'sandbox' => 'false'
 				);
@@ -561,8 +561,8 @@ class StudentEntryReceivablePaymentController extends Controller
 		$data = array(
 			'appkey' => $whatsappPlugin['appKey'],
 			'authkey' => $whatsappPlugin['authkey'],
-			'to' => PhoneNumber::setFormat($contact['phone']),
-			'target' => PhoneNumber::setFormat($contact['phone']),
+			'to' => $contact['phone'] && PhoneNumber::setFormat($contact['phone']),
+			'target' => $contact['phone'] && PhoneNumber::setFormat($contact['phone']),
 			'message' => $message,
 			'sandbox' => 'false'
 		);

@@ -364,7 +364,7 @@ class StudentEntryPaymentController extends Controller
 			// send whatsapp
 			$contact = Contact::with(['student', 'lastLevel'])->find($validated['contact_id']);
 
-			if ($validated['send_wa'] && $contact['phone']) {
+			if ($validated['send_wa']) {
 				$whatsAppLog = WhatsappLog::create([
 					'organization_id' => $organization['id'],
 					'contact_id' => $validated['contact_id'],
@@ -391,8 +391,8 @@ class StudentEntryPaymentController extends Controller
 				$data = array(
 					'appkey' => $whatsappPlugin['appKey'],
 					'authkey' => $whatsappPlugin['authkey'],
-					'to' => PhoneNumber::setFormat($contact['phone']),
-					'target' => PhoneNumber::setFormat($contact['phone']),
+					'to' => $contact['phone'] && PhoneNumber::setFormat($contact['phone']),
+					'target' => $contact['phone'] && PhoneNumber::setFormat($contact['phone']),
 					'message' => $message,
 					'sandbox' => 'false'
 				);
@@ -827,8 +827,8 @@ class StudentEntryPaymentController extends Controller
 			$data = array(
 				'appkey' => $whatsappPlugin['appKey'],
 				'authkey' => $whatsappPlugin['authkey'],
-				'to' => PhoneNumber::setFormat($contact['phone']),
-				'target' => PhoneNumber::setFormat($contact['phone']),
+				'to' => $contact['phone'] && PhoneNumber::setFormat($contact['phone']),
+				'target' => $contact['phone'] && PhoneNumber::setFormat($contact['phone']),
 				'message' => $message,
 				'sandbox' => 'false'
 			);

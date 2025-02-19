@@ -403,7 +403,7 @@ class StudentMonthlyPaymentController extends Controller
 			$data = array(
 				'appkey' => $whatsappPlugin['appKey'],
 				'authkey' => $whatsappPlugin['authkey'],
-				'target' => PhoneNumber::setFormat($contact['phone']),
+				'target' => $contact['phone'] && PhoneNumber::setFormat($contact['phone']),
 				'message' => $message,
 				'sandbox' => 'false'
 			);
@@ -724,7 +724,7 @@ class StudentMonthlyPaymentController extends Controller
 		$data = array(
 			'appkey' => $whatsappPlugin['appKey'],
 			'authkey' => $whatsappPlugin['authkey'],
-			'target' => PhoneNumber::setFormat($contact['phone']),
+			'target' => $contact['phone'] && PhoneNumber::setFormat($contact['phone']),
 			'message' => $message,
 			'sandbox' => 'false'
 		);
