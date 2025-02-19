@@ -1,0 +1,1 @@
+import{j as e}from"./app-61cdbdaa.js";function t({province:s}){return e.jsx(e.Fragment,{children:e.jsxs("div",{className:" text-gray-900 py-2 px-2 border flex gap-5 justify-start",children:[e.jsx("div",{className:"ml-2",children:s.id}),e.jsx("div",{className:"mr-2 text-start",children:s.name})]})})}export{t as default};
