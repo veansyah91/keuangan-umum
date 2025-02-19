@@ -362,7 +362,9 @@ class StudentEntryPaymentController extends Controller
 			}				
 
 			// send whatsapp
-			if ($validated['send_wa']) {
+			$contact = Contact::with(['student', 'lastLevel'])->find($validated['contact_id']);
+
+			if ($validated['send_wa'] && $contact['phone']) {
 				$whatsAppLog = WhatsappLog::create([
 					'organization_id' => $organization['id'],
 					'contact_id' => $validated['contact_id'],
@@ -370,7 +372,6 @@ class StudentEntryPaymentController extends Controller
 					'status' => 'waiting'
 				]);
 
-				$contact = Contact::with(['student', 'lastLevel'])->find($validated['contact_id']);
 				$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
 
 				$tempDetail = '';
