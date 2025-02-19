@@ -11,4 +11,11 @@ export default defineConfig({
         }),
         react(),
     ],
+    server: {
+        cors: {
+          origin: '*', // Atur ke '*' atau sesuaikan dengan domain ngrok
+          methods: ['GET', 'POST', 'PUT', 'DELETE'],
+          allowedHeaders: ['Content-Type', 'Authorization']
+        }
+      }
 });

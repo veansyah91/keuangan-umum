@@ -159,7 +159,6 @@ export default function Create({ organization, newRef, contacts, date, categorie
           position: toast.POSITION.TOP_CENTER,
         });
         setSelectedContact({ id: null, name: '', phone: '' });
-        setSelectedAccount({ id: null, name: '', code: '', is_cash: false });
         setDefault(newRef);
       },
       onError: errors => {
