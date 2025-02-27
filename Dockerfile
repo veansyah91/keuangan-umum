@@ -44,4 +44,5 @@ RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
 EXPOSE 80
 
 # Start FrankenPHP dengan Octane
-CMD ["php", "artisan", "octane:start", "--host=0.0.0.0", "--port=80"]
+# CMD ["php", "artisan", "octane:start", "--host=0.0.0.0", "--port=80"]
+ENTRYPOINT ["php", "artisan", "octane:frankenphp"]

@@ -1,6 +1,14 @@
 version: '3.8'
 
 services:
+  # frankenphp:
+  #   build:
+  #     context: .
+  #   entrypoint: php artisan octane:frankenphp --workers=1 --max-requests=1
+  #   ports:
+  #     - "8002:8000"
+  #   volumes:
+  #     - .:/app
   app:
     build:
       context: .
@@ -11,7 +19,7 @@ services:
     volumes:
       - .:/app
     ports:
-      - "8000:80"
+      - "8001:80"
     networks:
       - laravel_network
     depends_on:
