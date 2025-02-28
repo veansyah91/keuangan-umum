@@ -16,6 +16,7 @@
         "maatwebsite/excel": "^3.1.48",
         "predis/predis": "^2.3",
         "riskihajar/terbilang": "^2.0",
+        "spatie/fork": "^1.2",
         "tightenco/ziggy": "^1.0"
     },
     "require-dev": {

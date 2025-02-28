@@ -161,6 +161,7 @@ return [
          */
         App\Providers\RepositoryServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
+        Illuminate\Concurrency\ConcurrencyServiceProvider::class, 
 
         /*
          * Application Service Providers...
