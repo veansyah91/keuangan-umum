@@ -141,7 +141,7 @@ export default function Show({ organization, program, department, project, journ
                         <div></div>
                         <div className='w-1/3 flex flex-col gap-28 mx-12'>
                             <div className='w-full text-center'>Dibuat Oleh</div>
-                            <div className='w-full text-center border-t border-slate-900'>{journalUser[0].name}</div>
+                            <div className='w-full text-center border-t border-slate-900'>{journalUser.length > 0 ? journalUser[0].name : ''}</div>
                         </div>
                     </div>
                 </div>
