@@ -137,6 +137,8 @@ export default function Index({ organization, role, payments, searchFilter, stud
 						<Link
 							href={route('cashflow.student-entry-payment', {
 								organization: organization.id,
+								start_date: dateValue.startDate,
+								end_date: dateValue.endDate,
 								page: payments.current_page - 1,
 								search: search,
 							})}
@@ -155,6 +157,8 @@ export default function Index({ organization, role, payments, searchFilter, stud
 						<Link
 							href={route('cashflow.student-entry-payment', {
 								organization: organization.id,
+								start_date: dateValue.startDate,
+								end_date: dateValue.endDate,
 								page: payments.current_page + 1,
 								search: search,
 							})}
@@ -255,6 +259,8 @@ export default function Index({ organization, role, payments, searchFilter, stud
 								<Link
 									href={route('cashflow.student-entry-payment', {
 										organization: organization.id,
+										start_date: dateValue.startDate,
+										end_date: dateValue.endDate,
 										page: payments.current_page - 1,
 										search: search,
 									})}
@@ -276,6 +282,8 @@ export default function Index({ organization, role, payments, searchFilter, stud
 								<Link
 									href={route('cashflow.student-entry-payment', {
 										organization: organization.id,
+										start_date: dateValue.startDate,
+										end_date: dateValue.endDate,
 										page: payments.current_page + 1,
 										search: search,
 									})}

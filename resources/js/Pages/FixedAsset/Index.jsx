@@ -229,6 +229,8 @@ export default function Index({
                         <Link
                             href={route('data-master.fixed-asset', {
                                 organization: organization.id,
+                                start_date: dateValue.startDate,
+                                end_date: dateValue.endDate,
                                 page: fixedAssets.current_page - 1,
                                 search: search,
                             })}
@@ -247,6 +249,8 @@ export default function Index({
                         <Link
                             href={route('data-master.fixed-asset', {
                                 organization: organization.id,
+                                start_date: dateValue.startDate,
+                                end_date: dateValue.endDate,
                                 page: fixedAssets.current_page + 1,
                                 search: search,
                             })}
@@ -343,6 +347,8 @@ export default function Index({
                                 <Link
                                     href={route('data-master.fixed-asset', {
                                         organization: organization.id,
+                                        start_date: dateValue.startDate,
+                                        end_date: dateValue.endDate,
                                         page: fixedAssets.current_page - 1,
                                         search: search,
                                     })}
@@ -364,6 +370,8 @@ export default function Index({
                                 <Link
                                     href={route('data-master.fixed-asset', {
                                         organization: organization.id,
+                                        start_date: dateValue.startDate,
+                                        end_date: dateValue.endDate,
                                         page: fixedAssets.current_page + 1,
                                         search: search,
                                     })}

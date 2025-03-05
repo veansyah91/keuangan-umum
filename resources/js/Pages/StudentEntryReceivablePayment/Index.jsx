@@ -135,6 +135,8 @@ export default function Index({ organization, role, receivablePayments, searchFi
 								organization: organization.id,
 								page: receivablePayments.current_page - 1,
 								search: search,
+								start_date: dateValue.startDate,
+								end_date: dateValue.endDate,
 							})}
 							preserveState
 							only={['receivablePayments']}>
@@ -152,6 +154,8 @@ export default function Index({ organization, role, receivablePayments, searchFi
 							href={route('cashflow.student-entry-receivable-payment', {
 								organization: organization.id,
 								page: receivablePayments.current_page + 1,
+								start_date: dateValue.startDate,
+								end_date: dateValue.endDate,
 								search: search,
 							})}
 							only={['receivablePayments']}
@@ -245,6 +249,8 @@ export default function Index({ organization, role, receivablePayments, searchFi
 									href={route('cashflow.student-entry-receivable-payment', {
 										organization: organization.id,
 										page: receivablePayments.current_page - 1,
+										start_date: dateValue.startDate,
+										end_date: dateValue.endDate,
 										search: search,
 									})}
 									preserveState
@@ -266,6 +272,8 @@ export default function Index({ organization, role, receivablePayments, searchFi
 									href={route('cashflow.student-entry-receivable-payment', {
 										organization: organization.id,
 										page: receivablePayments.current_page + 1,
+										start_date: dateValue.startDate,
+										end_date: dateValue.endDate,
 										search: search,
 									})}
 									only={['receivablePayments']}

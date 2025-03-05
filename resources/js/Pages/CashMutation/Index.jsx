@@ -208,6 +208,8 @@ export default function Index({
                         <Link
                             href={route('cashflow.cash-mutation', {
                                 organization: organization.id,
+                                start_date: dateValue.startDate,
+                                end_date: dateValue.endDate,
                                 page: cashMutations.current_page - 1,
                                 search: search,
                             })}
@@ -226,6 +228,8 @@ export default function Index({
                         <Link
                             href={route('cashflow.cash-mutation', {
                                 organization: organization.id,
+                                start_date: dateValue.startDate,
+                                end_date: dateValue.endDate,
                                 page: cashMutations.current_page + 1,
                                 search: search,
                             })}
@@ -321,6 +325,8 @@ export default function Index({
                                 <Link
                                     href={route('cashflow.cash-mutation', {
                                         organization: organization.id,
+                                        start_date: dateValue.startDate,
+                                        end_date: dateValue.endDate,
                                         page: cashMutations.current_page - 1,
                                         search: search,
                                     })}
@@ -342,6 +348,8 @@ export default function Index({
                                 <Link
                                     href={route('cashflow.cash-mutation', {
                                         organization: organization.id,
+                                        start_date: dateValue.startDate,
+                                        end_date: dateValue.endDate,
                                         page: cashMutations.current_page + 1,
                                         search: search,
                                     })}

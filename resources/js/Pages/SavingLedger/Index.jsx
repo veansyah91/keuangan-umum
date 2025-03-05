@@ -386,6 +386,8 @@ export default function Index({
             <Link
               href={route('cashflow.saving.ledger', {
                 organization: organization.id,
+                start_date : dateFilterValue.startDate,
+                end_date : dateFilterValue.endDate,
                 page: ledgers.current_page - 1,
                 search: search,
               })}
@@ -404,6 +406,8 @@ export default function Index({
             <Link
               href={route('cashflow.saving.ledger', {
                 organization: organization.id,
+                start_date : dateFilterValue.startDate,
+                end_date : dateFilterValue.endDate,
                 page: ledgers.current_page + 1,
                 search: search,
               })}
@@ -444,16 +448,21 @@ export default function Index({
           <div className='my-auto w-7/12'>
             {role !== 'viewer' && (
               <div className='space-x-2'>
-                <button onClick={createCreditData} className='bg-green-800 px-4 py-2 text-white border border-transparent rounded-md font-semibold'>
-                  <div className='text-xl font-bold rotate-90'>
-                    <FiLogIn />
-                  </div>
-                </button>
-                <button onClick={createDebitData} className='bg-orange-800 px-4 py-2 text-white border border-transparent rounded-md font-semibold'>
-                  <div className='text-xl font-bold -rotate-90'>
-                    <FiLogOut />
-                  </div>
-                </button>
+                <div className='tooltip' data-tip="Tambah Simpanan">
+                  <button onClick={createCreditData} className='bg-green-800 px-4 py-2 text-white border border-transparent rounded-md font-semibold'>
+                    <div className='text-xl font-bold rotate-90' >
+                      <FiLogIn />
+                    </div>
+                  </button>
+                </div>
+                
+                <div className='tooltip' data-tip="Tarik Simpanan">
+                  <button onClick={createDebitData} className='bg-orange-800 px-4 py-2 text-white border border-transparent rounded-md font-semibold'>
+                    <div className='text-xl font-bold -rotate-90'>
+                      <FiLogOut />
+                    </div>
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -501,6 +510,8 @@ export default function Index({
                 <Link
                   href={route('cashflow.saving.ledger', {
                     organization: organization.id,
+                    start_date : dateFilterValue.startDate,
+                    end_date : dateFilterValue.endDate,
                     page: ledgers.current_page - 1,
                     search: search,
                   })}
@@ -522,6 +533,8 @@ export default function Index({
                 <Link
                   href={route('cashflow.saving.ledger', {
                     organization: organization.id,
+                    start_date : dateFilterValue.startDate,
+                    end_date : dateFilterValue.endDate,
                     page: ledgers.current_page + 1,
                     search: search,
                   })}
