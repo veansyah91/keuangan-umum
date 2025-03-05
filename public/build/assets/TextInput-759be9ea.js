@@ -1,1 +1,0 @@
-import{r,j as i}from"./app-8a73958f.js";const d=r.forwardRef(function({autoComplete:s="off",type:e="text",className:n="",isFocused:f=!1,...u},t){const o=t||r.useRef();return r.useEffect(()=>{f&&o.current.focus()},[]),i.jsx("input",{...u,type:e,className:"border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm "+n,ref:o,autoComplete:s})});export{d as T};
