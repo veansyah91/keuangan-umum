@@ -18,11 +18,11 @@ use App\Models\SavingCategory;
 use App\Models\WhatsappPlugin;
 use Illuminate\Validation\Rule;
 use App\Jobs\SendWhatsAppNotifJob;
+use Hammunima\Terbilang\Terbilang;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Repositories\Log\LogRepository;
 use App\Repositories\User\UserRepository;
-use Riskihajar\Terbilang\Facades\Terbilang;
 use App\Repositories\Account\AccountRepository;
 use App\Repositories\Contact\ContactRepository;
 use App\Repositories\Journal\JournalRepository;
@@ -428,7 +428,7 @@ class SavingLedgerController extends Controller
 																	->with('contact', function($query) {
 																		return $query->with('contactCategories');
 																	})->first(),
-			'terbilang' => Terbilang::make($ledger['debit'] > 0 ? $ledger['debit'] : $ledger['credit'])
+			'terbilang' => Terbilang::nominal($ledger['debit'] > 0 ? $ledger['debit'] : $ledger['credit'])
 		]);
 	}
 
@@ -454,7 +454,7 @@ class SavingLedgerController extends Controller
 		"\n-------------------------------------------------------" . 
 		"\n*No Ref Transaksi*: " . $ledger['no_ref'] . 
 		"\n*Tanggal*: " . $tempDate->isoFormat('D MMMM YYYY') . 
-		"\n*Total*: IDR. " . $value . " _(" . Terbilang::make($ledger['debit'] > 0 ? $ledger['debit'] : $ledger['credit']) . ' rupiah)_'.
+		"\n*Total*: IDR. " . $value . " _(" . Terbilang::nominal($ledger['debit'] > 0 ? $ledger['debit'] : $ledger['credit']) . ' rupiah)_'.
 		"\n\n\nTtd, \n\n\n" . $organization['name'];
 
 		$whatsappPlugin = WhatsappPlugin::where('organization_id', $organization['id'])->first();
