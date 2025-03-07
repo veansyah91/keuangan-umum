@@ -171,7 +171,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
-        Riskihajar\Terbilang\TerbilangServiceProvider::class,
+        // Riskihajar\Terbilang\TerbilangServiceProvider::class,
 
         /*
          * Helper Service Providers...
@@ -196,7 +196,7 @@ return [
         // 'Example' => App\Facades\Example::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
 
-        'Terbilang' => Riskihajar\Terbilang\Facades\Terbilang::class,
+        // 'Terbilang' => Riskihajar\Terbilang\Facades\Terbilang::class,
     ])->toArray(),
 
 ];

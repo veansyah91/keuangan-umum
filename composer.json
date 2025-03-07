@@ -8,14 +8,14 @@
         "php": "^8.1|^8.2|^8.3",
         "ext-gd": "*",
         "guzzlehttp/guzzle": "^7.9",
-        "inertiajs/inertia-laravel": "2.0",
-        "laravel/framework": "^11.0",
+        "hammunima/terbilang": "^1.7",
+        "inertiajs/inertia-laravel": "2.0.1",
+        "laravel/framework": "^12.0.1",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.8",
         "league/flysystem-aws-s3-v3": "^3.29",
         "maatwebsite/excel": "^3.1.48",
         "predis/predis": "^2.3",
-        "riskihajar/terbilang": "^2.0",
         "tightenco/ziggy": "^1.0"
     },
     "require-dev": {
@@ -26,7 +26,8 @@
         "laravel/sail": "^1.18",
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^8.1",
-        "phpunit/phpunit": "^10.1",
+        "pestphp/pest": "*",
+        "phpunit/phpunit": "^11.0.1",
         "spatie/laravel-ignition": "^2.0"
     },
     "autoload": {
