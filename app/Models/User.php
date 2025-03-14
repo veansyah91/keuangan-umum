@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use URL;
+use App\Jobs\SendEmailJob;
 use App\Models\Affiliation;
 use Laravel\Sanctum\HasApiTokens;
 use App\Jobs\QueuedVerifyEmailJob;
 use App\Jobs\QueuedPasswordResetJob;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Redis;
 use App\Notifications\VerifyEmailQueued;
 use Illuminate\Notifications\Notifiable;
@@ -15,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use App\Repositories\MailBroadcast\MailBroadcastRepository;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -47,28 +51,42 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array<string, string>
      */
 
-    //Overrideen sendEmailVerificationNotification implementation
-
-    // public function sendEmailVerificationNotification()
-    // {
-    //     //dispactches the job to the queue passing it this User object
-    //     QueuedVerifyEmailJob::dispatch($this)->onConnection('redis');
-    // }
-
     public function sendEmailVerificationNotification()
     {
-        $this->notify(new VerifyEmailQueued);
+        // $this->notify(new VerifyEmailQueued);
+        $verificationUrl = URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(60),
+            ['id' => $this->getKey(), 'hash' => sha1($this->getEmailForVerification())]
+        );
+        $data = [
+            'user' => $this,
+            'content' => [
+                'subject' => "Verifikasi Alamat Email Anda",
+                'main_message' => "Silakan klik tautan di bawah untuk verifikasi alamat email anda.",
+                'footer_message' => Lang::get('<p>Abaikan email ini jika anda tidak melakukan registrasi pada keuanganumum.com.'),
+                'action_url' => $verificationUrl,
+                'action_text' => 'Verifikasi Email',
+            ]            
+        ];
+        SendEmailJob::dispatch($data);
     }
 
-    // public function sendEmailResetPasswordNotification($token)
-    // {
-    //     $this->notify(new ResetPasswordQueued($token));
-    // }
-
     public function sendPasswordResetNotification($token)
-    {
-        //dispactches the job to the queue passing it this User object        
-        QueuedPasswordResetJob::dispatch($this, $token);
+    {        
+        $data = [
+            'user' => $this,
+            'content' => [
+                'subject' => "Notifikasi Reset Password",
+                'main_message' => "Anda menerima email ini karena keuanganumum.com menerima permintaan Reset Password pada akun anda.",
+                'footer_message' => Lang::get('<p>Link ini akan kadaluarsa dalam 60 menit.</p>
+                <p>Abaikan email ini jika anda tidak melakukan permintaan Reset Password.</p>', ['count' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire')]),
+                'action_url' => env('APP_URL') . "/reset-password/" . $token . "?email=" . $this->email,
+                'action_text' => 'Reset Password',
+            ]            
+        ];
+
+        SendEmailJob::dispatch($data);
     }
 
     protected $casts = [

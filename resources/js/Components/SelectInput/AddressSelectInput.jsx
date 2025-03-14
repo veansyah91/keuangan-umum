@@ -17,7 +17,7 @@ export default function AddressSelectInput({
                 <div className='relative w-full cursor-default overflow-hidden rounded-lg bg-white text-left border-gray-300 border focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-300 sm:text-sm '>
                     <Combobox.Input
                         className='w-full border-none py-3 pl-3 pr-10 leading-5 text-gray-800 focus:ring-0'
-                        displayValue={(selected) => selected.name}
+                        displayValue={(selected) => selected?.name}
                         onChange={(event) => setQuery(event.target.value)}
                         placeholder={placeholder}
                         type='search'

@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Inertia\Inertia;
 use Inertia\Response;
 use App\Helpers\NewRef;
+use App\Jobs\SendEmailJob;
 use App\Models\Affiliation;
 use App\Models\Organization;
 use Illuminate\Http\Request;
@@ -121,6 +122,38 @@ class OrganizationInvoiceController extends Controller
         
         // send notification via email
         $user->notify(new OrganizationInvoiceNotification($organization, $organizationInvoice, $user['name']));
+        // $data = [
+        //     'user' => $user,
+        //     'content' => [
+        //         'subject' => "Pembuatan Organisasi/Bisnis Baru",
+        //         'main_message' => "<table>
+        //             <tbody>
+        //                 <tr>
+        //                     <td>Nama Organisasi</td>
+        //                     <td>:</td>
+        //                     <td>" . $organization->name . "</td>                            
+        //                 </tr>
+        //                 <tr>
+        //                     <td>Tipe</td>
+        //                     <td>:</td>
+        //                     <td>" . ($organization->type ?? 'basic') . "</td>                            
+        //                 </tr>
+        //                 <tr>
+        //                     <td>Status</td>
+        //                     <td>:</td>
+        //                     <td>" . "trial" . "</td>                            
+        //                 </tr>
+        //                 <tr>
+        //                     <td>Kadaluarsa</td>
+        //                     <td>:</td>
+        //                     <td>" . $tempDate->isoFormat('D MMMM YYYY') . "</td>                            
+        //                 </tr>
+        //             </tbody>
+        //         </table>",
+        //     ]            
+        // ];
+
+        // SendEmailJob::dispatch($data);
         return redirect(route('organization.invoice.show', [$organization['id'], $organizationInvoice['id']]))->with('success', 'Pesanan Perpanjangan Layanan Berhasil Dibuat!');
         // });
         

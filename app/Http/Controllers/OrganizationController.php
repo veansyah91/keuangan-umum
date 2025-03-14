@@ -10,6 +10,7 @@ use Inertia\Response;
 use App\Models\Account;
 use App\Models\Contact;
 use App\Models\Village;
+use App\Jobs\SendEmailJob;
 use App\Models\Affiliation;
 use Illuminate\Support\Str;
 use App\Models\AccountStaff;
@@ -619,7 +620,42 @@ class OrganizationController extends Controller
             // 
 
             // send notification via email
-            $user->notify(new OrganizationCreated($organization));
+            // $user->notify(new OrganizationCreated($organization));
+
+            $tempDate = new Carbon($organization->expired);
+            $data = [
+                'user' => $user,
+                'content' => [
+                    'subject' => "Pembuatan Organisasi/Bisnis Baru",
+                    'main_message' => "<table>
+                        <tbody>
+                            <tr>
+                                <td>Nama Organisasi</td>
+                                <td>:</td>
+                                <td>" . $organization->name . "</td>                            
+                            </tr>
+                            <tr>
+                                <td>Tipe</td>
+                                <td>:</td>
+                                <td>" . ($organization->type ?? 'basic') . "</td>                            
+                            </tr>
+                            <tr>
+                                <td>Status</td>
+                                <td>:</td>
+                                <td>" . "trial" . "</td>                            
+                            </tr>
+                            <tr>
+                                <td>Kadaluarsa</td>
+                                <td>:</td>
+                                <td>" . $tempDate->isoFormat('D MMMM YYYY') . "</td>                            
+                            </tr>
+                        </tbody>
+                    </table>",
+                ]            
+            ];
+
+            SendEmailJob::dispatch($data);
+
         });
 
 
