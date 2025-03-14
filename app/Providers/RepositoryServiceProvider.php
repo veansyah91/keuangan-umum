@@ -9,12 +9,14 @@ use App\Repositories\Program\ProgramRepository;
 use App\Repositories\Project\ProjectRepository;
 use App\Repositories\WhatsApp\WhatsAppRepository;
 use App\Repositories\Department\DepartmentRepository;
+use App\Repositories\Program\MailBroadcastRepository;
 use App\Repositories\Account\AccountRepositoryInterface;
 use App\Repositories\Journal\JournalRepositoryInterface;
 use App\Repositories\Program\ProgramRepositoryInterface;
 use App\Repositories\Project\ProjectRepositoryInterface;
 use App\Repositories\WhatsApp\WhatsAppRepositoryInterface;
 use App\Repositories\Department\DepartmentRepositoryInterface;
+use App\Repositories\Program\MailBroadcastRepositoryInterface;
 use App\Repositories\AccountCategory\AccountCategoryRepository;
 use App\Repositories\ContactCategory\ContactCategoryRepository;
 use App\Repositories\AccountCategory\AccountCategoryRepositoryInterface;
@@ -70,6 +72,9 @@ class RepositoryServiceProvider extends ServiceProvider
         );
         $this->app->bind(
             WhatsAppRepositoryInterface::class, WhatsAppRepository::class
+        );
+        $this->app->bind(
+            MailBroadcastRepositoryInterface::class, MailBroadcastRepository::class
         );
     }
 }
