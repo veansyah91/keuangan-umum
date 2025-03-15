@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\OrganizationInvoice;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
+use App\Repositories\Duitku\DuitkuRepository;
 use App\Notifications\OrganizationInvoiceNotification;
 
 class OrganizationInvoiceController extends Controller
@@ -111,7 +112,7 @@ class OrganizationInvoiceController extends Controller
 
         $user = Auth::user();
 
-        // DB::transaction(function() use ($user, $validated, $organization){
+        DB::transaction(function() use ($user, $validated, $organization){
         $organizationInvoice = OrganizationInvoice::create($validated);
 
         if ($validated['affiliation_id']) {
@@ -119,6 +120,29 @@ class OrganizationInvoiceController extends Controller
                 'affiliation_id' => $validated['affiliation_id']
             ]);
         }
+
+        // payment gateway
+        $data = [
+            'merchantCode' => config('duitku.merchantCode'),
+            'merchantKey' => config('duitku.merchantKey'),
+            'merchantUrlDev' => config('duitku.merchantUrlDev'),
+            'merchantUrlProd' => config('duitku.merchantUrlProd'),
+            'user' => $user,
+            'paymentAmount' => $validated['price'],
+            'merchantOrderId' => $validated['no_ref'],
+            'productDetails' => 'Perpanjangan Layanan Keuangan Umum',
+            'returnUrl' => route('organization.invoice.show', [$organization['id'], $organizationInvoice['id']]),
+            'product_details' => [
+                [
+                    'name' => strtoupper($validated['product']),
+                    'price' => $validated['price'],
+                    'quantity' => 1
+                ]
+            ]
+        ];
+
+        $duitku = new DuitkuRepository;
+        $duitku->createInvoice($data);
         
         // send notification via email
         $user->notify(new OrganizationInvoiceNotification($organization, $organizationInvoice, $user['name']));
@@ -155,7 +179,7 @@ class OrganizationInvoiceController extends Controller
 
         // SendEmailJob::dispatch($data);
         return redirect(route('organization.invoice.show', [$organization['id'], $organizationInvoice['id']]))->with('success', 'Pesanan Perpanjangan Layanan Berhasil Dibuat!');
-        // });
+        });
         
     }
 
@@ -175,5 +199,14 @@ class OrganizationInvoiceController extends Controller
                 'provider' => env('BANK'),
             ],
         ]);
+    }
+
+    public function responsePayment(Request $request)
+    {
+        return response()->json([
+            'success' => true,
+            'message' => 'Data retrieved successfully',
+            'data' => 'user'
+        ], 200);
     }
 }

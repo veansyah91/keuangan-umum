@@ -2,7 +2,7 @@
 
 namespace App\Repositories\Duitku;
 
-class DuitkuRepository implements LogRepositoryInterface
+class DuitkuRepository implements DuitkuRepositoryInterface
 {
   public function getPaymentMethod(){
     $urlDev = "https://sandbox.duitku.com/webapi/api/merchant/paymentmethod/getpaymentmethod";
@@ -59,32 +59,32 @@ class DuitkuRepository implements LogRepositoryInterface
   }
 
   public function createInvoice($data){
-    $merchantCode = config('duitku.merchantCode'); // dari duitku
-    $merchantKey = config('duitku.merchantKey'); // dari duitku
+    $merchantCode = $data['merchantCode']; // dari duitku
+    $merchantKey = $data['merchantKey']; // dari duitku
 
     $timestamp = round(microtime(true) * 1000); //in milisecond
-    $paymentAmount = 40000;
-    $merchantOrderId = time() . ''; // dari merchant, unique
-    $productDetails = 'Test Pay with duitku';
-    $email = 'test@test.com'; // email pelanggan merchant
-    $phoneNumber = '08123456789'; // nomor tlp pelanggan merchant (opsional)
+    $paymentAmount = $data['paymentAmount'];
+    $merchantOrderId = $data['merchantOrderId']; // dari merchant, unique
+    $productDetails = $data['productDetails'];
+    $email = $data['user']->email; // email pelanggan merchant
+    $phoneNumber = $data['user']->phone; // nomor tlp pelanggan merchant (opsional)
     $additionalParam = ''; // opsional
     $merchantUserInfo = ''; // opsional
-    $customerVaName = 'John Doe'; // menampilkan nama pelanggan pada tampilan konfirmasi bank
+    $customerVaName = $data['user']->name; // menampilkan nama pelanggan pada tampilan konfirmasi bank
     $callbackUrl = 'http://example.com/api-pop/backend/callback.php'; // url untuk callback
-    $returnUrl = 'http://example.com/api-pop/backend/redirect.php';//'http://example.com/return'; // url untuk redirect
-    $expiryPeriod = 10; // untuk menentukan waktu kedaluarsa dalam menit
+    $returnUrl = $data['returnUrl'];//'http://example.com/return'; // url untuk redirect
+    $expiryPeriod = 60; // untuk menentukan waktu kedaluarsa dalam menit
     $signature = hash('sha256', $merchantCode.$timestamp.$merchantKey);
     //$paymentMethod = 'VC'; //digunakan untuk direksional pembayaran
 
     // Detail pelanggan
-    $firstName = "John";
-    $lastName = "Doe";
+    $firstName = $data['user']->name;
+    $lastName = "";
 
     // Detail Alamat
-    $alamat = "Jl. Kembangan Raya";
-    $city = "Jakarta";
-    $postalCode = "11530";
+    $alamat = $data['user']->address;
+    $city = "";
+    $postalCode = "";
     $countryCode = "ID";
 
     $address = array(
@@ -117,9 +117,7 @@ class DuitkuRepository implements LogRepositoryInterface
         'price' => 30000,
         'quantity' => 3);
 
-    $itemDetails = array(
-        $item1, $item2
-    );
+    $itemDetails = $data['product_details'];
 
     /*Khusus untuk metode pembayaran Kartu Kredit
     $creditCardDetail = array (
@@ -147,6 +145,8 @@ class DuitkuRepository implements LogRepositoryInterface
         'expiryPeriod' => $expiryPeriod
         //'paymentMethod' => $paymentMethod
     );
+
+    dd($params);
 
     $params_string = json_encode($params);
     //echo $params_string;
